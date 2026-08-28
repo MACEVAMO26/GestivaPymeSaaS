@@ -1,0 +1,38 @@
+<div class="panel-contenido">
+  <div class="panel-header">
+    <h3 class="panel-title">Mis Notificaciones</h3>
+  </div>
+
+  <div class="panel-body" *ngIf="!cargando">
+    <div class="notificacion-item" [class.border-warning]="!n.leida" *ngFor="let n of notificaciones">
+      <span class="noti-icon" [ngClass]="n.leida ? 'bg-success' : 'bg-info'">
+        <i [class]="n.leida ? 'fas fa-check' : 'fas fa-bell'"></i>
+      </span>
+      <div class="noti-content">
+        <span class="noti-text">
+          <strong>{{ n.titulo }}</strong>
+          <span class="noti-nueva" *ngIf="!n.leida">Nueva</span>
+        </span>
+        <span class="noti-time">{{ n.descripcion || n.mensaje }}</span>
+      </div>
+      <button class="btn-xs" *ngIf="!n.leida" (click)="marcarLeida(n.id)">
+        Marcar como leída
+      </button>
+    </div>
+
+    <div class="notificacion-item" *ngIf="notificaciones.length === 0">
+      <span class="noti-icon bg-warning">
+        <i class="fas fa-inbox"></i>
+      </span>
+      <div class="noti-content">
+        <span class="noti-text">No tienes notificaciones.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="notificacion-item" *ngIf="cargando">
+    <div class="noti-content">
+      <span class="noti-text">Cargando...</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,333 @@
+@use './shared-styles/tema-cliente' as *;
+$shadow-dark: #d1d1bc;
+$shadow-light: #ffffff;
+$primary-color: #45a1ae;
+/* --- 2. LAYOUT PRINCIPAL --- */
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: $bg-base;
+  color: $text-main;
+  font-family: 'Montserrat', sans-serif;
+  overflow: hidden;
+}
+
+/* --- 3. HEADER NEUMÓRFICO --- */
+.global-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 15px; /* Más angosto verticalmente para aprovechar espacio */
+  background-color: #efefd3; /* Variante levemente más oscura por regla 18 */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Sombra suave para separar del cuerpo */
+  z-index: 10;
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+
+      .main-logo-img {
+        height: 28px; /* Reducido un poco para ajustar al nuevo header */
+      }
+
+      .badge-plan {
+        background-color: $bg-base;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        box-shadow: 3px 3px 6px $shadow-dark, -3px -3px 6px $shadow-light;
+      }
+    }
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+            /* Botón Accesibilidad - SOLO LOCAL (el global manda) */
+    .accessibility-btn {
+      /* Se deja vacío porque el estilo viene de styles.scss */
+    }
+
+    /* Botón de Notificación - Clon estricto del botón de Accesibilidad global */
+    .notification-btn {
+      background-color: #DBDB9B !important; 
+      border: none !important; 
+      width: 28px !important; 
+      height: 28px !important; 
+      min-width: 28px !important;
+      min-height: 28px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border-radius: 50% !important;
+      padding: 0 !important;
+      cursor: pointer !important;
+      transition: all 0.3s ease !important;
+      box-shadow: 2px 2px 5px #030303, -2px -2px 5px rgba(255,255,255,0.02) !important;
+      
+      svg {
+        width: 16px !important; 
+        height: 16px !important;
+        stroke: #000000 !important; 
+        stroke-width: 2 !important;
+        transition: all 0.3s ease;
+      }
+
+      &:hover {
+        background-color: #a16207 !important; 
+        box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5) !important;
+      }
+
+      &.has-notification {
+        svg {
+          stroke: #de3737 !important; /* Rojo */
+          transform: rotate(-15deg);
+        }
+      }
+    }
+
+    /* Perfil Neumórfico */
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 15px;
+      border-radius: 25px;
+      background-color: $bg-base;
+      box-shadow: 3px 3px 6px $shadow-dark, -3px -3px 6px $shadow-light;
+
+      .avatar, .avatar-img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        background-color: #efefd3;
+        box-shadow: inset 2px 2px 5px $shadow-dark, inset -2px -2px 5px $shadow-light;
+      }
+
+      .user-info {
+        display: flex;
+        flex-direction: column;
+
+        .user-name {
+          font-size: 11px;
+          font-weight: 600;
+        }
+
+        .user-role {
+          display: block;
+        }
+      }
+
+      .btn-logout {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        color: #de3737;
+        padding: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s;
+
+        &:hover {
+          background-color: #de3737;
+          color: white;
+          box-shadow: 2px 2px 5px $shadow-dark, -2px -2px 5px $shadow-light;
+        }
+      }
+    }
+  }
+}
+
+/* --- 4. CUERPO PRINCIPAL --- */
+.main-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* --- 5. SIDEBAR NEUMÓRFICO --- */
+.sidebar {
+  width: 175px; /* Súper angosto por petición del usuario */
+  background: $bg-base;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(0,0,0,0.02);
+  box-shadow: 4px 0 10px rgba(0,0,0,0.02); /* Sutil separación neumórfica */
+  position: relative; /* Para el botón flotante */
+
+  &.collapsed {
+    width: 55px; /* Súper angosto para modo compacto */
+
+    .nav-label {
+      display: none;
+    }
+    .toggle-btn svg {
+      transform: rotate(180deg);
+    }
+    .nav-menu {
+      padding: 0 8px;
+    }
+    .nav-item {
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      justify-content: center;
+    }
+  }
+
+  .toggle-btn {
+    position: absolute;
+    right: -24px; /* Empujado hacia afuera ajustado al nuevo tamaño */
+    top: 20px;
+    z-index: 100;
+    background: #dbdb9b; /* Mismo fondo que los botones del menú */
+    border: 1px solid #eca06e; /* Mismo borde que los botones del menú */
+    cursor: pointer;
+    color: #1a1a1a; /* Mismo color de texto/ícono que los botones del menú */
+    width: 24px; /* Tamaño más pequeño */
+    height: 24px;
+    padding: 0; /* Quitamos padding para controlar con width/height */
+    border-radius: 50%;
+    box-shadow: 2px 2px 5px #d1d1bc, -2px -2px 5px #ffffff; /* Misma sombra que los botones del menú */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+
+    svg {
+      width: 12px;
+      height: 12px;
+      stroke: #1a1a1a; /* Mismo color de ícono */
+      stroke-width: 3; /* Poner el símbolo < en negrita (más grueso) */
+    }
+
+    &:hover {
+      color: #45a1ae; /* Hover como los botones del menú */
+      box-shadow: inset 3px 3px 6px #d1d1bc, inset -3px -3px 6px #ffffff;
+      
+      svg {
+        stroke: #45a1ae; /* Hover del ícono */
+      }
+    }
+  }
+
+    .nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Separación aumentada para que no se vean apiñuscados */
+    padding: 0 6px; /* Reducido */
+    margin-top: 20px; /* Restaurado para que empiece arriba */
+    overflow-y: auto;
+    flex: 1;
+
+      /* Ocultar barra de scroll para estética limpia */
+      &::-webkit-scrollbar {
+        width: 0;
+        background: transparent;
+      }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        width: 100%; /* Estirar para no desperdiciar espacio a la derecha */
+        box-sizing: border-box;
+        background: #dbdb9b; /* Beige exacto solicitado */
+        border: 1px solid #eca06e; /* Borde exacto solicitado */
+        gap: 8px; /* Menos gap */
+        padding: 4px 10px; /* Más angosto verticalmente, mismo ancho */
+        border-radius: 50px; /* Forma de píldora */
+        text-decoration: none;
+        color: #1a1a1a;
+        font-size: 8.5px; /* Letra minimizada a petición del usuario */
+      font-weight: 600;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      box-shadow: 2px 2px 5px $shadow-dark, -2px -2px 5px $shadow-light; /* Estado inactivo: Elevado */
+
+      .nav-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 14px;
+        
+        ::ng-deep svg {
+          width: 14px;
+          height: 14px;
+        }
+        ::ng-deep i {
+          font-size: 14px;
+        }
+      }
+
+      &:hover {
+        color: $primary-color;
+      }
+
+      &.active {
+        box-shadow: inset 3px 3px 6px $shadow-dark, inset -3px -3px 6px $shadow-light; /* Estado activo: Hundido */
+        color: $primary-color;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+/* --- 6. ÁREA DE CONTENIDO (ROUTER OUTLET) --- */
+.content-area {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background-color: $bg-base;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- 7. FOOTER --- */
+.app-footer {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  .footer-logo {
+    height: 1.5rem; /* Más pequeño y discreto */
+    opacity: 0.5; /* Gris casi invisible por defecto */
+    filter: grayscale(100%);
+    transition: all 0.5s ease;
+    cursor: default;
+
+    &:hover {
+      opacity: 0.9;
+      filter: grayscale(0%);
+      transform: scale(1.05);
+    }
+  }
+
+  .footer-text {
+    font-size: 10px;
+    color: #888;
+    margin: 0;
+  }
+}

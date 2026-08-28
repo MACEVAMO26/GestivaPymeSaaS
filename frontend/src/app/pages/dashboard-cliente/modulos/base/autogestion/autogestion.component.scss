@@ -1,0 +1,550 @@
+@use 'sass:color';
+
+/* --- 0. BACKGROUND PRINCIPAL DEL MÓDULO AUTOGESTIÓN --- */
+
+/* --- 1. VARIABLES GLOBALES DE COLOR --- */
+$bg-color: #f5f5dc;
+$bg-base: #f5f5dc;
+$shadow-light: #ffffff;
+$shadow-dark: #d1d1bc;
+$text-dark: #333333;
+$text-muted: #666666;
+$btn-add: #45a1ae;
+$btn-volver: #de3737;
+$btn-save: #066810;
+$btn-gen-1: #6B8F71;
+$btn-gen-2: #7C6FA6;
+$btn-gen-3: #C9A227;
+$btn-gen-4: #8E5B75;
+$btn-gen-5: #B5654A;
+$btn-gen-6: #A38B6D;
+$btn-cert: #6B8F71;
+$btn-contract: #7C6FA6;
+
+/* --- 2. LAYOUT PRINCIPAL --- */
+.module-container {
+  padding: 1.5rem;
+  background: $bg-color;
+  font-family: 'Montserrat', sans-serif;
+  color: $text-dark;
+}
+
+.autogestion-container {
+  padding: 1.5rem;
+  background-color: $bg-color;
+  color: $text-dark;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.autogestion-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- 3. TIPOGRAFÍA (Jerarquía estricta) --- */
+.module-header {
+  margin-bottom: 2rem;
+
+  h1 {
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
+    color: $text-dark;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    text-align: center;
+    color: $text-muted;
+    font-size: 12px;
+  }
+}
+
+.module-header h1, h1.titulo-principal, .header-section h1 {
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 0.35rem;
+  color: $text-dark;
+}
+
+.subtitulo, h2.subtitulo, h3.subtitulo {
+  font-size: 13px;
+  font-weight: normal;
+  text-transform: uppercase;
+  text-align: left;
+  color: $text-dark;
+  margin-bottom: 0.5rem;
+}
+
+.module-header p, .descripcion, .descripcion-general, .subtitle, .header-section p, .nota, .text-muted-small, .badge-small {
+  font-size: 10px;
+  font-weight: normal;
+  text-transform: uppercase;
+  text-align: center;
+  color: $text-muted;
+  margin-top: 0.2rem;
+  margin-bottom: 1.25rem;
+  letter-spacing: 0.3px;
+  line-height: 1.4;
+}
+
+.form-label, p, td, th, li, label, .text-general {
+  font-size: 12px;
+  font-weight: normal;
+}
+
+/* --- 4. TARJETAS Y PANELES NEUMÓRFICOS --- */
+.neumorphic-panel, .glass-panel {
+  background: $bg-color;
+  border-radius: 16px;
+  box-shadow: 8px 8px 16px $shadow-dark, -8px -8px 16px $shadow-light;
+  padding: 1.2rem;
+  border: none;
+  margin-bottom: 0;
+}
+
+.neumorphic-panel-inner {
+  background: $bg-color;
+  border-radius: 12px;
+  box-shadow: inset 4px 4px 8px $shadow-dark, inset -4px -4px 8px $shadow-light;
+  padding: 1.5rem;
+  border: none;
+}
+
+.neu-dark-panel {
+  background-color: $bg-color;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 6px 6px 12px $shadow-dark, -6px -6px 12px $shadow-light;
+  margin-bottom: 1.5rem;
+
+  h3 {
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: left;
+    margin-bottom: 1rem;
+    color: $text-dark;
+  }
+
+  p {
+    font-size: 12px;
+    color: $text-muted;
+    margin-bottom: 1rem;
+  }
+}
+
+.panel-title, h3.panel-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+  color: $text-dark;
+  margin: 0 0 0.5rem 0;
+}
+
+/* --- 5. FORMULARIOS E INPUTS --- */
+.input-neumorphic, .neu-input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: none;
+  border-radius: 10px;
+  background: $bg-color;
+  box-shadow: inset 6px 6px 10px $shadow-dark, inset -6px -6px 10px $shadow-light;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  color: $text-dark;
+  outline: none;
+  transition: all 0.2s ease;
+
+  &:focus {
+    box-shadow: inset 8px 8px 12px $shadow-dark, inset -8px -8px 12px $shadow-light;
+  }
+}
+
+.grid-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+
+  label {
+    font-size: 12px;
+    text-transform: uppercase;
+    margin-bottom: 1.25rem;
+    color: $text-muted;
+  }
+
+  input, select, textarea {
+    background-color: $bg-color;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    color: $text-dark;
+    box-shadow: inset 4px 4px 8px $shadow-dark, inset -4px -4px 8px $shadow-light;
+    outline: none;
+    transition: all 0.3s ease;
+
+    &:focus {
+      box-shadow: inset 6px 6px 12px $shadow-dark, inset -6px -6px 12px $shadow-light;
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  }
+
+  .estado-aprobado { color: #066810; font-weight: bold; }
+  .estado-pendiente { color: #b5654a; }
+}
+
+.form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* --- 6. BOTONES TIPO PÍLDORA NEUMÓRFICA --- */
+.btn-neumorphic {
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 4px 4px 8px $shadow-dark, -1px -1px 2px rgba(255, 255, 255, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  &:active {
+    box-shadow: inset 4px 4px 8px rgba(0,0,0,0.1), inset -4px -4px 8px rgba(255,255,255,0.5);
+  }
+}
+
+.btn-add { @extend .btn-neumorphic; background-color: $btn-add; border: 2px solid color.adjust($btn-add, $lightness: -10%); color: #000000; }
+.btn-volver { @extend .btn-neumorphic; background-color: $btn-volver; border: 2px solid color.adjust($btn-volver, $lightness: -10%); color: #ffffff; }
+.btn-save { @extend .btn-neumorphic; background-color: $btn-save; border: 2px solid color.adjust($btn-save, $lightness: -10%); color: #ffffff; box-shadow: none; }
+.btn-pill { border-radius: 9999px; }
+
+.btn-general-1 { @extend .btn-neumorphic; background-color: $btn-gen-1; border: 2px solid color.adjust($btn-gen-1, $lightness: -10%); color: #ffffff; }
+.btn-general-2 { @extend .btn-neumorphic; background-color: $btn-gen-2; border: 2px solid color.adjust($btn-gen-2, $lightness: -10%); color: #ffffff; }
+.btn-general-3 { @extend .btn-neumorphic; background-color: $btn-gen-3; border: 2px solid color.adjust($btn-gen-3, $lightness: -10%); color: #ffffff; }
+.btn-general-4 { @extend .btn-neumorphic; background-color: $btn-gen-4; border: 2px solid color.adjust($btn-gen-4, $lightness: -10%); color: #ffffff; }
+.btn-general-5 { @extend .btn-neumorphic; background-color: $btn-gen-5; border: 2px solid color.adjust($btn-gen-5, $lightness: -10%); color: #ffffff; }
+.btn-general-6 { @extend .btn-neumorphic; background-color: $btn-gen-6; border: 2px solid color.adjust($btn-gen-6, $lightness: -10%); color: #ffffff; }
+
+.btn-cert {
+  background-color: $btn-cert;
+  box-shadow: 4px 4px 8px $shadow-dark, -4px -4px 8px $shadow-light;
+  border-color: color.adjust($btn-cert, $lightness: 15%);
+}
+
+.btn-contract {
+  background-color: $btn-contract;
+  box-shadow: 4px 4px 8px $shadow-dark, -4px -4px 8px $shadow-light;
+  border-color: color.adjust($btn-contract, $lightness: 15%);
+}
+
+/* --- 7. TABS DE NAVEGACIÓN --- */
+.tabs-nav-wrapper {
+  background: $bg-color;
+  border-radius: 9999px;
+  box-shadow: inset 4px 4px 8px $shadow-dark, inset -4px -4px 8px $shadow-light;
+  padding: 0.5rem;
+  margin: 0 auto 1.5rem auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  width: fit-content;
+}
+
+.tab-neu-inactive {
+  padding: 0.6rem 1rem;
+  border-radius: 9999px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  background-color: $bg-color;
+  color: $text-muted;
+  box-shadow: 4px 4px 8px $shadow-dark, -4px -4px 8px $shadow-light;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  text-decoration: none;
+}
+
+.tab-neu-active {
+  padding: 0.6rem 1rem;
+  border-radius: 9999px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  background-color: $bg-color;
+  color: $btn-add;
+  box-shadow: inset 4px 4px 8px $shadow-dark, inset -4px -4px 8px $shadow-light;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  text-decoration: none;
+}
+
+.tabs-nav-wrapper a, .tabs-nav-wrapper button, .tabs-nav-wrapper span {
+  font-weight: bold;
+}
+
+/* --- 8. PERFIL Y AVATAR --- */
+.profile-card { text-align: center; }
+
+.profile-header h3 {
+  font-size: 13px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-top: 0.5rem;
+  color: $text-dark;
+}
+
+.avatar-wrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 4px 4px 10px $shadow-dark, -4px -4px 10px $shadow-light;
+  background-color: $bg-color;
+  overflow: hidden;
+
+  .profile-avatar { width: 100%; height: 100%; object-fit: cover; }
+
+  .profile-avatar-placeholder {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: bold; color: $btn-cert;
+  }
+
+  .edit-overlay {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.3s ease;
+
+    svg { width: 24px; height: 24px; color: white; }
+  }
+
+  &:hover .edit-overlay { opacity: 1; }
+}
+
+.badge-role {
+  display: inline-block;
+  background-color: $bg-color;
+  padding: 0.25rem 1rem;
+  border-radius: 20px;
+  font-size: 12px; font-weight: bold; text-transform: uppercase;
+  color: $btn-cert;
+  box-shadow: inset 2px 2px 5px $shadow-dark, inset -2px -2px 5px $shadow-light;
+  margin-top: 0.5rem;
+}
+
+.profile-details {
+  margin-top: 1.5rem;
+  text-align: left;
+
+  .detail-item {
+    display: flex; align-items: center; gap: 0.5rem;
+    margin-bottom: 0.75rem; font-size: 12px; color: $text-dark;
+
+    svg { width: 16px; height: 16px; color: $btn-cert; }
+  }
+}
+
+/* --- 9. DOCUMENTOS --- */
+.docs-list { display: flex; flex-direction: column; gap: 1rem; }
+
+.doc-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem; background-color: $bg-color; border-radius: 12px;
+  box-shadow: 4px 4px 8px $shadow-dark, -4px -4px 8px $shadow-light;
+
+  .doc-info { display: flex; align-items: center; gap: 1rem; }
+  .doc-title { font-size: 12px; font-weight: bold; text-transform: uppercase; color: $text-dark; display: block; }
+  .doc-date { font-size: 12px; color: $text-muted; }
+  i {
+    font-size: 10px;
+    &.doc-icon-pdf { color: #de3737; }
+    &.doc-icon-ppt { color: #f39c12; }
+  }
+}
+
+/* --- 10. BADGES Y ESTADOS --- */
+.status-badge {
+  padding: 0.25rem 0.75rem; border-radius: 20px;
+  font-size: 12px; font-weight: bold; text-transform: uppercase;
+  box-shadow: inset 2px 2px 5px $shadow-dark, inset -2px -2px 5px $shadow-light;
+
+  &.approved { color: $btn-save; }
+  &.pending { color: #b5654a; }
+  &.rejected { color: #de3737; }
+  &.new { color: $text-muted; }
+}
+
+.card-header {
+  display: flex; justify-content: space-between;
+  align-items: center; margin-bottom: 0.75rem;
+}
+
+/* --- 11. ALERTAS --- */
+.alert-box {
+  padding: 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 10px;
+
+  &.error {
+    background-color: rgba(#de3737, 0.1);
+    border: 1px solid rgba(#de3737, 0.3);
+    color: #de3737;
+  }
+
+  &.warning {
+    background-color: rgba(#C9A227, 0.12);
+    border: 1px solid rgba(#C9A227, 0.35);
+    color: #8a6d12;
+  }
+}
+
+/* --- 12. INPUTS VARIOS --- */
+.file-input {
+  width: 100%; padding: 0.7rem;
+  background: $bg-color; border: none; border-radius: 8px;
+  box-shadow: inset 3px 3px 6px $shadow-dark, inset -3px -3px 6px $shadow-light;
+  font-family: 'Montserrat', sans-serif; font-size: 12px; color: $text-dark;
+}
+
+.hint-text { font-size: 10px; color: $text-muted; }
+.hint-text-small { font-size: 10px; color: $text-muted; font-weight: normal; text-transform: none; font-style: italic; }
+.hint-text-danger { font-size: 10px; color: $btn-volver; }
+
+.separator-line { border: none; height: 2px; background-color: $shadow-dark; margin: 1.5rem 0; }
+
+.section-title {
+  font-size: 13px; text-align: center; text-transform: uppercase;
+  font-weight: bold; color: $text-dark;
+}
+
+/* --- 13. CAMPO DE SOLO LECTURA (ARL/CAJA EMPRESA) EN AUTOGESTIÓN --- */
+.input-readonly-pill {
+  background: $bg-color;
+  box-shadow: inset 2px 2px 5px $shadow-dark, inset -2px -2px 5px $shadow-light;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 12px;
+  color: $text-dark;
+  font-family: 'Montserrat', sans-serif;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+}
+
+/* --- 14. VACACIONES --- */
+.times-stats {
+  display: flex; gap: 1rem;
+
+  .time-stat {
+    flex: 1; background-color: $bg-color; padding: 1rem;
+    border-radius: 12px; text-align: center;
+    box-shadow: inset 4px 4px 8px $shadow-dark, inset -4px -4px 8px $shadow-light;
+
+    h4 { font-size: 12px; font-weight: bold; color: $btn-contract; margin: 0; }
+    span { font-size: 12px; text-transform: uppercase; color: $text-muted; }
+  }
+}
+
+/* --- 15. SOLICITUDES --- */
+.solicitudes-list { display: flex; flex-direction: column; gap: 1rem; }
+
+.solicitud-card {
+  padding: 1rem; border-radius: 12px; background-color: $bg-color;
+  box-shadow: 4px 4px 8px $shadow-dark, -4px -4px 8px $shadow-light;
+
+  .solicitud-header {
+    display: flex; justify-content: space-between;
+    align-items: center; margin-bottom: 0.5rem;
+  }
+
+  .solicitud-fechas { font-size: 12px; font-weight: bold; color: $text-dark; }
+  .solicitud-tipo { font-size: 12px; color: $text-muted; margin-bottom: 0.5rem; }
+
+  .solicitud-badge {
+    padding: 0.25rem 0.75rem; border-radius: 20px;
+    font-size: 10px; font-weight: bold; text-transform: uppercase;
+
+    &.badge-aprobada { color: $btn-save; background: rgba($btn-save, 0.1); }
+    &.badge-pendiente { color: #b5654a; background: rgba(#b5654a, 0.1); }
+    &.badge-rechazada { color: #de3737; background: rgba(#de3737, 0.1); }
+  }
+
+  .solicitud-respuesta {
+    margin-top: 0.5rem; padding-top: 0.5rem;
+    border-top: 1px dashed $shadow-dark;
+    font-size: 12px; color: $text-dark;
+  }
+}
+
+/* --- 16. VARIOS --- */
+.volver-wrapper { margin-bottom: 1rem; }
+
+.quick-action-card h3 {
+  font-size: 13px; font-weight: bold; text-transform: uppercase; color: $text-dark;
+}
+
+.empty-docs-msg { font-size: 12px; color: $text-muted; text-align: center; padding: 1rem 0; }
+
+/* --- 17. ANIMACIONES --- */
+.fade-in { animation: fadeIn 0.4s ease-in-out; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+h4.section-title {
+  font-size: 13px; text-align: center; text-transform: uppercase;
+  font-weight: bold; color: $text-dark; margin: 1rem 0 0.5rem;
+}

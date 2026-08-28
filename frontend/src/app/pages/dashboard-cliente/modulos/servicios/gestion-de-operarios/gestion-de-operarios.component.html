@@ -1,0 +1,111 @@
+﻿<div [ngClass]="isEmbedded ? '' : 'module-container fade-in'">
+  @if(!isEmbedded) {
+  <div class="module-header text-center mb-4 relative">
+    <h1>Gestión de Operativos y Tickets</h1>
+    <p>Gestione los tickets de servicio, asigne Operativos y registre consumos de materiales.</p>
+  </div>
+  }
+
+  <div [ngClass]="isEmbedded ? '' : 'tab-content neumorphic-panel-inner p-4'">
+    @if(!isEmbedded) {
+    <div class="volver-wrapper">
+      <button class="btn-volver btn-pill" onclick="window.history.back()">
+        <i class="fas fa-arrow-left"></i> Volver
+      </button>
+    </div>
+    }
+
+    <div class="neumorphic-panel fade-in">
+      <h2 class="subtitulo">Crear Nuevo Ticket</h2>
+      <form (ngSubmit)="crearTicket()">
+        
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label class="form-label">Nombre del Cliente: *</label>
+            <input type="text" class="input-neumorphic" name="cliente" [(ngModel)]="nuevoTicket.cliente_nombre" required>
+          </div>
+
+          <div class="form-group full-width">
+            <label class="form-label">Servicio Requerido: *</label>
+            <input type="text" class="input-neumorphic" name="servicio" [(ngModel)]="nuevoTicket.servicio_requerido" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Fecha Solicitada:</label>
+            <input type="date" class="input-neumorphic" name="fecha_solicitada" [(ngModel)]="nuevoTicket.fecha_solicitada">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Hora Sugerida:</label>
+            <input type="time" class="input-neumorphic" name="hora_sugerida" [(ngModel)]="nuevoTicket.hora_sugerida">
+          </div>
+
+          <div class="form-group full-width">
+            <label class="form-label">Dirección del Servicio:</label>
+            <input type="text" class="input-neumorphic" name="direccion" [(ngModel)]="nuevoTicket.direccion">
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-add btn-pill" [disabled]="guardando">
+            @if (guardando) {
+              <span class="spinner-small"></span> Creando...
+            } @else {
+              + Crear Ticket
+            }
+          </button>
+        </div>
+      </form>
+
+      <div class="mt-4">
+        <h2 class="subtitulo">Tickets de Servicio Actuales</h2>
+        
+        @if (cargando) {
+          <div class="loading-overlay neumorphic-panel">
+            <div class="spinner"></div>
+            <p>Cargando tickets...</p>
+          </div>
+        }
+
+        @if (!cargando) {
+          <div class="table-container">
+            <table class="data-table neumorphic-table">
+              <thead>
+                <tr>
+                  <th>Consecutivo</th>
+                  <th>Cliente</th>
+                  <th>Servicio</th>
+                  <th>Fecha Sugerida</th>
+                  <th>Estado</th>
+                  <th>Técnico Asignado</th>
+                  <th style="text-align: center;">ACCIÓN</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let t of tickets">
+                  <td>{{ t.consecutivo }}</td>
+                  <td><strong>{{ t.cliente_nombre }}</strong></td>
+                  <td>{{ t.servicio_requerido }}</td>
+                  <td>{{ t.fecha_solicitada }} {{ t.hora_sugerida }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="getBadgeEstado(t.estado)">{{ t.estado }}</span>
+                  </td>
+                  <td>{{ t.tecnico_id || 'Sin Asignar' }}</td>
+                  <td style="text-align: center;">
+                    <app-solicitud-inactivacion [area]="'s_ope'" [entidad]="'tickets'" [entidadId]="t.id"
+                      [nombreEntidad]="'Ticket ' + (t.consecutivo || t.id)" label="Solicitar cancelación"></app-solicitud-inactivacion>
+                  </td>
+                </tr>
+                <tr *ngIf="tickets.length === 0">
+                  <td colspan="7" class="text-center">No hay tickets activos en este momento.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+

@@ -1,0 +1,585 @@
+@use 'sass:color';
+
+/* --- 1. VARIABLES GLOBALES DE COLOR --- */
+$bg-color: #f5f5dc;
+$shadow-light: #ffffff;
+$shadow-dark: #d1d1bc;
+$text-dark: #333333;
+$text-muted: #666666;
+$btn-add: #45a1ae;
+$btn-volver: #de3737;
+$btn-save: #066810;
+$btn-gen-1: #6B8F71;
+$btn-gen-2: #7C6FA6;
+$btn-gen-3: #C9A227;
+$btn-gen-4: #8E5B75;
+$btn-gen-5: #B5654A;
+$btn-gen-6: #A38B6D;
+
+/* --- 2. FONDOS Y LAYOUT PRINCIPAL --- */
+.module-container {
+  padding: 1.5rem;
+  background: $bg-color;
+  font-family: 'Montserrat', sans-serif;
+  color: $text-dark;
+}
+
+/* --- 3. TIPOGRAFIA (Jerarquia estricta) --- */
+/* Titulo principal: 16px, centrado, mayusculas, negrita */
+.module-header h1, h1.titulo-principal {
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+/* Subtitulo: 13px, izquierda, mayusculas, sin negrita */
+/* Subtitulo: 13px, izquierda, mayusculas, sin negrita */
+.subtitulo, h2.subtitulo, h3.subtitulo {
+  font-size: 13px;
+  font-weight: normal;
+  text-transform: uppercase;
+  text-align: left;
+  color: $text-muted;
+  margin-bottom: 0.5rem;
+}
+
+/* Descripciones y Notas: 10px */
+.module-header p, .descripcion, .descripcion-general, .subtitle, .header-section p, .nota, .text-muted-small, .badge-small, .noti-time, .reunion-detail {
+  font-size: 10px;
+  font-weight: normal;
+  text-transform: uppercase;
+  text-align: center;
+  color: $text-muted;
+  margin-bottom: 0.5rem;
+}
+
+/* Texto general: 12px */
+.form-label, p, td, th, li, label, .text-general {
+  font-size: 12px;
+  font-weight: normal;
+}
+
+/* Notas y descripciones: 10px */
+.nota, .descripcion, .text-muted-small, .badge-small, .noti-time, .reunion-detail {
+  font-size: 10px;
+  font-weight: normal;
+}
+
+/* --- 4. TARJETAS Y PANELES NEUMORFICOS --- */
+.neumorphic-panel, .glass-panel {
+  background: $bg-color;
+  border-radius: 16px;
+  box-shadow: 8px 8px 16px $shadow-dark, -8px -8px 16px $shadow-light;
+  padding: 1.2rem;
+  border: none;
+  margin-bottom: 0;
+}
+
+.neumorphic-panel-inner {
+  background: $bg-color;
+  border-radius: 12px;
+  box-shadow: inset 4px 4px 8px $shadow-dark, inset -4px -4px 8px $shadow-light;
+  padding: 1.5rem;
+  border: none;
+}
+
+/* --- 5. FORMULARIOS E INPUTS --- */
+.input-neumorphic, .neu-input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: none;
+  border-radius: 10px;
+  background: $bg-color;
+  box-shadow: inset 6px 6px 10px $shadow-dark, inset -6px -6px 10px $shadow-light;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  color: $text-dark;
+  outline: none;
+  transition: all 0.2s ease;
+
+  &:focus {
+    box-shadow: inset 8px 8px 12px $shadow-dark, inset -8px -8px 12px $shadow-light;
+  }
+}
+
+/* --- 6. BOTONES (DISENO PILDORA) --- */
+.btn-neumorphic {
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 4px 4px 8px $shadow-dark, -1px -1px 2px rgba(255, 255, 255, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  &:active {
+    box-shadow: inset 4px 4px 8px rgba(0,0,0,0.1), inset -4px -4px 8px rgba(255,255,255,0.5);
+  }
+}
+
+.btn-add { @extend .btn-neumorphic; background-color: $btn-add; border: 2px solid color.adjust($btn-add, $lightness: -10%); color: #000000; }
+.btn-volver { @extend .btn-neumorphic; background-color: $btn-volver; border: 2px solid color.adjust($btn-volver, $lightness: -10%); color: #ffffff; }
+.btn-save { @extend .btn-neumorphic; background-color: $btn-save; border: 2px solid color.adjust($btn-save, $lightness: -10%); color: #ffffff;  box-shadow: none; }
+.btn-pill { border-radius: 9999px; }
+
+.btn-general-1 { @extend .btn-neumorphic; background-color: $btn-gen-1; border: 2px solid color.adjust($btn-gen-1, $lightness: -10%); color: #ffffff; }
+.btn-general-2 { @extend .btn-neumorphic; background-color: $btn-gen-2; border: 2px solid color.adjust($btn-gen-2, $lightness: -10%); color: #ffffff; }
+.btn-general-3 { @extend .btn-neumorphic; background-color: $btn-gen-3; border: 2px solid color.adjust($btn-gen-3, $lightness: -10%); color: #ffffff; }
+.btn-general-4 { @extend .btn-neumorphic; background-color: $btn-gen-4; border: 2px solid color.adjust($btn-gen-4, $lightness: -10%); color: #ffffff; }
+.btn-general-5 { @extend .btn-neumorphic; background-color: $btn-gen-5; border: 2px solid color.adjust($btn-gen-5, $lightness: -10%); color: #ffffff; }
+.btn-general-6 { @extend .btn-neumorphic; background-color: $btn-gen-6; border: 2px solid color.adjust($btn-gen-6, $lightness: -10%); color: #ffffff; }
+
+/* Navegacion tipo Tabs */
+.tab-neu-inactive {
+  @extend .btn-neumorphic;
+  background-color: $bg-color;
+  color: $text-muted;
+  border: none;
+}
+
+.tab-neu-active {
+  @extend .btn-neumorphic;
+  background-color: $bg-color;
+  color: $btn-add;
+  box-shadow: inset 4px 4px 8px $shadow-dark, inset -4px -4px 8px $shadow-light;
+  border: none;
+}
+
+/* Titulos de panel interno (usados en cards y subpaneles) */
+.panel-title, h3.panel-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+  color: $text-dark;
+  margin: 0 0 0.5rem 0;
+}
+
+/* ========================================= */
+/* FIN BASE NEUMORFICA - INICIO DE LOCALES   */
+/* ========================================= */
+
+/* --- 1. VARIABLES GLOBALES DE COLOR --- */
+$bg-color: #f5f5dc;
+$shadow-light: #ffffff;
+$shadow-dark: #d1d1bc;
+
+$text-dark: #333333;
+$text-muted: #666666;
+
+$btn-add: #45a1ae;
+$btn-volver: #de3737;
+$btn-save: #066810;
+$btn-gen-1: #6B8F71;
+$btn-gen-2: #7C6FA6;
+$btn-gen-3: #C9A227;
+
+/* --- 2. FONDOS Y LAYOUT PRINCIPAL --- */
+.formalizacion-container {
+  padding: 1.5rem;
+  background: $bg-color;
+  font-family: 'Montserrat', sans-serif;
+  color: $text-dark;
+}
+
+/* Título: 16px, centrado, mayúsculas, negrita */
+.titulo-principal, .titulo {
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  color: $text-dark;
+}
+
+/* Subtítulo: 13px, izquierda, mayúsculas, sin negrita */
+.subtitulo {
+  font-size: 13px;
+  font-weight: normal;
+  text-transform: uppercase;
+  text-align: left;
+  margin-bottom: 1rem;
+  color: $text-dark;
+}
+
+.descripcion-general {
+  font-size: 10px;
+  text-align: center;
+  color: $text-muted;
+  margin-bottom: 1.5rem;
+}
+
+.text-center { text-align: center !important; }
+
+/* --- 4. PANELES NEUMORFICOS --- */
+.neumorphic-panel {
+  background: $bg-color;
+  border-radius: 16px;
+  box-shadow: 8px 8px 16px $shadow-dark, -8px -8px 16px $shadow-light;
+  padding: 2rem;
+  border: none;
+  margin-bottom: 2rem;
+}
+
+.neumorphic-panel-inner {
+  background: $bg-color;
+  border-radius: 12px;
+  box-shadow: inset 4px 4px 8px $shadow-dark, inset -4px -4px 8px $shadow-light;
+  padding: 1.5rem;
+  border: none;
+}
+
+/* --- 5. TABS DE NAVEGACION --- */
+.tabs-nav-wrapper {
+  background: $bg-color;
+  border-radius: 9999px;
+  box-shadow: inset 4px 4px 8px $shadow-dark, inset -4px -4px 8px $shadow-light;
+  padding: 0.5rem;
+  margin: 0 auto 2rem auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  width: fit-content;
+}
+
+.tab-neu-inactive, .tab-neu-active {
+  padding: 0.6rem 0.8rem;
+  border-radius: 9999px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: bold !important;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-neu-inactive {
+  background-color: $bg-color;
+  color: $text-muted;
+  box-shadow: 4px 4px 8px $shadow-dark, -4px -4px 8px $shadow-light;
+}
+
+.tab-neu-active {
+  background-color: $bg-color;
+  color: $btn-add;
+  box-shadow: inset 4px 4px 8px $shadow-dark, inset -4px -4px 8px $shadow-light;
+}
+
+/* --- 6. BOTONES --- */
+.btn-pill {
+  border-radius: 9999px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 4px 4px 8px $shadow-dark, -4px -4px 8px $shadow-light;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  outline: none;
+}
+
+.btn-pill:active {
+  box-shadow: inset 4px 4px 8px rgba(0,0,0,0.1), inset -4px -4px 8px rgba(255,255,255,0.5);
+}
+
+.btn-general-1 { background-color: $btn-gen-1; border: 2px solid #4a6850; color: #ffffff; padding: 0.5rem 1.5rem; font-size: 12px;
+  font-weight: normal; }
+.btn-general-2 { background-color: $btn-gen-2; border: 2px solid #574b7a; color: #ffffff; padding: 0.5rem 1.5rem; font-size: 12px;
+  font-weight: normal; }
+
+.btn-action {
+  width: 100px;
+  padding: 0.4rem 0 !important;
+  font-size: 12px;
+  display: inline-flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+}
+
+/* --- 7. TABLAS --- */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 12px;
+  margin-top: 1rem;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  text-align: left;
+  color: $text-dark;
+}
+
+.data-table th, .data-table td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.data-table th {
+  font-weight: bold !important;
+  text-transform: uppercase;
+  font-size: 12px;
+  border-bottom: 2px solid rgba(0,0,0,0.05);
+}
+
+.data-table tr {
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.data-table tr:hover {
+  background-color: rgba(0,0,0,0.02);
+}
+
+/* --- 8. BADGES --- */
+.badge {
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  background: $bg-color;
+  box-shadow: inset 2px 2px 4px $shadow-dark, inset -2px -2px 4px $shadow-light;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.badge-pendiente { color: $btn-gen-3; border: 1px solid rgba(201, 162, 39, 0.2); }
+
+/* --- 9. MODALES --- */
+.inline-form-container { width: 100%; display: block; }
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.modal-header h3 {
+  font-size: 13px;
+  text-align: left;
+  text-transform: uppercase;
+  font-weight: normal;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.btn-cerrar {
+  background: none;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+  color: $text-muted;
+}
+
+.modal-body {
+  padding: 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-footer {
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a4a4a;
+}
+
+.neu-input {
+  background: $bg-color;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  color: $text-dark;
+  box-shadow: inset 3px 3px 6px $shadow-dark, inset -3px -3px 6px $shadow-light;
+  outline: none;
+  width: 100%;
+}
+
+.neu-input:focus {
+  box-shadow: inset 4px 4px 8px #c2c2a9, inset -4px -4px 8px #ffffff;
+}
+
+/* --- 10. BANNER --- */
+.banner {
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.banner-aviso {
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a4a4a;
+}
+
+.neu-input {
+  background: $bg-color;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  color: $text-dark;
+  box-shadow: inset 3px 3px 6px $shadow-dark, inset -3px -3px 6px $shadow-light;
+  outline: none;
+  width: 100%;
+}
+
+.neu-input:focus {
+  box-shadow: inset 4px 4px 8px #c2c2a9, inset -4px -4px 8px #ffffff;
+}
+
+/* --- 10. BANNER --- */
+.banner {
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.banner-aviso {
+  background: rgba(201, 162, 39, 0.1);
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.banner-text {
+  margin: 0;
+  font-size: 12px;
+  color: $text-dark;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a4a4a;
+}
+
+.neu-input {
+  background: $bg-color;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  color: $text-dark;
+  box-shadow: inset 3px 3px 6px $shadow-dark, inset -3px -3px 6px $shadow-light;
+  outline: none;
+  width: 100%;
+}
+
+.neu-input:focus {
+  box-shadow: inset 4px 4px 8px #c2c2a9, inset -4px -4px 8px #ffffff;
+}
+
+/* --- 10. BANNER --- */
+.banner {
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.banner-aviso {
+  background: rgba(201, 162, 39, 0.1);
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.banner-text {
+  margin: 0;
+  font-size: 12px;
+  color: $text-dark;
+}
+
+.banner-aviso .banner-text {
+  color: $btn-gen-3;
+}
+
+/* --- BOTONES DE ACCIÓN EN TABLAS (DISEÑO PÍLDORA CON ÍCONO SEGÚN IMAGEN 3) --- */
+.btn-action-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 26px;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 3px 3px 6px $shadow-dark, -3px -3px 6px $shadow-light;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 13px;
+
+  i {
+    color: #ffffff;
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 4px 4px 8px $shadow-dark, -4px -4px 8px $shadow-light;
+  }
+
+  &:active {
+    box-shadow: inset 2px 2px 4px $shadow-dark, inset -2px -2px 4px $shadow-light;
+  }
+}
+
+.btn-action-edit {
+  background: #6B8F71;
+}
+
+.btn-action-delete {
+  background: #B5654A;
+}
+
+/* --- 11. ANIMACIONES --- */
+.fade-in { animation: fadeIn 0.3s ease-in-out; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

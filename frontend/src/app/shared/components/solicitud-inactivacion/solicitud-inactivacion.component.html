@@ -1,0 +1,107 @@
+<button type="button" class="btn-solicitar" (click)="abrir()">
+  <i class="fas fa-flag"></i> {{ label }}
+</button>
+
+@if (isOpen) {
+<div class="sol-overlay fade-in" (click.self)="cerrar()">
+  <div class="sol-modal">
+    <div class="sol-header">
+      <h3>Solicitud de inactivación</h3>
+      <button class="sol-cerrar" (click)="cerrar()">×</button>
+    </div>
+    <div class="sol-body">
+
+      <div class="sol-target">
+        <strong>Registro:</strong> {{ nombreEntidad }}
+      </div>
+
+      <!-- CREAR SOLICITUD (Operativo) -->
+      @if (esOperativo) {
+        <div class="sol-nueva">
+          <textarea class="sol-textarea" [(ngModel)]="motivo" rows="3" placeholder="Motivo de la solicitud (obligatorio)..."></textarea>
+          <button class="sol-btn-primario" (click)="crearSolicitud()" [disabled]="isSubmitting">
+            {{ isSubmitting ? 'Enviando...' : 'Enviar solicitud' }}
+          </button>
+        </div>
+      }
+
+      <!-- LISTA DE SOLICITUDES -->
+      <div class="sol-lista">
+        @if (cargando) {
+          <p class="sol-vacio">Cargando solicitudes...</p>
+        } @else if (solicitudes.length === 0) {
+          <p class="sol-vacio">No hay solicitudes para este registro.</p>
+        }
+
+        @for (s of solicitudes; track s.id) {
+          <div class="sol-item">
+            <div class="sol-item-top">
+              <div>
+                <strong>Solicitud #{{ s.id }}</strong>
+                <span class="badge" [ngClass]="claseEstado(s)">{{ etiquetaEstado(s) }}</span>
+              </div>
+              <button class="sol-link" (click)="abrirHilo(s)">
+                {{ solicitudAbierta?.id === s.id ? 'Ocultar hilo' : 'Ver hilo' }}
+              </button>
+            </div>
+
+            <p class="sol-motivo">
+              <strong>{{ nombreUsuario(s.solicitante) }}:</strong> {{ s.motivo || 'Sin motivo' }}
+            </p>
+            @if (s.nota_final) {
+              <p class="sol-nota"><strong>Nota final:</strong> {{ s.nota_final }}</p>
+            }
+
+            @if (solicitudAbierta?.id === s.id) {
+              <!-- HILO DE RÉPLICAS -->
+              <div class="sol-hilo">
+                @for (r of (s.respuestas || []); track r.id) {
+                  <div class="sol-msg">
+                    <span class="sol-msg-autor">{{ nombreUsuario(r.usuario) }}:</span>
+                    <span class="sol-msg-texto">{{ r.mensaje }}</span>
+                  </div>
+                }
+                @if ((s.respuestas || []).length === 0) {
+                  <p class="sol-vacio">Sin respuestas aún.</p>
+                }
+
+                @if ((s.estado === 'pendiente' || s.estado === 'en_replica') && esParticipante(s)) {
+                  <div class="sol-replica">
+                    <input class="sol-input" [(ngModel)]="mensajeReplica" placeholder="Escribe una respuesta..." />
+                    <button class="sol-btn-secundario" (click)="responder(s)" [disabled]="isSubmitting || !mensajeReplica.trim()">Responder</button>
+                  </div>
+                }
+
+                <!-- DECISIÓN DEL JEFE DE ÁREA / GERENTE -->
+                @if (esDecisorDe(s) && (s.estado === 'pendiente' || s.estado === 'en_replica')) {
+                  <div class="sol-decision">
+                    @if (!accionDecidir) {
+                      <div class="sol-decision-botones">
+                        <button class="sol-btn-aprobar" (click)="decidir(s, 'aprobar')">Aprobar y ejecutar</button>
+                        <button class="sol-btn-rechazar" (click)="decidir(s, 'rechazar')">Rechazar</button>
+                      </div>
+                    } @else {
+                      <input class="sol-input" [(ngModel)]="notaFinal"
+                             [placeholder]="accionDecidir === 'rechazar' ? 'Nota del rechazo (obligatoria)' : 'Nota (opcional)'" />
+                      <div class="sol-decision-botones">
+                        <button class="sol-btn-aprobar" (click)="confirmarDecision(s)" [disabled]="isSubmitting">Confirmar</button>
+                        <button class="sol-btn-secundario" (click)="accionDecidir = ''" [disabled]="isSubmitting">Cancelar</button>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      @if (esDecisor) {
+        <p class="sol-aviso">Como Jefe de Área/Gerente puedes aprobar y ejecutar o rechazar la solicitud. Toda acción queda registrada con trazabilidad.</p>
+      } @else {
+        <p class="sol-aviso">Tu solicitud queda en espera; el Jefe de Área la aprueba, ejecuta o rechaza, y puedes responder en el hilo.</p>
+      }
+    </div>
+  </div>
+</div>
+}

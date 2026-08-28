@@ -1,0 +1,355 @@
+<div class="module-container fade-in">
+
+  <div class="module-header text-center mb-4 relative">
+    <h1 class="titulo-principal">CAJA REGISTRADORA Y AUDITORÍA DE PAGOS</h1>
+    <p class="descripcion-general">Control de caja diaria a $0, verificación de comprobantes por finanzas y resumen semanal.</p>
+  </div>
+
+  <!-- NAVEGACIÓN SUB-PESTAÑAS NEUMÓRFICAS (EVITA HACINAMIENTO) -->
+  <div class="tabs-nav-wrapper mb-4">
+    <button class="tab-neu-inactive" [class.tab-neu-active]="subTabActiva === 'operacion'" (click)="switchSubTab('operacion')">
+      <span class="icon">💵</span> Operación Diaria
+    </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="subTabActiva === 'auditoria'" (click)="switchSubTab('auditoria')">
+      <span class="icon">🔍</span> Auditoría de Pagos (Jefe de Finanzas)
+      @if (movimientosPendientes.length > 0) {
+        <span class="badge badge-warning ml-1">{{ movimientosPendientes.length }}</span>
+      }
+    </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="subTabActiva === 'semanal'" (click)="switchSubTab('semanal')">
+      <span class="icon">📊</span> Resumen Semanal
+    </button>
+  </div>
+
+  <div class="tab-content neumorphic-panel-inner p-4">
+    <div class="volver-wrapper">
+      <button class="btn-volver btn-pill" onclick="window.history.back()">
+        <i class="fas fa-arrow-left"></i> Volver
+      </button>
+    </div>
+
+    <!-- SUB-PESTAÑA 1: OPERACIÓN DIARIA -->
+    @if (subTabActiva === 'operacion') {
+      <div class="fade-in">
+        
+        <!-- SELECCIÓN O APERTURA DE CAJA -->
+        <div class="neumorphic-panel mb-4">
+          <div class="header-section flex-between">
+            <h2 class="subtitulo" style="margin: 0;">ESTADO DE CAJA: 
+              <strong [ngClass]="cajaActiva?.estado === 'abierta' ? 'text-ingreso' : 'text-egreso'">
+                {{ (cajaActiva?.estado || 'cerrada') | uppercase }}
+              </strong>
+            </h2>
+            <div class="text-muted text-xs">Apertura estándar a las {{ horaApertura }} (Base: $0)</div>
+          </div>
+
+          @if (cajaActiva?.estado === 'cerrada' || !cajaActiva) {
+            <div class="form-grid form-grid-end mt-3">
+              <div class="form-group">
+                <label class="form-label">Base inicial para abrir caja ($):</label>
+                <input type="number" class="input-neumorphic" [(ngModel)]="montoApertura" min="0">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Hora de Apertura:</label>
+                <input type="text" class="input-neumorphic" [(ngModel)]="horaApertura">
+              </div>
+              <div class="form-group form-group-btn">
+                <button class="btn-save btn-pill" (click)="abrirCaja()" [disabled]="procesando">
+                  + Abrir Caja Diaria
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (cajaActiva?.estado === 'abierta') {
+          <!-- KPIS DE BALANCE DE CAJA Y FORMAS DE PAGO -->
+          <div class="resumen-grid mb-4">
+            <div class="kpi-card">
+              <div class="kpi-value" style="color: #066810;">$ {{ totalIngresosEfectivo | number:'1.0-0' }}</div>
+              <div class="kpi-label">Ingresos Efectivo (Caja)</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-value" style="color: #45a1ae;">$ {{ totalIngresosBanco | number:'1.0-0' }}</div>
+              <div class="kpi-label">Transferencia Bancaria</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-value" style="color: #C9A227;">$ {{ totalIngresosTarjeta | number:'1.0-0' }}</div>
+              <div class="kpi-label">Tarjeta Crédito / Débito</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-value" style="color: #8E5B75;">$ {{ totalIngresosCredito | number:'1.0-0' }}</div>
+              <div class="kpi-label">Crédito / Cuotas</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-value" style="color: #de3737;">$ {{ totalEgresos | number:'1.0-0' }}</div>
+              <div class="kpi-label">Egresos / Gastos</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-value" style="color: #7C6FA6;">$ {{ saldoNetoCaja | number:'1.0-0' }}</div>
+              <div class="kpi-label">Saldo Neto en Caja</div>
+            </div>
+          </div>
+
+          <!-- REGISTRO DE MOVIMIENTO CON MEDIO DE PAGO Y COMPROBANTE -->
+          <div class="neumorphic-panel mb-4">
+            <h2 class="subtitulo">Registrar Movimiento / Cobro</h2>
+            <form (ngSubmit)="registrarMovimiento()">
+              <div class="form-row-divider mb-3">
+                <div class="form-group">
+                  <label class="form-label">Tipo de Movimiento:</label>
+                  <select class="input-neumorphic" name="tipo" [(ngModel)]="nuevoMovimiento.tipo">
+                    <option value="ingreso">Ingreso (+)</option>
+                    <option value="egreso">Egreso (Gasto) (-)</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Medio de Pago:</label>
+                  <select class="input-neumorphic" name="medio_pago" [(ngModel)]="nuevoMovimiento.medio_pago">
+                    <option *ngFor="let m of mediosPago" [value]="m">{{ m }}</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Monto ($):</label>
+                  <input type="number" class="input-neumorphic" name="monto" [(ngModel)]="nuevoMovimiento.monto" min="1" required>
+                </div>
+              </div>
+              
+              <div class="form-row-divider">
+                <div class="form-group">
+                  <label class="form-label">Concepto / Razón del Pago:</label>
+                  <input type="text" class="input-neumorphic" name="concepto" [(ngModel)]="nuevoMovimiento.concepto" placeholder="Ej: Cobro factura Venta #102" required>
+                </div>
+              </div>
+
+              <!-- SECCIÓN CARGA DE COMPROBANTE (SI NO ES EFECTIVO) -->
+              @if (nuevoMovimiento.medio_pago !== 'Efectivo') {
+                <div class="mt-3 p-3 neumorphic-panel-inner bg-cream">
+                  <label class="form-label text-azul">
+                    <i class="fas fa-paperclip"></i> Adjuntar Comprobante de Pago (Digital / Banco):
+                  </label>
+                  <div class="flex items-center gap-3 mt-2">
+                    <label class="btn-general-2 cursor-pointer btn-pill">
+                      <i class="fas fa-cloud-upload-alt"></i> {{ subiendoComprobante ? 'Subiendo a Cloudinary...' : 'Seleccionar Comprobante' }}
+                      <input type="file" accept="image/*,.pdf" class="hidden" [disabled]="subiendoComprobante" (change)="onArchivoSeleccionado($event)">
+                    </label>
+
+                    @if (nuevoMovimiento.comprobante_url) {
+                      <span class="badge badge-success">
+                        <i class="fas fa-check"></i> Comprobante Cargado
+                      </span>
+                    }
+                  </div>
+                  <small class="descripcion-general text-left mt-1" style="display: block;">* El pago entrará en estado PENDIENTE hasta ser auditado por el Jefe de Finanzas.</small>
+                </div>
+              }
+
+              <div class="form-actions mt-4 text-center">
+                <button type="submit" class="btn-save btn-pill" [disabled]="procesando">
+                  <i class="fas fa-save"></i> Registrar Movimiento
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- HISTORIAL DE MOVIMIENTOS DEL DÍA -->
+          <div class="neumorphic-panel mb-4">
+            <h2 class="subtitulo">Movimientos Registrados Hoy</h2>
+            <div class="table-responsive">
+              <table class="data-table premium-table">
+                <thead>
+                  <tr>
+                    <th>HORA</th>
+                    <th>TIPO</th>
+                    <th>MEDIO PAGO</th>
+                    <th>CONCEPTO</th>
+                    <th>MONTO</th>
+                    <th>ESTADO AUDITORÍA</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let m of movimientos">
+                    <td>{{ m.created_at | date:'short' }}</td>
+                    <td [ngClass]="m.tipo === 'egreso' ? 'text-egreso' : 'text-ingreso'">
+                      <strong>{{ m.tipo | uppercase }}</strong>
+                    </td>
+                    <td><span class="badge badge-primary">{{ m.medio_pago || 'Efectivo' }}</span></td>
+                    <td>{{ m.concepto }}</td>
+                    <td><strong>$ {{ m.monto | number:'1.0-0' }}</strong></td>
+                    <td>
+                      <span class="badge" [ngClass]="m.medio_pago === 'Efectivo' ? 'badge-success' : 'badge-warning'">
+                        {{ m.medio_pago === 'Efectivo' ? 'Aprobado (Efectivo)' : 'Pendiente Auditar' }}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="movimientos.length === 0">
+                    <td colspan="6" class="text-center">No hay movimientos en esta jornada.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- CIERRE DE CAJA DIARIO -->
+          <div class="neumorphic-panel">
+            <h2 class="subtitulo">Realizar Cierre de Caja (Arqueo Final)</h2>
+            <div class="form-grid form-grid-end">
+              <div class="form-group">
+                <label class="form-label">Efectivo final contado en caja ($):</label>
+                <input type="number" class="input-neumorphic" [(ngModel)]="montoCierre" min="0">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Hora de Cierre:</label>
+                <input type="text" class="input-neumorphic" [(ngModel)]="horaCierre">
+              </div>
+              <div class="form-group form-group-btn">
+                <button class="btn-volver btn-pill" (click)="cerrarCaja()" [disabled]="procesando">
+                  <i class="fas fa-lock"></i> Firmar y Cerrar Caja
+                </button>
+              </div>
+            </div>
+          </div>
+
+        }
+      </div>
+    }
+
+    <!-- SUB-PESTAÑA 2: AUDITORÍA DE PAGOS (JEFE DE FINANZAS) -->
+    @if (subTabActiva === 'auditoria') {
+      <div class="fade-in">
+        <div class="neumorphic-panel mb-4">
+          <h2 class="subtitulo">Panel de Auditoría de Comprobantes (Exclusivo Jefe de Finanzas)</h2>
+          <p class="descripcion-general" style="text-align: left; margin-bottom: 1.5rem;">
+            Verifique la veracidad de los comprobantes bancarios y digitales. Al rechazar una transacción, se cancela automáticamente el servicio o venta asociada.
+          </p>
+
+          <div class="table-responsive">
+            <table class="data-table premium-table">
+              <thead>
+                <tr>
+                  <th>FECHA / HORA</th>
+                  <th>CLIENTE</th>
+                  <th>CONCEPTO</th>
+                  <th>MEDIO PAGO</th>
+                  <th>MONTO</th>
+                  <th>COMPROBANTE</th>
+                  <th class="text-center">VERIFICACIÓN</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let m of movimientosPendientes">
+                  <td>{{ m.fecha_hora }}</td>
+                  <td><strong>{{ m.cliente }}</strong></td>
+                  <td>{{ m.concepto }}</td>
+                  <td><span class="badge badge-secondary">{{ m.medio_pago }}</span></td>
+                  <td><strong class="text-azul">$ {{ m.monto | number:'1.0-0' }}</strong></td>
+                  <td>
+                    <button class="btn-general-3 btn-pill btn-xs" (click)="verComprobante(m)">
+                      <i class="fas fa-eye"></i> Ver Soporte
+                    </button>
+                  </td>
+                  <td class="text-center">
+                    <div class="flex gap-2 justify-center">
+                      <button class="btn-save btn-pill btn-xs" (click)="aprobarTransaccion(m)">
+                        <i class="fas fa-check"></i> Aprobar
+                      </button>
+                      <button class="btn-volver btn-pill btn-xs" (click)="rechazarTransaccion(m)">
+                        <i class="fas fa-times"></i> Rechazar
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="movimientosPendientes.length === 0">
+                  <td colspan="7" class="text-center py-6">
+                    <i class="fas fa-check-circle text-emerald-500 fa-2x mb-2" style="display: block; opacity: 0.5;"></i>
+                    <span class="text-muted">No hay comprobantes pendientes de auditoría.</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- SUB-PESTAÑA 3: RESUMEN SEMANAL -->
+    @if (subTabActiva === 'semanal') {
+      <div class="fade-in">
+        <div class="neumorphic-panel mb-4">
+          <div class="flex-between">
+            <h2 class="subtitulo" style="margin: 0;">Resumen y Conteo de Cajas Semanal (Lunes a Domingo)</h2>
+            <div class="badge badge-primary font-bold text-sm">Gran Total Semanal: $ {{ granTotalSemanal | number:'1.0-0' }}</div>
+          </div>
+          <p class="descripcion-general" style="text-align: left; margin-top: 0.5rem; margin-bottom: 1.5rem;">
+            Desglose acumulado por jornada diaria de apertura a $0, efectivo recaudado vs. bancos y transacciones auditadas.
+          </p>
+
+          <div class="table-responsive">
+            <table class="data-table premium-table">
+              <thead>
+                <tr>
+                  <th>DÍA</th>
+                  <th>APERTURA (AM)</th>
+                  <th>CIERRE (PM)</th>
+                  <th>EFECTIVO CAJA</th>
+                  <th>CUENTA BANCO</th>
+                  <th>APROBADOS</th>
+                  <th>RECHAZADOS</th>
+                  <th>TOTAL JORNADA</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let r of resumenSemanal">
+                  <td><strong>{{ r.dia }}</strong></td>
+                  <td>{{ r.apertura }}</td>
+                  <td>{{ r.cierre }}</td>
+                  <td class="text-positivo">$ {{ r.efectivo | number:'1.0-0' }}</td>
+                  <td class="text-azul">$ {{ r.banco | number:'1.0-0' }}</td>
+                  <td><span class="badge badge-success">{{ r.aprobados }}</span></td>
+                  <td><span class="badge badge-danger">{{ r.rechazados }}</span></td>
+                  <td><strong style="font-size: 14px;">$ {{ r.total | number:'1.0-0' }}</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    }
+
+  </div>
+</div>
+
+<!-- VISOR MODAL COMPROBANTE DE AUDITORÍA -->
+@if (modalAuditoria && movimientoAuditoria) {
+  <div class="modal-backdrop fade-in" (click)="cerrarAuditoriaModal()">
+    <div class="modal-box neumorphic-panel" (click)="$event.stopPropagation()" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 style="margin: 0;">AUDITAR COMPROBANTE DE PAGO</h3>
+        <button class="btn-icon" (click)="cerrarAuditoriaModal()">&times;</button>
+      </div>
+      <div class="modal-body text-center">
+        <p class="descripcion-general mb-2">Transacción #{{ movimientoAuditoria.id }} - {{ movimientoAuditoria.cliente }}</p>
+        <div class="mb-3">
+          <strong class="text-azul" style="font-size: 16px;">$ {{ movimientoAuditoria.monto | number:'1.0-0' }}</strong>
+          <div class="text-muted text-xs">{{ movimientoAuditoria.medio_pago }} - {{ movimientoAuditoria.concepto }}</div>
+        </div>
+
+        <div class="comprobante-preview-box p-3 neumorphic-panel-inner mb-4">
+          <p class="text-xs font-semibold mb-2">Comprobante de Pago Subido:</p>
+          <img [src]="movimientoAuditoria.comprobante_url" alt="Sporte de Pago" style="max-width: 100%; max-height: 250px; border-radius: 8px; object-fit: contain;">
+        </div>
+
+        <div class="flex justify-center gap-3">
+          <button class="btn-save btn-pill" (click)="aprobarTransaccion(movimientoAuditoria)">
+            <i class="fas fa-check"></i> Aprobar Verídico
+          </button>
+          <button class="btn-volver btn-pill" (click)="rechazarTransaccion(movimientoAuditoria)">
+            <i class="fas fa-times"></i> Rechazar y Cancelar Venta
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

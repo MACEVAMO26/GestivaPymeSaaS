@@ -1,0 +1,171 @@
+<div class="module-container fade-in">
+    <!-- HTML ENCABEZADO -->
+    <div class="module-header text-center mb-4 relative">
+        <div class="header-title">
+            <h1>Gestión de Clientes</h1>
+            <p class="descripcion-general">Administra tus contactos y portafolio de clientes.</p>
+        </div>
+        <div class="header-actions">
+            @if(tabActiva === 'directorio') {
+                <button class="btn-add btn-pill" (click)="abrirModalNuevo()">
+                    + Nuevo Cliente
+                </button>
+            }
+        </div>
+    </div>
+
+    <!-- TABS NEUMORPHIC (ACTUALIZADAS) -->
+    <div class="tabs-nav-wrapper">
+        <button class="tab-neu-inactive" [class.tab-neu-active]="tabActiva === 'directorio'" (click)="tabActiva = 'directorio'"> <span class="icon">👥</span> Directorio de Clientes </button>
+        <button class="tab-neu-inactive" [class.tab-neu-active]="tabActiva === 'crm'" (click)="tabActiva = 'crm'"> <span class="icon">🤝</span> CRM / Vista 360º </button>
+    </div>
+
+    @if(tabActiva === 'directorio') {
+    <div class="tab-content neumorphic-panel-inner p-4">
+        <!-- BARRA DE BUSQUEDA Y FILTROS -->
+        <div class="search-filter-bar mb-4">
+            <div class="search-group">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="input-neumorphic" placeholder="Buscar cliente por nombre, email o documento..." [(ngModel)]="searchTerm" (ngModelChange)="filtrarClientes()">
+            </div>
+            <div class="filter-group">
+                <select class="input-neumorphic" [(ngModel)]="tipoFiltro" (ngModelChange)="filtrarClientes()">
+                    <option value="">Todos los tipos</option>
+                    <option value="Particular">Particular</option>
+                    <option value="Empresa">Empresa</option>
+                </select>
+            </div>
+        </div>
+
+        @if(cargando) {
+            <div class="loading-overlay neumorphic-panel">
+                <div class="spinner"></div>
+                <p>Cargando clientes...</p>
+            </div>
+        } @else {
+            <div class="table-container">
+                <table class="data-table neumorphic-table">
+                    <thead>
+                        <tr>
+                            <th>CLIENTE</th>
+                            <th>DOCUMENTO</th>
+                            <th>CONTACTO</th>
+                            <th>TIPO</th>
+                            <th class="col-accion">ACCIÓN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (cliente of clientes; track cliente.id) {
+                            <tr>
+                                <td><strong>{{ getNombreCliente(cliente) }}</strong></td>
+                                <td>{{ getDocumentoFormateado(cliente) }}</td>
+                                <td>
+                                    <div class="contact-stack">
+                                        <span class="contact-phone">{{ cliente.telefono || '--' }}</span>
+                                        <span class="contact-email">{{ cliente.email || '--' }}</span>
+                                    </div>
+                                </td>
+                                <td>{{ cliente.tipo_cliente || 'Natural' }}</td>
+                                <td class="col-accion">
+                                    <div class="actions-cell">
+                                        <button type="button" class="btn-action-360" (click)="ver360(cliente)">
+                                            <i class="fas fa-eye"></i> Ver 360°
+                                        </button>
+                                        <button type="button" class="btn-action-inactivar" (click)="solicitarInactivacion(cliente)">
+                                            <i class="fas fa-flag"></i> SOLICITAR INACTIVACIÓN
+                                        </button>
+                                        <button type="button" class="btn-action-icon-edit" title="Editar datos" (click)="abrirModalEditar(cliente)">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        @if (clientes.length === 0) {
+                            <tr>
+                                <td colspan="5" class="text-center py-8 text-gray-500">
+                                    No se encontraron clientes.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        </div>
+    } <!-- End if Directorio -->
+
+    <!-- HTML MODAL CREACION / EDICION -->
+    @if(showModal) {
+    <div class="inline-form-container mt-4" (click)="cerrarModal()">
+        <div class="neumorphic-panel neumorphic-panel" (click)="$event.stopPropagation()">
+            <div class="panel-header mb-4">
+                <h1>{{ isEditMode ? 'Editar Cliente' : 'Registrar Nuevo Cliente' }}</h1>
+                <button class="btn-icon" (click)="cerrarModal()">✕</button>
+            </div>
+            <div class="panel-body">
+                <form (ngSubmit)="guardarCliente()" #clienteForm="ngForm">
+                    <div class="form-row-divider">
+                        <div class="form-group">
+                            <label>Tipo de Cliente</label>
+                            <select class="input-neumorphic" [(ngModel)]="clienteActual.tipo_cliente" name="tipo_cliente">
+                                <option value="Natural">Persona Natural / Particular</option>
+                                <option value="Juridico">Empresa / Persona Jurídica</option>
+                            </select>
+                        </div>
+                        <div class="form-group" *ngIf="clienteActual.tipo_cliente === 'Juridico'">
+                            <label>Razón Social de la Empresa *</label>
+                            <input type="text" class="input-neumorphic" [(ngModel)]="clienteActual.nombre_razon_social" name="nombre_razon_social" placeholder="Ej: CorpTech Solutions S.A.S." required>
+                        </div>
+                        <div class="form-group" *ngIf="clienteActual.tipo_cliente !== 'Juridico'">
+                            <label>Nombres *</label>
+                            <input type="text" class="input-neumorphic" [(ngModel)]="clienteActual.nombres" name="nombres" placeholder="Ej: Carlos Andrés" required>
+                        </div>
+                    </div>
+                    <div class="form-row-divider">
+                        <div class="form-group" *ngIf="clienteActual.tipo_cliente !== 'Juridico'">
+                            <label>Apellidos</label>
+                            <input type="text" class="input-neumorphic" [(ngModel)]="clienteActual.apellidos" name="apellidos" placeholder="Ej: Ramírez Torres">
+                        </div>
+                        <div class="form-group">
+                            <label>{{ clienteActual.tipo_cliente === 'Juridico' ? 'NIT de la Empresa *' : 'Cédula / Documento *' }}</label>
+                            <input type="text" class="input-neumorphic" [(ngModel)]="clienteActual.documento" name="documento" [placeholder]="clienteActual.tipo_cliente === 'Juridico' ? 'Ej: NIT 901.811.863-5' : 'Ej: CC 1.020.192.551'" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email de Contacto</label>
+                            <input type="email" class="input-neumorphic" [(ngModel)]="clienteActual.email" name="email" placeholder="contacto@empresa.com">
+                        </div>
+                    </div>
+                    <div class="form-row-divider">
+                        <div class="form-group">
+                            <label>Teléfono</label>
+                            <input type="text" class="input-neumorphic" [(ngModel)]="clienteActual.telefono" name="telefono" placeholder="Ej: 6011234567 / 3101234567">
+                        </div>
+                        <div class="form-group">
+                            <label>Ciudad</label>
+                            <input type="text" class="input-neumorphic" [(ngModel)]="clienteActual.ciudad" name="ciudad" placeholder="Ej: Bogotá">
+                        </div>
+                        <div class="form-group">
+                            <label>Dirección</label>
+                            <input type="text" class="input-neumorphic" [(ngModel)]="clienteActual.direccion" name="direccion" placeholder="Ej: Calle 100 #19-30">
+                        </div>
+                    </div>
+                    <div class="modal-footer mt-4">
+                        <button type="button" class="btn-volver btn-pill" (click)="cerrarModal()">Cancelar</button>
+                        <button type="submit" class="btn-save btn-pill" [disabled]="!clienteForm.form.valid || isSaving">
+                            <span *ngIf="!isSaving">Guardar Cliente</span>
+                            <span *ngIf="isSaving">Guardando...</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    }
+
+    @if(tabActiva === 'crm') {
+        <div class="neumorphic-panel fade-in mt-4">
+            <app-crm-gestion-de-clientes [isEmbedded]="true" [clienteInicial]="clienteSeleccionado360"></app-crm-gestion-de-clientes>
+        </div>
+    }
+</div>

@@ -1,0 +1,66 @@
+﻿<!-- HTML MÓDULO CALENDARIO -->
+<div style="display: flex; flex-direction: column;">
+  <div class="module-header mb-3 text-center">
+    <h1 style="font-size: 16px; font-weight: bold; text-transform: uppercase; margin: 0;">Calendario Personal</h1>
+    <div class="month-selector" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 5px;">
+      <button class="btn-icon" (click)="mesAnterior()" title="Mes anterior" style="width: 24px; height: 24px;">◀</button>
+      <span style="font-size: 12px; font-weight: bold; text-transform: uppercase;">{{ nombreMes }}</span>
+      <button class="btn-icon" (click)="mesSiguiente()" title="Mes siguiente" style="width: 24px; height: 24px;">▶</button>
+    </div>
+  </div>
+
+  <div class="panel-body">
+    <!-- Grilla del calendario (Mini) -->
+    <div class="calendar-grid" style="gap: 4px;">
+      <!-- Días de la semana -->
+      @for (dia of diasSemana; track dia) {
+        <div class="weekday" style="font-size: 10px; font-weight: bold;">{{ dia }}</div>
+      }
+      
+      <!-- Días vacíos -->
+      @for (vacio of diasVacios; track $index) {
+        <div class="day-cell empty" style="min-height: 25px;"></div>
+      }
+      
+      <!-- Días interactivos -->
+      @for (dia of diasDelMes; track dia.dia) {
+        <div class="day-cell" style="min-height: 25px; font-size: 12px; cursor: pointer;"
+             [class.today]="dia.hoy" 
+             [class.has-event]="dia.evento"
+             [ngStyle]="{'background': diaSeleccionado?.dia === dia.dia ? '#dcebea' : ''}"
+             (click)="seleccionarDia(dia)">
+          {{ dia.dia }}
+        </div>
+      }
+    </div>
+
+    <!-- Agenda del Día Seleccionado -->
+    <div class="agenda-del-dia mt-4 pt-3" style="border-top: 1px solid #d1d1bc;">
+      <h2 style="font-size: 13px; text-transform: uppercase; margin-bottom: 10px; color: #333; text-align: left;">
+        AGENDA DEL {{ diaSeleccionado?.dia }} DE {{ nombreMes }}
+      </h2>
+      
+      @if (eventosDelDia.length === 0) {
+        <p style="font-size: 10px; color: #666; text-align: left; padding: 5px 0;">No tienes eventos programados para este día.</p>
+      } @else {
+        <div style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; padding-right: 5px;">
+          @for (evento of eventosDelDia; track evento.id) {
+            <div class="neumorphic-panel-inner" style="padding: 10px; border-radius: 8px;">
+              <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                <span style="width: 8px; height: 8px; border-radius: 50%; display: inline-block; background-color: {{evento.color_etiqueta || '#45a1ae'}};"></span>
+                <strong style="font-size: 12px; font-weight: normal;">{{evento.titulo}}</strong>
+              </div>
+              <div style="font-size: 10px; color: #666; padding-left: 14px;">
+                {{evento.fecha_inicio | date:'shortTime'}} 
+                @if(evento.descripcion) {
+                  - {{evento.descripcion}}
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+  </div>
+</div>

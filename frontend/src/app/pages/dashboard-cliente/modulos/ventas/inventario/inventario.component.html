@@ -1,0 +1,474 @@
+<div class="module-container fade-in">
+  <div [hidden]="(showModal) || (showModalCategoria)" class="main-view-wrapper">
+  <div class="module-header text-center mb-4 relative">
+    <h1 class="titulo-principal">INVENTARIO</h1>
+    <p class="descripcion-general">Control de existencias, catálogo de productos, entradas, salidas y kardex.</p>
+    
+    <div class="acciones-centro mt-3">
+      <button class="btn-save btn-pill" (click)="exportarExcel()">
+        <i class="fas fa-file-excel icon-mr-5"></i> Exportar a Excel
+      </button>
+    </div>
+  </div>
+
+  <!-- HTML PESTAÑAS (TABS) -->
+  <div class="tabs-nav-wrapper">
+    <button class="tab-neu-inactive" 
+            [class.tab-neu-active]="activeTab === 'catalogo'" 
+            (click)="switchTab('catalogo')"> <span class="icon">📋</span> Catálogo </button>
+    <button class="tab-neu-inactive" 
+            [class.tab-neu-active]="activeTab === 'movimientos'" 
+            (click)="switchTab('movimientos')"> <span class="icon">📌</span> Entradas / Salidas </button>
+    <button class="tab-neu-inactive" 
+            [class.tab-neu-active]="activeTab === 'ajustes'" 
+            (click)="switchTab('ajustes')"> <span class="icon">📌</span> Ajustes </button>
+    <button class="tab-neu-inactive" 
+            [class.tab-neu-active]="activeTab === 'kardex'" 
+            (click)="switchTab('kardex')"> <span class="icon">📌</span> Kardex </button>
+    <button class="tab-neu-inactive" 
+            [class.tab-neu-active]="activeTab === 'categorias'" 
+            (click)="switchTab('categorias')"> <span class="icon">📂</span> Categorías </button>
+  </div>
+
+  <!-- HTML CONTENIDO DE TABS -->
+  <div class="tab-content neumorphic-panel-inner p-4">
+  <!-- Botón Volver Inyectado -->
+  <div class="volver-wrapper">
+    <button class="btn-volver btn-pill" onclick="window.history.back()">
+      <i class="fas fa-arrow-left"></i> Volver
+    </button>
+  </div>
+    
+    <!-- HTML CATALOGO DE PRODUCTOS -->
+    @if(activeTab === 'catalogo') {
+      <div class="neumorphic-panel fade-in">
+        <div class="action-bar">
+          <input type="text" 
+                 class="search-input input-neumorphic" 
+                 placeholder="Buscar por código, nombre..."
+                 [(ngModel)]="searchTerm">
+                 
+          <button class="btn-add btn-pill" (click)="abrirModal()">
+            <i class="fas fa-plus"></i> Nuevo Producto
+          </button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="premium-table data-table">
+            <thead>
+              <tr>
+                <th>CÓDIGO</th>
+                <th>NOMBRE</th>
+                <th>CATEGORÍA</th>
+                <th>PRECIO</th>
+                <th>COSTO</th>
+                <th>STOCK</th>
+                <th>ESTADO</th>
+                <th>ACCIONES</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(prod of productosFiltrados; track prod.id) {
+                <tr>
+                  <td><strong>{{codigoProducto(prod)}}</strong></td>
+                  <td>{{prod.nombre}}</td>
+                  <td>{{nombreCategoria(prod)}}</td>
+                  <td>{{prod.precio_venta | currency:'COP':'symbol':'1.0-0'}}</td>
+                  <td>{{prod.precio_compra | currency:'COP':'symbol':'1.0-0'}}</td>
+                  <td>
+                    <span class="badge" [ngClass]="getBadgeClass(stockProducto(prod), stockMinimoProducto(prod))">
+                      {{stockProducto(prod)}}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge" [class.badge-success]="prod.activo" [class.badge-danger]="!prod.activo">
+                      {{prod.activo ? 'Activo' : 'Inactivo'}}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="acciones-fila">
+                      <button class="btn-icon" title="Editar"><i class="fas fa-edit"></i></button>
+                      <button class="btn-icon text-danger" title="Eliminar"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </td>
+                </tr>
+              }
+              @if(productosFiltrados.length === 0) {
+                <tr>
+                  <td colspan="8" style="padding: 0;">
+                    <div class="empty-state">
+                      No hay productos registrados.
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+<!-- HTML ENTRADAS / SALIDAS -->
+    @if(activeTab === 'movimientos') {
+      <div class="neumorphic-panel fade-in">
+        <div class="neumorphic-panel panel-seccion">
+          <h2 class="subtitulo">Registrar Movimiento</h2>
+          <div class="form-fila">
+            <div class="form-group" style="flex: 1; min-width: 200px;">
+              <label>Tipo *</label>
+              <select class="input-neumorphic" [(ngModel)]="formMovimiento.tipo">
+                <option value="entrada">Entrada (+)</option>
+                <option value="salida">Salida (-)</option>
+              </select>
+            </div>
+            <div class="form-group" style="flex: 2; min-width: 200px;">
+              <label>Producto *</label>
+              <select class="input-neumorphic" [(ngModel)]="formMovimiento.producto_id">
+                <option value="" disabled selected>Seleccione el producto...</option>
+                @for(prod of productosOriginales; track prod.id) {
+                  <option [value]="prod.id">{{codigoProducto(prod)}} - {{prod.nombre}}</option>
+                }
+              </select>
+            </div>
+            <div class="form-group" style="flex: 1; min-width: 150px;">
+              <label>Cantidad *</label>
+              <input type="number" class="input-neumorphic" [(ngModel)]="formMovimiento.cantidad" min="1" placeholder="Ej. 10">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top: 1rem;">
+            <label>Motivo / Observaciones</label>
+            <input type="text" class="input-neumorphic" [(ngModel)]="formMovimiento.observaciones" placeholder="Ej. Compra a proveedor #1040">
+          </div>
+          <div style="text-align: right; margin-top: 1.5rem;">
+            <button class="btn-save btn-pill" (click)="registrarMovimiento()" [disabled]="guardando">
+              @if(guardando) { <i class="fas fa-spinner fa-spin"></i> Guardando... } @else { Registrar Movimiento }
+            </button>
+          </div>
+        </div>
+
+        <h2 class="subtitulo">Historial Reciente</h2>
+        <div class="table-responsive">
+          <table class="premium-table data-table">
+            <thead>
+              <tr>
+                <th>FECHA</th>
+                <th>TIPO</th>
+                <th>PRODUCTO</th>
+                <th>CANTIDAD</th>
+                <th>MOTIVO</th>
+                <th>USUARIO</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(m of movimientos; track m.id) {
+                <tr>
+                  <td>{{fechaMovimiento(m)}}</td>
+                  <td>
+                    <span class="badge" [ngClass]="(m.tipo_movimiento === 'entrada' || m.tipo === 'entrada') ? 'badge-success' : 'badge-danger'">
+                      {{m.tipo_movimiento || m.tipo}}
+                    </span>
+                  </td>
+                  <td>{{nombreMovimientoProducto(m)}}</td>
+                  <td [class.text-positivo]="m.cantidad > 0" [class.text-negativo]="m.cantidad < 0">{{m.cantidad > 0 ? '+' : ''}}{{m.cantidad}}</td>
+                  <td>{{m.observaciones || m.justificacion || '-'}}</td>
+                  <td>{{m.usuario_id ? 'Usuario #' + m.usuario_id : 'Admin'}}</td>
+                </tr>
+              }
+              @if(movimientos.length === 0) {
+                <tr>
+                  <td colspan="6"><div class="empty-state">No hay movimientos registrados.</div></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+<!-- HTML AJUSTES -->
+    @if(activeTab === 'ajustes') {
+      <div class="neumorphic-panel fade-in">
+        <div class="neumorphic-panel panel-seccion">
+          <h2 class="subtitulo">Nuevo Ajuste (Merma/Daño)</h2>
+          <div class="form-fila">
+            <div class="form-group" style="flex: 2; min-width: 200px;">
+              <label>Producto *</label>
+              <select class="input-neumorphic" [(ngModel)]="formAjuste.producto_id">
+                <option value="" disabled selected>Seleccione el producto...</option>
+                @for(prod of productosOriginales; track prod.id) {
+                  <option [value]="prod.id">{{codigoProducto(prod)}} - {{prod.nombre}}</option>
+                }
+              </select>
+            </div>
+            <div class="form-group" style="flex: 1; min-width: 150px;">
+              <label>Cantidad a Descontar *</label>
+              <input type="number" class="input-neumorphic" [(ngModel)]="formAjuste.cantidad" min="1" placeholder="Ej. 1">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top: 1rem;">
+            <label>Justificación del Ajuste *</label>
+            <input type="text" class="input-neumorphic" [(ngModel)]="formAjuste.observaciones" placeholder="Ej. Monitor dañado en bodega">
+          </div>
+          <div style="text-align: right; margin-top: 1.5rem;">
+            <button class="btn-save btn-pill" (click)="aplicarAjuste()" [disabled]="guardando">
+              @if(guardando) { <i class="fas fa-spinner fa-spin"></i> Aplicando... } @else { Aplicar Ajuste }
+            </button>
+          </div>
+        </div>
+
+        <h2 class="subtitulo">Registro de Ajustes</h2>
+        <div class="table-responsive">
+          <table class="premium-table data-table">
+            <thead>
+              <tr>
+                <th>FECHA</th>
+                <th>PRODUCTO</th>
+                <th>CANTIDAD AJUSTADA</th>
+                <th>JUSTIFICACIÓN</th>
+                <th>AUTORIZADO POR</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(m of movimientos; track m.id) {
+                @if(m.tipo_movimiento === 'ajuste' || m.tipo === 'ajuste') {
+                  <tr>
+                    <td>{{fechaMovimiento(m)}}</td>
+                    <td>{{nombreMovimientoProducto(m)}}</td>
+                    <td class="text-negativo">{{m.cantidad}}</td>
+                    <td>{{m.observaciones || m.justificacion || '-'}}</td>
+                    <td>{{m.usuario_id ? 'Usuario #' + m.usuario_id : 'Gerente'}}</td>
+                  </tr>
+                }
+              }
+              @if(ajustesRegistrados().length === 0) {
+                <tr>
+                  <td colspan="5"><div class="empty-state">No hay ajustes registrados.</div></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+<!-- HTML KARDEX -->
+    @if(activeTab === 'kardex') {
+      <div class="neumorphic-panel fade-in">
+        <div class="action-bar-kardex">
+          <div class="form-group" style="flex: 2; margin: 0;">
+            <label>Seleccionar Producto para Kardex</label>
+            <select class="input-neumorphic" [(ngModel)]="productoKardex">
+              <option value="" disabled selected>Buscar producto...</option>
+              @for(prod of productosOriginales; track prod.id) {
+                <option [value]="prod.id">{{codigoProducto(prod)}} - {{prod.nombre}}</option>
+              }
+            </select>
+          </div>
+          <div class="form-group" style="flex: 1; margin: 0;">
+            <label>Mes</label>
+            <input type="month" class="input-neumorphic">
+          </div>
+          <button class="btn-add btn-pill" (click)="generarKardex()"><i class="fas fa-search"></i> Generar</button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="premium-table data-table">
+            <thead>
+              <tr>
+                <th>FECHA</th>
+                <th>CONCEPTO</th>
+                <th>ENTRADA</th>
+                <th>SALIDA</th>
+                <th>SALDO ACTUAL</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(fila of kardexFilas; track $index) {
+                <tr>
+                  <td>{{fila.fecha}}</td>
+                  <td>{{fila.concepto}}</td>
+                  <td class="text-positivo" *ngIf="fila.entrada > 0">+{{fila.entrada}}</td>
+                  <td *ngIf="fila.entrada === 0">-</td>
+                  <td class="text-negativo" *ngIf="fila.salida > 0">-{{fila.salida}}</td>
+                  <td *ngIf="fila.salida === 0">-</td>
+                  <td><strong>{{fila.saldo}}</strong></td>
+                </tr>
+              }
+              @if(kardexFilas.length === 0) {
+                <tr>
+                  <td colspan="5"><div class="empty-state">Seleccione un producto y pulse Generar.</div></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+<!-- HTML CATEGORÍAS -->
+    @if(activeTab === 'categorias') {
+      <div class="neumorphic-panel fade-in">
+        <div class="action-bar">
+          <p class="descripcion-general" style="margin: 0;">Clasifique sus productos y servicios por categorías.</p>
+          <button class="btn-add btn-pill" (click)="abrirModalCategoria()">
+            <i class="fas fa-plus"></i> Nueva Categoría
+          </button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="premium-table data-table">
+            <thead>
+              <tr>
+                <th>NOMBRE</th>
+                <th>DESCRIPCIÓN</th>
+                <th>TIPO</th>
+                <th>PRODUCTOS</th>
+                <th>ESTADO</th>
+                <th>ACCIONES</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(cat of categorias; track cat.id) {
+                <tr>
+                  <td><strong>{{cat.nombre}}</strong></td>
+                  <td>{{cat.descripcion || '-'}}</td>
+                  <td>{{tipoCategoria(cat)}}</td>
+                  <td>{{productosPorCategoria(cat.id)}}</td>
+                  <td>
+                    <span class="badge" [class.badge-success]="cat.activo" [class.badge-danger]="!cat.activo">
+                      {{cat.activo ? 'Activa' : 'Inactiva'}}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="acciones-fila">
+                      <button class="btn-icon" title="Editar" (click)="abrirModalEditarCategoria(cat)"><i class="fas fa-edit"></i></button>
+                      <button class="btn-icon text-danger" title="Eliminar" (click)="eliminarCategoria(cat)"><i class="fas fa-trash"></i></button>
+                    </div>
+                  </td>
+                </tr>
+              }
+              @if(categorias.length === 0) {
+                <tr>
+                  <td colspan="6">
+                    <div class="empty-state">No hay categorías registradas. Cree la primera para clasificar sus productos.</div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+  </div>
+
+<!-- HTML MODAL NUEVO PRODUCTO -->
+@if(showModal) {
+<div class="view-switch-panel fade-in">
+  <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+    <div class="panel-header mb-4">
+      <h1 class="titulo-principal">NUEVO PRODUCTO</h1>
+      <button class="btn-close" (click)="cerrarModal()">&times;</button>
+    </div>
+    <div class="panel-body">
+      <div class="form-group">
+        <label>Código SKU *</label>
+        <input type="text" class="input-neumorphic" [(ngModel)]="formProducto.codigo" placeholder="Ej. PRD-004">
+      </div>
+        <div class="form-group">
+          <label>Nombre del Producto *</label>
+          <input type="text" class="input-neumorphic" [(ngModel)]="formProducto.nombre" placeholder="Ej. Teclado Mecánico">
+        </div>
+        <div class="form-group">
+          <label>Categoría *</label>
+          <select class="input-neumorphic" [(ngModel)]="formProducto.categoria_id">
+            <option value="" disabled selected>Seleccione una categoría</option>
+            @for(cat of categorias; track cat.id) {
+              <option [value]="cat.id">{{cat.nombre}}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Unidad de Medida *</label>
+          <input type="text" class="input-neumorphic" [(ngModel)]="formProducto.unidad_medida" placeholder="Ej. Unidad, Kg, Caja">
+        </div>
+        <div style="display: flex; gap: 1rem;">
+          <div class="form-group" style="flex: 1;">
+            <label>Precio de Venta</label>
+            <input type="number" class="input-neumorphic" [(ngModel)]="formProducto.precio_venta">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>Costo de Compra</label>
+            <input type="number" class="input-neumorphic" [(ngModel)]="formProducto.precio_compra">
+          </div>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+          <div class="form-group" style="flex: 1;">
+            <label>Stock Inicial</label>
+            <input type="number" class="input-neumorphic" [(ngModel)]="formProducto.stock_inicial" placeholder="Ej. 10">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>Imagen del Producto</label>
+            <input type="file" class="input-neumorphic" (change)="onFileSelected($event)" accept="image/*">
+          </div>
+        </div>
+      </div>
+    
+<div class="modal-footer" style="margin-top: 2rem;">
+      <button class="btn-volver btn-pill" (click)="cerrarModal()">Volver</button>
+      <button class="btn-save btn-pill" (click)="guardarProducto()" [disabled]="guardando">
+        @if(guardando) {
+          <i class="fas fa-spinner fa-spin"></i> Guardando...
+        } @else {
+          Guardar Producto
+        }
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- HTML MODAL CATEGORÍA -->
+@if(showModalCategoria) {
+<div class="view-switch-panel fade-in">
+  <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+    <div class="panel-header mb-4">
+      <h1 class="titulo-principal">{{ editandoCategoria ? 'EDITAR CATEGORÍA' : 'NUEVA CATEGORÍA' }}</h1>
+      <button class="btn-close" (click)="cerrarModalCategoria()">&times;</button>
+    </div>
+    <div class="panel-body">
+      <div class="form-group">
+        <label>Nombre *</label>
+        <input type="text" class="input-neumorphic" [(ngModel)]="formCategoria.nombre" placeholder="Ej. Electrónica">
+      </div>
+      <div class="form-group">
+        <label>Descripción</label>
+        <textarea class="input-neumorphic" rows="2" [(ngModel)]="formCategoria.descripcion" placeholder="Descripción breve de la categoría"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Tipo *</label>
+        <select class="input-neumorphic" [(ngModel)]="formCategoria.tipo">
+          <option value="ventas">Ventas</option>
+          <option value="servicios">Servicios</option>
+          <option value="ventas y servicios">Ventas y Servicios</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer" style="margin-top: 2rem;">
+      <button class="btn-volver btn-pill" (click)="cerrarModalCategoria()">Volver</button>
+      <button class="btn-save btn-pill" (click)="guardarCategoria()" [disabled]="guardandoCategoria">
+        @if(guardandoCategoria) {
+          <i class="fas fa-spinner fa-spin"></i> Guardando...
+        } @else {
+          Guardar Categoría
+        }
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+
+

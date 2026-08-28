@@ -1,0 +1,335 @@
+@use 'sass:color';
+
+/* --- 0. BACKGROUND PRINCIPAL DEL MÓDULO CRM CLIENTES --- */
+.module-container {
+  padding: 1.5rem;
+  background: #f5f5dc;
+  font-family: 'Montserrat', sans-serif;
+  color: #333333;
+  min-height: 100%;
+}
+
+/* --- 1. VARIABLES GLOBALES --- */
+$bg-color:    #f5f5dc;
+$shadow-light:#ffffff;
+$shadow-dark: #d1d1bc;
+$text-dark:   #333333;
+$text-muted:  #666666;
+$btn-add:     #45a1ae;
+$btn-volver:  #de3737;
+$btn-save:    #066810;
+$btn-gen-1:   #6B8F71;
+
+/* --- 2. TIPOGRAFÍA GLOBAL (jerarquía estricta) --- */
+.module-header h1, h1.titulo-principal {
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+  margin: 0 0 0.25rem;
+  color: $text-dark;
+}
+
+.subtitulo, h2.subtitulo {
+  font-size: 13px;
+  font-weight: normal;
+  text-transform: uppercase;
+  text-align: left;
+  color: $text-dark;
+  margin: 0 0 0.75rem;
+}
+
+.module-header p, .descripcion-general {
+  font-size: 10px;
+  font-weight: normal;
+  text-transform: uppercase;
+  text-align: center;
+  color: $text-muted;
+  margin: 0 0 1rem;
+  letter-spacing: 0.3px;
+}
+
+.cliente-seleccionado-info {
+  font-size: 11px;
+  color: $text-muted;
+  margin-top: 0.35rem;
+  margin-bottom: 0;
+}
+
+p, td, th, li, label, select, input { font-size: 12px; }
+
+/* --- 3. PANELES NEUMÓRFICOS --- */
+.neumorphic-panel {
+  background: $bg-color;
+  border-radius: 16px;
+  box-shadow: 8px 8px 16px $shadow-dark, -8px -8px 16px $shadow-light;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.neumorphic-panel-inner {
+  background: $bg-color;
+  border-radius: 12px;
+  box-shadow: inset 4px 4px 8px $shadow-dark, inset -4px -4px 8px $shadow-light;
+  padding: 1.5rem;
+}
+
+/* --- 4. BARRA DE BÚSQUEDA Y FILTROS --- */
+.search-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.search-group {
+  position: relative;
+  flex: 1 1 320px;
+  display: flex;
+  align-items: center;
+}
+
+.search-group .search-icon {
+  position: absolute;
+  left: 1rem;
+  color: $text-muted;
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.search-group input.input-neumorphic {
+  padding-left: 2.5rem;
+}
+
+.filter-group-btn {
+  flex: 0 0 auto;
+}
+
+/* --- 5. INPUTS NEUMÓRFICOS --- */
+.input-neumorphic {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 10px;
+  background: $bg-color;
+  box-shadow: inset 6px 6px 10px $shadow-dark, inset -6px -6px 10px $shadow-light;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  color: $text-dark;
+  outline: none;
+  transition: all 0.2s ease;
+
+  &:focus {
+    box-shadow: inset 8px 8px 12px $shadow-dark, inset -8px -8px 12px $shadow-light;
+  }
+}
+
+/* --- 6. TABLA DE CLIENTES Y SERVICIOS --- */
+.table-container {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.data-table,
+.neumorphic-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  color: $text-dark;
+
+  thead tr {
+    border-bottom: 2px solid rgba(0, 0, 0, 0.06);
+  }
+
+  th {
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: $text-muted;
+    padding: 0.85rem 1.25rem;
+    white-space: nowrap;
+    text-align: left;
+  }
+
+  td {
+    padding: 1.1rem 1.25rem;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    line-height: 1.5;
+  }
+
+  tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.018);
+    transition: background-color 0.15s ease;
+  }
+
+  tr.fila-seleccionada {
+    background-color: rgba(69, 161, 174, 0.08);
+  }
+
+  td strong {
+    font-size: 12px;
+    font-weight: 600;
+    color: $text-dark;
+  }
+}
+
+/* Columna CONTACTO apilada */
+.contact-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  .contact-phone {
+    font-size: 12px;
+    color: $text-dark;
+  }
+
+  .contact-email {
+    font-size: 10px;
+    color: $text-muted;
+  }
+}
+
+/* Columna ACCIÓN centrada */
+th.col-accion, td.col-accion {
+  text-align: center;
+  padding-right: 1.5rem;
+}
+
+/* --- 7. CELDA DE ACCIONES --- */
+.actions-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  white-space: nowrap;
+}
+
+/* Botón Ver 360° */
+.btn-action-360 {
+  background: #3aa0ac;
+  color: #ffffff;
+  border: none;
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 11px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 3px 3px 6px $shadow-dark, -2px -2px 5px $shadow-light;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  i { font-size: 10px; }
+
+  &:hover {
+    background: #2e8b96;
+    transform: translateY(-1px);
+  }
+}
+
+/* Badges */
+.badge {
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  background: $bg-color;
+  box-shadow: inset 2px 2px 4px $shadow-dark, inset -2px -2px 4px $shadow-light;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.badge-primary   { color: #45a1ae; }
+.badge-success   { color: #066810; }
+.badge-warning   { color: #C9A227; }
+.badge-info      { color: #7C6FA6; }
+.badge-secondary { color: #666666; }
+
+/* --- 8. BOTONES TIPO PÍLDORA --- */
+.btn-neumorphic {
+  padding: 0.65rem 1.5rem;
+  border-radius: 9999px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 4px 4px 8px $shadow-dark, -4px -4px 8px $shadow-light;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  &:active {
+    box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.1), inset -4px -4px 8px rgba(255, 255, 255, 0.5);
+  }
+}
+
+.btn-general-1 {
+  @extend .btn-neumorphic;
+  background-color: $btn-gen-1;
+  border: 2px solid color.adjust($btn-gen-1, $lightness: -10%);
+  color: #ffffff;
+}
+
+.btn-volver {
+  @extend .btn-neumorphic;
+  background-color: $btn-volver;
+  border: 2px solid color.adjust($btn-volver, $lightness: -10%);
+  color: #ffffff;
+}
+
+.btn-save {
+  @extend .btn-neumorphic;
+  background-color: $btn-save;
+  border: 2px solid color.adjust($btn-save, $lightness: -10%);
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.btn-pill { border-radius: 9999px; }
+
+.volver-wrapper {
+  margin-bottom: 1.25rem;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.panel-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* --- 9. ESTADOS VACÍO Y CARGA --- */
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: $text-muted;
+  font-style: italic;
+}
+
+.text-center { text-align: center; }
+.py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+.text-gray-500 { color: $text-muted; font-style: italic; font-size: 12px; }
+
+/* --- 10. ANIMACIONES --- */
+.fade-in {
+  animation: fadeIn 0.25s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

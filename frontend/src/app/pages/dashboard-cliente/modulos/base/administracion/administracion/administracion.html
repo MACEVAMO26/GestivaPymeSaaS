@@ -1,0 +1,44 @@
+
+<!-- HTML MÓDULO ADMINISTRACIÓN (LAYOUT PRINCIPAL) -->
+<div class="module-container fade-in">
+  
+<div class="module-header text-center mb-4 relative">
+    <h1 class="titulo-principal">ADMINISTRACIÓN</h1>
+    <p class="descripcion-general">Configura la empresa, sus usuarios, roles, estructura y soporte técnico.</p>
+  </div>
+
+  <!-- BARRA SUPERIOR DE NAVEGACIÓN INTERNA -->
+  <div class="tabs-nav-wrapper">
+    <a routerLink="./empresa" routerLinkActive="tab-neu-active" class="tab-neu-inactive">
+      <span class="icon">🏢</span> EMPRESA
+    </a>
+    <a routerLink="./usuarios" routerLinkActive="tab-neu-active" class="tab-neu-inactive">
+      <span class="icon">👥</span> USUARIOS
+    </a>
+    <a routerLink="./roles" routerLinkActive="tab-neu-active" class="tab-neu-inactive">
+      <span class="icon">🔑</span> ROLES Y ACCESOS
+    </a>
+    <a routerLink="./estructura" routerLinkActive="tab-neu-active" class="tab-neu-inactive">
+      <span class="icon">📊</span> ESTRUCTURA
+    </a>
+    <a routerLink="./soporte" routerLinkActive="tab-neu-active" class="tab-neu-inactive">
+      <span class="icon">🛠️</span> SOPORTE TÉCNICO
+    </a>
+    <a routerLink="./auditoria" routerLinkActive="tab-neu-active" class="tab-neu-inactive">
+      <span class="icon">📝</span> AUDITORÍA
+    </a>
+    @if (esGerente) {
+      <a routerLink="./contrato" routerLinkActive="tab-neu-active" class="tab-neu-inactive">
+        <span class="icon">📜</span> CONTRATO SAAS
+      </a>
+    }
+  </div>
+
+  <!-- ÁREA DE CONTENIDO (Donde cargan los subcomponentes) -->
+<div class="tab-content neumorphic-panel-inner">
+    <router-outlet></router-outlet>
+  </div>
+
+</div>
+
+

@@ -1,0 +1,34 @@
+<div class="ia-tutorial-overlay" *ngIf="mostrar">
+  <div class="ia-tutorial-modal">
+    <!-- Close button / Skip tutorial -->
+    <button class="btn-skip" (click)="finalizarTutorial()">Omitir Tutorial &times;</button>
+
+    <div class="ia-tutorial-content">
+      <!-- Mascot Image -->
+      <div class="ia-mascot">
+        <img src="assets/images/GestivaIA/IA_Gestiva.png" alt="Gestiva IA Mascot">
+      </div>
+
+      <!-- Dialogue Bubble -->
+      <div class="ia-dialogue">
+        <h3 *ngIf="pasos.length > 0">{{ pasos[pasoActual].title }}</h3>
+        <p *ngIf="pasos.length > 0">{{ pasos[pasoActual].description }}</p>
+
+        <!-- Navigation -->
+        <div class="actions">
+          @if (pasoActual < pasos.length - 1) {
+            <button class="btn-add" (click)="siguiente()">Siguiente</button>
+            <button class="btn-omitir" style="margin-left: 10px; background: transparent; color: #666; border: none; text-decoration: underline; cursor: pointer; font-size: 12px;" (click)="finalizarTutorial()">Omitir</button>
+          } @else {
+            <button class="btn-add success" (click)="finalizarTutorial()">¡Empezar a trabajar!</button>
+          }
+        </div>
+        
+        <!-- Step Indicators -->
+        <div class="step-indicators" style="display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-top: 15px;">
+          <span *ngFor="let p of pasos; let i = index" [class.active]="pasoActual === i" style="width: 8px; height: 8px; border-radius: 50%; background: #ccc;" [style.background]="pasoActual === i ? '#45a1ae' : '#ccc'"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

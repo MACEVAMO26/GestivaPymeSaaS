@@ -1,0 +1,126 @@
+<div [ngClass]="isEmbedded ? '' : 'module-container fade-in'">
+  @if(!isEmbedded) {
+    <!-- HTML ENCABEZADO -->
+    <div class="module-header text-center mb-4 relative">
+      <h1>CRM - Gestión de Clientes</h1>
+      <p class="descripcion-general">Vista 360º de las interacciones, tickets y servicios prestados a los clientes.</p>
+    </div>
+  }
+
+  <div [ngClass]="isEmbedded ? '' : 'tab-content neumorphic-panel-inner p-4'">
+    @if(!isEmbedded) {
+      <div class="volver-wrapper">
+        <button class="btn-volver btn-pill" onclick="window.history.back()">
+          <i class="fas fa-arrow-left"></i> Volver
+        </button>
+      </div>
+    }
+
+    <div class="neumorphic-panel fade-in">
+      <h2 class="subtitulo">Buscador de Clientes</h2>
+      <div class="search-filter-bar mb-4">
+        <div class="search-group">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" class="input-neumorphic" [(ngModel)]="busqueda" (keyup.enter)="buscar()" (ngModelChange)="buscar()" placeholder="Buscar cliente por nombre o documento...">
+        </div>
+        <div class="filter-group-btn">
+          <button type="button" class="btn-general-1 btn-pill" (click)="buscar()">Buscar</button>
+        </div>
+      </div>
+
+      @if(clientes.length === 0) {
+        <div class="empty-state" style="margin-top: 1.5rem;">
+          <i class="fas fa-users mb-2" style="font-size: 16px; opacity: 0.5;"></i>
+          <p style="font-size: 12px; margin: 0;">Aún no hay clientes registrados.</p>
+        </div>
+      } @else {
+        <div class="table-container" style="margin-top: 1.5rem;">
+          <table class="data-table neumorphic-table">
+            <thead>
+              <tr>
+                <th>CLIENTE</th>
+                <th>DOCUMENTO</th>
+                <th>CONTACTO</th>
+                <th>TIPO</th>
+                <th class="col-accion">ACCIÓN</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(cli of resultados; track cli.id) {
+                <tr [class.fila-seleccionada]="clienteSeleccionado?.id === cli.id" (click)="seleccionarCliente(cli)" style="cursor: pointer;">
+                  <td><strong>{{nombreCliente(cli)}}</strong></td>
+                  <td>{{getDocumentoFormateado(cli)}}</td>
+                  <td>
+                    <div class="contact-stack">
+                      <span class="contact-phone">{{cli.telefono || '--'}}</span>
+                      <span class="contact-email">{{cli.email || '--'}}</span>
+                    </div>
+                  </td>
+                  <td>{{cli.tipo_cliente || 'Natural'}}</td>
+                  <td class="col-accion">
+                    <div class="actions-cell">
+                      <button type="button" class="btn-action-360" (click)="seleccionarCliente(cli); $event.stopPropagation()">
+                        <i class="fas fa-eye"></i> Ver 360°
+                      </button>
+                      <app-solicitud-inactivacion [area]="'s_crm'" [entidad]="'clientes'" [entidadId]="cli.id"
+                        [nombreEntidad]="nombreCliente(cli)" (click)="$event.stopPropagation()"></app-solicitud-inactivacion>
+                    </div>
+                  </td>
+                </tr>
+              }
+              @if (resultados.length === 0) {
+                <tr>
+                  <td colspan="5" class="text-center py-8 text-gray-500">
+                    No se encontraron clientes con el criterio de búsqueda.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    @if(clienteSeleccionado) {
+      <div class="neumorphic-panel fade-in mt-4">
+        <div class="panel-header-flex">
+          <div>
+            <h2 class="subtitulo" style="margin: 0;">Historial y Detalle del Cliente (Vista 360°)</h2>
+            <p class="cliente-seleccionado-info">Cliente: <strong>{{nombreCliente(clienteSeleccionado)}}</strong> &bull; {{getDocumentoFormateado(clienteSeleccionado)}}</p>
+          </div>
+          <button class="btn-save btn-pill" (click)="nuevaVisita()">
+            <i class="fas fa-plus"></i> Nueva Visita
+          </button>
+        </div>
+
+        <div class="table-container" style="margin-top: 1.5rem;">
+          <table class="data-table neumorphic-table">
+            <thead>
+              <tr>
+                <th>CONSECUTIVO</th>
+                <th>SERVICIO</th>
+                <th>FECHA SOLICITADA</th>
+                <th>ESTADO</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(tk of historialTickets; track tk.id) {
+                <tr>
+                  <td><strong>{{tk.consecutivo || ('TICK-' + tk.id)}}</strong></td>
+                  <td>{{tk.servicio_requerido || '--'}}</td>
+                  <td>{{tk.fecha_solicitada || '--'}}</td>
+                  <td><span class="badge" [ngClass]="getBadgeEstado(tk.estado)">{{tk.estado || 'Pendiente'}}</span></td>
+                </tr>
+              }
+              @if(historialTickets.length === 0) {
+                <tr>
+                  <td colspan="4" class="text-center py-8 text-gray-500">Este cliente aún no tiene tickets de servicio registrados.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </div>
+</div>

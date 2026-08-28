@@ -1,0 +1,89 @@
+<div class="gestiva-bot-container">
+  
+  <!-- Burbuja de mensaje inicial (Tutorial) -->
+  <div class="bot-bubble slide-in" *ngIf="showBubble && !showChat">
+    <button class="close-bubble" (click)="showBubble = false">&times;</button>
+    <p>{{ bubbleMessage }}</p>
+  </div>
+
+  <!-- Panel de Chat -->
+  <div class="bot-chat-panel slide-up" *ngIf="showChat">
+    <div class="chat-header">
+      <div class="bot-info">
+        <img src="assets/images/GestivaIA/IA_Gestiva.png" alt="Gestiva" class="chat-avatar">
+        <div>
+          <h4>Gestiva IA</h4>
+          <span>Asistente Inteligente</span>
+        </div>
+      </div>
+      <div class="header-actions" style="display: flex; align-items: center; gap: 10px;">
+        <label class="toggle-mode" style="font-size: 10px; color: #aaa; display: flex; align-items: center; cursor: pointer;">
+          <input type="checkbox" [(ngModel)]="isAdvancedMode" style="margin-right: 4px;">
+          Modo Avanzado
+        </label>
+        <button class="close-chat" (click)="closeChat()">&times;</button>
+      </div>
+    </div>
+
+    <!-- Tareas permitidas + tutorial -->
+    <div class="chat-tareas">
+      <div class="chat-tareas-title">TAREAS PERMITIDAS</div>
+      <div class="chat-tareas-grid">
+        <button class="suggestion-btn" (click)="sendSuggestion('Genera un resumen ejecutivo de mis ventas, clientes y tareas del mes. Incluye secciones claras y puntos clave.')">Generar resúmenes y reportes</button>
+        <button class="suggestion-btn" (click)="sendSuggestion('Ayúdame a redactar un correo profesional. Indícame el tema (venta, cobro, cliente o colaborador).')">Redactar correos y respuestas</button>
+        <button class="suggestion-btn" (click)="sendSuggestion('Analiza mis datos de ventas y clientes y recomiéndame qué métricas revisar para mejorar resultados.')">Analizar datos de ventas/clientes</button>
+        <button class="suggestion-btn" (click)="sendSuggestion('Diseña un plan de seguimientos automáticos y alertas para mis clientes y tareas.')">Automatizar seguimientos y alertas</button>
+      </div>
+      <button class="btn-replay-tutorial" (click)="verTutorial()">
+        <i class="fas fa-redo"></i> ¿Deseas ver el tutorial de nuevo?
+      </button>
+    </div>
+    
+    <div class="chat-body" style="overflow-y: auto; max-height: 300px;">
+      
+      <!-- Historial de Conversación -->
+      <div *ngFor="let msg of chatHistory" [ngClass]="msg.role === 'user' ? 'user-message' : 'bot-message'" style="margin-bottom: 10px; padding: 8px; border-radius: 8px; background: rgba(255,255,255,0.05);">
+        <strong *ngIf="msg.role === 'user'" style="color: #45a1ae;">Tú:</strong>
+        <strong *ngIf="msg.role === 'assistant'" style="color: #10b981;">Gestiva AI:</strong>
+        <p style="margin: 0; font-size: 12px; color: #ddd;">{{ msg.content }}</p>
+      </div>
+
+      <!-- Preguntas precargadas según el módulo (solo se muestran si no hay chat avanzado) -->
+      <div class="chat-options" *ngIf="chatHistory.length <= 1">
+        <div *ngIf="currentModule === 'empleados'">
+          <button class="suggestion-btn" (click)="sendSuggestion('¿Cómo agrego un nuevo empleado?')">¿Cómo agrego un nuevo empleado?</button>
+          <button class="suggestion-btn" (click)="sendSuggestion('¿Cómo veo los documentos de un empleado?')">¿Cómo veo los documentos de un empleado?</button>
+        </div>
+        <div *ngIf="currentModule === 'inventario'">
+          <button class="suggestion-btn" (click)="sendSuggestion('¿Cómo creo un producto?')">¿Cómo creo un producto?</button>
+          <button class="suggestion-btn" (click)="sendSuggestion('¿Cómo actualizo el stock?')">¿Cómo actualizo el stock?</button>
+        </div>
+        <div *ngIf="currentModule === 'clientes'">
+          <button class="suggestion-btn" (click)="sendSuggestion('¿Cómo registro un cliente?')">¿Cómo registro un cliente?</button>
+        </div>
+        <div *ngIf="currentModule === 'ventas'">
+          <button class="suggestion-btn" (click)="sendSuggestion('¿Cómo genero una factura?')">¿Cómo genero una factura?</button>
+        </div>
+        <div *ngIf="currentModule === 'general'">
+          <button class="suggestion-btn" (click)="sendSuggestion('¿Qué puedo hacer en GestivaPyme?')">¿Qué puedo hacer en GestivaPyme?</button>
+        </div>
+      </div>
+
+      <div *ngIf="isLoading" style="text-align: center; color: #aaa; font-size: 11px; font-style: italic;">
+        Gestiva AI está escribiendo...
+      </div>
+    </div>
+
+    <div class="chat-input-area">
+      <input type="text" placeholder="Escribe tu pregunta..." [(ngModel)]="userMessage" (keyup.enter)="sendMessage()">
+      <button class="send-btn" (click)="sendMessage()" [disabled]="isLoading || !userMessage"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <!-- Avatar Flotante -->
+  <div class="bot-avatar-wrapper" (click)="toggleChat()">
+    <img src="assets/images/GestivaIA/IA_Gestiva.png" alt="Gestiva" class="bot-avatar bounce">
+    <span class="notification-dot" *ngIf="showBubble"></span>
+  </div>
+
+</div>

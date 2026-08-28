@@ -1,0 +1,33 @@
+<div class="panel-contenido">
+  <div class="panel-header">
+    <h3 class="panel-title">Mis Recordatorios</h3>
+  </div>
+
+  <form (ngSubmit)="agregar()">
+    <div class="add-recordatorio">
+      <input type="text" class="neu-input" name="titulo" [(ngModel)]="nuevoTitulo" placeholder="Título" required>
+      <button type="submit" class="btn-pill btn-primary" [disabled]="guardando">
+        <i class="fas fa-plus"></i>
+      </button>
+    </div>
+    <input type="text" class="neu-input" name="descripcion" [(ngModel)]="nuevaDescripcion" placeholder="Descripción (Opcional)">
+  </form>
+
+  <div class="panel-body">
+    <div class="recordatorio-item" *ngFor="let r of recordatorios">
+      <label class="neu-checkbox-container">
+        <input type="checkbox" [checked]="r.completado" (change)="marcar(r.id, !r.completado)">
+        <span class="neu-checkmark"></span>
+      </label>
+      <span class="recordatorio-text" [class.recordatorio-completado]="r.completado">{{ r.titulo }}</span>
+      <span class="recordatorio-desc" *ngIf="r.descripcion">{{ r.descripcion }}</span>
+      <button class="btn-eliminar" (click)="eliminar(r.id)">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>
+
+    <div class="recordatorio-item" *ngIf="recordatorios.length === 0">
+      <span class="recordatorio-text">No tienes recordatorios.</span>
+    </div>
+  </div>
+</div>

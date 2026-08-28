@@ -1,0 +1,109 @@
+<div class="module-container fade-in">
+  <div class="module-header text-center mb-4 relative">
+    <h1>DIRECTRICES IA</h1>
+    <p>Configura los recordatorios y sugerencias silenciosas que la IA le dará a tu equipo.</p>
+  </div>
+
+  <div class="tab-content neumorphic-panel-inner p-4">
+    
+    <div class="volver-wrapper">
+      <button class="btn-volver btn-pill" onclick="window.history.back()">
+        <i class="fas fa-arrow-left"></i> Volver
+      </button>
+    </div>
+
+    <!-- LISTADO DE DIRECTRICES -->
+    <div *ngIf="!showForm" class="neumorphic-panel fade-in">
+      <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
+        <button class="btn-add btn-pill" (click)="abrirFormulario()">+ Nueva Directriz</button>
+      </div>
+
+      <h2 class="subtitulo">Directrices Activas</h2>
+
+        <div *ngIf="cargando" class="text-center-py-8">
+          <app-loading-spinner message="Cargando directrices..."></app-loading-spinner>
+        </div>
+
+        <div *ngIf="!cargando" class="table-container">
+          <table class="data-table neumorphic-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Mensaje</th>
+                <th>Audiencia</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let dir of directrices">
+                <td>{{ dir.id }}</td>
+                <td>{{ dir.mensaje }}</td>
+                <td>{{ dir.audiencia }}</td>
+                <td>
+                  <button class="btn-estado" [class.btn-estado-activa]="dir.activo" [class.btn-estado-inactiva]="!dir.activo" (click)="toggleActivo(dir)">
+                    {{ dir.activo ? 'ACTIVA' : 'INACTIVA' }}
+                  </button>
+                </td>
+                <td>
+                  <button class="btn-icon" (click)="abrirFormulario(dir)" title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn-icon text-danger" (click)="eliminarDirectriz(dir.id)" title="Eliminar">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="directrices.length === 0">
+                <td colspan="5" class="text-center" style="padding: 20px;">No hay directrices configuradas. ¡Crea la primera!</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+    </div>
+
+    <!-- FORMULARIO DE CREACIÓN/EDICIÓN -->
+    <div *ngIf="showForm" class="neumorphic-panel fade-in">
+      <h2 class="subtitulo">{{ modoEdicion ? 'Editar Directriz' : 'Nueva Directriz' }}</h2>
+        
+        <form (ngSubmit)="guardarDirectriz()">
+          <div class="form-grid">
+            
+            <div class="form-group full-width">
+              <label class="form-label">Mensaje del Asistente: *</label>
+              <textarea class="input-neumorphic" name="mensaje" [(ngModel)]="form.mensaje" rows="3" required
+                        placeholder="Ej: Recuerden cargar sus soportes de ventas antes del mediodía."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Audiencia (¿A quién va dirigido?): *</label>
+              <select class="input-neumorphic" name="audiencia" [(ngModel)]="form.audiencia" required>
+                <option value="Todos">Toda la Empresa</option>
+                <option value="Gerencia">Solo Jefes y Gerencia</option>
+                <option value="RRHH">Recursos Humanos</option>
+                <option value="Ventas">Área de Ventas</option>
+                <option value="Operativos">Empleados Operativos (Generales)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Estado:</label>
+              <select class="input-neumorphic" name="activo" [(ngModel)]="form.activo">
+                <option [ngValue]="true">Activa</option>
+                <option [ngValue]="false">Inactiva (Oculta temporalmente)</option>
+              </select>
+            </div>
+
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-save btn-pill" [disabled]="guardando">
+              <span *ngIf="guardando" class="spinner-small"></span> 
+              {{ guardando ? 'Guardando...' : (modoEdicion ? 'Actualizar Directriz' : '+ Guardar Directriz') }}
+            </button>
+          </div>
+        </form>
+    </div>
+
+  </div>
+</div>

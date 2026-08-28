@@ -1,0 +1,125 @@
+<!-- HTML CONFIGURACIÓN DE EMPRESA -->
+<div class="fade-in">
+  <!-- Botón Volver Inyectado -->
+  <div class="volver-wrapper">
+    <button class="btn-volver btn-pill" onclick="window.history.back()">
+      <i class="fas fa-arrow-left"></i> VOLVER
+    </button>
+  </div>
+
+  <div class="module-header text-center mb-4 relative">
+    <h1>CONFIGURACIÓN DE EMPRESA</h1>
+    <p>Configura la información general, NIT y logo de tu empresa.</p>
+  </div>
+
+  <div class="panel-body">
+    <!-- Componente de Carga Neumórfico -->
+    @if (isLoading) {
+    <div class="neumorphic-panel fade-in">
+      <app-loading-spinner
+        message="Cargando datos de la empresa..."
+      ></app-loading-spinner>
+    </div>
+    } @if (!isLoading) {
+    <div class="neumorphic-panel">
+      <form>
+        <div class="form-row-divider">
+          <div class="form-group">
+            <label>Nombre / Razón Social</label>
+            <input type="text" class="input-neumorphic" name="nombre" [(ngModel)]="empresaData.nombre" required />
+          </div>
+          <div class="form-group">
+            <label>NIT / Número de Identificación</label>
+            <input type="text" class="input-neumorphic" name="nit" [(ngModel)]="empresaData.nit" required />
+          </div>
+        </div>
+
+        <div class="form-row-divider">
+          <div class="form-group">
+            <label>Tipo de Empresa</label>
+            <select class="input-neumorphic" name="tipo_empresa" [(ngModel)]="empresaData.tipo_empresa" required>
+              <option value="Ventas">Ventas</option>
+              <option value="Servicios">Servicios</option>
+              <option value="Mixto">Mixta</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Dirección</label>
+            <input type="text" class="input-neumorphic" name="direccion" [(ngModel)]="empresaData.direccion" />
+          </div>
+          <div class="form-group">
+            <label>Teléfono</label>
+            <input type="tel" class="input-neumorphic" name="telefono" [(ngModel)]="empresaData.telefono" />
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Logo de la Empresa</label>
+          @if (logoPreview) {
+          <img [src]="logoPreview" class="logo-preview" alt="Nuevo logo" />
+          } @else if (empresaData.logo_url) {
+          <img
+            [src]="empresaData.logo_url"
+            class="logo-preview"
+            alt="Logo actual"
+          />
+          }
+          <div class="upload-zone neumorphic-panel" (click)="logoInput.click()">
+            <span class="upload-icon">📷</span>
+            <p>
+              {{ logoSeleccionado ? logoSeleccionado.name : 'Clic para subir un
+              nuevo logo' }}
+            </p>
+          </div>
+          <input
+            type="file"
+            #logoInput
+            (change)="onLogoSelected($event)"
+            accept=".jpg,.jpeg,.png"
+            style="display: none"
+          />
+          @if (logoSeleccionado) {
+          <p class="descripcion-general">
+            El nuevo logo se enviará a revisión para su aprobación, este atento
+            a cualquier eventualidad.
+          </p>
+          }
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn-save btn-pill"
+            (click)="guardarCambios()"
+            [disabled]="isSaving"
+          >
+            @if (isSaving) {
+            <span class="spinner-small"></span> Guardando... } @else { Guardar
+            Cambios }
+          </button>
+        </div>
+      </form>
+    </div>
+    }
+  </div>
+</div>
+
+<!-- STACK DE NOTIFICACIONES (TOASTS NEUMÓRFICOS) -->
+<div class="toast-stack">
+  @for (toast of toasts; track toast.id) {
+  <div class="neu-toast" [ngClass]="'toast-' + toast.tipo">
+    <div class="toast-icon">
+      @if (toast.tipo === 'success') { <span>✓</span> } @if (toast.tipo ===
+      'error') { <span>✕</span> } @if (toast.tipo === 'warning') {
+      <span>!</span> } @if (toast.tipo === 'info') { <span>i</span> }
+    </div>
+    <div class="toast-content">
+      <h4>{{ toast.titulo }}</h4>
+      @if (toast.descripcion) {
+      <p>{{ toast.descripcion }}</p>
+      }
+    </div>
+    <button class="toast-close" (click)="cerrarToast(toast.id)">×</button>
+  </div>
+  }
+</div>

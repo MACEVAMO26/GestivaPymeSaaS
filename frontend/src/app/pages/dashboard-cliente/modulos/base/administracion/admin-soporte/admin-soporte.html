@@ -1,0 +1,91 @@
+<div class="soporte-module fade-in">
+  <div class="volver-wrapper">
+    <button class="btn-volver btn-pill" onclick="window.history.back()">
+      <i class="fas fa-arrow-left"></i> VOLVER
+    </button>
+  </div>
+
+  <div class="module-header">
+    <h1 class="titulo-principal text-center">SOPORTE TÉCNICO AL SAAS</h1>
+    <p class="descripcion-general">Envía solicitudes, comprobantes y pide ayuda técnica a la administración central.</p>
+  </div>
+
+  <div class="form-container neumorphic-panel mb-4">
+    <h2 class="subtitulo">CREAR NUEVA SOLICITUD</h2>
+    <form (ngSubmit)="enviarTicket()">
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label class="form-label">Asunto de la Solicitud <span class="text-danger">*</span></label>
+          <select class="input-neumorphic" name="asunto" [(ngModel)]="nuevoTicket.asunto" required>
+            <option value="">-- Selecciona el Asunto --</option>
+            @for (opcion of opcionesAsunto; track opcion) {
+              <option [value]="opcion">{{ opcion }}</option>
+            }
+          </select>
+        </div>
+        
+        <div class="form-group full-width">
+          <label class="form-label">Mensaje o Detalles <span class="text-danger">*</span></label>
+          <textarea class="input-neumorphic" name="mensaje" [(ngModel)]="nuevoTicket.mensaje" rows="4" required placeholder="Describe tu solicitud o proporciona detalles (ej. links de comprobantes)"></textarea>
+        </div>
+
+        @if (requireFile) {
+          <div class="form-group full-width fade-in mt-3">
+            <label class="form-label">Adjuntar Archivo Requerido <span class="text-danger">*</span></label>
+            <input type="file" id="archivoRequerido" class="input-neumorphic" (change)="onFileSelected($event)" [accept]="fileAcceptType" style="padding: 10px;">
+            <small class="text-muted" style="margin-top: 5px; display: block;">Por favor adjunta el archivo correspondiente para esta solicitud.</small>
+          </div>
+        }
+      </div>
+
+      <div class="form-actions mt-3">
+        <button type="submit" class="btn-save btn-pill flex-items-center" [disabled]="isSaving || !nuevoTicket.asunto || !nuevoTicket.mensaje">
+          @if (isSaving) {
+            <span class="spinner-small icon-mr-5"></span> Enviando...
+          } @else {
+            <i class="fas fa-paper-plane icon-mr-5"></i> Enviar Ticket
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <h2 class="subtitulo mt-4">HISTORIAL DE TICKETS</h2>
+  <div class="table-container neumorphic-panel">
+    @if (isLoading) {
+      <div class="fade-in">
+        <app-loading-spinner message="Cargando historial de tickets..."></app-loading-spinner>
+      </div>
+    } @else {
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Asunto</th>
+            <th>Estado</th>
+            <th>Resolución/Notas</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (ticket of tickets; track ticket.id) {
+            <tr>
+              <td>{{ ticket.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td><strong>{{ ticket.asunto }}</strong><br><small class="text-muted">{{ ticket.mensaje }}</small></td>
+              <td>
+                <span class="badge" [ngClass]="getEstadoBadgeClass(ticket.estado)">
+                  {{ ticket.estado }}
+                </span>
+              </td>
+              <td>{{ ticket.notas_resolucion || 'Aún sin revisión' }}</td>
+            </tr>
+          }
+          @if (tickets.length === 0) {
+            <tr>
+              <td colspan="4" class="text-center tabla-vacia">No tienes tickets de soporte generados.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>

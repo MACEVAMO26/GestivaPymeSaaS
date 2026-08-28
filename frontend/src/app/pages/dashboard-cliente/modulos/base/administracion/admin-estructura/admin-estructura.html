@@ -1,0 +1,335 @@
+<!-- HTML VISTA PRINCIPAL DE ESTRUCTURA ORGANIZACIONAL -->
+<div class="gestion-humana-container fade-in">
+  <div [hidden]="isModalSedeOpen || isModalAreaOpen || isModalCargoOpen" class="main-view-wrapper">
+    <div class="volver-wrapper">
+      <button class="btn-volver btn-pill" onclick="window.history.back()">
+        <i class="fas fa-arrow-left icon-mr-5"></i> Volver
+      </button>
+    </div>
+
+    <div class="module-header text-center mb-4">
+      <h1 class="titulo-principal">ESTRUCTURA ORGANIZACIONAL</h1>
+      <p class="descripcion-general">Gestiona sedes, áreas, departamentos y cargos de la empresa.</p>
+
+      <div class="acciones-centro mt-3">
+        @if (activeTab === 'sedes') {
+          <button class="btn-add btn-pill" (click)="abrirModalSede()">+ Nueva Sede</button>
+        } @else if (activeTab === 'areas') {
+          <button class="btn-add btn-pill" (click)="abrirModalArea()">+ Nueva Área</button>
+        } @else if (activeTab === 'cargos') {
+          <button class="btn-add btn-pill" (click)="abrirModalCargo()">+ Nuevo Cargo</button>
+        }
+      </div>
+    </div>
+
+    <div class="tabs-nav-wrapper">
+      <button class="tab-neu-inactive" [class.tab-neu-active]="activeTab === 'sedes'" (click)="setTab('sedes')"> <span class="icon">🏢</span> Sedes </button>
+      <button class="tab-neu-inactive" [class.tab-neu-active]="activeTab === 'areas'" (click)="setTab('areas')"> <span class="icon">📍</span> Áreas </button>
+      <button class="tab-neu-inactive" [class.tab-neu-active]="activeTab === 'cargos'" (click)="setTab('cargos')"> <span class="icon">👔</span> Cargos </button>
+    </div>
+
+    <div class="neu-card neu-card-wide">
+      @if (isLoading) {
+        <div class="fade-in">
+          <app-loading-spinner message="Cargando datos..."></app-loading-spinner>
+        </div>
+      } @else {
+        <!-- TAB SEDES -->
+        @if (activeTab === 'sedes') {
+          <h2 class="subtitulo">SEDES REGISTRADAS</h2>
+          <div class="table-container fade-in">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nombre de la Sede</th>
+                  <th>Dirección</th>
+                  <th>Teléfono</th>
+                  <th>Estado</th>
+                  <th class="text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (sede of sedes; track sede.id) {
+                  <tr>
+                    <td><strong>{{ sede.nombre }}</strong></td>
+                    <td>{{ sede.direccion || 'N/A' }}</td>
+                    <td>{{ sede.telefono || 'N/A' }}</td>
+                    <td>
+                      @if (sede.estado === 'activa') {
+                        <span class="badge badge-activo">Activa</span>
+                      } @else {
+                        <span class="badge badge-baja">Inactiva</span>
+                      }
+                    </td>
+                    <td class="text-center">
+                      <div class="acciones-tabla-centro">
+                        <button class="btn-general-1 btn-pill btn-xs" (click)="abrirEdicionSede(sede)" title="Editar Sede">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+                @if (sedes.length === 0) {
+                  <tr><td colspan="5" class="text-center" style="padding: 2rem;">No hay sedes registradas.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        <!-- TAB ÁREAS -->
+        @if (activeTab === 'areas') {
+          <h2 class="subtitulo">ÁREAS REGISTRADAS</h2>
+          <div class="table-container fade-in">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 20%;">Nombre del Área</th>
+                  <th style="width: 30%;">Descripción</th>
+                  <th style="width: 25%;">Módulos Asignados</th>
+                  <th style="width: 10%;">Estado</th>
+                  <th style="width: 15%; text-align: center;">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (area of areas; track area.id) {
+                  <tr>
+                    <td><strong>{{ area.nombre }}</strong></td>
+                    <td class="text-muted">{{ area.descripcion || 'Sin descripción' }}</td>
+                    <td>
+                      <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                        @for (mod of area.modulos; track mod.id) {
+                          <span class="badge badge-activo" style="font-size: 10px; padding: 3px 8px;">{{ mod.nombre }}</span>
+                        }
+                        @if (!area.modulos || area.modulos.length === 0) {
+                          <span style="color: #888; font-size: 11px;">
+                            {{ area.nombre.toLowerCase() === 'gerencia' ? 'Todos los módulos' : 'Ninguno' }}
+                          </span>
+                        }
+                      </div>
+                    </td>
+                    <td>
+                      @if (area.activo) {
+                        <span class="badge badge-activo">Activa</span>
+                      } @else {
+                        <span class="badge badge-baja">Inactiva</span>
+                      }
+                    </td>
+                    <td class="text-center">
+                      <div class="acciones-tabla-centro">
+                        <button class="btn-general-1 btn-pill btn-xs" (click)="abrirEdicionArea(area)" title="Editar Área y Módulos">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-general-5 btn-pill btn-xs" (click)="cambiarEstadoArea(area)" [title]="area.activo ? 'Desactivar Área' : 'Activar Área'">
+                          <i class="fas" [ngClass]="area.activo ? 'fa-ban' : 'fa-check'"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+                @if (areas.length === 0) {
+                  <tr><td colspan="5" class="text-center" style="padding: 2rem;">No hay áreas registradas.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        <!-- TAB CARGOS -->
+        @if (activeTab === 'cargos') {
+          <h2 class="subtitulo">CARGOS REGISTRADOS</h2>
+          <div class="fade-in">
+            @for (rol of roles; track rol.id) {
+              @if (getCargosByRol(rol.id).length > 0) {
+                <h3 class="panel-title text-left mt-4 mb-2" style="color: #6B8F71; font-size: 14px; text-transform: uppercase; border-bottom: 1px solid #d1d1bc; padding-bottom: 4px;">{{ rol.nombre }}</h3>
+                <div class="table-container mb-4" style="box-shadow: none; border: 1px solid rgba(0,0,0,0.05); background: transparent;">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Nombre del Cargo</th>
+                        <th>Descripción</th>
+                        <th>Estado</th>
+                        <th class="text-center">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (cargo of getCargosByRol(rol.id); track cargo.id) {
+                        <tr>
+                          <td><strong>{{ cargo.nombre }}</strong></td>
+                          <td class="text-muted">{{ cargo.descripcion || 'Sin descripción' }}</td>
+                          <td>
+                            @if (cargo.activo) {
+                              <span class="badge badge-activo">Activo</span>
+                            } @else {
+                              <span class="badge badge-baja">Inactivo</span>
+                            }
+                          </td>
+                          <td class="text-center">
+                            <div class="acciones-tabla-centro">
+                              <button class="btn-general-1 btn-pill btn-xs" (click)="abrirEdicionCargo(cargo)" [disabled]="cargo.nombre === 'Jefe de Recursos Humanos' || cargo.nombre === 'Gerente General'" title="Editar Cargo">
+                                <i class="fas fa-edit"></i>
+                              </button>
+                              <button class="btn-general-5 btn-pill btn-xs" (click)="cambiarEstadoCargo(cargo)" [disabled]="cargo.nombre === 'Jefe de Recursos Humanos' || cargo.nombre === 'Gerente General'" [title]="cargo.activo ? 'Desactivar' : 'Activar'">
+                                <i class="fas" [ngClass]="cargo.activo ? 'fa-ban' : 'fa-check'"></i>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
+            }
+            
+            @if (cargos.length === 0) {
+              <div class="text-center" style="padding: 2rem;">No hay cargos registrados.</div>
+            }
+          </div>
+        }
+      }
+    </div>
+  </div>
+
+  <!-- PANEL NUEVA/EDITAR SEDE -->
+  @if (isModalSedeOpen) {
+  <div class="view-switch-panel fade-in">
+    <div class="neu-card neu-card-wide">
+      <div class="text-center mb-4">
+        <h3 class="titulo-principal">{{ editandoSedeId ? 'EDITAR' : 'NUEVA' }} SEDE</h3>
+      </div>
+      <form>
+        <div class="form-row-divider mb-3">
+          <div class="form-group">
+            <label class="form-label">Nombre de la Sede <span class="text-danger">*</span></label>
+            <input type="text" class="input-neumorphic" name="nombre" [(ngModel)]="nuevaSede.nombre" required>
+          </div>
+        </div>
+        <div class="form-row-divider mb-3">
+          <div class="form-group">
+            <label class="form-label">Dirección</label>
+            <input type="text" class="input-neumorphic" name="direccion" [(ngModel)]="nuevaSede.direccion">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Teléfono</label>
+            <input type="text" class="input-neumorphic" name="telefono" [(ngModel)]="nuevaSede.telefono">
+          </div>
+        </div>
+        @if (editandoSedeId) {
+          <div class="form-row-divider mb-3">
+            <div class="form-group">
+              <label class="form-label">Estado</label>
+              <select class="input-neumorphic" name="estado" [(ngModel)]="nuevaSede.estado">
+                <option value="activa">Activa</option>
+                <option value="inactiva">Inactiva</option>
+              </select>
+            </div>
+          </div>
+        }
+        <div class="acciones-centro" style="margin-top: 2rem;">
+          <button type="button" class="btn-general-5 btn-pill btn-action" (click)="cerrarModales()" [disabled]="isSaving">Cancelar</button>
+          <button type="button" class="btn-save btn-pill btn-action" (click)="guardarSede()" [disabled]="isSaving">
+            @if (isSaving) { Guardando... } @else { Guardar }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  }
+
+  <!-- PANEL NUEVA ÁREA -->
+  @if (isModalAreaOpen) {
+  <div class="view-switch-panel fade-in">
+    <div class="neu-card neu-card-wide">
+      <div class="text-center mb-4">
+        <h3 class="titulo-principal">NUEVA ÁREA</h3>
+      </div>
+      <form>
+        <div class="form-group mb-3">
+          <label class="form-label">Nombre del Área <span class="text-danger">*</span></label>
+          <input type="text" class="input-neumorphic" name="nombre" [(ngModel)]="nuevaArea.nombre" required>
+        </div>
+        <div class="form-group mb-3">
+          <label class="form-label">Descripción</label>
+          <textarea class="input-neumorphic" name="descripcion" [(ngModel)]="nuevaArea.descripcion" rows="3"></textarea>
+        </div>
+
+        <!-- HTML SELECTOR DE MÓDULOS POR ÁREA -->
+        <div class="form-group mb-4">
+          <label class="form-label" style="font-weight: bold; display: block; margin-bottom: 5px;">Módulos Asignados al Área</label>
+          <p style="margin-bottom: 5px; font-size: 12px; color: #888;">Selecciona los módulos a los que tendrán acceso los cargos de esta área.</p>
+          <p style="margin-bottom: 15px; font-size: 11px; color: #aaa;"><em>Nota: Los módulos base (Inicio, Administración, Formalización, Autogestión, Gestiva IA, Tareas) son fijos por sistema y no requieren asignación por área.</em></p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; padding: 15px; border-radius: 12px; background: #f5f5dc; box-shadow: inset 4px 4px 8px #d0d0bb, inset -4px -4px 8px #ffffff;">
+            @for (mod of modulosDisponiblesParaAreaSeleccionada; track mod.id) {
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" [checked]="isModuloUiSeleccionado(mod.id)" (change)="toggleModuloArea(mod.id)" style="width: 16px; height: 16px; accent-color: #45a1ae;">
+                <span style="font-size: 13px; font-weight: 500;">{{ mod.nombre }}</span>
+              </label>
+            }
+            @if (modulosDisponiblesParaAreaSeleccionada.length === 0) {
+              <span style="font-size: 12px; color: #888;">Cargando módulos...</span>
+            }
+          </div>
+        </div>
+
+        <div class="acciones-centro" style="margin-top: 2rem;">
+          <button type="button" class="btn-general-5 btn-pill btn-action" (click)="cerrarModales()" [disabled]="isSaving">Cancelar</button>
+          <button type="button" class="btn-save btn-pill btn-action" (click)="guardarArea()" [disabled]="isSaving">
+            @if (isSaving) { Guardando... } @else { Guardar }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  }
+
+  <!-- PANEL NUEVO CARGO -->
+  @if (isModalCargoOpen) {
+  <div class="view-switch-panel fade-in">
+    <div class="neu-card neu-card-wide">
+        <div class="text-center mb-4">
+          <h3 class="titulo-principal">{{ editandoCargoId ? 'EDITAR CARGO' : 'NUEVO CARGO' }}</h3>
+        </div>
+      <form>
+        <div class="form-group mb-3">
+          <label class="form-label">Nombre del Cargo <span class="text-danger">*</span></label>
+          <input type="text" class="input-neumorphic" name="nombre" [(ngModel)]="nuevoCargo.nombre" required>
+        </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Área Asociada <span class="text-danger">*</span></label>
+            <select class="input-neumorphic" name="area_id" [(ngModel)]="nuevoCargo.area_id" required>
+              <option value="">Selecciona un Área</option>
+              @for (area of areas; track area.id) {
+                <option [value]="area.id">{{ area.nombre }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Rol de Sistema Asociado <span class="text-danger">*</span></label>
+            <select class="input-neumorphic" name="rol_id" [(ngModel)]="nuevoCargo.rol_id" required>
+              <option value="">Selecciona un Rol</option>
+              @for (rol of roles; track rol.id) {
+                <option [value]="rol.id">{{ rol.nombre }}</option>
+              }
+            </select>
+          </div>
+        <div class="form-group mb-3">
+          <label class="form-label">Descripción</label>
+          <textarea class="input-neumorphic" name="descripcion" [(ngModel)]="nuevoCargo.descripcion" rows="2"></textarea>
+        </div>
+        <div class="form-group mb-3">
+          <label class="form-label">Funciones</label>
+          <textarea class="input-neumorphic" name="funciones" [(ngModel)]="nuevoCargo.funciones" rows="2"></textarea>
+        </div>
+        <div class="acciones-centro" style="margin-top: 2rem;">
+          <button type="button" class="btn-general-5 btn-pill btn-action" (click)="cerrarModales()" [disabled]="isSaving">Cancelar</button>
+          <button type="button" class="btn-save btn-pill btn-action" (click)="guardarCargo()" [disabled]="isSaving">
+            @if (isSaving) { Guardando... } @else { Guardar }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  }
+</div>

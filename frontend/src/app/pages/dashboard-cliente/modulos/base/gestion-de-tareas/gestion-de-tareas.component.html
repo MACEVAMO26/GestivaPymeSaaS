@@ -1,0 +1,225 @@
+<div class="module-container fade-in">
+
+  <div class="module-header text-center mb-4 relative">
+    <h1 class="titulo-principal">GESTIÓN DE TAREAS</h1>
+    <p class="descripcion-general">Crea, asigna y da seguimiento a las tareas del equipo, incluidas las cooperativas por área.</p>
+  </div>
+
+  <!-- PESTAÑAS -->
+  <div class="tabs-nav-wrapper">
+    <button class="tab-neu-inactive" [class.tab-neu-active]="activeTab === 'asignacion'" (click)="switchTab('asignacion')"> <span class="icon">📌</span> ASIGNACIÓN DE TAREAS </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="activeTab === 'actuales'" (click)="switchTab('actuales')"> <span class="icon">🔄</span> TAREAS ACTUALES </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="activeTab === 'entregadas'" (click)="switchTab('entregadas')"> <span class="icon">✅</span> TAREAS ENTREGADAS </button>
+  </div>
+
+  <div class="tab-content neumorphic-panel-inner p-4">
+
+    <div class="volver-wrapper">
+      <button class="btn-volver btn-pill" onclick="window.history.back()">
+        <i class="fas fa-arrow-left"></i> Volver
+      </button>
+    </div>
+
+    @if(activeTab === 'asignacion') {
+    <div class="neumorphic-panel fade-in">
+      <h2 class="subtitulo">Asignar Nueva Tarea</h2>
+        <form (ngSubmit)="crearTarea()">
+
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label class="form-label">Título de la tarea: *</label>
+              <input type="text" class="input-neumorphic" name="titulo" [(ngModel)]="nuevaTarea.titulo" required>
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label">Descripción detallada:</label>
+              <textarea class="input-neumorphic" name="descripcion" [(ngModel)]="nuevaTarea.descripcion" rows="3"></textarea>
+            </div>
+
+            @if (esGerenteOjefe) {
+              <div class="form-group">
+                <label class="form-label">Tipo de tarea: *</label>
+                <div class="tipo-tarea-opciones">
+                  <button type="button" class="tab-neu-inactive" [class.tab-neu-active]="nuevaTarea.tipo === 'individual'" (click)="setTipo('individual')">
+                    Individual
+                  </button>
+                  <button type="button" class="tab-neu-inactive" [class.tab-neu-active]="nuevaTarea.tipo === 'cooperativa'" (click)="setTipo('cooperativa')">
+                    Cooperativa
+                  </button>
+                </div>
+              </div>
+            }
+
+            @if (nuevaTarea.tipo === 'cooperativa' && esGerenteOjefe) {
+              <div class="form-group">
+                <label class="form-label">Área destino (cooperativa): *</label>
+                <select class="input-neumorphic" name="area_id" [(ngModel)]="nuevaTarea.area_id" required>
+                  <option [ngValue]="0">-- Seleccione el Área --</option>
+                  <option *ngFor="let a of areas" [ngValue]="a.id">{{ a.nombre }}</option>
+                </select>
+                <small class="text-muted">La tarea cooperativa será visible para todos los Operativos del área.</small>
+              </div>
+            }
+
+            @if (esOperativo) {
+              <div class="form-group full-width">
+                <div class="banner banner-aviso">
+                  <p class="banner-text">
+                    Como Operativo puedes crear tareas solo para ti mismo. Para tareas cooperativas o asignadas a otros, solicítalo al Jefe de Área.
+                  </p>
+                </div>
+              </div>
+            }
+
+            @if (nuevaTarea.tipo === 'individual') {
+              <div class="form-group">
+                <label class="form-label">Asignar a: *</label>
+                @if (esOperativo) {
+                  <input type="text" class="input-neumorphic" [value]="user?.primer_nombre + ' ' + user?.primer_apellido" disabled>
+                } @else {
+                  <select class="input-neumorphic" name="asignado_id" [(ngModel)]="nuevaTarea.asignado_id" required>
+                    <option [ngValue]="0">-- Seleccione Empleado --</option>
+                    <option *ngFor="let emp of empleados" [ngValue]="emp.usuario?.id">
+                      {{ nombreUsuario(emp.usuario) }} ({{ emp.cargo?.nombre || 'Sin cargo' }})
+                    </option>
+                  </select>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-add btn-pill" [disabled]="guardando">
+              @if (guardando) {
+                <span class="spinner-small"></span> Guardando...
+              } @else {
+                + Asignar Tarea
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    }
+
+    @if(activeTab === 'actuales') {
+    <div class="neumorphic-panel fade-in">
+      <h2 class="subtitulo">Tareas Actuales</h2>
+
+        @if (cargando) {
+          <div class="text-center-py-8">
+            <app-loading-spinner message="Cargando tareas..."></app-loading-spinner>
+          </div>
+        }
+
+        @if (!cargando) {
+          <div class="table-container">
+            <table class="data-table neumorphic-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Título</th>
+                  <th>Tipo</th>
+                  <th>Asignado Por</th>
+                  <th>Asignado A</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let t of tareasActuales">
+                  <td>{{ t.id }}</td>
+                  <td>
+                    {{ t.titulo }}
+                    <div *ngIf="t.descripcion" class="td-desc">{{ t.descripcion }}</div>
+                  </td>
+                  <td>
+                    <span *ngIf="esCooperativa(t)" class="badge badge-cooperativa">
+                      ðŸ‘¥ Cooperativa ({{ nombreArea(t) }})
+                    </span>
+                    <span *ngIf="!esCooperativa(t)" class="badge badge-individual">
+                      ðŸ‘¤ Individual
+                    </span>
+                  </td>
+                  <td>{{ nombreUsuario(t.asignador) }}</td>
+                  <td>{{ nombreUsuario(t.asignado) }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="claseEstado(t.estado)">{{ etiquetaEstado(t.estado) }}</span>
+                  </td>
+                  <td>
+                    @if (puedeEditarEstado(t)) {
+                      <select #estadoSelect class="input-neumorphic select-estado" (change)="actualizarEstado(t.id, estadoSelect.value)">
+                        <option value="" selected disabled>Cambiar...</option>
+                        <option value="notificada">Notificada</option>
+                        <option value="vista">Vista</option>
+                        <option value="en_proceso">En Proceso</option>
+                        <option value="con_dificultades">Con Dificultades</option>
+                        <option value="terminada">Terminada</option>
+                      </select>
+                    } @else {
+                      <span class="text-muted">Solo lectura</span>
+                    }
+                  </td>
+                </tr>
+                <tr *ngIf="tareasActuales.length === 0">
+                  <td colspan="7" class="text-center">No hay tareas actuales.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    }
+
+    @if(activeTab === 'entregadas') {
+    <div class="neumorphic-panel fade-in">
+      <h2 class="subtitulo">Tareas Entregadas</h2>
+
+        @if (cargando) {
+          <div class="text-center-py-8">
+            <app-loading-spinner message="Cargando tareas..."></app-loading-spinner>
+          </div>
+        }
+
+        @if (!cargando) {
+          <div class="table-container">
+            <table class="data-table neumorphic-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Título</th>
+                  <th>Tipo</th>
+                  <th>Asignado Por</th>
+                  <th>Asignado A</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let t of tareasEntregadas">
+                  <td>{{ t.id }}</td>
+                  <td>{{ t.titulo }}</td>
+                  <td>
+                    <span *ngIf="esCooperativa(t)" class="badge badge-cooperativa">
+                      ðŸ‘¥ Cooperativa ({{ nombreArea(t) }})
+                    </span>
+                    <span *ngIf="!esCooperativa(t)" class="badge badge-individual">
+                      ðŸ‘¤ Individual
+                    </span>
+                  </td>
+                  <td>{{ nombreUsuario(t.asignador) }}</td>
+                  <td>{{ nombreUsuario(t.asignado) }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="claseEstado(t.estado)">{{ etiquetaEstado(t.estado) }}</span>
+                  </td>
+                </tr>
+                <tr *ngIf="tareasEntregadas.length === 0">
+                  <td colspan="6" class="text-center">No hay tareas entregadas.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+</div>

@@ -1,0 +1,128 @@
+/* ==========================================================================
+   SISTEMA DE DISEÑO BASE DEL CLIENTE
+========================================================================== */
+
+/* --- 1. VARIABLES GLOBALES DE COLOR --- */
+// Fondos
+$bg-base: #f5f5dc; // Beige claro, fondo principal
+$bg-header: #efefd3; // Variante más oscura para header
+
+// Textos
+$text-main: #1a1a1a;
+$text-muted: #4a4a4a;
+
+// Colores Base Botones según Regla 19 de AGENTS.md
+$btn-agregar-bg: #45a1ae; // Botón "+ Agregar/Nuevo" (siempre azul claro)
+$btn-agregar-text: #000000; // Letra negra
+
+$btn-volver-bg: #de3737; // Botón "Volver" (siempre rojo)
+$btn-volver-text: #ffffff; // Letras blancas
+
+$btn-guardar-bg: #066810; // Botones de guardado/carga (verde exclusivo)
+$btn-guardar-text: #ffffff; // Letra blanca
+
+// Colores permitidos para botones generales
+$color-gen-1: #6B8F71;
+$color-gen-2: #7C6FA6;
+$color-gen-3: #C9A227;
+$color-gen-4: #8E5B75;
+$color-gen-5: #B5654A;
+$color-gen-6: #A38B6D;
+
+
+/* --- 2. MIXINS NEUMÓRFICOS (Relieves y Hundimientos) --- */
+@mixin shadow-elevated {
+  box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.08), -6px -6px 12px rgba(255, 255, 255, 0.8);
+}
+
+@mixin shadow-sunk {
+  box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.08), inset -4px -4px 8px rgba(255, 255, 255, 0.8);
+}
+
+@mixin shadow-button {
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.12), -4px -4px 8px rgba(255, 255, 255, 0.9);
+}
+
+
+/* --- 3. MIXINS ESTRUCTURALES (Tipografía) --- */
+@mixin text-title-main {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 700; // Únicos con negrita
+  text-transform: uppercase;
+  text-align: center;
+  color: $text-main;
+}
+
+@mixin text-subtitle {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 400; // Sin negrita
+  text-transform: uppercase;
+  text-align: left;
+  color: $text-main;
+}
+
+@mixin text-normal {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: $text-main;
+}
+
+@mixin text-description {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  color: $text-muted;
+}
+
+
+/* --- 4. CLASES UTILITARIAS PARA BOTONES --- */
+
+
+@mixin btn-pill-base {
+  border-radius: 9999px; // Forma de cápsula completa
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 24px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  
+  &:active {
+    @include shadow-sunk;
+  }
+}
+
+// Botón Agregar / Nuevo
+@mixin btn-agregar {
+  @include btn-pill-base;
+  @include shadow-button;
+  background-color: $btn-agregar-bg;
+  color: $btn-agregar-text;
+  border: 2px solid $btn-agregar-border;
+}
+
+// Botón Volver
+@mixin btn-volver {
+  @include btn-pill-base;
+  @include shadow-button;
+  background-color: $btn-volver-bg;
+  color: $btn-volver-text;
+  border: 2px solid $btn-volver-border;
+}
+
+// Botón Guardar / Carga
+@mixin btn-guardar {
+  @include btn-pill-base;
+  // Exclusivo: Diseño flat oscuro sin luz
+  box-shadow: none;
+  background-color: $btn-guardar-bg;
+  color: $btn-guardar-text;
+  border: 2px solid $btn-guardar-border;
+}

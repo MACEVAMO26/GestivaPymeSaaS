@@ -1,0 +1,70 @@
+﻿<div [ngClass]="isEmbedded ? '' : 'module-container fade-in'">
+  @if(!isEmbedded) {
+  <div class="module-header text-center mb-4 relative">
+    <h1>Reportes y Analíticas de Servicios</h1>
+    <p>Visualice las métricas de eficiencia de los técnicos y servicios más solicitados.</p>
+  </div>
+  }
+
+  <div [ngClass]="isEmbedded ? '' : 'tab-content neumorphic-panel-inner p-4'">
+    @if(!isEmbedded) {
+    <div class="volver-wrapper">
+      <button class="btn-volver btn-pill" onclick="window.history.back()">
+        <i class="fas fa-arrow-left"></i> Volver
+      </button>
+    </div>
+    }
+
+    <div class="neumorphic-panel fade-in">
+      <h2 class="subtitulo">Filtros de Reporte</h2>
+      <div class="form-grid" style="align-items: end;">
+        <div class="form-group">
+          <label class="form-label">Desde:</label>
+          <input type="date" class="input-neumorphic" [(ngModel)]="desde">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Hasta:</label>
+          <input type="date" class="input-neumorphic" [(ngModel)]="hasta">
+        </div>
+        <div class="form-group" style="padding-bottom: 0.2rem;">
+          <button type="button" class="btn-general-2 btn-pill" (click)="generarReporte()">Generar Reporte</button>
+        </div>
+      </div>
+
+      @if(cargando) {
+        <div class="text-center" style="padding: 2rem;">
+          <i class="fas fa-spinner fa-spin" style="font-size: 16px;"></i>
+          <p class="descripcion-general" style="margin-top: 0.5rem;">Calculando métricas...</p>
+        </div>
+      } @else {
+        <div class="mt-4">
+          <h2 class="subtitulo">Métricas Principales</h2>
+          <div class="metrics-grid">
+
+            <div class="neumorphic-panel-inner text-center">
+              <p class="metric-label">Total de Tickets Atendidos</p>
+              <strong class="metric-value-accent">{{totalAtendidos}}</strong>
+            </div>
+
+            <div class="neumorphic-panel-inner text-center">
+              <p class="metric-label">Técnico con más servicios</p>
+              <strong class="metric-value">{{tecnicoTop}}</strong>
+            </div>
+
+            <div class="neumorphic-panel-inner text-center">
+              <p class="metric-label">Servicio más demandado</p>
+              <strong class="metric-value">{{servicioTop}}</strong>
+            </div>
+
+            <div class="neumorphic-panel-inner text-center">
+              <p class="metric-label">Tasa de Finalización</p>
+              <strong class="metric-value-danger">{{tasaFinalizacion}}%</strong>
+            </div>
+
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,341 @@
+<!-- HTML NAVEGACION -->
+<nav class="navbar">
+  <div class="navbar-container">
+    <div class="navbar-content">
+      <div class="navbar-logo">
+        <img src="assets/images/Logos/GESTIVAPYME(6).png" alt="GestivaPyme" class="logo-img">
+      </div>
+      <div class="navbar-links">
+        <a href="#nosotros" class="nav-link">Quiénes Somos</a>
+        <a href="#servicios" class="nav-link">Qué Ofrecemos</a>
+        <a href="#compromiso" class="nav-link">Compromiso Social</a>
+        <a href="#precios" class="nav-link">Precios</a>
+        <a routerLink="/login" (click)="goToLogin(); $event.preventDefault()" class="nav-btn-login">Iniciar Sesión</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- HTML CONTENIDO -->
+<main class="main-content">
+
+  <!-- HTML HERO -->
+  <section class="hero-section">
+    <div class="hero-container">
+      
+      <div class="hero-text-area">
+        <h1 class="hero-title">
+          Gestión inteligente para <span class="text-emerald-500">negocios reales</span>
+        </h1>
+        <p class="hero-subtitle">
+          Ya seas un negocio de servicios, ventas o ambos, nuestro sistema en la nube te ayudará a tomar el control total. GestivaPyme es el aliado tecnológico que organiza tu equipo, automatiza tus procesos y potencia tu crecimiento de verdad.
+        </p>
+        <p class="hero-colombiana">
+          Diseñado y creado por una 
+          <span class="text-flag">colombiana</span>, 
+          para solucionar las necesidades reales de los emprendedores 
+          <span class="text-flag">colombianos</span>.
+        </p>
+        <div class="hero-actions" style="position: relative; z-index: 20;">
+          <a routerLink="/login" class="btn-start" style="cursor: pointer;">
+            Empieza Ahora
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-image-area">
+        <div class="hero-glow"></div>
+        <div class="hero-image-box">
+          <img src="assets/illustrations/landingpage.jpg" alt="fotografia de equipo" class="hero-main-image">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HTML NOSOTROS -->
+  <section id="nosotros" class="about-section">
+    <div class="about-container">
+      <div class="about-header">
+        <h2 class="section-title">Quiénes Somos</h2>
+        <p class="section-subtitle">
+          Somos un equipo apasionado por democratizar la tecnología. Creemos que las herramientas de gestión de clase mundial no deberían ser exclusivas de las multinacionales. Estamos aquí para darle superpoderes a los dueños y dueñas de negocios reales.
+        </p>
+      </div>
+
+      <div class="mission-vision-grid">
+        
+        <div class="mv-card">
+          <div class="mv-icon">🎯</div>
+          <h3 class="mv-title">Nuestra Misión</h3>
+          <p class="mv-text">
+            Empoderar a micro y pequeñas empresas con tecnología accesible, intuitiva y potente, permitiéndoles organizar sus equipos y finanzas para competir en el mercado actual sin el estrés de las grandes corporaciones.
+          </p>
+        </div>
+
+        <div class="mv-card">
+          <div class="mv-icon">👁️</div>
+          <h3 class="mv-title">Nuestra Visión</h3>
+          <p class="mv-text">
+            Ser el aliado tecnológico número uno de las pymes en la región, construyendo una red de negocios eficientes, rentables y liderados por personas reales que por fin tienen el control de su tiempo.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- HTML COMPROMISO SOCIAL -->
+  <section id="compromiso" class="social-section">
+    <div class="social-glow"></div>
+    
+    <div class="social-content">
+      <h2 class="social-title">Compromiso Social</h2>
+      <p class="social-text">
+        No solo hacemos software, construimos comunidad. En GestivaPyme estamos comprometidos con el desarrollo local. Por eso, destinamos un porcentaje de nuestros ingresos y horas de capacitación para ayudar a pequeños emprendedores de bajos recursos a digitalizar sus primeros negocios. <strong>Porque si tú creces, crecemos todos.</strong>
+      </p>
+      
+      <div class="social-badge">
+        <span class="social-badge-icon">🌱</span>
+        <span class="social-badge-text">Tecnología con propósito humano</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- HTML SOLUCIONES -->
+  <section id="servicios" class="features-section">
+    <div class="features-container">
+      <div class="features-header">
+        <h2 class="section-title">Tu Plan Base + Módulos a tu Medida</h2>
+        <p class="section-subtitle">Paga solo por lo que usas. Un sistema base completo, y módulos adicionales por solo $20.000 extra al mes para cuando tu negocio crezca.</p>
+      </div>
+      
+      <div class="features-grid">
+        
+        <div class="feature-card">
+          <div class="feature-glow"></div>
+          <div class="feature-icon">📊</div>
+          <h3 class="feature-title">Gestión Financiera</h3>
+          <p class="feature-text">Controla tus ingresos, gastos y prefacturación de forma intuitiva y sin complicaciones.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-glow"></div>
+          <div class="feature-icon">👥</div>
+          <h3 class="feature-title">Control de Equipos</h3>
+          <p class="feature-text">Asigna tareas, maneja horarios y mejora la comunicación de tu pequeño equipo.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-glow"></div>
+          <div class="feature-icon">📦</div>
+          <h3 class="feature-title">Inventario Simple</h3>
+          <p class="feature-text">Para tu ferretería o e-commerce. Conoce exactamente qué tienes disponible en bodega en todo momento.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- HTML PRECIOS -->
+  <section id="precios" class="pricing-section">
+    <div class="pricing-container">
+      <div class="pricing-header">
+        <h2 class="section-title">Planes Simples y Transparentes</h2>
+        <p class="section-subtitle">Diseñados para el flujo de caja de las pequeñas empresas reales.</p>
+      </div>
+
+      <div class="pricing-grid">
+        
+        <!-- Plan Emprendedor -->
+        <div class="pricing-card card-emprendedor">
+          <h3 class="pricing-title">Plan Emprendedor</h3>
+          <p class="pricing-desc">Ideal para microempresas<br><span class="user-limit">(Hasta 5 usuarios)</span></p>
+          <div class="pricing-price">
+            <span class="price-amount text-blue-400">$70.000</span>
+            <span class="price-period"> COP / mes</span>
+          </div>
+          <div class="referral-banner banner-blue">
+            <span class="text-xs font-medium">🤝 <strong>¿Vienes referido o traes a un amigo?</strong> Obtén <strong>10% de descuento</strong></span>
+          </div>
+          <ul class="pricing-features">
+            <li><span class="check-icon">✓</span> Hasta 5 usuarios en el sistema</li>
+            <li><span class="check-icon">✓</span> Gestión financiera y operativa base</li>
+            <li><span class="check-icon">✓</span> <strong>Plan Anual:</strong> ¡1 mes GRATIS + 5% EXTRA referidos!</li>
+          </ul>
+          <a routerLink="/login" class="pricing-btn btn-emprendedor mt-auto">Elegir Plan</a>
+        </div>
+
+        <!-- Plan Pyme -->
+        <div class="pricing-card card-pyme">
+          <div class="popular-badge-container">
+            <span class="popular-badge">Más Popular</span>
+          </div>
+          
+          <h3 class="pricing-title mt-4">Plan Pyme</h3>
+          <p class="pricing-desc">Para empresas en crecimiento<br><span class="user-limit">(Hasta 15 usuarios)</span></p>
+          <div class="pricing-price mb-4">
+            <span class="price-amount text-amber-400">$140.000</span>
+            <span class="price-period"> COP / mes</span>
+          </div>
+          <div class="referral-banner banner-amber">
+            <span class="text-xs font-medium">🤝 <strong>¿Vienes referido o traes a un amigo?</strong> Obtén <strong>10% de descuento</strong></span>
+          </div>
+          <ul class="pricing-features">
+            <li><span class="check-icon">✓</span> Hasta 15 usuarios simultáneos</li>
+            <li><span class="check-icon">✓</span> Soporte técnico prioritario</li>
+            <li><span class="check-icon">✓</span> <strong>Plan Anual:</strong> ¡1 mes GRATIS + 5% EXTRA referidos!</li>
+          </ul>
+          <a routerLink="/login" class="pricing-btn btn-pyme mt-auto">Elegir Plan</a>
+        </div>
+
+        <!-- Plan Empresarial -->
+        <div class="pricing-card card-empresarial">
+          <h3 class="pricing-title">Plan Empresarial</h3>
+          <p class="pricing-desc">Para operaciones robustas<br><span class="user-limit">(Hasta 50 usuarios)</span></p>
+          <div class="pricing-price">
+            <span class="price-amount text-emerald-400">$280.000</span>
+            <span class="price-period"> COP / mes</span>
+          </div>
+          <div class="referral-banner banner-emerald">
+            <span class="text-xs font-medium">🤝 <strong>¿Vienes referido o traes a un amigo?</strong> Obtén <strong>10% de descuento</strong></span>
+          </div>
+          <ul class="pricing-features">
+            <li><span class="check-icon">✓</span> Hasta 50 usuarios y máximo rendimiento</li>
+            <li><span class="check-icon">✓</span> Asignación de servidor dedicada</li>
+            <li><span class="check-icon">✓</span> <strong>Plan Anual:</strong> ¡1 mes GRATIS + 5% EXTRA referidos!</li>
+          </ul>
+          <a routerLink="/login" class="pricing-btn btn-empresarial mt-auto">Elegir Plan</a>
+        </div>
+
+      </div>
+
+      <p class="pricing-note">
+        Estos planes son de entrada. Además, contamos con planes de funciones adicionales como asistente IA, facturación electrónica, WhatsApp Business y gestión humana, por un costo atractivo y a la medida de tu negocio.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<!-- HTML FOOTER -->
+<footer class="footer-section">
+  <div class="footer-container">
+    
+    <div class="cookies-box">
+      <p>
+        Al navegar en los sitios webs propiedad de <strong class="text-emerald-400">GestivaPyme</strong>, se acepta el uso de Cookies según nuestros <a href="#" class="cookies-link">términos y condiciones</a>.
+      </p>
+    </div>
+    
+    <div class="footer-copyright">
+      <img src="assets/images/Logos/GESTIVAPYME(6).png" alt="GestivaPyme Logo" class="footer-logo">
+      <p class="footer-text">
+        COPYRIGHT © 2026 GestivaPyme S.A.S. Todos los derechos reservados.
+      </p>
+    </div>
+
+  </div>
+</footer>
+
+<!-- HTML CHATBOT -->
+<div class="chatbot-wrapper">
+  
+  <div class="chatbot-window" [class.force-open]="isChatbotOpen || botView === 'form' || botView === 'phone'">
+    
+    <div class="chatbot-header">
+      <div class="chatbot-header-glow"></div>
+      <div class="chatbot-avatar">
+         <img src="assets/images/Bot/gestiva-bot.png" alt="Gestiva">
+      </div>
+      <div class="chatbot-info">
+        <h4>Gestiva</h4>
+        <p>Asistente Virtual IA</p>
+      </div>
+    </div>
+    
+    <div class="chatbot-body">
+      @if (botView === 'menu') {
+        <p class="chatbot-greeting">
+          ¡Hola! Soy Gestiva 👋 ¿Cómo puedo ayudarte a impulsar tu Pyme hoy?
+        </p>
+        <div class="chatbot-options">
+          <button (click)="showPhone()" class="chat-option hover-blue">
+            <span class="option-text"><span class="mr-3 text-lg">📞</span> Llámanos</span>
+            <span class="option-arrow text-blue-500">→</span>
+          </button>
+          <button (click)="showForm()" class="chat-option hover-amber">
+            <span class="option-text"><span class="mr-3 text-lg">📅</span> Déjanos llamarte</span>
+            <span class="option-arrow text-amber-500">→</span>
+          </button>
+        </div>
+      }
+
+      @if (botView === 'phone') {
+        <div class="cb-phone-view">
+          <p class="cb-phone-label">Línea de atención nacional:</p>
+          <h3 class="cb-phone-number">
+            +57 300 000 00000
+          </h3>
+          <p class="cb-phone-hint">Puedes copiar el número y llamarnos cuando quieras.</p>
+          <button (click)="backToMenu()" class="cb-back-btn">
+            ← Volver al menú
+          </button>
+        </div>
+      }
+
+      @if (botView === 'form') {
+        <div class="cb-form-view">
+          <p class="cb-form-title">Déjanos tus datos y te contactaremos en breve:</p>
+          <form (ngSubmit)="submitLead()">
+            <input type="text" [(ngModel)]="leadForm.nombre" name="nombre" placeholder="Tu nombre" class="cb-input" required>
+            <input type="tel" [(ngModel)]="leadForm.telefono" name="telefono" placeholder="Teléfono" class="cb-input" required>
+            <input type="email" [(ngModel)]="leadForm.correo" name="correo" placeholder="Correo" class="cb-input" required>
+            
+            <select [(ngModel)]="leadForm.horario_llamada" name="horario_llamada" class="cb-input" required>
+              <option value="" disabled selected>¿A qué hora prefieres?</option>
+              <option value="Mañana (8am - 12pm)">Mañana (8am - 12pm)</option>
+              <option value="Tarde (12pm - 4pm)">Tarde (12pm - 4pm)</option>
+              <option value="Final de tarde (4pm - 8pm)">Final de tarde (4pm - 8pm)</option>
+            </select>
+            <p class="cb-input-hint">* De 8pm a 8am no se atiende</p>
+
+            <textarea [(ngModel)]="leadForm.mensaje" name="mensaje" placeholder="Mensaje (opcional)" class="cb-input" rows="2"></textarea>
+            
+            <div class="cb-form-actions">
+              <button type="button" (click)="backToMenu()" class="cb-btn-cancel">Cancelar</button>
+              <button type="submit" [disabled]="isSubmitting" class="cb-btn-submit">
+                <span *ngIf="!isSubmitting">Enviar</span>
+                <span *ngIf="isSubmitting" class="flex-center-all">
+                  <svg class="icon-spin-sm-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Enviando...
+                </span>
+              </button>
+            </div>
+          </form>
+          @if (errorMessage) {
+            <div class="cb-error">
+              {{ errorMessage }}
+            </div>
+          }
+        </div>
+      }
+
+      @if (botView === 'success') {
+        <div class="cb-success-view">
+          <div class="cb-success-icon">✓</div>
+          <p class="cb-success-title">¡Datos enviados!</p>
+          <p class="cb-success-desc">Nos pondremos en contacto contigo pronto.</p>
+        </div>
+      }
+    </div>
+  </div>
+
+  <button class="chatbot-trigger" [class.active-bot]="isChatbotOpen" (click)="toggleChatbot()">
+    <img src="assets/images/Bot/gestiva-bot.png" alt="Gestiva Botón">
+    <span class="chatbot-notification"></span>
+  </button>
+  
+</div>

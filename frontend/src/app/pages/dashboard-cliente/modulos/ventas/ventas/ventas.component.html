@@ -1,0 +1,265 @@
+<div class="module-container fade-in">
+  <div [hidden]="(showModalAnular && ventaSeleccionada)" class="main-view-wrapper">
+
+  <div class="module-header text-center mb-4 relative">
+    <h1 class="titulo-principal">VENTAS</h1>
+    <p class="descripcion-general">Gestión de Punto de Venta (POS) y registro de facturación de clientes.</p>
+    
+    <div class="acciones-centro mt-3">
+      <button class="btn-save btn-pill" (click)="exportarExcel()">
+        <i class="fas fa-file-excel icon-mr-5"></i> Exportar a Excel
+      </button>
+    </div>
+  </div>
+
+  <!-- HTML PESTAÑAS -->
+  <div class="tabs-nav-wrapper">
+    <button class="tab-neu-inactive" 
+            [class.tab-neu-active]="activeTab === 'pos'" 
+            (click)="switchTab('pos')"> <span class="icon">🛒</span> Punto de Venta </button>
+    <button class="tab-neu-inactive" 
+            [class.tab-neu-active]="activeTab === 'historial'" 
+            (click)="switchTab('historial')"> <span class="icon">📜</span> Historial de Ventas </button>
+  </div>
+
+  <!-- HTML CONTENIDO DE TABS -->
+  <div class="tab-content neumorphic-panel-inner p-4">
+  <!-- Botón Volver Inyectado -->
+  <div class="volver-wrapper">
+    <button class="btn-volver btn-pill" onclick="window.history.back()">
+      <i class="fas fa-arrow-left"></i> Volver
+    </button>
+  </div>
+    
+    <!-- HTML PUNTO DE VENTA POS -->
+    @if(activeTab === 'pos') {
+      <div class="neumorphic-panel fade-in pos-layout">
+        
+        <!-- HTML PANEL IZQUIERDO SELECCION -->
+        <div class="pos-panel-izq">
+          <!-- HTML BUSCADOR DE CLIENTE -->
+            <div class="neu-card" style="max-width: 800px; margin: 0 auto; margin-bottom: 0;">
+              <h3 class="panel-titulo"><i class="fas fa-user"></i> Datos del Cliente</h3>
+              <div class="form-group" style="margin-top: 1rem;">
+                <label>Cliente (Buscar o Seleccionar)</label>
+                <select class="input-neumorphic" [(ngModel)]="clienteSeleccionado">
+                  <option value="" disabled selected>Seleccione cliente...</option>
+                  @for(cliente of clientesDisponibles; track cliente.id) {
+                    <option [value]="cliente.id">{{cliente.nombres}} {{cliente.apellidos}} ({{cliente.documento}})</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+          <!-- HTML BUSCADOR DE PRODUCTO -->
+          <div class="neu-card" style="max-width: 800px; margin: 0 auto; padding: 1.5rem;">
+            <h3 class="panel-titulo" style="margin-bottom: 1rem;">Agregar Producto</h3>
+            <div class="form-fila">
+              <div class="form-group" style="flex: 2; margin-bottom: 0; min-width: 200px;">
+                <label>Producto *</label>
+                  <select class="input-neumorphic" [(ngModel)]="productoActual">
+                    <option value="" disabled selected>Seleccione producto del inventario...</option>
+                    @for(prod of productosDisponibles; track prod.id) {
+                      <option [value]="prod.id">{{prod.nombre}} ({{prod.precio_venta | currency:'COP':'symbol':'1.0-0'}})</option>
+                    }
+                  </select>
+              </div>
+              <div class="form-group" style="flex: 1; margin-bottom: 0; min-width: 100px;">
+                <label>Cant.</label>
+                <input type="number" class="input-neumorphic" [(ngModel)]="cantidadActual" min="1">
+              </div>
+              <div style="display: flex; align-items: flex-end;">
+                <button class="btn-add btn-pill" (click)="agregarAlCarrito()">
+                  <i class="fas fa-plus"></i> Agregar
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- HTML CARRITO DE COMPRAS -->
+          <div class="neu-card" style="max-width: 800px; margin: 0 auto; padding: 1.5rem; flex: 1;">
+            <h3 class="panel-titulo" style="margin-bottom: 1rem;">Detalle de la Venta</h3>
+            <div class="table-responsive" style="margin-top: 0;">
+              <table class="premium-table data-table">
+                <thead>
+                  <tr>
+                    <th>PRODUCTO</th>
+                    <th>PRECIO</th>
+                    <th>CANT.</th>
+                    <th>SUBTOTAL</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                    @for(item of carrito; track item.id; let i = $index) {
+                      <tr>
+                        <td>{{item.nombre}}</td>
+                        <td class="text-muted">{{item.precio_unitario | currency:'COP':'symbol':'1.0-0'}}</td>
+                        <td style="font-weight: bold;">{{item.cantidad}}</td>
+                        <td class="text-positivo">{{item.subtotal | currency:'COP':'symbol':'1.0-0'}}</td>
+                        <td style="text-align: right;">
+                        <button class="btn-icon text-danger" (click)="removerDelCarrito($index)"><i class="fas fa-times"></i></button>
+                      </td>
+                    </tr>
+                  }
+                  @if(carrito.length === 0) {
+                    <tr>
+                      <td colspan="6" class="text-muted" style="text-align: center; padding: 2rem;">El carrito está vacío. Agregue productos.</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- HTML PANEL DERECHO TOTALES -->
+        <div class="pos-panel-der">
+          <div class="neumorphic-panel resumen-panel">
+            <h3 class="panel-titulo" style="margin-bottom: 1rem;">Resumen</h3>
+            
+            <div class="subtotal-fila">
+              <span>Subtotal:</span>
+              <span>{{totalCarrito | currency:'COP':'symbol':'1.0-0'}}</span>
+            </div>
+            <div class="subtotal-fila">
+              <span>Impuestos (0%):</span>
+              <span>$0</span>
+            </div>
+            <hr class="divider">
+            <div class="total-fila">
+              <span class="total-label">TOTAL:</span>
+              <span class="total-monto">{{totalCarrito | currency:'COP':'symbol':'1.0-0'}}</span>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 2rem;">
+              <label>Método de Pago</label>
+              <select class="input-neumorphic" [(ngModel)]="metodoPago">
+                <option value="efectivo">Efectivo</option>
+                <option value="tarjeta">Tarjeta de Crédito / Débito</option>
+                <option value="transferencia">Transferencia Bancaria</option>
+              </select>
+            </div>
+
+            <button class="btn-save btn-pill btn-block" 
+                    (click)="registrarVenta()" [disabled]="guardando">
+              @if(guardando) {
+                <i class="fas fa-spinner fa-spin"></i> Registrando...
+              } @else {
+                <i class="fas fa-check-circle"></i> Registrar Venta
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- HTML HISTORIAL DE VENTAS -->
+    @if(activeTab === 'historial') {
+      <div class="neumorphic-panel fade-in">
+        <div class="action-bar">
+          <input type="text" 
+                 class="search-input input-neumorphic" 
+                 placeholder="Buscar por factura, cliente..."
+                 [(ngModel)]="searchTerm">
+        </div>
+
+        <div class="table-responsive">
+          <table class="premium-table data-table">
+            <thead>
+              <tr>
+                <th>FACTURA</th>
+                <th>CLIENTE</th>
+                <th>FECHA</th>
+                <th>TOTAL VENTA</th>
+                <th>ESTADO</th>
+                <th>ESTADO PAQUETE</th>
+                <th style="text-align: center;">ACCIONES</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(venta of ventasFiltradas; track venta.id) {
+                <tr>
+                  <td><strong>{{numeroFactura(venta)}}</strong></td>
+                  <td>{{venta.cliente?.nombres}} {{venta.cliente?.apellidos}}</td>
+                  <td>{{venta.created_at | date:'shortDate'}}</td>
+                  <td>{{venta.total | currency:'COP':'symbol':'1.0-0'}}</td>
+                  <td>
+                    <span class="badge" [ngClass]="getBadgeClass(venta.estado)">
+                      {{venta.estado}}
+                    </span>
+                  </td>
+                  <td>
+                    <select class="input-neumorphic select-paquete"
+                            [ngModel]="venta.estado_paquete || 'Preparando'"
+                            (ngModelChange)="cambiarEstadoPaquete(venta, $event)">
+                      <option value="Preparando">Preparando</option>
+                      <option value="En camino">En camino</option>
+                      <option value="Entregado">Entregado</option>
+                    </select>
+                  </td>
+                  <td>
+                    <div class="acciones-fila">
+                      <button class="btn-icon" title="Ver Detalle"><i class="fas fa-eye"></i></button>
+                      <button class="btn-icon text-danger" title="Anular Factura" 
+                              *ngIf="venta.estado !== 'Anulada'"
+                              (click)="abrirModalAnular(venta)">
+                        <i class="fas fa-ban"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+              @if(ventasFiltradas.length === 0) {
+                <tr>
+                  <td colspan="6" style="padding: 0;">
+                    <div class="empty-state">
+                      No hay ventas registradas.
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+  </div>
+
+<!-- HTML MODAL CONFIRMAR ANULACION -->
+@if(showModalAnular && ventaSeleccionada) {
+<div class="view-switch-panel fade-in">
+  <div class="neu-card" style="max-width: 800px; margin: 0 auto; max-width: 450px; text-align: center;">
+    <div class="modal-header modal-header-center">
+      <i class="fas fa-exclamation-triangle icon-danger"></i>
+    </div>
+    <div class="panel-body">
+      <h1 class="modal-title">¿Anular Venta {{numeroFactura(ventaSeleccionada)}}?</h1>
+      <p class="text-muted" style="margin-bottom: 1rem;">
+        Esta acción es irreversible. Se regresarán los productos al inventario y el monto no se contabilizará en caja.
+      </p>
+      
+      <div class="modal-footer">
+        <button class="btn-volver btn-pill" (click)="cerrarModalAnular()">Cancelar</button>
+        <button class="btn-volver btn-pill" 
+                (click)="confirmarAnulacion()" [disabled]="guardando">
+          @if(guardando) {
+            <i class="fas fa-spinner fa-spin"></i> Anulando...
+          } @else {
+            Sí, Anular Venta
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+
+
+
+
+

@@ -1,0 +1,33 @@
+﻿<!-- HTML MÓDULO REUNIONES -->
+<div style="display: flex; flex-direction: column;">
+  <div class="module-header text-center" style="margin-bottom: 0.5rem;">
+    <h1 style="font-size: 16px; font-weight: bold; text-transform: uppercase; margin: 0;">Próximas Reuniones</h1>
+  </div>
+
+  <div class="panel-body">
+    @if(cargando) {
+      <div class="text-center" style="padding: 1rem;">
+        <i class="fas fa-spinner fa-spin" style="font-size: 16px;"></i>
+      </div>
+    } @else {
+      @for(r of reuniones; track r.id) {
+        <div class="reunion-card" style="padding: 1rem; border-radius: 8px;">
+          <div class="reunion-date" style="padding: 0.5rem;">
+            <span class="day" style="font-size: 16px; font-weight: bold;">{{diaReunion(r)}}</span>
+            <span class="month" style="font-size: 10px; text-transform: uppercase;">{{mesReunion(r)}}</span>
+          </div>
+          <div class="reunion-info">
+            <h3 class="reunion-motive" style="font-size: 13px; text-transform: uppercase; margin-bottom: 4px; text-align: left;">{{r.titulo}}</h3>
+            <p class="descripcion-general" style="font-size: 12px; margin: 2px 0;">Responsable: {{organizadorReunion(r)}}</p>
+            <p class="reunion-detail" style="font-size: 12px; margin: 2px 0;">Hora: {{horaReunion(r)}} | {{r.tipo_encuentro === 'virtual' ? 'Virtual' : 'Presencial'}}</p>
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state text-center" style="padding: 1rem 0; opacity: 0.6;">
+          <i class="fas fa-calendar-times" style="font-size: 16px; margin-bottom: 0.5rem;"></i>
+          <p style="font-size: 12px; margin: 0;">No tienes reuniones programadas.</p>
+        </div>
+      }
+    }
+  </div>
+</div>

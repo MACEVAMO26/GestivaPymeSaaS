@@ -1,0 +1,391 @@
+<div class="module-container fade-in">
+  <div [hidden]="(modalAsignacion && ticketSeleccionado) || (modalEjecucion && ticketSeleccionado)" class="main-view-wrapper">
+
+  <div class="module-header text-center mb-4 relative">
+    <h1>Gestión de Servicios (FSM)</h1>
+    <p>Recepción de tickets, despacho de técnicos, ejecución en sitio y estadísticas de rendimiento.</p>
+  </div>
+
+  <!-- HTML PESTAÑAS -->
+  <div class="tabs-nav-wrapper">
+    <button class="tab-neu-inactive" [class.tab-neu-active]="activeTab === 'recepcion'" (click)="switchTab('recepcion')"> <span class="icon">📥</span> 1. Recepción (Tickets) </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="activeTab === 'agenda'" (click)="switchTab('agenda')"> <span class="icon">📅</span> 2. Agenda y Despacho </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="activeTab === 'ejecucion'" (click)="switchTab('ejecucion')"> <span class="icon">🛠️</span> 3. Ejecución / Materiales </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="activeTab === 'rendimiento'" (click)="switchTab('rendimiento')"> <span class="icon">📈</span> Rendimiento Técnico </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="activeTab === 'catalogo'" (click)="switchTab('catalogo')"> <span class="icon">📋</span> Catálogo Tarifado </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="activeTab === 'operarios'" (click)="switchTab('operarios')"> <span class="icon">👷</span> Gestión de Operarios </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="activeTab === 'reportes'" (click)="switchTab('reportes')"> <span class="icon">📊</span> Reportes de Servicios </button>
+  </div>
+
+  <!-- HTML CONTENIDO DE TABS -->
+<div class="tab-content neumorphic-panel-inner p-4">
+  <!-- Botón Volver Inyectado -->
+  <div class="volver-wrapper">
+    <button class="btn-volver btn-pill" onclick="window.history.back()">
+      <i class="fas fa-arrow-left"></i> Volver
+    </button>
+  </div>
+    
+    <!-- HTML RECEPCION TICKETS -->
+    @if(activeTab === 'recepcion') {
+      <div class="neumorphic-panel fade-in fsm-layout">
+        
+        <!-- HTML FORMULARIO CREACION -->
+        <div class="fsm-form-col">
+          <h3 class="panel-titulo">Nuevo Ticket de Servicio</h3>
+          <div class="form-group">
+            <label>Cliente (Razón Social o Nombre)</label>
+            <input type="text" class="input-neumorphic" [(ngModel)]="formTicket.cliente" placeholder="Ej: Clínica San José">
+          </div>
+          <div class="form-group">
+            <label>Servicio Requerido (Debe coincidir con catálogo)</label>
+            <select class="input-neumorphic" [(ngModel)]="formTicket.servicio">
+              <option value="">Seleccione un servicio...</option>
+              @for(cat of catalogo; track cat.id) {
+                <option [value]="cat.nombre">{{cat.nombre}} - {{cat.tarifa | currency:'COP':'symbol':'1.0-0'}}</option>
+              }
+            </select>
+          </div>
+          <div class="form-fila">
+            <div class="form-group" style="flex: 1;">
+              <label>Fecha Solicitada</label>
+              <input type="date" class="input-neumorphic" [(ngModel)]="formTicket.fecha">
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label>Hora Sugerida</label>
+              <input type="time" class="input-neumorphic" [(ngModel)]="formTicket.hora">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Dirección / Ubicación del servicio</label>
+            <input type="text" class="input-neumorphic" [(ngModel)]="formTicket.direccion" placeholder="Calle, Barrio, Ciudad...">
+          </div>
+          <div style="text-align: right; margin-top: 1rem;">
+            <button class="btn-save btn-pill" (click)="crearTicket()" [disabled]="guardando">
+              @if(guardando) { <i class="fas fa-spinner fa-spin"></i> Registrando... }
+              @else { Crear Ticket de Servicio }
+            </button>
+          </div>
+        </div>
+
+        <!-- HTML TABLA TICKETS HISTORICOS -->
+        <div class="fsm-historial-col">
+          <h3 class="panel-titulo">Historial de Solicitudes</h3>
+          <div class="table-responsive">
+            <table class="premium-table data-table">
+              <thead>
+                <tr>
+                  <th>TK</th>
+                  <th>CLIENTE</th>
+                  <th>SERVICIO</th>
+                  <th>ESTADO</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for(tk of tickets; track tk.id) {
+                  <tr>
+                    <td><strong>{{tk.consecutivo}}</strong></td>
+                    <td>{{tk.cliente_nombre}}</td>
+                    <td>{{tk.servicio_requerido}}</td>
+                    <td><span class="badge" [ngClass]="getBadgeEstado(tk.estado)">{{tk.estado}}</span></td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- HTML AGENDA DESPACHO -->
+    @if(activeTab === 'agenda') {
+      <div class="neumorphic-panel fade-in">
+        <p class="descripcion-general" style="margin-bottom: 1.5rem;">Asigna los tickets pendientes a tus técnicos en campo. Visualiza la carga de trabajo diaria.</p>
+        
+        <div class="table-responsive">
+          <table class="premium-table data-table">
+            <thead>
+              <tr>
+                <th>TICKET</th>
+                <th>CLIENTE / LUGAR</th>
+                <th>FECHA / HORA</th>
+                <th>TÉCNICO ASIGNADO</th>
+                <th>ESTADO</th>
+                <th style="text-align: center;">DESPACHO</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(tk of ticketsPendientes; track tk.id) {
+                <tr>
+                  <td><strong>{{tk.consecutivo}}</strong></td>
+                  <td>{{tk.cliente_nombre}}<br><span class="text-muted text-xs">📍 {{tk.direccion}}</span></td>
+                  <td>{{tk.fecha_solicitada}} a las {{tk.hora_sugerida}}</td>
+                  <td class="text-azul" style="font-weight: bold;">{{nombreTecnico(tk.tecnico_id)}}</td>
+                  <td><span class="badge" [ngClass]="getBadgeEstado(tk.estado)">{{tk.estado}}</span></td>
+                  <td style="text-align: center;">
+                    <button class="btn-add btn-pill btn-xs" (click)="abrirAsignacion(tk)" [disabled]="!puedeAsignarOperarios()" [title]="puedeAsignarOperarios() ? 'Asignar / Despachar Técnico' : 'Solo el Jefe de Servicios o Coordinador de Operativos puede asignar operarios'">
+                      <i class="fas fa-truck"></i> Asignar
+                    </button>
+                  </td>
+                </tr>
+              }
+              @if(ticketsPendientes.length === 0) {
+                <tr><td colspan="6" class="tabla-vacia">No hay tickets pendientes de asignar.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+    <!-- EJECUCIÓN / MATERIALES -->
+    @if(activeTab === 'ejecucion') {
+      <div class="neumorphic-panel fade-in">
+        <p class="text-muted" style="margin-bottom: 1.5rem;">Panel operativo del técnico. Permite cerrar servicios en sitio descontando automáticamente el material del inventario.</p>
+        
+        <div class="ejecucion-grid">
+          @for(tk of tickets; track tk.id) {
+            @if(tk.estado === 'Asignado' || tk.estado === 'En Sitio') {
+              <div class="neumorphic-panel ticket-card">
+                <div style="display: flex; justify-content: space-between;">
+                  <h3 style="margin: 0;">{{tk.consecutivo}}</h3>
+                  <span class="badge" [ngClass]="getBadgeEstado(tk.estado)">{{tk.estado}}</span>
+                </div>
+                <p class="ticket-dato"><strong>Cliente:</strong> {{tk.cliente_nombre}}</p>
+                <p class="ticket-dato"><strong>Servicio:</strong> {{tk.servicio_requerido}}</p>
+                <p class="ticket-dato"><strong>Técnico:</strong> {{nombreTecnico(tk.tecnico_id)}}</p>
+                
+                <button class="btn-general-5 btn-pill btn-block" style="margin-top: 1rem;" (click)="abrirEjecucion(tk)">
+                  <i class="fas fa-tools"></i> Registrar Ejecución
+                </button>
+              </div>
+            }
+          }
+        </div>
+      </div>
+    }
+
+    <!-- HTML RENDIMIENTO TECNICO -->
+    @if(activeTab === 'rendimiento') {
+      <div class="rendimiento-layout fade-in">
+        
+        <!-- HTML LISTA TECNICOS -->
+        <div class="rendimiento-tecnicos neumorphic-panel-inner">
+          <h3 class="panel-titulo">Plantilla Técnica</h3>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            @for(tec of tecnicos; track tec.id) {
+              <div class="tech-card" [class.tech-card-active]="tecnicoDashboard?.id === tec.id" (click)="seleccionarTecnicoRender(tec)">
+                <strong>{{tec.nombre}}</strong>
+                <div class="text-muted text-xs">{{tec.cargo}}</div>
+              </div>
+            } @empty {
+              <div class="empty-state">
+                <i class="fas fa-users-slash mb-2" style="font-size: 16px; opacity: 0.5;"></i>
+                <p class="descripcion-general" style="margin: 0;">No hay personal técnico registrado aún. Agregue operarios/técnicos en Gestión Humana.</p>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- HTML DASHBOARD GRAFICO -->
+        <div class="rendimiento-dashboard neumorphic-panel-inner">
+          @if(tecnicoDashboard) {
+            <h1 class="rendimiento-titulo">Rendimiento: <span class="text-azul">{{tecnicoDashboard.nombre}}</span></h1>
+            <p class="text-muted" style="margin-bottom: 2rem;">Métricas en vivo de servicios finalizados, satisfacción de cliente y control de quejas basadas en el Field Service.</p>
+            
+            <div class="chart-container">
+              
+              <!-- HTML BARRA CITAS CUMPLIDAS -->
+              <div class="bar-row">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                  <span class="bar-label">Servicios Finalizados</span>
+                  <span class="valor-ok">{{tecnicoDashboard.rendimiento.cumplidas}} / {{tecnicoDashboard.rendimiento.total}}</span>
+                </div>
+                <div class="progress-bg">
+                  <div class="progress-fill progress-fill-ok" [style.width]="getPorcentaje(tecnicoDashboard.rendimiento.cumplidas, tecnicoDashboard.rendimiento.total) + '%'"></div>
+                </div>
+              </div>
+
+              <!-- HTML BARRA CITAS SATISFACTORIAS -->
+              <div class="bar-row">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                  <span class="bar-label">Servicios Satisfactorios (SLA)</span>
+                  <span class="valor-info">{{tecnicoDashboard.rendimiento.satisfactorias}}</span>
+                </div>
+                <div class="progress-bg">
+                  <div class="progress-fill progress-fill-info" [style.width]="getPorcentaje(tecnicoDashboard.rendimiento.satisfactorias, tecnicoDashboard.rendimiento.cumplidas) + '%'"></div>
+                </div>
+              </div>
+
+              <!-- HTML BARRA QUEJAS GARANTIAS -->
+              <div class="bar-row">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                  <span class="bar-label">Quejas / Devoluciones por Garantía</span>
+                  <span class="valor-alerta">{{tecnicoDashboard.rendimiento.quejas}}</span>
+                </div>
+                <div class="progress-bg">
+                  <div class="progress-fill progress-fill-alerta" [style.width]="getPorcentaje(tecnicoDashboard.rendimiento.quejas, 20) + '%'"></div>
+                </div>
+                <small class="text-muted">La barra roja debe mantenerse lo más baja posible (Límite alerta: 20)</small>
+              </div>
+
+            </div>
+          } @else {
+            <div class="empty-state" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 4rem 0;">
+              <i class="fas fa-chart-line fa-3x mb-4" style="opacity: 0.5;"></i>
+              <p class="text-muted">No hay técnicos registrados o seleccionados.</p>
+            </div>
+          }
+        </div>
+
+      </div>
+    }
+
+    <!-- HTML CATALOGO TARIFADO -->
+    @if(activeTab === 'catalogo') {
+      <div class="neumorphic-panel fade-in">
+        <p class="text-muted" style="margin-bottom: 1.5rem;">Definición de servicios base para la empresa. Estos alimentan las cotizaciones y facturas.</p>
+        
+        <div class="table-responsive">
+          <table class="premium-table data-table">
+            <thead>
+              <tr>
+                <th>CÓDIGO</th>
+                <th>NOMBRE DEL SERVICIO</th>
+                <th>DURACIÓN ESTIMADA</th>
+                <th>TARIFA BASE</th>
+                <th style="text-align: center;">ACCIÓN</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(cat of catalogo; track cat.id) {
+                <tr>
+                  <td><strong>{{codigoServicio(cat.id)}}</strong></td>
+                  <td>{{cat.nombre}}</td>
+                  <td><i class="fas fa-clock"></i> {{cat.tiempo_estimado || 'N/D'}}</td>
+                  <td class="text-positivo">{{cat.tarifa | currency:'COP':'symbol':'1.0-0'}}</td>
+                  <td style="text-align: center;">
+                    <app-solicitud-inactivacion [area]="'s_cat'" [entidad]="'servicios'" [entidadId]="cat.id"
+                      [nombreEntidad]="cat.nombre"></app-solicitud-inactivacion>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+      @if(activeTab === 'operarios') {
+      <div class="neumorphic-panel fade-in">
+        <app-gestion-de-operarios [isEmbedded]="true"></app-gestion-de-operarios>
+      </div>
+    }
+
+    @if(activeTab === 'reportes') {
+      <div class="neumorphic-panel fade-in">
+        <app-reportes-de-servicios [isEmbedded]="true"></app-reportes-de-servicios>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- HTML MODALES -->
+
+  </div>
+
+<!-- HTML MODAL ASIGNACION AGENDA -->
+@if (modalAsignacion && ticketSeleccionado) {
+<div class="view-switch-panel fade-in">
+  <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+    <div class="panel-header mb-4">
+      <h1>DESPACHAR TÉCNICO</h1>
+      <button class="btn-close" (click)="cerrarAsignacion()">&times;</button>
+    </div>
+    <div class="panel-body">
+      <p class="text-muted" style="margin-bottom: 1rem;">Ticket: <strong>{{ticketSeleccionado.consecutivo}}</strong> ({{ticketSeleccionado.servicio_requerido}})</p>
+      
+      <div class="form-group">
+        <label>Seleccione Técnico Disponible</label>
+        <select class="input-neumorphic" [(ngModel)]="tecnicoSeleccionado">
+          <option value="">-- Seleccionar --</option>
+          @for(tec of tecnicos; track tec.id) {
+            <option [value]="tec.id">{{tec.nombre}}</option>
+          }
+        </select>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn-volver btn-pill" (click)="cerrarAsignacion()">Cancelar</button>
+      <button class="btn-save btn-pill" (click)="guardarAsignacion()" [disabled]="guardando || !tecnicoSeleccionado">
+        @if(guardando) { <i class="fas fa-spinner fa-spin"></i> Asignando... }
+        @else { Confirmar Despacho }
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- HTML MODAL EJECUCION MATERIALES -->
+@if (modalEjecucion && ticketSeleccionado) {
+<div class="view-switch-panel fade-in">
+  <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+    <div class="panel-header mb-4">
+      <h1>CERRAR SERVICIO ({{ticketSeleccionado.consecutivo}})</h1>
+      <button class="btn-close" (click)="cerrarEjecucion()">&times;</button>
+    </div>
+    <div class="panel-body">
+      
+      <div class="material-box">
+        <h4>Material Utilizado (Descuento de Inventario)</h4>
+        
+        <div style="display: flex; gap: 0.5rem; align-items: flex-end; margin-bottom: 1rem;">
+          <div class="form-group" style="flex: 2; margin: 0;">
+            <label class="label-xs">Repuesto / Item</label>
+            <select class="input-neumorphic" [(ngModel)]="materialSeleccionado">
+              <option value="">Seleccionar...</option>
+              @for(inv of inventario; track inv.id) {
+                <option [value]="inv.producto_id">{{nombreProducto(inv.producto_id)}} (Stock: {{stockProducto(inv.producto_id)}})</option>
+              }
+            </select>
+          </div>
+          <div class="form-group" style="flex: 1; margin: 0;">
+            <label class="label-xs">Cant.</label>
+            <input type="number" class="input-neumorphic" [(ngModel)]="cantidadMaterial" min="1">
+          </div>
+          <button class="btn-add btn-pill btn-xs" (click)="agregarMaterial()">+</button>
+        </div>
+
+        <!-- HTML LISTA MATERIALES DESCONTAR -->
+        @if(materialesUsados.length > 0) {
+          <ul class="text-muted text-xs" style="padding-left: 1.5rem; margin: 0;">
+            @for(mat of materialesUsados; track mat.producto_id) {
+              <li>{{mat.cantidad}}x {{nombreProducto(mat.producto_id)}}</li>
+            }
+          </ul>
+        }
+      </div>
+
+      <p class="text-danger text-xs" style="text-align: center;">* Al finalizar, el servicio pasará a facturación y los materiales se descontarán del inventario central de forma irreversible.</p>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn-volver btn-pill" (click)="cerrarEjecucion()">Cancelar</button>
+      <button class="btn-save btn-pill" (click)="finalizarServicio()" [disabled]="guardando">
+        @if(guardando) { <i class="fas fa-spinner fa-spin"></i> Finalizando... }
+        @else { Firmar y Finalizar Servicio }
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,329 @@
+<div class="login-container relative">
+  <!-- HTML NAVEGACION -->
+  <a routerLink="/" class="back-link">
+    <span class="back-icon">&larr;</span>
+    <span class="back-text">VOLVER A GESTIVAPYME</span>
+  </a>
+
+  <!-- HTML AUTENTICACION -->
+  <div class="login-card">
+    <!-- HTML ACCESIBILIDAD -->
+    <div class="accessibility-widget">
+      <button
+        (click)="toggleAccessibilityMenu()"
+        class="accessibility-btn"
+        title="Opciones de Accesibilidad Visual"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2.5"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+          />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+          />
+        </svg>
+      </button>
+
+      @if (isAccessibilityMenuOpen) {
+        <div class="accessibility-menu">
+          <div class="menu-header">
+            <p>Daltonismo</p>
+          </div>
+          <button
+            (click)="setDaltonismMode('normal')"
+            [class.active]="accessibilityService.currentMode() === 'normal'"
+          >
+            Estándar
+          </button>
+          <button
+            (click)="setDaltonismMode('protanopia')"
+            [class.active]="accessibilityService.currentMode() === 'protanopia'"
+          >
+            Protanopia
+          </button>
+          <button
+            (click)="setDaltonismMode('deuteranopia')"
+            [class.active]="
+              accessibilityService.currentMode() === 'deuteranopia'
+            "
+          >
+            Deuteranopia
+          </button>
+          <button
+            (click)="setDaltonismMode('tritanopia')"
+            [class.active]="accessibilityService.currentMode() === 'tritanopia'"
+          >
+            Tritanopia
+          </button>
+        </div>
+      }
+    </div>
+
+    <!-- HTML ENCABEZADO -->
+    <div class="header-container">
+      <h2 class="welcome-text">BIENVENIDO A</h2>
+      <img
+        src="assets/images/Logos/GESTIVAPYME(5).png"
+        alt="GestivaPyme Logo"
+        class="brand-logo"
+      />
+    </div>
+
+    <!-- HTML FORMULARIO ACTIVO -->
+    @if (!requiresPasswordChange) {
+      <form class="login-form" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label class="form-label">Usuario</label>
+          <input
+            type="email"
+            name="email"
+            [(ngModel)]="credentials.email"
+            class="form-input"
+            placeholder="usuario@ejemplo.com"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Contraseña</label>
+          <div class="password-wrapper">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              name="password"
+              [(ngModel)]="credentials.password"
+              class="form-input"
+              placeholder="••••••••"
+              required
+            />
+            <button
+              type="button"
+              class="toggle-password-btn"
+              (click)="togglePasswordVisibility()"
+            >
+              @if (!showPassword) {
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="2.5"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                  />
+                </svg>
+              } @else {
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="2.5"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 10c0 0 3.5 5 8 5s8-5 8-5"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 15v3.5M8 14.5l-2 2.5M16 14.5l2 2.5"
+                  />
+                </svg>
+              }
+            </button>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <label class="checkbox-container">
+            <input type="checkbox" class="form-checkbox" />
+            Recuerdame
+          </label>
+          <button type="button" class="forgot-link" (click)="abrirModalRecuperar()">¿Olvidaste tu contraseña?</button>
+        </div>
+
+        <button type="submit" class="submit-btn" [disabled]="isLoading">
+          <span *ngIf="!isLoading">INICIAR SESIÓN</span>
+          <span *ngIf="isLoading" class="flex-center-all">
+            <svg
+              class="icon-spin-sm-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            Iniciando...
+          </span>
+        </button>
+      </form>
+    } @else {
+      <!-- HTML CAMBIO DE CLAVE -->
+      <form class="login-form" (ngSubmit)="onSubmit()">
+        <div class="alert-warning" role="alert">
+          <strong class="alert-strong">¡Hola! </strong>
+          <span class="alert-text"
+            >Por seguridad, debes crear tu propia contraseña antes de
+            continuar.</span
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Nueva Contraseña</label>
+          <p class="password-hint">
+            La contraseña debe tener mínimo 8 caracteres, 1 mayúscula, 1
+            minúscula, no uses tu número de identificación.
+          </p>
+          <div class="password-wrapper">
+            <input
+              type="text"
+              name="newPassword"
+              [(ngModel)]="changePasswordData.newPassword"
+              class="form-input"
+              placeholder="MiClaveSegura123!"
+              required
+            />
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="submit-btn save-password-btn"
+          [disabled]="isLoading"
+        >
+          <span *ngIf="!isLoading">GUARDAR CONTRASEÑA</span>
+          <span *ngIf="isLoading" class="flex-center-all">
+            <svg
+              class="icon-spin-sm-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            GUARDANDO...
+          </span>
+        </button>
+      </form>
+    }
+  </div>
+
+  <!-- HTML MODAL SISTEMA SUSPENDIDO -->
+  @if (suspendedMessage) {
+    <div class="modal-overlay-susp fade-in">
+      <div class="modal-content-susp">
+        <div class="modal-icon-container-susp">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="icon-xl-susp"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+        </div>
+        <h3 class="modal-title-susp">Acceso Restringido</h3>
+        <p class="modal-desc-susp">{{ suspendedMessage }}</p>
+        <button (click)="suspendedMessage = ''" class="btn-understand-susp">
+          Entendido
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- HTML MODAL RECUPERACIÓN DE CONTRASEÑA -->
+  @if (showRecoveryModal) {
+    <div class="modal-overlay-susp fade-in" (click)="cerrarModalRecuperar()">
+      <div class="modal-content-susp" style="max-width: 440px;" (click)="$event.stopPropagation()">
+        <div class="flex-between mb-3" style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 class="modal-title-susp" style="margin: 0; font-size: 16px;">Recuperación de Contraseña</h3>
+          <button type="button" class="btn-icon" style="background: none; border: none; font-size: 18px; cursor: pointer;" (click)="cerrarModalRecuperar()">✕</button>
+        </div>
+
+        <div class="modal-body text-left" style="text-align: left;">
+          <p class="modal-desc-susp mb-3" style="font-size: 12px; margin-bottom: 1rem; color: #555;">
+            Ingresa tu correo electrónico registrado. Si coincide con una cuenta activa, tu contraseña cambiará temporalmente a <strong>usuario12369</strong> y se te pedirá crear tu clave definitiva al ingresar.
+          </p>
+
+          <div class="form-group mb-3">
+            <label class="form-label" style="font-size: 11px; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 0.25rem;">Correo Electrónico Registrado</label>
+            <input type="email" class="form-input" [(ngModel)]="recoveryEmail" placeholder="usuario@ejemplo.com" style="width: 100%; font-size: 12px; padding: 0.6rem 0.8rem; border-radius: 8px;" required>
+          </div>
+
+          @if (recoveryError) {
+            <div class="mb-3 p-2 rounded" style="color: #de3737; background: #fde8e8; font-size: 11px;">
+              {{ recoveryError }}
+            </div>
+          }
+
+          @if (recoveryMessage) {
+            <div class="mb-3 p-3 rounded" style="color: #066810; background: #e6f4ea; font-size: 11px;">
+              <p style="margin: 0 0 0.5rem 0; font-weight: bold;">{{ recoveryMessage }}</p>
+              <button type="button" class="submit-btn mt-2" style="width: 100%; padding: 0.5rem; font-size: 12px;" (click)="cerrarModalRecuperar()">
+                Iniciar Sesión con Clave Temporal
+              </button>
+            </div>
+          }
+        </div>
+
+        @if (!recoveryMessage) {
+          <div class="mt-4 flex-between" style="display: flex; justify-content: space-between; gap: 0.5rem;">
+            <button type="button" class="btn-understand-susp" style="background: #de3737; color: white;" (click)="cerrarModalRecuperar()">Cancelar</button>
+            <button type="button" class="submit-btn" style="padding: 0.5rem 1rem; font-size: 12px;" (click)="solicitarRecuperacion()" [disabled]="isRecovering">
+              {{ isRecovering ? 'Procesando...' : 'Restablecer Contraseña' }}
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

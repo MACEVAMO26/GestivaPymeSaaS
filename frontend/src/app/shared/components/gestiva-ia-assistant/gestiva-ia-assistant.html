@@ -1,0 +1,20 @@
+<div class="gestiva-ia-assistant-container">
+  <!-- Globo de diálogo -->
+  <div class="ia-bubble" *ngIf="mostrarGlobo">
+    <div class="ia-bubble-content">
+      <p *ngFor="let sugerencia of sugerencias" class="sugerencia-item">
+        <i class="fas fa-lightbulb"></i> {{ sugerencia }}
+      </p>
+      <!-- Botón para ver tutorial de nuevo -->
+      <button class="btn-replay-tutorial" (click)="verTutorialDeNuevo()">
+        <i class="fas fa-redo"></i> ¿Deseas ver el tutorial de nuevo?
+      </button>
+    </div>
+    <button class="btn-close-bubble" (click)="mostrarGlobo = false">&times;</button>
+  </div>
+
+  <!-- Mascota (Botón toggle) -->
+  <div class="ia-mascot-btn" (click)="toggleGlobo()">
+    <img src="assets/images/GestivaIA/IA_Gestiva.png" alt="Gestiva IA Assistant">
+  </div>
+</div>

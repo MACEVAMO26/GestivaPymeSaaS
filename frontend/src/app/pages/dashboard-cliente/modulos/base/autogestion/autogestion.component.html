@@ -1,0 +1,388 @@
+
+<div class="module-container fade-in">
+  <!-- HTML ENCABEZADO -->
+  <div class="module-header text-center mb-4 relative">
+    <div class="header-content">
+      <h1>Autogestión del Empleado</h1>
+      <p>Administra tu perfil, solicita tiempos y mantén tus documentos al día.</p>
+    </div>
+  </div>
+
+  <div class="tab-content neumorphic-panel-inner p-4">
+    
+    <div class="volver-wrapper">
+      <button class="btn-volver btn-pill" onclick="window.history.back()">
+        <i class="fas fa-arrow-left"></i> Volver
+      </button>
+    </div>
+
+    <div class="neumorphic-panel fade-in">
+      <div class="autogestion-grid">
+    
+    <!-- HTML COLUMNA IZQUIERDA -->
+    <div class="left-column">
+      
+      <!-- HTML TARJETA PERFIL -->
+      <div class="neu-dark-panel profile-card">
+        <div class="profile-header">
+          <!-- Input oculto para subir foto -->
+          <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none;">
+          
+          <div class="avatar-wrapper" (click)="!isUploadingAvatar && fileInput.click()" title="Haz clic para cambiar tu foto">
+            @if (profileImageUrl || user?.avatar_url) {
+              <img [src]="profileImageUrl || user?.avatar_url" alt="Avatar" class="profile-avatar editable-avatar" [class.opacity-50]="isUploadingAvatar">
+            } @else {
+              <div class="profile-avatar-placeholder editable-avatar" [class.opacity-50]="isUploadingAvatar">{{ user?.nombres?.charAt(0) || 'A' }}</div>
+            }
+            <div class="edit-overlay">
+              <svg *ngIf="!isUploadingAvatar" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="camera-icon">
+                <path d="M12 9a3.75 3.75 0 1 0 0 7.5A3.75 3.75 0 0 0 12 9Z" />
+                <path fill-rule="evenodd" d="M9.344 3.071a49.52 49.52 0 0 1 5.312 0c.967.052 1.83.585 2.332 1.39l.821 1.317c.24.383.645.643 1.11.71.386.054.77.113 1.152.177 1.432.239 2.429 1.493 2.429 2.909V18a3 3 0 0 1-3 3h-15a3 3 0 0 1-3-3V9.574c0-1.416.997-2.67 2.429-2.909.382-.064.766-.123 1.151-.178a1.56 1.56 0 0 0 1.11-.71l.822-1.315a2.942 2.942 0 0 1 2.332-1.39ZM6.75 12.75a5.25 5.25 0 1 1 10.5 0 5.25 5.25 0 0 1-10.5 0Zm12-1.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd" />
+              </svg>
+              <svg *ngIf="isUploadingAvatar" class="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="descripcion-general" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+          </div>
+          
+          <h3>{{ user?.nombres }} {{ user?.apellidos }}</h3>
+          <span class="badge-role">{{ user?.rol?.nombre || 'Empleado' }}</span>
+        </div>
+        
+        <div class="profile-details">
+          <div class="detail-item">
+            <svg class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            <span>{{ user?.email }}</span>
+          </div>
+          <div class="detail-item">
+            <svg class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"/></svg>
+            <span>{{ user?.documento }}</span>
+          </div>
+          <div class="detail-item">
+            <svg class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            <span>{{ user?.cargo?.nombre || 'Sin Cargo Asignado' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- HTML TARJETA DOCUMENTOS -->
+      <div class="neu-dark-panel quick-action-card mt-3">
+        <h3>Documentos Compartidos</h3>
+        <p>Documentos institucionales (contratos, anexos, etc.)</p>
+        
+        <div class="empty-docs-msg" *ngIf="!misDocumentos || misDocumentos.length === 0">
+          No tienes documentos disponibles por el momento.
+        </div>
+
+        <div class="docs-list">
+          <div class="doc-item" *ngFor="let doc of misDocumentos">
+            <div class="doc-info">
+              <i class="fas fa-file-pdf doc-icon-pdf" *ngIf="doc.tipo_archivo === 'pdf'"></i>
+              <i class="fas fa-file-powerpoint doc-icon-ppt" *ngIf="doc.tipo_archivo === 'powerpoint'"></i>
+              <div class="doc-text">
+                <strong class="doc-title" [title]="doc.nombre">{{ doc.nombre }}</strong>
+                <span class="doc-date">{{ doc.created_at | date:'shortDate' }}</span>
+              </div>
+            </div>
+            <a [href]="doc.cloudinary_url" target="_blank" class="btn-save btn-pill btn-sm" title="Descargar Documento">
+              Descargar
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- HTML COLUMNA DERECHA -->
+    <div class="right-column">
+      
+      <!-- HTML AFILIACIONES -->
+      <div class="neu-dark-panel form-card">
+        <div class="card-header">
+          <h3>Mis Afiliaciones (Seguridad Social)</h3>
+          @if (afiliacion?.estado === 'aprobado') {
+            <span class="status-badge approved">Verificado</span>
+          } @else if (afiliacion?.estado === 'pendiente') {
+            <span class="status-badge pending">Pendiente de Aprobación</span>
+          } @else if (afiliacion?.estado === 'rechazado') {
+            <span class="status-badge rejected">Rechazado</span>
+          } @else {
+            <span class="status-badge new">No registradas</span>
+          }
+        </div>
+        
+        @if (afiliacion?.estado === 'rechazado' && afiliacion?.notas_rechazo) {
+          <div class="alert-box error">
+            <strong>Motivo del rechazo:</strong> {{ afiliacion.notas_rechazo }}
+          </div>
+        }
+
+        @if (!isHR && !moduloRRHH && vecesModificadas >= 2) {
+          <div class="alert-box error">
+            <strong>Límite alcanzado.</strong> Tus afiliaciones solo pueden modificarse 2 veces. Contacta a Gestión Humana o Gerencia para más cambios.
+          </div>
+        } @else if (!isHR && !moduloRRHH) {
+          <div class="alert-box warning">
+            Tu empresa no tiene el módulo Gestión Humana: tus afiliaciones pueden modificarse hasta
+            <strong>{{ 2 - vecesModificadas }} vez/veces más</strong> ({{ vecesModificadas }}/2 usadas). Con Gestión Humana, el cambio es ilimitado y lo revisa RRHH.
+          </div>
+        }
+
+        <form (ngSubmit)="guardarAfiliaciones()" class="grid-form">
+          <!-- EPS (Seleccionable por el empleado) -->
+          <div class="form-group">
+            <label>EPS</label>
+            <select [(ngModel)]="formAfiliacion.eps" name="eps" required
+                    [ngClass]="{'estado-pendiente': formAfiliacion.estado === 'pendiente', 'estado-aprobado': formAfiliacion.estado === 'aprobado'}">
+              <option value="" disabled selected>Seleccione EPS...</option>
+              <option value="Sura">EPS Sura</option>
+              <option value="Sanitas">EPS Sanitas</option>
+              <option value="Compensar">Compensar EPS</option>
+              <option value="SaludTotal">Salud Total</option>
+              <option value="NuevaEPS">Nueva EPS</option>
+              <option value="Famisanar">Famisanar</option>
+              <option value="Aliansalud">Aliansalud</option>
+            </select>
+          </div>
+          
+          <!-- ARL (Fija por la empresa, solo lectura) -->
+          <div class="form-group">
+            <label>ARL <span class="hint-text-small">(Asignada por Empresa)</span></label>
+            <div class="input-readonly-pill" title="La ARL la determina la empresa">
+              {{ arlEmpresa || 'No asignada por la Empresa' }}
+            </div>
+          </div>
+          
+          <!-- Fondo de Pensión (Seleccionable por el empleado) -->
+          <div class="form-group">
+            <label>Fondo de Pensión</label>
+            <select [(ngModel)]="formAfiliacion.afondo_pension" name="afondo_pension" required
+                    [ngClass]="{'estado-pendiente': formAfiliacion.estado === 'pendiente', 'estado-aprobado': formAfiliacion.estado === 'aprobado'}">
+              <option value="" disabled selected>Seleccione Fondo...</option>
+              <option value="Porvenir">Porvenir</option>
+              <option value="Proteccion">Protección</option>
+              <option value="Colfondos">Colfondos</option>
+              <option value="Skandia">Skandia</option>
+              <option value="Colpensiones">Colpensiones (Fondo Público)</option>
+            </select>
+          </div>
+
+          <!-- Fondo de Cesantías (Seleccionable por el empleado) -->
+          <div class="form-group">
+            <label>Fondo de Cesantías</label>
+            <select [(ngModel)]="formAfiliacion.fondo_cesantias" name="fondo_cesantias" required
+                    [ngClass]="{'estado-pendiente': formAfiliacion.estado === 'pendiente', 'estado-aprobado': formAfiliacion.estado === 'aprobado'}">
+              <option value="" disabled selected>Seleccione Fondo de Cesantías...</option>
+              <option value="Porvenir">Porvenir</option>
+              <option value="Proteccion">Protección</option>
+              <option value="Colfondos">Colfondos</option>
+              <option value="FNA">Fondo Nacional del Ahorro (FNA)</option>
+            </select>
+          </div>
+
+          <!-- Caja de Compensación (Fija por la empresa, solo lectura) -->
+          <div class="form-group">
+            <label>Caja de Compensación <span class="hint-text-small">(Asignada por Empresa)</span></label>
+            <div class="input-readonly-pill" title="La Caja de Compensación la determina la empresa">
+              {{ cajaCompensacionEmpresa || 'No asignada por la Empresa' }}
+            </div>
+          </div>
+
+          <!-- Estado Afiliación -->
+          <div class="form-group">
+            <label>Estado Afiliación</label>
+            <select [(ngModel)]="formAfiliacion.estado_afiliacion" name="estado_afiliacion" required
+                    [ngClass]="{'estado-pendiente': formAfiliacion.estado === 'pendiente', 'estado-aprobado': formAfiliacion.estado === 'aprobado'}">
+              <option [ngValue]="true">Activa</option>
+              <option [ngValue]="false">Inactiva</option>
+            </select>
+          </div>
+
+          @if (!isHR) {
+            <div class="form-group">
+              <label>Documento de soporte del cambio {{ !moduloRRHH ? '*' : '' }}</label>
+              <input type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" (change)="onAfiliacionFileSelected($event)" class="file-input">
+              <small class="hint-text">Adjunta el formulario de traslado EPS/Pensión (obligatorio sin Gestión Humana).</small>
+            </div>
+          }
+          @if (isHR) {
+            <hr class="separator-line">
+            <h4 class="section-title">Gestión Interna (Exclusivo RRHH)</h4>
+            
+            <div class="form-group">
+              <label>Fecha de Contratación</label>
+              <input type="date" [(ngModel)]="formAfiliacion.fecha_contratacion" name="fecha_contratacion"
+                     [ngClass]="{'estado-aprobado': formAfiliacion.fecha_contratacion}">
+            </div>
+            <div class="form-group">
+              <label>Finalización de Contrato <span class="hint-text-danger">(Oculto al empleado)</span></label>
+              <input type="date" [(ngModel)]="formAfiliacion.finalizacion_contrato" name="finalizacion_contrato"
+                     [ngClass]="{'estado-aprobado': formAfiliacion.finalizacion_contrato}">
+            </div>
+            <div class="form-group">
+              <label>Renovación de Contrato</label>
+              <input type="date" [(ngModel)]="formAfiliacion.renovacion_contrato" name="renovacion_contrato"
+                     [ngClass]="{'estado-aprobado': formAfiliacion.renovacion_contrato}">
+            </div>
+            <div class="form-group">
+              <label>Estado de Afiliación</label>
+              <select [(ngModel)]="formAfiliacion.estado" name="estado">
+                <option value="nuevo">Nuevo / Abierto</option>
+                <option value="pendiente">Pendiente (En Revisión)</option>
+                <option value="aprobado">Aprobado</option>
+                <option value="rechazado">Rechazado</option>
+              </select>
+            </div>
+          } @else {
+            @if (formAfiliacion.fecha_contratacion || formAfiliacion.renovacion_contrato) {
+              <hr class="separator-line">
+            }
+            @if (formAfiliacion.fecha_contratacion) {
+              <div class="form-group">
+                <label>Fecha de Contratación</label>
+                <input type="date" [value]="formAfiliacion.fecha_contratacion" disabled
+                       class="estado-aprobado">
+              </div>
+            }
+            @if (formAfiliacion.renovacion_contrato) {
+              <div class="form-group">
+                <label>Renovación de Contrato</label>
+                <input type="date" [value]="formAfiliacion.renovacion_contrato" disabled
+                       class="estado-aprobado">
+                @if (cantidadRenovaciones > 0) {
+                  <span class="renovaciones-msg">
+                    ⏳ Usted ha tenido {{ cantidadRenovaciones }} renovaciones de contrato.
+                  </span>
+                }
+              </div>
+            }
+          }
+          
+          <div class="form-actions">
+            @if (isHR) {
+              <button type="button" class="btn-save btn-pill" (click)="gestionarAfiliacionAdmin()" [disabled]="isSavingAdmin">
+                <span *ngIf="!isSavingAdmin">Guardar Gestión (RRHH)</span>
+                <span *ngIf="isSavingAdmin" class="loading-text">
+                  <svg class="icon-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Guardando...
+                </span>
+              </button>
+            } @else {
+              @if (formAfiliacion.estado !== 'pendiente') {
+                <button type="submit" class="btn-save btn-pill" [disabled]="isSaving || !puedeModificarAfiliaciones">
+                  <span *ngIf="!isSaving">{{ formAfiliacion.estado === 'nuevo' ? 'Guardar Afiliaciones' : 'Actualizar Afiliaciones' }}</span>
+                  <span *ngIf="isSaving" class="loading-text">
+                    <svg class="icon-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Guardando...
+                  </span>
+                </button>
+                <button type="button" class="btn-save btn-pill btn-cert" (click)="descargarCertificado()">
+                  <i class="fas fa-file-pdf"></i> Certificado Laboral
+                </button>
+
+                @if (formAfiliacion.estado === 'aprobado' || formAfiliacion.estado === 'rechazado') {
+                  <p class="nota-estado">Nota: Si cambia sus afiliaciones actuales, volverán al estado <strong>Pendiente de Aprobación</strong> por RRHH.</p>
+                }
+              } @else {
+                <span class="espera-aprobacion">
+                  En espera de aprobación
+                </span>
+              }
+            }
+          </div>
+        </form>
+      </div>
+
+      <!-- HTML VACACIONES Y TIEMPOS -->
+      <div class="neu-dark-panel times-card">
+        <h3>Tiempos y Vacaciones</h3>
+        <p>Consulta tus días disponibles y realiza solicitudes de vacaciones.</p>
+        
+        <div class="times-stats mb-6">
+          <div class="time-stat">
+            <h4>{{ diasDisponibles }}</h4>
+            <span>Días Disponibles</span>
+          </div>
+          <div class="time-stat">
+            <h4>{{ misVacaciones.length || 0 }}</h4>
+            <span>Solicitudes Históricas</span>
+          </div>
+        </div>
+
+        <hr class="separator-line mb-6">
+        
+        <h4 class="section-title mb-4">Nueva Solicitud de Vacaciones</h4>
+        <form (ngSubmit)="solicitarVacaciones()" class="grid-form mb-8">
+          <div class="date-grid">
+            <div class="form-group">
+              <label>Fecha Inicio</label>
+              <input type="date" [(ngModel)]="nuevaVacacion.fecha_inicio" name="vac_inicio" required>
+            </div>
+            <div class="form-group">
+              <label>Fecha Fin</label>
+              <input type="date" [(ngModel)]="nuevaVacacion.fecha_fin" name="vac_fin" required>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Tipo de Vacaciones</label>
+            <select [(ngModel)]="nuevaVacacion.tipo" name="vac_tipo" required>
+              <option value="Disfrute Legal">Disfrute Legal (Remuneradas)</option>
+              <option value="Colectivas">Colectivas</option>
+              <option value="Anticipadas">Anticipadas</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Observaciones (Opcional)</label>
+            <textarea [(ngModel)]="nuevaVacacion.observaciones" name="vac_obs" rows="2"></textarea>
+          </div>
+          
+          <button type="submit" class="btn-save btn-pill w-full mt-2" [disabled]="isSubmittingVacacion">
+            {{ isSubmittingVacacion ? 'Enviando...' : 'Enviar Solicitud a RRHH' }}
+          </button>
+        </form>
+
+        @if (misVacaciones && misVacaciones.length > 0) {
+          <h4 class="section-title mb-4">Mis Solicitudes</h4>
+          <div class="solicitudes-list">
+            @for (vac of misVacaciones; track vac.id) {
+              <div class="solicitud-card">
+                <div class="solicitud-header">
+                  <span class="solicitud-fechas">{{ vac.fecha_inicio }} al {{ vac.fecha_fin }}</span>
+                  <span class="solicitud-badge"
+                        [ngClass]="{
+                          'badge-pendiente': vac.estado === 'pendiente',
+                          'badge-aprobada': vac.estado === 'aprobada',
+                          'badge-rechazada': vac.estado === 'rechazada'
+                        }">
+                    {{ vac.estado }}
+                  </span>
+                </div>
+                <p class="solicitud-tipo">Tipo: {{ vac.tipo }}</p>
+                @if (vac.justificacion_respuesta) {
+                  <div class="solicitud-respuesta">
+                    <strong>Respuesta RRHH:</strong> {{ vac.justificacion_respuesta }}
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+    </div>
+    </div>
+  </div>
+</div>
+
+
+

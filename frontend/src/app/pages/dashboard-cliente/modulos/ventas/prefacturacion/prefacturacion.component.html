@@ -1,0 +1,252 @@
+<div class="module-container fade-in">
+  <div [hidden]="(showModalApertura) || (showModalCierre)" class="main-view-wrapper">
+
+  <div class="module-header text-center mb-4 relative">
+    <h1 class="titulo-principal">Prefacturación y Caja</h1>
+    <p class="descripcion-general">Control de cuadre diario de caja, ingresos, egresos y documentos pendientes de pago.</p>
+  </div>
+
+  <!-- HTML PESTAÑAS -->
+  <div class="tabs-nav-wrapper">
+    <button class="tab-neu-inactive" 
+            [class.tab-neu-active]="activeTab === 'caja'" 
+            (click)="switchTab('caja')"> <span class="icon">💵</span> GESTIÓN DE CAJA </button>
+    <button class="tab-neu-inactive" 
+            [class.tab-neu-active]="activeTab === 'prefacturas'" 
+            (click)="switchTab('prefacturas')"> <span class="icon">🧾</span> PREFACTURAS PENDIENTES </button>
+  </div>
+
+  <!-- HTML CONTENIDO DE TABS -->
+  <div class="tab-content neumorphic-panel-inner p-4">
+    <!-- Boton Volver Inyectado -->
+    <div class="volver-wrapper">
+      <button class="btn-volver btn-pill" onclick="window.history.back()">
+        <i class="fas fa-arrow-left"></i> VOLVER
+      </button>
+    </div>
+    
+    <!-- HTML GESTIÓN DE CAJA -->
+    @if(activeTab === 'caja') {
+      <div class="fade-in">
+
+        @if(!cajaAbierta) {
+          <!-- CAJA CERRADA -->
+          <div class="estado-caja">
+            <i class="fas fa-cash-register icon-cerrada"></i>
+            <h1 class="estado-title">LA CAJA ESTÁ CERRADA</h1>
+            <p class="text-muted" style="margin-bottom: 2rem;">Debes realizar la apertura de caja para empezar a registrar movimientos en efectivo.</p>
+            <button class="btn-save btn-pill" style="padding: 1rem 2rem; font-size: 16px;" (click)="abrirCajaModal()">
+              <i class="fas fa-lock-open"></i> Abrir Caja
+            </button>
+          </div>
+        } @else {
+          <!-- CAJA ABIERTA -->
+          <div class="caja-abierta">
+            
+            <!-- TARJETAS DE RESUMEN -->
+            <div class="tarjetas-resumen">
+              <div class="neumorphic-panel card-resumen card-ingreso">
+                <h3 class="card-label">Total Ingresos</h3>
+                <span class="card-monto monto-ingreso">{{totalIngresos | currency:'COP':'symbol':'1.0-0'}}</span>
+              </div>
+              <div class="neumorphic-panel card-resumen card-egreso">
+                <h3 class="card-label">Total Egresos</h3>
+                <span class="card-monto monto-egreso">{{totalEgresos | currency:'COP':'symbol':'1.0-0'}}</span>
+              </div>
+              <div class="neumorphic-panel-inner card-resumen card-saldo">
+                <h3 class="card-label">Saldo Actual en Caja</h3>
+                <span class="card-monto monto-saldo">{{saldoActual | currency:'COP':'symbol':'1.0-0'}}</span>
+              </div>
+              
+              <button class="btn-volver btn-pill btn-cierre" (click)="abrirCierreModal()">
+                <i class="fas fa-lock"></i> Realizar Cierre de Caja
+              </button>
+            </div>
+
+            <!-- REGISTRO DE MOVIMIENTOS Y TABLA -->
+            <div class="movimientos-columna">
+              
+              <div class="neu-card" style="max-width: 800px; margin: 0 auto; padding: 1.5rem;">
+                <h3 class="panel-titulo" style="margin-bottom: 1rem;">Registrar Movimiento Manual</h3>
+                <div class="form-fila">
+                  <div class="form-group" style="flex: 1;">
+                    <label class="form-label">Tipo</label>
+                    <select class="input-neumorphic" [(ngModel)]="tipoMovimiento">
+                      <option value="ingreso">Ingreso (+)</option>
+                      <option value="egreso">Egreso (-)</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="flex: 1;">
+                    <label class="form-label">Monto</label>
+                    <input type="number" class="input-neumorphic" [(ngModel)]="montoMovimiento" placeholder="0">
+                  </div>
+                  <div class="form-group" style="flex: 2;">
+                    <label class="form-label">Concepto / Razón</label>
+                    <input type="text" class="input-neumorphic" [(ngModel)]="conceptoMovimiento" placeholder="Ej. Pago servicio internet">
+                  </div>
+                  <div style="display: flex; align-items: flex-end; padding-bottom: 0.5rem;">
+                    <button class="btn-add btn-pill" (click)="registrarMovimiento()">
+                      Guardar
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="neu-card" style="max-width: 800px; margin: 0 auto; padding: 1.5rem; flex: 1;">
+                <h3 class="panel-titulo" style="margin-bottom: 1rem;">Últimos Movimientos del Día</h3>
+                <div class="table-responsive" style="margin-top: 1rem;">
+                  <table class="data-table neumorphic-table">
+                    <thead>
+                      <tr>
+                        <th>FECHA/HORA</th>
+                        <th>TIPO</th>
+                        <th>CONCEPTO</th>
+                        <th>MONTO</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for(mov of movimientos; track $index) {
+                        <tr>
+                          <td>{{fechaMovimiento(mov) | date:'short'}}</td>
+                          <td>
+                            @if(mov.tipo === 'ingreso' || mov.tipo === 'apertura') {
+                              <span class="badge badge-success">{{mov.tipo}}</span>
+                            } @else {
+                              <span class="badge badge-danger">{{mov.tipo}}</span>
+                            }
+                          </td>
+                          <td>{{mov.concepto}}</td>
+                          <td [ngClass]="mov.tipo === 'egreso' ? 'text-negativo' : 'text-positivo'">
+                            {{mov.tipo === 'egreso' ? '-' : '+'}}{{mov.monto | currency:'COP':'symbol':'1.0-0'}}
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+<!-- HTML PREFACTURAS PENDIENTES -->
+    @if(activeTab === 'prefacturas') {
+      <div class="fade-in">
+
+        <p class="text-muted" style="margin-bottom: 1.5rem;">Documentos pendientes de confirmación de pago o emisión de factura final.</p>
+        
+        <div class="table-responsive">
+          <table class="data-table neumorphic-table">
+            <thead>
+              <tr>
+                <th>CONSECUTIVO</th>
+                <th>CLIENTE</th>
+                <th>FECHA</th>
+                <th>MONTO</th>
+                <th>ESTADO</th>
+                <th style="text-align: center;">ACCIÓN DE CAJA</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(pref of prefacturas; track pref.id) {
+                <tr>
+                  <td><strong>{{consecutivoPref(pref)}}</strong></td>
+                  <td>{{nombreClientePref(pref)}}</td>
+                  <td>{{fechaPref(pref)}}</td>
+                  <td>{{pref.total | currency:'COP':'symbol':'1.0-0'}}</td>
+                  <td>
+                    <span class="badge" [ngClass]="getBadgeClass(estadoPref(pref))">
+                      {{estadoPref(pref)}}
+                    </span>
+                  </td>
+                  <td style="text-align: center;">
+                    @if(estadoPref(pref) === 'borrador' || estadoPref(pref) === 'enviado' || estadoPref(pref) === 'Pendiente') {
+                      <button class="btn-save btn-pill btn-xs" (click)="generarDocumento(pref.id!)">
+                        <i class="fas fa-file-invoice"></i> Generar Factura
+                      </button>
+                    } @else {
+                      <span class="text-muted" style="font-size: 13px;"><i class="fas fa-check"></i> Procesada</span>
+                    }
+                  </td>
+                </tr>
+              }
+              @if(prefacturas.length === 0 && !cargando) {
+                <tr>
+                  <td colspan="6" class="tabla-vacia">No hay prefacturas registradas.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+  </div>
+
+<!-- HTML MODAL APERTURA -->
+@if(showModalApertura) {
+<div class="view-switch-panel fade-in">
+  <div class="neu-card" style="max-width: 800px; margin: 0 auto; max-width: 400px; text-align: center;">
+    <div class="modal-header modal-header-center">
+      <i class="fas fa-key icon-success"></i>
+    </div>
+    <div class="panel-body">
+      <h1 class="modal-title">APERTURA DE CAJA</h1>
+      <p class="text-muted" style="margin-bottom: 1.5rem;">Indica el monto base (sencillo) con el que inicia la caja hoy.</p>
+      
+      <div class="form-group" style="text-align: left;">
+        <label>Base Inicial ($)</label>
+        <input type="number" class="input-neumorphic monto-input" [(ngModel)]="montoApertura" placeholder="0">
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn-volver btn-pill" (click)="cerrarCajaModal()">Cancelar</button>
+        <button class="btn-save btn-pill" (click)="confirmarApertura()" [disabled]="guardando">
+          @if(guardando) {
+            <i class="fas fa-spinner fa-spin"></i> Abriendo...
+          } @else {
+            Confirmar Apertura
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+<!-- HTML MODAL CIERRE -->
+@if(showModalCierre) {
+<div class="view-switch-panel fade-in">
+  <div class="neu-card" style="max-width: 800px; margin: 0 auto; max-width: 400px; text-align: center;">
+    <div class="modal-header modal-header-center">
+      <i class="fas fa-lock icon-danger"></i>
+    </div>
+    <div class="panel-body">
+      <h1 class="modal-title">CIERRE DE CAJA</h1>
+      <p class="text-muted" style="margin-bottom: 1.5rem;">El sistema registrará un saldo esperado de <strong>{{saldoActual | currency:'COP':'symbol':'1.0-0'}}</strong>. ¿Estás seguro de realizar el cuadre y cerrar la caja?</p>
+      
+      <div class="modal-footer">
+        <button class="btn-volver btn-pill" (click)="cerrarCierreModal()">Cancelar</button>
+        <button class="btn-volver btn-pill" (click)="confirmarCierre()" [disabled]="guardando">
+          @if(guardando) {
+            <i class="fas fa-spinner fa-spin"></i> Cerrando...
+          } @else {
+            Sí, Cerrar Caja
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+
+
+
+
+

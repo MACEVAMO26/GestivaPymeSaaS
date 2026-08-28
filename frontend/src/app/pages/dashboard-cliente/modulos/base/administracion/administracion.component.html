@@ -1,0 +1,148 @@
+  <!-- Botón Volver Inyectado -->
+  <div style="margin-bottom: 1.5rem; display: flex; justify-content: flex-start;">
+    <button class="btn-volver btn-pill" onclick="window.history.back()">
+      <i class="fas fa-arrow-left"></i> Volver
+    </button>
+  </div>
+
+<div class="administracion-container">
+  <div class="header-section">
+    <h1>Administración de Cuenta y Contrato SaaS</h1>
+    <p class="subtitle">Gestione la legalidad de su servicio con GestivaPyme.</p>
+  </div>
+
+  @if (isLoading) {
+    <app-loading-spinner message="Cargando información del contrato..."></app-loading-spinner>
+  } @else {
+    @if (contratoActivo) {
+      <div class="contract-wrapper card-neumorphic">
+        <div class="contract-header">
+          <h2>Términos y Condiciones de Servicio SAAS</h2>
+          <span class="badge badge-info">Versión {{ contratoActivo.version }}</span>
+        </div>
+
+        <!-- Contenido del Contrato -->
+        <div class="contract-body" [innerHTML]="contratoActivo.contenido">
+        </div>
+
+        @if (userEmpresa?.contrato_id === contratoActivo.id) {
+          <!-- Contrato ya firmado -->
+          <div class="contract-footer signed-state bg-emerald-50 border border-emerald-200 p-6 rounded-xl mt-6">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="icon-circle bg-emerald-100 text-emerald-600 w-12 h-12 rounded-full flex items-center justify-center text-2xl">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <div>
+                <h3 class="text-emerald-800 font-bold text-lg m-0">Contrato Firmado y Aceptado</h3>
+                <p class="text-emerald-600 text-sm m-0">Fecha de firma: {{ userEmpresa?.fecha_firma | date:'medium' }}</p>
+              </div>
+            </div>
+            
+            <div class="firma-preview mb-4">
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Su Firma Registrada:</p>
+              <img [src]="userEmpresa?.firma_gerente_url" alt="Firma del Gerente" class="firma-img border border-gray-300 rounded bg-white max-w-xs max-h-32 object-contain p-2">
+            </div>
+
+            <button class="btn-primary w-full sm:w-auto" (click)="descargarCopiaContrato()">
+              <i class="fas fa-file-pdf"></i> Descargar Copia del Contrato
+            </button>
+          </div>
+        } @else {
+          <!-- Contrato pendiente de firma -->
+          <div class="contract-footer pending-state bg-amber-50 border border-amber-200 p-6 rounded-xl mt-6">
+            <h3 class="text-amber-800 font-bold text-lg mb-2">
+              <i class="fas fa-exclamation-triangle"></i> Acción Requerida: Firma del Contrato
+            </h3>
+            <p class="text-amber-700 text-sm mb-6">
+              Para continuar utilizando GestivaPyme sin interrupciones, el Gerente debe leer y firmar el presente contrato en el recuadro a continuación.
+            </p>
+
+            <div class="signature-section bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+              <div class="flex justify-between items-center mb-2">
+                <label class="text-sm font-semibold text-gray-700">Dibuje su firma aquí:</label>
+                <button class="text-xs text-red-500 hover:text-red-700 font-medium transition-colors" (click)="limpiarFirma()">
+                  <i class="fas fa-eraser"></i> Limpiar
+                </button>
+              </div>
+              
+              <div class="canvas-container border-2 border-dashed border-gray-300 rounded-lg overflow-hidden relative cursor-crosshair">
+                <canvas #firmaCanvas width="600" height="200" class="w-full h-48 bg-gray-50"></canvas>
+              </div>
+
+              <div class="mt-6 flex flex-col sm:flex-row items-center gap-4">
+                <button class="btn-success w-full font-bold py-3 text-lg" (click)="firmarContrato()" [disabled]="isSubmitting">
+                  @if (isSubmitting) {
+                    <i class="fas fa-spinner fa-spin"></i> Procesando...
+                  } @else {
+                    <i class="fas fa-file-signature"></i> Firmar y Aceptar Contrato
+                  }
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="empty-state card-neumorphic text-center p-12">
+        <div class="text-gray-400 text-5xl mb-4"><i class="fas fa-file-contract"></i></div>
+        <h3 class="text-gray-700 font-bold text-xl mb-2">No hay contratos activos</h3>
+        <p class="text-gray-500">El administrador del sistema aún no ha publicado un contrato de servicio.</p>
+      </div>
+    }
+
+    <!-- Migración de Datos (Onboarding SaaS) -->
+    <div class="migracion-wrapper card-neumorphic mt-6">
+      <div class="migracion-header">
+        <h2><i class="fas fa-truck-loading"></i> Migración de Datos</h2>
+        <p class="subtitle">Mueva su información histórica (Excel, otro sistema o documentos) a GestivaPyme en 3 pasos.</p>
+      </div>
+
+      <div class="migracion-grid">
+        <div class="migracion-item">
+          <div class="icon-circle bg-indigo-100 text-indigo-600">
+            <i class="fas fa-file-excel"></i>
+          </div>
+          <div class="migracion-item-body">
+            <h3>1. Descargar Plantilla</h3>
+            <p>Excel vacío con las columnas que debe llenar con sus datos históricos.</p>
+            <button class="btn-general-3" (click)="descargarPlantilla()">
+              <i class="fas fa-download"></i> Descargar Plantilla
+            </button>
+          </div>
+        </div>
+
+        <div class="migracion-item">
+          <div class="icon-circle bg-emerald-100 text-emerald-600">
+            <i class="fas fa-cloud-upload-alt"></i>
+          </div>
+          <div class="migracion-item-body">
+            <h3>2. Subir Excel Lleno</h3>
+            <p>Envíe el archivo lleno. El equipo técnico de GestivaPyme lo revisará y cargará sus datos.</p>
+            <label class="btn-general-2 cursor-pointer">
+              <i class="fas fa-upload"></i> {{ migrando ? 'Subiendo...' : 'Subir Archivo' }}
+              <input type="file" accept=".xlsx,.xls,.csv" class="hidden" [disabled]="migrando" (change)="onArchivoMigracionSeleccionado($event)" />
+            </label>
+          </div>
+        </div>
+
+        <div class="migracion-item">
+          <div class="icon-circle bg-amber-100 text-amber-600">
+            <i class="fas fa-save"></i>
+          </div>
+          <div class="migracion-item-body">
+            <h3>3. Respaldar mi Negocio</h3>
+            <p>Descargue un Excel con todo lo que ya tiene: ventas, empleados, productos, clientes, proveedores y servicios.</p>
+            <button class="btn-general-1" (click)="descargarBackup()">
+              <i class="fas fa-file-export"></i> Descargar Respaldo
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+
+
+
+

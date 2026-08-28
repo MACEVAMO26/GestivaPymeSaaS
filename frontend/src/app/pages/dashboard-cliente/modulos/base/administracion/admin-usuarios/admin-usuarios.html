@@ -1,0 +1,274 @@
+<div class="usuarios-module fade-in">
+  <div class="main-view fade-in" *ngIf="!showModal && !tempPasswordGenerated">
+  <!-- Botón Volver Inyectado -->
+  <div class="volver-wrapper">
+    <button class="btn-volver btn-pill" onclick="window.history.back()">
+      <i class="fas fa-arrow-left"></i> VOLVER
+    </button>
+  </div>
+
+  <!-- HTML ENCABEZADO -->
+  <div class="module-header text-center mb-4 relative">
+    <h1>GESTIÓN DE USUARIOS</h1>
+    <p>Crea el perfil inicial de los usuarios para que Gestión Humana los asigne.</p>
+    <div class="acciones-centro">
+      <button class="btn-add btn-pill" (click)="abrirModal()">
+        <i class="fas fa-plus"></i> Nuevo Usuario
+      </button>
+    </div>
+  </div>
+
+  <!-- HTML TABLA USUARIOS AGRUPADA POR ROL -->
+  <div class="fade-in">
+
+    <!-- Estado de carga -->
+    <div *ngIf="isLoading" class="text-center-py-8">
+      <app-loading-spinner message="Cargando usuarios..."></app-loading-spinner>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="errorMessage && !isLoading" class="empty-state error-msg">
+      Error: {{ errorMessage }}
+    </div>
+
+    <!-- Sin usuarios -->
+    <div *ngIf="!isLoading && !errorMessage && usuarios.length === 0" class="empty-state">
+      No hay usuarios registrados aún.
+    </div>
+
+    <!-- Bloques por Rol -->
+    @for (rol of rolesPresentes; track rol) {
+      <h3 class="panel-title text-left mt-4 mb-2"
+          style="color: #6B8F71; font-size: 13px; text-transform: uppercase;
+                 border-bottom: 1px solid #d1d1bc; padding-bottom: 4px; font-weight: bold;">
+        {{ rol }}
+      </h3>
+
+      <div class="table-container mb-4"
+           style="box-shadow: none; border: 1px solid rgba(0,0,0,0.05); background: transparent;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Documento</th>
+              <th>Nombres</th>
+              <th>Apellidos</th>
+              <th>Email</th>
+              <th>Área</th>
+              <th>Formalización</th>
+              <th>Estado Sistema</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (u of getUsuariosPorRol(rol); track u.id) {
+              <tr>
+                <td>{{ u.documento }}</td>
+                <td>{{ u.nombres }}</td>
+                <td>{{ u.apellidos }}</td>
+                <td>{{ u.email }}</td>
+                <td>
+                  <span style="font-size: 10px; color: #666;">
+                    {{ u.empleado?.area?.nombre || 'Sin Área' }}
+                  </span>
+                </td>
+                <td>
+                  <span class="status-badge"
+                    [ngClass]="{'status-active': u.perfil_formalizado, 'status-pending': !u.perfil_formalizado}">
+                    {{ u.perfil_formalizado ? 'FORMALIZADO' : 'PENDIENTE RRHH' }}
+                  </span>
+                </td>
+                <td>
+                  <span class="status-badge"
+                    [ngClass]="{'status-active': u.activo, 'status-inactive': !u.activo}">
+                    {{ u.activo ? 'ACTIVO' : 'INACTIVO' }}
+                  </span>
+                </td>
+                <td class="acciones-cell">
+                  <div class="acciones-iconos">
+                    <!-- Editar -->
+                    <button
+                      type="button"
+                      class="btn-icon-action btn-icon-edit"
+                      title="Editar Usuario"
+                      (click)="abrirModalEditar(u)">
+                      <i class="fas fa-pen"></i>
+                    </button>
+
+                    <!-- Inactivar / Activar -->
+                    <button
+                      type="button"
+                      class="btn-icon-action"
+                      [ngClass]="u.activo ? 'btn-icon-warning' : 'btn-icon-success'"
+                      [title]="u.activo ? 'Inactivar Usuario' : 'Activar Usuario'"
+                      *ngIf="puedeInactivar(u)"
+                      (click)="cambiarEstado(u)">
+                      <i class="fas" [ngClass]="u.activo ? 'fa-user-slash' : 'fa-user-check'"></i>
+                    </button>
+
+                    <!-- Eliminar -->
+                    <button
+                      type="button"
+                      class="btn-icon-action btn-icon-delete"
+                      title="Eliminar Usuario"
+                      *ngIf="puedeInactivar(u)"
+                      (click)="eliminarUsuario(u)">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+
+                    <!-- Baja pendiente -->
+                    <button class="btn-save btn-pill btn-sm btn-reject"
+                      *ngIf="u.empleado?.baja_solicitada"
+                      (click)="aprobarBaja(u)"
+                      [disabled]="isApprovingBaja">
+                      <span *ngIf="!isApprovingBaja">Baja Pendiente</span>
+                      <span *ngIf="isApprovingBaja">
+                        <svg class="icon-spin-sm" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                          <path class="descripcion-general" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      </span>
+                    </button>
+
+                    <span class="status-badge status-inactive"
+                      *ngIf="!puedeInactivar(u) && (esGerenteGeneral(u) || esAuditor(u))">
+                      Protegido
+                    </span>
+                    <span class="status-badge status-inactive"
+                      *ngIf="!puedeInactivar(u) && esJefeRRHH(u) && !esGerenteGeneral(u) && !esAuditor(u)">
+                      Solo Gerente
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+  </div>
+
+  <!-- HTML MODAL CREACION / EDICION USUARIO -->
+  <div *ngIf="showModal && !tempPasswordGenerated" class="view-switch-panel fade-in">
+    <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+      <div class="panel-header mb-4">
+        <h3>{{ isEditMode ? 'Editar Usuario' : 'Crear Nuevo Usuario' }}</h3>
+        <button class="btn-close" (click)="cerrarModal()">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+
+      <div class="alert-info" *ngIf="!isEditMode">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-md text-blue">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+        </svg>
+        <p>Este usuario quedará registrado de forma preliminar. El área de Gestión Humana deberá completar su formalización asignándole cargo, área y permisos.</p>
+      </div>
+
+      <div class="panel-body">
+        <form (ngSubmit)="guardarUsuario()">
+          <div class="form-row-divider mb-3">
+            <div class="form-group">
+              <label>Primer Nombre *</label>
+              <input type="text" class="neu-input" name="primer_nombre" [(ngModel)]="formData.primer_nombre" required placeholder="Primer Nombre">
+            </div>
+            <div class="form-group">
+              <label>Segundo Nombre</label>
+              <input type="text" class="neu-input" name="segundo_nombre" [(ngModel)]="formData.segundo_nombre" placeholder="Segundo Nombre (Opcional)">
+            </div>
+          </div>
+          
+          <div class="form-row-divider mb-3">
+            <div class="form-group">
+              <label>Primer Apellido *</label>
+              <input type="text" class="neu-input" name="primer_apellido" [(ngModel)]="formData.primer_apellido" required placeholder="Primer Apellido">
+            </div>
+            <div class="form-group">
+              <label>Segundo Apellido</label>
+              <input type="text" class="neu-input" name="segundo_apellido" [(ngModel)]="formData.segundo_apellido" placeholder="Segundo Apellido">
+            </div>
+          </div>
+
+          <div class="form-row-divider mb-3">
+            <div class="form-group">
+              <label>Tipo de Documento *</label>
+              <select class="neu-input" name="tipo_documento" [(ngModel)]="formData.tipo_documento" required>
+                <option value="CC">Cédula de Ciudadanía</option>
+                <option value="CE">Cédula de Extranjería</option>
+                <option value="PASAPORTE">Pasaporte</option>
+                <option value="PEP">PEP</option>
+                <option value="PPT">PPT</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Número de Documento *</label>
+              <input type="text" class="neu-input" name="documento" [(ngModel)]="formData.documento" required placeholder="Número de Documento">
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Correo Personal {{ isEditMode ? '(Opcional)' : '*' }}</label>
+            <input type="email" class="neu-input" name="email_personal" [(ngModel)]="formData.email_personal" [required]="!isEditMode" placeholder="correo@personal.com">
+          </div>
+
+          <div class="form-row-divider mb-3">
+            <div class="form-group">
+              <label>Teléfono</label>
+              <input type="text" class="neu-input" name="telefono" [(ngModel)]="formData.telefono" placeholder="Opcional">
+            </div>
+            <div class="form-group">
+              <label>Dirección</label>
+              <input type="text" class="neu-input" name="direccion" [(ngModel)]="formData.direccion" placeholder="Opcional">
+            </div>
+          </div>
+
+          <div class="form-actions mt-3">
+            <button type="button" class="btn-volver btn-pill" (click)="cerrarModal()">Cancelar</button>
+            <button type="submit" class="btn-save btn-pill flex-items-center flex-justify-center" [disabled]="isSubmitting">
+              <span *ngIf="!isSubmitting">{{ isEditMode ? 'Guardar Cambios' : 'Crear Usuario' }}</span>
+              <span *ngIf="isSubmitting" class="flex-items-center">
+                <svg class="icon-spin-sm" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Guardando...
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- HTML MODAL ALERTA CONTRASEÑA -->
+  <div *ngIf="tempPasswordGenerated" class="view-switch-panel fade-in">
+    <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+      <div class="success-icon-container">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-xl text-green">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <h3>¡Usuario Creado con Éxito!</h3>
+      <p>El perfil de <strong>{{nuevoUsuarioNombre}}</strong> ha sido creado exitosamente y está a la espera de que Gestión Humana complete su formalización.</p>
+      
+      <div class="password-box mt-3 mb-3">
+        <label>USUARIO (CORREO CORPORATIVO)</label>
+        <div class="password-display text-blue password-lowercase">
+          {{ emailGenerado }}
+        </div>
+        <label class="mt-3">CONTRASEÑA TEMPORAL</label>
+        <div class="password-display">
+          {{ tempPasswordGenerated }}
+        </div>
+        <small class="text-gray mt-1">Cópialos y envíaselos al usuario de forma segura. El sistema le pedirá cambiar la contraseña al primer inicio de sesión.</small>
+      </div>
+
+      <button class="btn-general w-full" (click)="cerrarModal()">Entendido</button>
+    </div>
+  </div>
+</div>
+
+
+
+

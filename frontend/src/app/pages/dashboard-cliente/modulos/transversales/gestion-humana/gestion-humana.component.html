@@ -1,0 +1,357 @@
+<div class="gestion-humana-container fade-in">
+  <div [hidden]="(isContratoModalOpen && empleadoContrato)" class="main-view-wrapper">
+
+  <!-- ENCABEZADO -->
+  <div class="module-header text-center mb-4 relative">
+    <h1 class="titulo-principal">GESTIÓN HUMANA</h1>
+    <p class="descripcion-general">Administra contratos, perfiles laborales y novedades del personal.</p>
+    
+    <div class="acciones-centro mt-3">
+      <button class="btn-general-1 btn-pill" (click)="exportarExcel()">
+        <i class="fas fa-file-excel icon-mr-5"></i> Exportar a Excel
+      </button>
+      <button class="btn-general-2 btn-pill" (click)="abrirModuloTiempo()">
+        <svg class="icon" style="width:16px;height:16px;margin-right:5px;" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
+        Módulo de Gestión de Tiempos
+      </button>
+    </div>
+  </div>
+
+  <!-- NAVEGACIÓN TABS -->
+  <div class="tabs-nav-wrapper">
+    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'pendientes'" (click)="setTab('pendientes')"> <span class="icon">⏳</span> Solicitudes <span class="badge badge-pendiente" *ngIf="vacacionesPendientes.length > 0" style="margin-left: 5px;">{{vacacionesPendientes.length}}</span> </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'activos'" (click)="setTab('activos')"> <span class="icon">✅</span> Personal Activo </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'inactivos'" (click)="setTab('inactivos')"> <span class="icon">✅</span> Inactivos </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'ausentes'" (click)="setTab('ausentes')"> <span class="icon">🏖️</span> Ausentes / Vacaciones </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'contratos'" (click)="setTab('contratos')"> <span class="icon">📑</span> Contratos <span class="badge badge-pendiente" *ngIf="alertasContratos > 0" style="margin-left: 5px;">{{alertasContratos}}</span> </button>
+    
+    
+    
+    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'configuracion'" (click)="setTab('configuracion')"> <span class="icon">📌</span> Configuración </button>
+  </div>
+
+  <!-- CONTENIDO DE TABS -->
+  <div class="tab-content neumorphic-panel-inner p-4">
+    <!-- Botón Volver Inyectado -->
+    <div class="volver-wrapper">
+      <button class="btn-volver btn-pill" onclick="window.history.back()">
+        <i class="fas fa-arrow-left"></i> Volver
+      </button>
+    </div>
+
+  <!-- TAB SOLICITUDES -->
+  <div class="neumorphic-panel fade-in" *ngIf="currentTab === 'pendientes'">
+    <h2 class="subtitulo">SOLICITUDES DE VACACIONES PENDIENTES</h2>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Empleado</th>
+            <th>Fechas</th>
+            <th>Tipo</th>
+            <th>Observaciones</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let vac of vacacionesPendientes">
+            <td>{{ vac.usuario?.nombres }} {{ vac.usuario?.apellidos }}</td>
+            <td>{{ vac.fecha_inicio | date:'shortDate' }} al {{ vac.fecha_fin | date:'shortDate' }}</td>
+            <td>{{ vac.tipo }}</td>
+            <td>{{ vac.observaciones || 'Ninguna' }}</td>
+            <td class="text-center">
+              <button class="btn-general-1 btn-pill btn-action" (click)="abrirModalVacaciones(vac)">Revisar</button>
+            </td>
+          </tr>
+          <tr *ngIf="vacacionesPendientes.length === 0">
+            <td colspan="5" class="text-center" style="padding: 2rem;">No hay solicitudes de vacaciones pendientes.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB ACTIVOS -->
+  <div class="neumorphic-panel fade-in" *ngIf="currentTab === 'activos'">
+    <h2 class="subtitulo">PERSONAL ACTIVO</h2>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Cod. Emp</th>
+            <th>Documento</th>
+            <th>Nombre Completo</th>
+            <th>Área</th>
+            <th>Cargo</th>
+            <th>Estado</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let emp of empleadosActivos">
+            <tr>
+              <td>{{ emp.codigo_empleado || 'N/A' }}</td>
+              <td>{{ emp.usuario?.documento }}</td>
+              <td>{{ emp.usuario?.nombres }} {{ emp.usuario?.apellidos }}</td>
+              <td>{{ emp.area?.nombre || 'Sin Asignar' }}</td>
+              <td>{{ emp.cargo?.nombre || 'Sin Asignar' }}</td>
+              <td>
+                <span class="badge badge-activo" *ngIf="!emp.baja_solicitada">ACTIVO</span>
+                <span class="badge badge-baja" *ngIf="emp.baja_solicitada">BAJA EN PROCESO</span>
+              </td>
+              <td class="text-center">
+                <div class="acciones-tabla-centro">
+                  <button class="btn-general-1 btn-pill btn-action" (click)="verDetalles(emp)">
+                    {{ empleadoExpandido?.id === emp.id ? 'Ocultar' : 'Detalles' }}
+                  </button>
+                  <button class="btn-general-5 btn-pill btn-action" (click)="abrirModalBaja(emp)" *ngIf="!emp.baja_solicitada">Baja</button>
+                </div>
+              </td>
+            </tr>
+            <!-- EXPEDIENTE DIGITAL (expandible) -->
+            <tr *ngIf="empleadoExpandido?.id === emp.id">
+              <td colspan="7" class="expediente-cell">
+                <div class="expediente-panel neumorphic-panel-inner">
+                  <h3 class="subtitulo">EXPEDIENTE DIGITAL DE {{ nombreCompletoUsuario(emp.usuario) }}</h3>
+
+                  <!-- SUBIR DOCUMENTO -->
+                  <div class="expediente-upload">
+                    <div class="form-group">
+                      <label class="form-label">Nombre del documento</label>
+                      <input type="text" class="input-neumorphic" [(ngModel)]="nombreDocumento" placeholder="Ej. Contrato firmado 2026">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Categoría</label>
+                      <select class="input-neumorphic" [(ngModel)]="categoriaDocumento">
+                        <option *ngFor="let c of categoriasDocumento" [value]="c">{{ c }}</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Archivo</label>
+                      <input type="file" class="input-neumorphic" (change)="onFileSelected($event)">
+                    </div>
+                    <div class="expediente-upload-btn">
+                      <button class="btn-general-1 btn-pill btn-action" (click)="subirDocumento()" [disabled]="isUploading">
+                        @if (isUploading) { <span class="spinner-small"></span> } @else { Subir }
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- DOCUMENTOS AGRUPADOS POR CATEGORÍA -->
+                  <div class="expediente-grupos">
+                    <div *ngFor="let grupo of categoriasConDocumentos" class="expediente-grupo">
+                      <h4 class="expediente-categoria">{{ grupo.categoria }} <span class="badge badge-pendiente">{{ grupo.docs.length }}</span></h4>
+                      <ul class="expediente-lista">
+                        <li *ngFor="let doc of grupo.docs" class="expediente-item">
+                          <button class="expediente-link" (click)="abrirDocumento(doc)">
+                            <i class="fas fa-file"></i> {{ doc.nombre }}
+                          </button>
+                          <span class="expediente-tipo">{{ doc.tipo_archivo }}</span>
+                          <button class="expediente-eliminar" (click)="eliminarDocumento(doc.id)" title="Eliminar">🗑️</button>
+                        </li>
+                      </ul>
+                    </div>
+                    <p *ngIf="documentosEmpleado.length === 0" class="texto-normal" style="text-align:center;padding:1rem;">
+                      Aún no hay documentos en el expediente de este empleado.
+                    </p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+          <tr *ngIf="empleadosActivos.length === 0">
+            <td colspan="7" class="text-center" style="padding: 2rem;">No hay empleados activos en el sistema.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB INACTIVOS -->
+  <div class="neumorphic-panel fade-in" *ngIf="currentTab === 'inactivos'">
+    <h2 class="subtitulo">PERSONAL INACTIVO</h2>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Cod. Emp</th>
+            <th>Documento</th>
+            <th>Nombre Completo</th>
+            <th>Área</th>
+            <th>Cargo</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let emp of empleadosInactivos">
+            <td>{{ emp.codigo_empleado || 'N/A' }}</td>
+            <td>{{ emp.usuario?.documento }}</td>
+            <td>{{ emp.usuario?.nombres }} {{ emp.usuario?.apellidos }}</td>
+            <td>{{ emp.area?.nombre || 'Sin Asignar' }}</td>
+            <td>{{ emp.cargo?.nombre || 'Sin Asignar' }}</td>
+            <td><span class="badge badge-baja">INACTIVO</span></td>
+          </tr>
+          <tr *ngIf="empleadosInactivos.length === 0">
+            <td colspan="6" class="text-center" style="padding: 2rem;">No hay empleados inactivos.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB AUSENTES -->
+  <div class="neumorphic-panel fade-in" *ngIf="currentTab === 'ausentes'">
+    <h2 class="subtitulo">PERSONAL AUSENTE / VACACIONES</h2>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Cod. Emp</th>
+            <th>Documento</th>
+            <th>Nombre Completo</th>
+            <th>Área</th>
+            <th>Cargo</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let emp of empleadosAusentes">
+            <td>{{ emp.codigo_empleado || 'N/A' }}</td>
+            <td>{{ emp.usuario?.documento }}</td>
+            <td>{{ emp.usuario?.nombres }} {{ emp.usuario?.apellidos }}</td>
+            <td>{{ emp.area?.nombre || 'Sin Asignar' }}</td>
+            <td>{{ emp.cargo?.nombre || 'Sin Asignar' }}</td>
+            <td><span class="badge badge-pendiente">{{ emp.estado }}</span></td>
+          </tr>
+          <tr *ngIf="empleadosAusentes.length === 0">
+            <td colspan="6" class="text-center" style="padding: 2rem;">No hay empleados ausentes.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB CONTRATOS -->
+  <div class="neumorphic-panel fade-in" *ngIf="currentTab === 'contratos'">
+    <h2 class="subtitulo">CONTRATOS DEL PERSONAL</h2>
+
+    <div class="banner banner-aviso" *ngIf="alertasContratos > 0">
+      <p class="banner-text">
+        <strong>{{ alertasContratos }}</strong> contrato(s) con vencimiento próximo o vencido. Revísalos y renueva o actualiza la información.
+      </p>
+    </div>
+
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Documento</th>
+            <th>Nombre Completo</th>
+            <th>Área</th>
+            <th>Cargo</th>
+            <th>Tipo Contrato</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th>Estado</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let emp of todosEmpleados">
+            <td>{{ emp.usuario?.documento || 'N/A' }}</td>
+            <td>{{ nombreCompletoUsuario(emp.usuario) }}</td>
+            <td>{{ emp.area?.nombre || 'Sin Asignar' }}</td>
+            <td>{{ emp.cargo?.nombre || 'Sin Asignar' }}</td>
+            <td>{{ emp.tipo_contrato || '—' }}</td>
+            <td>{{ emp.fecha_contratacion | date:'shortDate' }}</td>
+            <td>{{ emp.fecha_fin_contrato ? (emp.fecha_fin_contrato | date:'shortDate') : '—' }}</td>
+            <td><span class="badge" [ngClass]="claseContrato(emp)">{{ etiquetaContrato(emp) }}</span></td>
+            <td class="text-center">
+              <div class="acciones-tabla-centro">
+                <button class="btn-general-1 btn-pill btn-action" (click)="abrirModalContrato(emp)">Editar</button>
+                <button class="btn-general-2 btn-pill btn-action" (click)="descargarCertificado(emp)">Certificado</button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="todosEmpleados.length === 0">
+            <td colspan="9" class="text-center" style="padding: 2rem;">No hay empleados registrados.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB CONFIGURACION -->
+  <div class="neumorphic-panel fade-in" *ngIf="currentTab === 'configuracion'">
+    <h2 class="subtitulo">CONFIGURACIÓN DE SEGURIDAD SOCIAL</h2>
+    <p class="descripcion-general" style="text-align: left;">Establezca la ARL y la Caja de Compensación para toda la empresa.</p>
+    
+    <form (ngSubmit)="guardarConfiguracionRRHH()">
+      <div class="form-row-divider">
+        <div class="form-group">
+          <label class="form-label">ARL</label>
+          <input type="text" class="input-neumorphic" name="arl" [(ngModel)]="configuracionRRHH.arl" placeholder="Ej. SURA" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Caja de Compensación Familiar</label>
+          <input type="text" class="input-neumorphic" name="caja_compensacion" [(ngModel)]="configuracionRRHH.caja_compensacion" placeholder="Ej. Comfama" required>
+        </div>
+      </div>
+      <div class="acciones-centro" style="margin-top: 2rem;">
+        <button type="submit" class="btn-save btn-pill" [disabled]="isConfigSubmitting">Guardar Configuración</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+  </div>
+
+  <!-- PANEL EDITAR CONTRATO -->
+  @if (isContratoModalOpen && empleadoContrato) {
+  <div class="view-switch-panel fade-in">
+    <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+      <div class="text-center mb-4">
+        <h3 class="titulo-principal">EDITAR CONTRATO</h3>
+        <p class="texto-normal">{{ nombreCompletoUsuario(empleadoContrato.usuario) }}</p>
+      </div>
+      <form (ngSubmit)="guardarContrato()">
+        <div class="form-row-divider mb-3">
+          <div class="form-group">
+            <label class="form-label">Tipo de Contrato *</label>
+            <select class="input-neumorphic" name="tipo_contrato" [(ngModel)]="contratoForm.tipo_contrato" required>
+              <option value="">Seleccione...</option>
+              <option value="Indefinido">Indefinido</option>
+              <option value="Fijo">Fijo</option>
+              <option value="Por Obra">Por Obra</option>
+              <option value="Práctica">Práctica</option>
+              <option value="Aprendizaje">Aprendizaje</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Fecha Contratación *</label>
+            <input type="date" class="input-neumorphic" name="fecha_contratacion" [(ngModel)]="contratoForm.fecha_contratacion" required>
+          </div>
+        </div>
+        <div class="form-row-divider">
+          <div class="form-group">
+            <label class="form-label">Fecha Fin (si aplica)</label>
+            <input type="date" class="input-neumorphic" name="fecha_fin_contrato" [(ngModel)]="contratoForm.fecha_fin_contrato">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Salario Básico</label>
+            <input type="number" class="input-neumorphic" name="salario" [(ngModel)]="contratoForm.salario">
+          </div>
+        </div>
+        <div class="acciones-centro" style="margin-top: 2rem;">
+          <button type="button" class="btn-general-5 btn-pill btn-action" (click)="cerrarModalContrato()">Cancelar</button>
+          <button type="submit" class="btn-save btn-pill btn-action" [disabled]="isSubmitting">
+            @if (isSubmitting) { <span class="spinner-small"></span> } @else { Guardar }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  }
+</div>

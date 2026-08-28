@@ -1,0 +1,74 @@
+<div class="fade-in">
+  <!-- Botón Volver Inyectado -->
+  <div class="volver-wrapper">
+    <button class="btn-volver btn-pill" onclick="window.history.back()">
+      <i class="fas fa-arrow-left"></i> VOLVER
+    </button>
+  </div>
+
+  <div class="module-header text-center mb-4 relative">
+    <h1>AUDITORÍA DEL SISTEMA</h1>
+    <div class="info-box-neu neumorphic-panel">
+      <p class="descripcion-general">
+        <strong>🛡️ Lectura de Seguridad:</strong> Este módulo registra
+        automáticamente todas las acciones sensibles realizadas por los usuarios
+        en la plataforma.
+      </p>
+    </div>
+  </div>
+
+  <div class="panel-body">
+    @if (isLoading) {
+    <div class="loading-overlay neumorphic-panel">
+      <div class="spinner"></div>
+      <p>Cargando registros de auditoría...</p>
+    </div>
+    } @else {
+    <div class="neu-table-container">
+      <table class="neu-table">
+        <thead>
+          <tr>
+            <th>Fecha y Hora</th>
+            <th>Usuario Responsable</th>
+            <th>Acción Realizada</th>
+            <th>Detalles Adicionales</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (logs.length === 0) {
+          <tr>
+            <td colspan="4" class="empty-state">
+              No hay registros de auditoría recientes.
+            </td>
+          </tr>
+          } @for (log of logs; track log.id) {
+          <tr>
+            <td style="white-space: nowrap">
+              {{ (log.fecha_hora || log.created_at) | date:'short' }}
+            </td>
+            <td>
+              <div class="user-info">
+                <span class="user-name"
+                  >{{ log.usuario?.nombre || 'Sistema' }}</span
+                >
+              </div>
+            </td>
+            <td>
+              <span class="role-badge">{{ log.accion }}</span>
+            </td>
+            <td>
+              <div
+                style="max-width: 400px; overflow-wrap: break-word"
+                class="text-muted"
+              >
+                {{ log.descripcion || log.detalles || 'Sin detalles' }}
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+  </div>
+</div>

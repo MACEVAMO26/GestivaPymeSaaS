@@ -1,0 +1,265 @@
+<div class="formalizacion-container fade-in">
+
+  <!-- ENCABEZADO -->
+  <div class="module-header text-center mb-4">
+    <h1 class="titulo-principal">FORMALIZACIÓN DE USUARIOS</h1>
+    <p class="descripcion-general">Completa el perfil laboral de los usuarios creados por Gerencia para desbloquear su acceso al sistema.</p>
+  </div>
+
+  <!-- NAVEGACIÓN TABS -->
+  <div class="tabs-nav-wrapper">
+    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'pendientes'" (click)="setTab('pendientes')">
+      <span class="icon">⏳</span> Pendientes
+      <span class="badge badge-pendiente" *ngIf="pendientes.length > 0" style="margin-left: 5px;">{{pendientes.length}}</span>
+    </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'formalizados'" (click)="setTab('formalizados')">
+      <span class="icon">✅</span> Formalizados
+    </button>
+  
+    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'estructura'" (click)="setTab('estructura')">
+      <span class="icon">📊</span> Estructura
+    </button>
+    
+    
+  </div>
+
+  <div class="tab-content neumorphic-panel-inner p-4">
+
+    <!-- TAB PENDIENTES -->
+    <div class="neumorphic-panel fade-in" *ngIf="currentTab === 'pendientes'">
+      <h2 class="subtitulo">PENDIENTES DE FORMALIZAR</h2>
+      <div class="banner banner-aviso">
+        <p class="banner-text">
+          Estos usuarios fueron creados por Gerencia y están bloqueados en el sistema hasta que completes su perfil laboral.
+        </p>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Documento</th>
+              <th>Nombre Completo</th>
+              <th>Correo</th>
+              <th>Fecha Creación</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of pendientes">
+              <td>{{ p.documento }}</td>
+              <td>{{ nombreCompleto(p) }}</td>
+              <td>{{ p.email }}</td>
+              <td>{{ p.created_at | date:'shortDate' }}</td>
+              <td class="text-center">
+                <button type="button" class="btn-action-icon btn-action-edit" title="Formalizar Empleado" (click)="abrirModalFormalizar(p)">
+                  <i class="fas fa-user-check"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="pendientes.length === 0">
+              <td colspan="5" class="text-center" style="padding: 2rem;">No hay usuarios pendientes de formalización.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB FORMALIZADOS -->
+    <div class="neumorphic-panel fade-in" *ngIf="currentTab === 'formalizados'">
+      <h2 class="subtitulo">PERSONAL FORMALIZADO</h2>
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Documento</th>
+              <th>Nombre Completo</th>
+              <th>Área</th>
+              <th>Cargo</th>
+              <th>Tipo Contrato</th>
+              <th>Fecha Contratación</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let e of formalizados">
+              <td>{{ e.usuario?.documento }}</td>
+              <td>{{ nombreCompleto(e.usuario) }}</td>
+              <td>{{ areaNombre(e) }}</td>
+              <td>{{ cargoNombre(e) }}</td>
+              <td>{{ e.tipo_contrato || '—' }}</td>
+              <td>{{ e.fecha_contratacion | date:'shortDate' }}</td>
+              <td class="text-center">
+                <button type="button" class="btn-action-icon btn-action-edit" title="Editar Permisos y Perfil" (click)="abrirModalEditarEmpleado(e)">
+                  <i class="fas fa-user-edit"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="formalizados.length === 0">
+              <td colspan="7" class="text-center" style="padding: 2rem;">Aún no hay personal formalizado.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  
+
+<!-- TAB ESTRUCTURA -->
+  <div class="neumorphic-panel fade-in" *ngIf="currentTab === 'estructura'">
+    <app-admin-estructura></app-admin-estructura>
+  </div>
+
+  
+<!-- MODAL FORMALIZAR -->
+  <div class="inline-form-container mt-4" *ngIf="isFormalizarModalOpen" (click.self)="cerrarModalFormalizar()">
+    <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+      <div class="panel-header mb-4">
+        <h3>Formalizar: {{ nombreCompleto(usuarioAFormalizar) }}</h3>
+        <button class="btn-cerrar" (click)="cerrarModalFormalizar()">×</button>
+      </div>
+      <div class="panel-body">
+          <div class="form-group">
+            <label>Sede *</label>
+            <select [(ngModel)]="formalizarForm.sede_id" class="neu-input">
+              <option value="">Seleccione la sede</option>
+              <option *ngFor="let s of sedes" [value]="s.id">{{ s.nombre }}</option>
+            </select>
+          </div>
+        <div class="form-group">
+          <label>Área *</label>
+          <select [(ngModel)]="formalizarForm.area_id" class="neu-input">
+            <option value="">Seleccione el área</option>
+            <option *ngFor="let a of areas" [value]="a.id">{{ a.nombre }}</option>
+          </select>
+        </div>
+          <div class="form-group">
+            <label>Cargo *</label>
+            <select [(ngModel)]="formalizarForm.cargo_id" class="neu-input" [disabled]="!formalizarForm.area_id">
+              <option value="">{{ formalizarForm.area_id ? 'Seleccione el cargo' : 'Primero seleccione un área' }}</option>
+              <option *ngFor="let c of getCargosPorArea(formalizarForm.area_id)" [value]="c.id">{{ c.nombre }}</option>
+            </select>
+          </div>
+        <div class="form-group">
+          <label>Tipo de Contrato *</label>
+          <select [(ngModel)]="formalizarForm.tipo_contrato" class="neu-input">
+            <option value="">Seleccione el tipo</option>
+            <option value="Indefinido">Indefinido</option>
+            <option value="Fijo">Fijo</option>
+            <option value="Por Obra">Por Obra</option>
+            <option value="Práctica">Práctica</option>
+            <option value="Aprendizaje">Aprendizaje</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Fecha de Contratación *</label>
+          <input type="date" [(ngModel)]="formalizarForm.fecha_contratacion" class="neu-input" />
+        </div>
+        <div class="form-group">
+          <label>Salario (opcional)</label>
+          <input type="number" [(ngModel)]="formalizarForm.salario" class="neu-input" placeholder="0.00" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-general-2 btn-pill" (click)="cerrarModalFormalizar()">Cancelar</button>
+        <button class="btn-general-1 btn-pill" (click)="submitFormalizar()" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Guardando...' : 'Formalizar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EDICIÓN EMPLEADO FORMALIZADO Y MÓDULOS -->
+  <div class="modal-backdrop" *ngIf="isEditarEmpleadoModalOpen" (click)="cerrarModalEditarEmpleado()">
+    <div class="modal-card neumorphic-panel" (click)="$event.stopPropagation()" style="max-width: 680px; max-height: 90vh; overflow-y: auto;">
+      <div class="modal-header flex-between mb-3">
+        <h2 class="subtitulo" style="margin: 0;">Editar Perfil y Módulos Autorizados</h2>
+        <button type="button" class="btn-icon text-muted" (click)="cerrarModalEditarEmpleado()">✕</button>
+      </div>
+
+      <p class="descripcion-general mb-3">
+        Empleado: <strong>{{ nombreCompleto(empleadoAEditar?.usuario) }}</strong> ({{ empleadoAEditar?.usuario?.documento }})
+      </p>
+
+      <form (ngSubmit)="submitEditarEmpleado()">
+        <div class="form-row-divider mb-3">
+          <div class="form-group">
+            <label class="form-label">Sede:</label>
+            <select class="input-neumorphic" [(ngModel)]="editarEmpleadoForm.sede_id" name="sede_id" required>
+              <option value="">Seleccione Sede</option>
+              <option *ngFor="let s of sedes" [value]="s.id">{{ s.nombre }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Área Organizacional:</label>
+            <select class="input-neumorphic" [(ngModel)]="editarEmpleadoForm.area_id" name="area_id" required>
+              <option value="">Seleccione Área</option>
+              <option *ngFor="let a of areas" [value]="a.id">{{ a.nombre }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row-divider mb-3">
+          <div class="form-group">
+            <label class="form-label">Cargo:</label>
+            <select class="input-neumorphic" [(ngModel)]="editarEmpleadoForm.cargo_id" name="cargo_id" required>
+              <option value="">Seleccione Cargo</option>
+              <option *ngFor="let c of getCargosPorArea(editarEmpleadoForm.area_id)" [value]="c.id">{{ c.nombre }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tipo Contrato:</label>
+            <select class="input-neumorphic" [(ngModel)]="editarEmpleadoForm.tipo_contrato" name="tipo_contrato" required>
+              <option value="Término Indefinido">Término Indefinido</option>
+              <option value="Término Fijo">Término Fijo</option>
+              <option value="Prestación de Servicios">Prestación de Servicios</option>
+              <option value="Obra o Labor">Obra o Labor</option>
+              <option value="Aprendizaje">Aprendizaje</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row-divider mb-3">
+          <div class="form-group">
+            <label class="form-label">Fecha Contratación:</label>
+            <input type="date" class="input-neumorphic" [(ngModel)]="editarEmpleadoForm.fecha_contratacion" name="fecha_contratacion" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Salario Mensual ($):</label>
+            <input type="number" class="input-neumorphic" [(ngModel)]="editarEmpleadoForm.salario" name="salario" min="0">
+          </div>
+        </div>
+
+        <!-- PERMISOS DE MÓDULOS DEL NAVEGADOR -->
+        <div class="mt-4 p-3 neumorphic-panel-inner bg-cream">
+          <label class="form-label text-azul" style="font-weight: bold; margin-bottom: 0.5rem; display: block;">
+            <i class="fas fa-key"></i> Módulos Habilitados en Menú Lateral para este Empleado:
+          </label>
+          <small class="descripcion-general mb-3" style="display: block;">
+            * Nota: Inicio y Autogestión son siempre visibles para todos los empleados.
+          </small>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
+            <label *ngFor="let mod of listaModulosDisponibles" class="checkbox-label cursor-pointer p-2 rounded" style="display: flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.4); font-size: 11px;">
+              <input type="checkbox" [checked]="isModuloPermitido(mod.id)" (change)="toggleModuloPermitido(mod.id)">
+              <i [class]="mod.icono"></i> {{ mod.nombre }}
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer flex-between mt-4">
+          <button type="button" class="btn-volver btn-pill" (click)="cerrarModalEditarEmpleado()">Cancelar</button>
+          <button type="submit" class="btn-save btn-pill" [disabled]="isSubmitting">
+            <i class="fas fa-save"></i> {{ isSubmitting ? 'Guardando...' : 'Guardar Cambios' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+

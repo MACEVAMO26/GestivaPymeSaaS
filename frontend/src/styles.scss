@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   SISTEMA DE ACCESIBILIDAD VISUAL (DALTONISMO)
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+/* Botón de Accesibilidad (Ojo) Unificado */
+.accessibility-btn {
+  background-color: #DBDB9B !important; 
+  border: none !important; 
+  width: 28px !important; 
+  height: 28px !important; 
+  min-width: 28px !important;
+  min-height: 28px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 2px 2px 5px #030303, -2px -2px 5px rgba(255,255,255,0.02) !important;
+}
+
+.accessibility-btn svg {
+  width: 16px !important; 
+  height: 16px !important;
+  stroke: #000000 !important; 
+  stroke-width: 2 !important;
+}
+
+.accessibility-btn:hover {
+  background-color: #a57025 !important; 
+  box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5) !important;
+}

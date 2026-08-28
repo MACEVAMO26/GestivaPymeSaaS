@@ -1,0 +1,105 @@
+<div class="module-container fade-in">
+  <div class="module-header text-center mb-4 relative">
+    <h1 class="titulo-principal">AGENDA Y CALENDARIO</h1>
+    <p class="descripcion-general">Programe citas, visitas técnicas y reuniones.</p>
+  </div>
+
+  <div class="tab-content neumorphic-panel-inner p-4">
+    <!-- Botón Volver Inyectado -->
+    <div class="volver-wrapper">
+      <button class="btn-volver btn-pill" onclick="window.history.back()">
+        <i class="fas fa-arrow-left"></i> Volver
+      </button>
+    </div>
+
+    <div class="neumorphic-panel fade-in">
+      @if(!esOperativo) {
+      <div style="margin-bottom: 2rem;">
+        <h2 class="subtitulo">Agendar Nuevo Evento</h2>
+      <form (ngSubmit)="guardarEvento()">
+        
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label class="form-label">Título del Evento: *</label>
+            <input type="text" class="input-neumorphic" name="titulo" [(ngModel)]="nuevoEvento.titulo" required>
+          </div>
+
+          <div class="form-group full-width">
+            <label class="form-label">Descripción / Detalles:</label>
+            <textarea class="input-neumorphic" name="descripcion" [(ngModel)]="nuevoEvento.descripcion" rows="2"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Fecha y Hora de Inicio: *</label>
+            <input type="datetime-local" class="input-neumorphic" name="fecha_inicio" [(ngModel)]="nuevoEvento.fecha_inicio" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Fecha y Hora de Fin: *</label>
+            <input type="datetime-local" class="input-neumorphic" name="fecha_fin" [(ngModel)]="nuevoEvento.fecha_fin" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Color de Etiqueta:</label>
+            <input type="color" class="input-neumorphic color-input" name="color_etiqueta" [(ngModel)]="nuevoEvento.color_etiqueta">
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-add btn-pill" [disabled]="guardando">
+            @if (guardando) {
+              <span class="spinner-small"></span> Guardando...
+            } @else {
+              + Guardar Evento
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+    }
+
+    <div class="mt-4">
+      <h2 class="subtitulo">Próximos Eventos y Citas</h2>
+      
+      @if (cargando) {
+        <div class="loading-overlay neumorphic-panel">
+          <div class="spinner"></div>
+          <p>Cargando agenda...</p>
+        </div>
+      }
+
+      @if (!cargando) {
+        <div class="table-container">
+          <table class="data-table neumorphic-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Color</th>
+                <th>Título</th>
+                <th>Descripción</th>
+                <th>Inicio</th>
+                <th>Fin</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let e of eventos">
+                <td>{{ e.id }}</td>
+                <td>
+                  <div class="color-swatch" [style.backgroundColor]="e.color_etiqueta"></div>
+                </td>
+                <td><strong>{{ e.titulo }}</strong></td>
+                <td>{{ e.descripcion }}</td>
+                <td>{{ e.fecha_inicio | date:'short' }}</td>
+                <td>{{ e.fecha_fin | date:'short' }}</td>
+              </tr>
+              <tr *ngIf="eventos.length === 0">
+                <td colspan="6" class="text-center">No hay eventos programados.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </div>
+  </div>
+</div>

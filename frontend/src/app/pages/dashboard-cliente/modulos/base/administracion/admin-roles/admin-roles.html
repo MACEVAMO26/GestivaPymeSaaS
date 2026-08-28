@@ -1,0 +1,258 @@
+<!-- HTML GESTIÓN DE ROLES -->
+<div class="fade-in">
+  <!-- Botón Volver Inyectado -->
+  <div class="volver-wrapper">
+    <button class="btn-volver btn-pill" onclick="window.history.back()">
+      <i class="fas fa-arrow-left"></i> VOLVER
+    </button>
+  </div>
+
+  <div class="module-header text-center mb-4 relative">
+    <h1>ROLES Y ACCESOS</h1>
+    <p>Define los permisos de acceso al sistema para los roles globales.</p>
+  </div>
+
+  <div class="panel-body">
+    @if (isLoading) {
+    <div class="loading-overlay neumorphic-panel">
+      <div class="spinner"></div>
+      <p>Cargando roles...</p>
+    </div>
+    } @else {
+    <div class="neu-table-container">
+      <table class="neu-table">
+        <thead>
+          <tr>
+            <th>Nombre del Rol</th>
+            <th>Descripción</th>
+            <th>Tipo</th>
+            <th>Estado</th>
+            <th>Acciones Permitidas</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (roles.length === 0) {
+          <tr>
+            <td colspan="5" class="empty-state">No hay roles registrados.</td>
+          </tr>
+          } @for (rol of roles; track rol.id) {
+          <tr>
+            <td>
+              <div class="user-info">
+                <span class="user-name">{{ rol.nombre }}</span>
+              </div>
+            </td>
+            <td>{{ rol.descripcion || 'Sin descripción' }}</td>
+            <td>
+              @if (rol.es_base) {
+              <span class="role-badge">Sistema</span>
+              } @else {
+              <span class="role-badge role-badge-personalizado"
+                >Personalizado</span
+              >
+              }
+            </td>
+            <td>
+              @if (rol.activo) {
+              <span class="badge badge-active">Activo</span>
+              } @else {
+              <span class="badge badge-inactive">Inactivo</span>
+              }
+            </td>
+            <td>
+              <div class="acciones-tabla">
+                <!-- Mostrar botón de permisos si es Gerente o Auditor, sino el de expandir áreas -->
+                @if (rol.nombre.toLowerCase() === 'gerente general' ||
+                rol.nombre.toLowerCase() === 'auditor') {
+                <button
+                  class="btn-icon"
+                  title="Permisos bloqueados por el sistema"
+                  disabled
+                >
+                  🔒
+                </button>
+                } @else {
+                <button
+                  class="btn-icon"
+                  (click)="abrirPermisos(rol)"
+                  title="Editar Permisos"
+                >
+                  ⚙️
+                </button>
+                }
+                <button
+                  class="btn-icon"
+                  (click)="cambiarEstado(rol)"
+                  title="Activar/Desactivar"
+                  [disabled]="rol.es_base"
+                >
+                  @if (rol.es_base) { 🔒 } @else { @if (rol.activo) { 🚫 } @else
+                  { ✅ } }
+                </button>
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+  </div>
+</div>
+
+@if (isModalOpen) {
+<div class="inline-form-container mt-4">
+  <div class="modal-card neumorphic-panel">
+    <div class="panel-header mb-4">
+      <h1>Crear Nuevo Rol</h1>
+      <button class="btn-close" (click)="cerrarModal()" [disabled]="isSaving">
+        ×
+      </button>
+    </div>
+    <div class="panel-body">
+      <form>
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label>Nombre del Rol <span class="text-danger">*</span></label>
+            <input
+              type="text"
+              class="input-neumorphic"
+              name="nombre"
+              [(ngModel)]="nuevoRol.nombre"
+              required
+            />
+          </div>
+
+          <div class="form-group full-width">
+            <label>Descripción</label>
+            <textarea
+              class="input-neumorphic"
+              name="descripcion"
+              [(ngModel)]="nuevoRol.descripcion"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div class="form-group full-width info-box neumorphic-panel">
+            <p>
+              <strong>Nota:</strong> Los roles personalizados te permiten
+              definir permisos específicos más adelante. Los roles base del
+              sistema no pueden ser desactivados ni modificados.
+            </p>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn-save btn-pill"
+            (click)="guardarRol()"
+            [disabled]="isSaving"
+          >
+            @if (isSaving) {
+            <span class="spinner-small"></span> Guardando... } @else { Crear Rol
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+}
+
+<!-- MODAL EDITOR DE PERMISOS -->
+@if (isPermisosOpen) {
+<div class="inline-form-container mt-4">
+  <div class="modal-card neumorphic-panel permisos-modal">
+    <div class="panel-header mb-4">
+      <h1>
+        Permisos del rol: {{ rolPermisos?.nombre }}
+      </h1>
+      <button
+        class="btn-close"
+        (click)="cerrarPermisos()"
+        [disabled]="isPermisosSaving"
+      >
+        ×
+      </button>
+    </div>
+    <div class="panel-body">
+      <p class="descripcion-general">
+        Marque qué acciones puede realizar este rol sobre cada módulo.
+      </p>
+
+      <div class="permisos-acciones-top" style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <button type="button" class="btn-general-1 btn-pill btn-xs" style="padding: 6px 12px; font-size: 11px;" (click)="seleccionarTodos()">
+          <i class="fas fa-check-square"></i> Seleccionar Todos
+        </button>
+        <button type="button" class="btn-general-5 btn-pill btn-xs" style="padding: 6px 12px; font-size: 11px;" (click)="deseleccionarTodos()">
+          <i class="fas fa-square"></i> Deseleccionar Todos
+        </button>
+      </div>
+
+      <div class="permisos-scroll-container" style="max-height: 60vh; overflow-y: auto;">
+        @for (paquete of getPaquetesCatalogo(); track paquete) {
+          <h3 class="panel-title text-left mt-3 mb-2" style="color: #6B8F71; font-size: 13px; text-transform: uppercase; border-bottom: 1px solid #d1d1bc; padding-bottom: 4px;">{{ getPaqueteNombre(paquete) }}</h3>
+          
+          <div class="table-container permisos-table-wrap mb-4" style="box-shadow: none; border: 1px solid rgba(0,0,0,0.05); background: transparent;">
+            <table class="neu-table permisos-table">
+              <thead>
+                <tr>
+                  <th style="width: 30%">Módulo</th>
+                  @for (acc of acciones; track acc.key) {
+                  <th class="text-center">{{ acc.label }}</th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                @for (modulo of getModulosByPaquete(paquete); track modulo.id) {
+                <tr>
+                  <td>
+                    <div class="area-cell">
+                      <span class="area-nombre" style="font-weight: 500;">{{ modulo.nombre }}</span>
+                    </div>
+                  </td>
+                  @for (acc of acciones; track acc.key) {
+                  <td class="text-center">
+                    <input
+                      type="checkbox"
+                      [checked]="esAccion(modulo.id, acc.key)"
+                      (change)="toggleAccion(modulo.id, acc.key)"
+                      [disabled]="rolPermisos?.nombre?.toLowerCase() === 'operativo' && acc.key === 'puede_inactivar'"
+                    />
+                  </td>
+                  }
+                </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+        
+        @if (modulosCatalogo.length === 0) {
+          <div class="text-center p-4 text-muted">Cargando módulos disponibles...</div>
+        }
+      </div>
+    </div>
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn-volver btn-pill"
+        (click)="cerrarPermisos()"
+        [disabled]="isPermisosSaving"
+      >
+        Cancelar
+      </button>
+      <button
+        type="button"
+        class="btn-save btn-pill"
+        (click)="guardarPermisos()"
+        [disabled]="isPermisosSaving"
+      >
+        @if (isPermisosSaving) {
+        <span class="spinner-small"></span> Guardando... } @else { Guardar
+        Permisos }
+      </button>
+    </div>
+  </div>
+</div>
+}
