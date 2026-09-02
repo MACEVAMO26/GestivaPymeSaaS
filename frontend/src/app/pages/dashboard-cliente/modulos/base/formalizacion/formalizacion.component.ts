@@ -37,14 +37,27 @@ export class FormalizacionComponent implements OnInit {
 
   isFormalizarModalOpen = false;
   isSubmitting = false;
-  formalizarForm = {
+  
+  // Opciones estándar colombianas de Seguridad Social
+  listaEPS = ['Sura', 'Sanitas', 'Compensar', 'SaludTotal', 'NuevaEPS', 'Famisanar', 'Aliansalud'];
+  listaPensiones = ['Proteccion', 'Porvenir', 'Colfondos', 'Skandia', 'Colpensiones'];
+  listaCesantias = ['Proteccion', 'Porvenir', 'Colfondos', 'FNA'];
+  listaARL = ['SURA', 'Positiva', 'Seguros Bolívar', 'AXA Colpatria', 'La Equidad'];
+  listaCajas = ['Compensar', 'Colsubsidio', 'Cafam', 'Comfama', 'Comfenalco'];
+
+  formalizarForm: any = {
     usuario_id: null,
     sede_id: '',
     area_id: '',
     cargo_id: '',
     fecha_contratacion: '',
-    tipo_contrato: '',
-    salario: ''
+    tipo_contrato: 'Indefinido',
+    salario: '',
+    eps: 'Sura',
+    fondo_pension: 'Proteccion',
+    fondo_cesantias: 'Proteccion',
+    arl: 'SURA',
+    caja_compensacion: 'Compensar'
   };
   usuarioAFormalizar: any = null;
 
@@ -75,6 +88,12 @@ export class FormalizacionComponent implements OnInit {
     tipo_contrato: '',
     fecha_contratacion: '',
     salario: '',
+    eps: 'Sura',
+    fondo_pension: 'Proteccion',
+    fondo_cesantias: 'Proteccion',
+    arl: 'SURA',
+    caja_compensacion: 'Compensar',
+    estado: 'activo',
     modulos_permitidos: {}
   };
 
@@ -136,7 +155,20 @@ export class FormalizacionComponent implements OnInit {
 
   abrirModalFormalizar(p: any) {
     this.usuarioAFormalizar = p;
-    this.formalizarForm = { usuario_id: null, sede_id: '', area_id: '', cargo_id: '', tipo_contrato: '', fecha_contratacion: '', salario: '' };
+    this.formalizarForm = {
+      usuario_id: p.id,
+      sede_id: this.sedes.length > 0 ? this.sedes[0].id : '',
+      area_id: '',
+      cargo_id: '',
+      tipo_contrato: 'Indefinido',
+      fecha_contratacion: new Date().toISOString().slice(0, 10),
+      salario: '',
+      eps: 'Sura',
+      fondo_pension: 'Proteccion',
+      fondo_cesantias: 'Proteccion',
+      arl: 'SURA',
+      caja_compensacion: 'Compensar'
+    };
     this.isFormalizarModalOpen = true;
   }
 
@@ -163,7 +195,12 @@ export class FormalizacionComponent implements OnInit {
       cargo_id: this.formalizarForm.cargo_id,
       tipo_contrato: this.formalizarForm.tipo_contrato,
       fecha_contratacion: this.formalizarForm.fecha_contratacion,
-      salario: this.formalizarForm.salario
+      salario: this.formalizarForm.salario,
+      eps: this.formalizarForm.eps,
+      fondo_pension: this.formalizarForm.fondo_pension,
+      fondo_cesantias: this.formalizarForm.fondo_cesantias,
+      arl: this.formalizarForm.arl,
+      caja_compensacion: this.formalizarForm.caja_compensacion
     }).pipe(timeout(15000)).subscribe({
       next: (res) => {
         this.isSubmitting = false;
@@ -209,6 +246,12 @@ export class FormalizacionComponent implements OnInit {
       tipo_contrato: e.tipo_contrato || 'Término Indefinido',
       fecha_contratacion: e.fecha_contratacion ? e.fecha_contratacion.substring(0, 10) : '',
       salario: e.salario || 0,
+      eps: e.eps || 'Sura',
+      fondo_pension: e.fondo_pension || 'Proteccion',
+      fondo_cesantias: e.fondo_cesantias || 'Proteccion',
+      arl: e.arl || 'SURA',
+      caja_compensacion: e.caja_compensacion || 'Compensar',
+      estado: e.estado || 'activo',
       modulos_permitidos: modObj
     };
     this.isEditarEmpleadoModalOpen = true;

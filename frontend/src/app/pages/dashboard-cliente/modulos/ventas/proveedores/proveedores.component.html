@@ -1,327 +1,352 @@
 <div class="module-container fade-in">
   <div [hidden]="(showModal) || (showModalPago && cuentaSeleccionada) || (showModalEvaluacion && evaluacionSeleccionada)" class="main-view-wrapper">
-  <div class="module-header">
-    <h1>Gestión de Proveedores</h1>
-    <p>Administra el inventario de proveedores, cuentas por pagar y evaluaciones de desempeño.</p>
-  </div>
+    <div class="module-header">
+      <h1>Gestión de Proveedores</h1>
+      <p>Administra el inventario de proveedores, cuentas por pagar y evaluaciones de desempeño contractual.</p>
+    </div>
 
-  <!-- HTML PESTAÑAS -->
-  <div class="tabs-nav-wrapper">
-    <button class="tab-neu-inactive" 
-            [class.tab-neu-active]="activeTab === 'directorio'" 
-            (click)="switchTab('directorio')"> <span class="icon">📖</span> Directorio </button>
-    <button class="tab-neu-inactive" 
-            [class.tab-neu-active]="activeTab === 'cuentas'" 
-            (click)="switchTab('cuentas')"> <span class="icon">📌</span> Cuentas por Pagar </button>
-    <button class="tab-neu-inactive" 
-            [class.tab-neu-active]="activeTab === 'evaluaciones'" 
-            (click)="switchTab('evaluaciones')"> <span class="icon">📌</span> Evaluaciones y Contratos </button>
-  </div>
+    <!-- HTML PESTAÑAS -->
+    <div class="tabs-nav-wrapper">
+      <button class="tab-neu-inactive" 
+              [class.tab-neu-active]="activeTab === 'directorio'" 
+              (click)="switchTab('directorio')">
+        <span class="icon">📖</span> Directorio
+      </button>
+      <button class="tab-neu-inactive" 
+              [class.tab-neu-active]="activeTab === 'cuentas'" 
+              (click)="switchTab('cuentas')">
+        <span class="icon">📌</span> Cuentas por Pagar
+      </button>
+      <button class="tab-neu-inactive" 
+              [class.tab-neu-active]="activeTab === 'evaluaciones'" 
+              (click)="switchTab('evaluaciones')">
+        <span class="icon">⭐</span> Evaluaciones y Contratos
+      </button>
+    </div>
 
-  <!-- HTML CONTENIDO DE TABS -->
-  <div class="tab-content neumorphic-panel-inner p-4">
-  <!-- Botón Volver Inyectado -->
-  <div class="volver-wrapper">
-    <button class="btn-volver btn-pill" onclick="window.history.back()">
-      <i class="fas fa-arrow-left"></i> Volver
-    </button>
-  </div>
-    
-    <!-- HTML DIRECTORIO -->
-    @if(activeTab === 'directorio') {
-      <div class="neumorphic-panel fade-in">
-        <div class="action-bar">
-          <input type="text" 
-                 class="search-input input-neumorphic" 
-                 placeholder="Buscar por Razón Social, NIT, Contacto..."
-                 [(ngModel)]="searchTerm"
-                 (input)="filtrarProveedores()">
-                 
-          <button class="btn-add btn-pill" (click)="abrirModal()">
-            <i class="fas fa-plus"></i> Nuevo Proveedor
-          </button>
-        </div>
+    <!-- HTML CONTENIDO DE TABS -->
+    <div class="tab-content neumorphic-panel-inner p-4">
+      <!-- Botón Volver -->
+      <div class="volver-wrapper">
+        <button class="btn-volver btn-pill" onclick="window.history.back()">
+          <i class="fas fa-arrow-left"></i> Volver
+        </button>
+      </div>
+      
+      <!-- TAB DIRECTORIO -->
+      @if(activeTab === 'directorio') {
+        <div class="neumorphic-panel fade-in">
+          <div class="action-bar">
+            <input type="text" 
+                   class="search-input input-neumorphic" 
+                   placeholder="Buscar por Razón Social, NIT, Contacto..."
+                   [(ngModel)]="searchTerm"
+                   (input)="filtrarProveedores()">
+                   
+            <button class="btn-add btn-pill" (click)="abrirModal()">
+              <i class="fas fa-plus"></i> Nuevo Proveedor
+            </button>
+          </div>
 
-        <div class="table-responsive">
-          <table class="premium-table data-table">
-            <thead>
-              <tr>
-                <th>PROVEEDOR</th>
-                <th>CONTACTO PRINCIPAL</th>
-                <th>EMAIL / DIRECCIÓN</th>
-                <th>EVALUACIÓN BASE</th>
-                <th>ACCIONES</th>
-              </tr>
-            </thead>
-            <tbody>
-              @if (proveedoresFiltrados.length === 0) {
+          <div class="table-responsive">
+            <table class="premium-table data-table">
+              <thead>
                 <tr>
-                  <td colspan="5" style="padding: 2rem; text-align: center;">
-                    <div class="empty-state">
-                      No hay proveedores registrados.
-                    </div>
-                  </td>
+                  <th>PROVEEDOR</th>
+                  <th>CONTACTO PRINCIPAL</th>
+                  <th>EMAIL / DIRECCIÓN</th>
+                  <th>EVALUACIÓN BASE</th>
+                  <th>ACCIONES</th>
                 </tr>
-              } @else {
-                @for (proveedor of proveedoresFiltrados; track proveedor.id) {
+              </thead>
+              <tbody>
+                @if (proveedoresFiltrados.length === 0) {
                   <tr>
-                    <td>
-                      <strong>{{proveedor.razon_social}}</strong><br>
-                      <span class="text-muted text-xs">ID: {{ formatearId(proveedor.id) }} | NIT: {{proveedor.nit}}</span>
-                    </td>
-                    <td>
-                      <strong>{{proveedor.contacto || 'N/A'}}</strong><br>
-                      <span class="text-xs">📞 {{proveedor.telefono || 'N/A'}}</span>
-                    </td>
-                    <td>
-                      <span class="text-xs">✉️ {{proveedor.email || 'N/A'}}</span><br>
-                      <span class="text-xs">📍 {{proveedor.direccion || 'N/A'}}</span>
-                    </td>
-                    <td>
-                      <span class="badge" [ngClass]="getBadgeEval(proveedor.estado_evaluacion || 'No Evaluado')">
-                        {{ proveedor.estado_evaluacion || 'No Evaluado' }}
-                      </span>
-                    </td>
-                    <td>
-                      <div class="acciones-fila">
-                        <button class="btn-icon" (click)="abrirModal(proveedor)" title="Editar">✏️</button>
-                        <app-solicitud-inactivacion [area]="'v_prov'" [entidad]="'proveedores'" [entidadId]="proveedor.id"
-                          [nombreEntidad]="proveedor.razon_social"></app-solicitud-inactivacion>
-                        <button class="btn-icon text-danger" (click)="eliminarProveedor(proveedor.id)" title="Eliminar" [disabled]="deletingId === proveedor.id">
-                          @if(deletingId === proveedor.id) {
-                            <i class="fas fa-spinner fa-spin"></i>
-                          } @else {
-                            🗑️
-                          }
-                        </button>
+                    <td colspan="5" style="padding: 2rem; text-align: center;">
+                      <div class="empty-state">
+                        No hay proveedores registrados.
                       </div>
                     </td>
                   </tr>
+                } @else {
+                  @for (proveedor of proveedoresFiltrados; track proveedor.id) {
+                    <tr>
+                      <td>
+                        <strong>{{proveedor.razon_social}}</strong><br>
+                        <span class="text-muted text-xs">ID: {{ formatearId(proveedor.id) }} | NIT: {{proveedor.nit}}</span>
+                      </td>
+                      <td>
+                        <strong>{{proveedor.contacto || 'N/A'}}</strong><br>
+                        <span class="text-xs">📞 {{proveedor.telefono || 'N/A'}}</span>
+                      </td>
+                      <td>
+                        <span class="text-xs">✉️ {{proveedor.email || 'N/A'}}</span><br>
+                        <span class="text-xs">📍 {{proveedor.direccion || 'N/A'}}</span>
+                      </td>
+                      <td>
+                        <span class="badge" [ngClass]="getBadgeEval(proveedor.estado_evaluacion || 'No Evaluado')">
+                          {{ proveedor.estado_evaluacion || 'No Evaluado' }}
+                        </span>
+                      </td>
+                      <td>
+                        <div class="acciones-fila">
+                          <button class="btn-icon" (click)="abrirModal(proveedor)" title="Editar">✏️</button>
+                          <app-solicitud-inactivacion [area]="'v_prov'" [entidad]="'proveedores'" [entidadId]="proveedor.id"
+                            [nombreEntidad]="proveedor.razon_social"></app-solicitud-inactivacion>
+                          <button class="btn-icon text-danger" (click)="eliminarProveedor(proveedor.id)" title="Eliminar" [disabled]="deletingId === proveedor.id">
+                            @if(deletingId === proveedor.id) {
+                              <i class="fas fa-spinner fa-spin"></i>
+                            } @else {
+                              🗑️
+                            }
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  }
                 }
-              }
-            </tbody>
-          </table>
-        </div>
-      </div>
-    }
-
-<!-- HTML CUENTAS POR PAGAR -->
-    @if(activeTab === 'cuentas') {
-      <div class="neumorphic-panel fade-in">
-        <div class="cuentas-resumen">
-          <div class="neumorphic-panel card-resumen">
-            <h3 class="card-label">Total Adeudado</h3>
-            <span class="monto-deuda">{{totalDeuda | currency:'COP':'symbol':'1.0-0'}}</span>
-          </div>
-          <div class="info-deuda">
-            <p class="descripcion-general">Aquí puedes visualizar las facturas pendientes de pago a tus proveedores. Recuerda registrar los pagos a tiempo para mantener un buen historial crediticio y una evaluación 'Excelente'.</p>
+              </tbody>
+            </table>
           </div>
         </div>
+      }
 
-        <div class="table-responsive">
-          <table class="premium-table data-table">
-            <thead>
-              <tr>
-                <th>PROVEEDOR</th>
-                <th>FACTURA</th>
-                <th>EMISIÓN</th>
-                <th>VENCIMIENTO</th>
-                <th>MONTO</th>
-                <th>ESTADO</th>
-                <th style="text-align: center;">ACCIÓN</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for(cuenta of cuentasPorPagar; track cuenta.id) {
+      <!-- TAB CUENTAS POR PAGAR -->
+      @if(activeTab === 'cuentas') {
+        <div class="neumorphic-panel fade-in">
+          <div class="cuentas-resumen">
+            <div class="neumorphic-panel card-resumen">
+              <h3 class="card-label">Total Adeudado</h3>
+              <span class="monto-deuda">{{totalDeuda | currency:'COP':'symbol':'1.0-0'}}</span>
+            </div>
+            <div class="info-deuda">
+              <p class="descripcion-general">Aquí puedes visualizar las facturas pendientes de pago a tus proveedores. Recuerda registrar los pagos a tiempo para mantener un buen historial crediticio y una evaluación excelente.</p>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="premium-table data-table">
+              <thead>
                 <tr>
-                  <td><strong>{{nombreProveedorCuenta(cuenta)}}</strong></td>
-                  <td>{{cuenta.factura_numero}}</td>
-                  <td>{{cuenta.fecha_emision}}</td>
-                  <td>{{cuenta.fecha_vencimiento}}</td>
-                  <td style="font-weight: bold;">{{cuenta.saldo_pendiente | currency:'COP':'symbol':'1.0-0'}}</td>
-                  <td>
-                    <span class="badge" [ngClass]="getBadgeCuentas(cuenta.estado)">{{cuenta.estado}}</span>
-                  </td>
-                  <td style="text-align: center;">
-                    @if(cuenta.estado !== 'Pagada' && cuenta.saldo_pendiente > 0) {
-                      <button class="btn-save btn-pill btn-xs" (click)="abrirPago(cuenta)">
-                        <i class="fas fa-hand-holding-usd"></i> Registrar Pago
-                      </button>
-                    } @else {
-                      <span class="text-positivo text-xs"><i class="fas fa-check-double"></i> Saldado</span>
-                    }
-                  </td>
+                  <th>PROVEEDOR</th>
+                  <th>FACTURA</th>
+                  <th>EMISIÓN</th>
+                  <th>VENCIMIENTO</th>
+                  <th>TOTAL</th>
+                  <th>SALDO PENDIENTE</th>
+                  <th>ESTADO</th>
+                  <th style="text-align: center;">ACCIÓN</th>
                 </tr>
-              }
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                @if (cuentasPorPagar.length === 0) {
+                  <tr>
+                    <td colspan="8" style="padding: 2rem; text-align: center;">
+                      <div class="empty-state">
+                        No hay facturas o cuentas por pagar pendientes.
+                      </div>
+                    </td>
+                  </tr>
+                } @else {
+                  @for(cuenta of cuentasPorPagar; track cuenta.id) {
+                    <tr>
+                      <td><strong>{{nombreProveedorCuenta(cuenta)}}</strong></td>
+                      <td><span class="badge badge-secundario">{{cuenta.factura_numero}}</span></td>
+                      <td>{{cuenta.fecha_emision}}</td>
+                      <td>{{cuenta.fecha_vencimiento}}</td>
+                      <td>{{cuenta.total | currency:'COP':'symbol':'1.0-0'}}</td>
+                      <td style="font-weight: bold; color: #de3737;">{{cuenta.saldo_pendiente | currency:'COP':'symbol':'1.0-0'}}</td>
+                      <td>
+                        <span class="badge" [ngClass]="getBadgeCuentas(cuenta.estado)">{{cuenta.estado}}</span>
+                      </td>
+                      <td style="text-align: center;">
+                        @if(cuenta.estado !== 'Pagada' && cuenta.saldo_pendiente > 0) {
+                          <button class="btn-save btn-pill btn-xs" (click)="abrirPago(cuenta)">
+                            <i class="fas fa-hand-holding-usd"></i> Registrar Pago
+                          </button>
+                        } @else {
+                          <span class="text-positivo text-xs"><i class="fas fa-check-double"></i> Saldado</span>
+                        }
+                      </td>
+                    </tr>
+                  }
+                }
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
-    }
+      }
 
-    <!-- HTML EVALUACIONES -->
-    @if(activeTab === 'evaluaciones') {
-      <div class="neumorphic-panel fade-in">
-        <p class="text-muted" style="margin-bottom: 1.5rem;">Califica el desempeño de tus proveedores. Un historial de entregas a tiempo y buena calidad de repuestos impacta directamente en tu puntuación de calidad (SLAs).</p>
-        
-        <div class="table-responsive">
-          <table class="premium-table data-table">
-            <thead>
-              <tr>
-                <th>PROVEEDOR</th>
-                <th>VIGENCIA CONTRATO</th>
-                <th>CALIFICACIÓN</th>
-                <th>DESEMPEÑO (NRC)</th>
-                <th>COMENTARIOS DE SERVICIO</th>
-                <th style="text-align: center;">EVALUAR</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for(eval of contratos; track eval.id) {
+      <!-- TAB EVALUACIONES Y CONTRATOS -->
+      @if(activeTab === 'evaluaciones') {
+        <div class="neumorphic-panel fade-in">
+          <p class="text-muted" style="margin-bottom: 1.5rem;">Califica el desempeño de tus proveedores y supervisa el estado contractual. Un historial de entregas a tiempo y calidad de suministros impacta directamente en tus indicadores de gestión (SLAs).</p>
+          
+          <div class="table-responsive">
+            <table class="premium-table data-table">
+              <thead>
                 <tr>
-                  <td><strong>{{eval.proveedor}}</strong></td>
-                  <td>{{eval.vigencia}}</td>
-                  <td class="stars">
-                    {{ '★'.repeat(eval.calificacion || 0) }}{{ '☆'.repeat(5 - (eval.calificacion || 0)) }}
-                  </td>
-                  <td>
-                    <span class="badge" [ngClass]="getBadgeEval(eval.nrc)">{{eval.nrc}}</span>
-                  </td>
-                  <td class="cell-truncate">{{eval.comentarios}}</td>
-                  <td style="text-align: center;">
-                    <button class="btn-general-2 btn-pill" style="padding: 0.4rem 0.8rem;" (click)="abrirEvaluar(eval)">
-                      <i class="fas fa-star-half-alt"></i> Calificar
-                    </button>
-                  </td>
+                  <th>PROVEEDOR</th>
+                  <th>ESTADO CONTRACTUAL</th>
+                  <th>CALIFICACIÓN</th>
+                  <th>DESEMPEÑO</th>
+                  <th>OBSERVACIONES / SLAs</th>
+                  <th style="text-align: center;">EVALUAR</th>
                 </tr>
+              </thead>
+              <tbody>
+                @if (contratos.length === 0) {
+                  <tr>
+                    <td colspan="6" style="padding: 2rem; text-align: center;">
+                      <div class="empty-state">
+                        No hay evaluaciones registradas.
+                      </div>
+                    </td>
+                  </tr>
+                } @else {
+                  @for(eval of contratos; track eval.id) {
+                    <tr>
+                      <td><strong>{{eval.proveedor}}</strong></td>
+                      <td><span class="badge badge-aprobada">{{eval.vigencia}}</span></td>
+                      <td class="stars" style="color: #C9A227; font-size: 1.1rem;">
+                        {{ '★'.repeat(eval.calificacion || 0) }}{{ '☆'.repeat(5 - (eval.calificacion || 0)) }}
+                        <span class="text-muted text-xs" style="margin-left: 4px;">({{eval.calificacion || 0}}/5)</span>
+                      </td>
+                      <td>
+                        <span class="badge" [ngClass]="getBadgeEval(eval.nrc)">{{eval.nrc}}</span>
+                      </td>
+                      <td class="cell-truncate">{{eval.comentarios}}</td>
+                      <td style="text-align: center;">
+                        <button class="btn-general-2 btn-pill" style="padding: 0.4rem 0.8rem;" (click)="abrirEvaluar(eval)">
+                          <i class="fas fa-star-half-alt"></i> Calificar
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- HTML MODAL DIRECTORIO (NUEVO / EDITAR PROVEEDOR) -->
+  @if (showModal) {
+    <div class="view-switch-panel fade-in">
+      <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+        <div class="panel-header mb-4">
+          <h1>{{ isEditMode ? 'EDITAR PROVEEDOR' : 'NUEVO PROVEEDOR' }}</h1>
+          <button class="btn-close" (click)="cerrarModal()">&times;</button>
+        </div>
+        <div class="panel-body">
+          <div class="form-fila">
+            <div class="form-group" style="flex: 2; min-width: 200px;">
+              <label>Razón Social *</label>
+              <input type="text" class="input-neumorphic" [(ngModel)]="proveedorActual.razon_social" placeholder="Empresa S.A.S">
+            </div>
+            <div class="form-group" style="flex: 1; min-width: 150px;">
+              <label>NIT / RUT *</label>
+              <input type="text" class="input-neumorphic" [(ngModel)]="proveedorActual.nit" placeholder="900.123.456-7">
+            </div>
+          </div>
+
+          <div class="form-fila">
+            <div class="form-group" style="flex: 1;">
+              <label>Contacto Principal</label>
+              <input type="text" class="input-neumorphic" [(ngModel)]="proveedorActual.contacto" placeholder="Nombre completo">
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label>Teléfono</label>
+              <input type="text" class="input-neumorphic" [(ngModel)]="proveedorActual.telefono" placeholder="300 000 0000">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Correo Electrónico (Para órdenes de compra)</label>
+            <input type="email" class="input-neumorphic" [(ngModel)]="proveedorActual.email" placeholder="ventas@empresa.com">
+          </div>
+
+          <div class="form-group">
+            <label>Dirección</label>
+            <input type="text" class="input-neumorphic" [(ngModel)]="proveedorActual.direccion" placeholder="Calle/Carrera">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-volver btn-pill" (click)="cerrarModal()">Volver</button>
+          <button class="btn-save btn-pill" (click)="guardarProveedor()" [disabled]="isSaving">
+            @if(isSaving) {
+              <i class="fas fa-spinner fa-spin"></i> Guardando...
+            } @else {
+              Guardar Proveedor
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- HTML MODAL REGISTRAR PAGO -->
+  @if(showModalPago && cuentaSeleccionada) {
+    <div class="view-switch-panel fade-in">
+      <div class="neu-card" style="max-width: 500px; margin: 0 auto; text-align: center;">
+        <div class="modal-header modal-header-center">
+          <i class="fas fa-money-check-alt icon-success"></i>
+        </div>
+        <div class="panel-body">
+          <h1 class="modal-title">REGISTRAR PAGO A PROVEEDOR</h1>
+          <p class="text-muted" style="margin-bottom: 1rem;">
+            ¿Confirmas el pago total de la factura <strong>{{cuentaSeleccionada.factura_numero}}</strong> por valor de <strong>{{cuentaSeleccionada.saldo_pendiente | currency:'COP':'symbol':'1.0-0'}}</strong> al proveedor <strong>{{nombreProveedorCuenta(cuentaSeleccionada)}}</strong>?
+          </p>
+          
+          <div class="modal-footer">
+            <button class="btn-volver btn-pill" (click)="cerrarPago()">Cancelar</button>
+            <button class="btn-save btn-pill" (click)="confirmarPago()" [disabled]="isSaving">
+              @if(isSaving) {
+                <i class="fas fa-spinner fa-spin"></i> Procesando...
+              } @else {
+                Confirmar Pago
               }
-            </tbody>
-          </table>
+            </button>
+          </div>
         </div>
       </div>
-    }
-  </div>
+    </div>
+  }
+
+  <!-- HTML MODAL EVALUACION -->
+  @if(showModalEvaluacion && evaluacionSeleccionada) {
+    <div class="view-switch-panel fade-in">
+      <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+        <div class="panel-header mb-4">
+          <h1>EVALUAR PROVEEDOR Y CONTRATO</h1>
+          <button class="btn-close" (click)="cerrarEvaluar()">&times;</button>
+        </div>
+        <div class="panel-body">
+          <p class="text-muted" style="text-align: center; margin-bottom: 1.5rem;">Evaluación para: <strong>{{evaluacionSeleccionada.proveedor}}</strong></p>
+          
+          <div class="form-group" style="text-align: center;">
+            <label>Calificación (1 a 5 Estrellas)</label>
+            <input type="number" class="input-neumorphic monto-input" [(ngModel)]="nuevaCalificacion" min="1" max="5">
+          </div>
+
+          <div class="form-group">
+            <label>Comentarios de Desempeño y Cumplimiento de Contrato</label>
+            <textarea class="input-neumorphic" rows="3" [(ngModel)]="nuevoComentario" placeholder="Ej: Entregas rápidas, cumplimiento de garantías y SLAs..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-volver btn-pill" (click)="cerrarEvaluar()">Volver</button>
+          <button class="btn-save btn-pill" (click)="guardarEvaluacion()" [disabled]="isSaving">
+            @if(isSaving) {
+              <i class="fas fa-spinner fa-spin"></i> Guardando...
+            } @else {
+              Guardar Evaluación
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 </div>
-
-<!-- HTML MODALES -->
-
-  </div>
-
-<!-- HTML MODAL DIRECTORIO -->
-@if (showModal) {
-<div class="view-switch-panel fade-in">
-  <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
-    <div class="panel-header mb-4">
-      <h1>{{ isEditMode ? 'EDITAR PROVEEDOR' : 'NUEVO PROVEEDOR' }}</h1>
-      <button class="btn-close" (click)="cerrarModal()">&times;</button>
-    </div>
-    <div class="panel-body">
-      <div class="form-fila">
-        <div class="form-group" style="flex: 2; min-width: 200px;">
-          <label>Razón Social *</label>
-          <input type="text" class="input-neumorphic" [(ngModel)]="proveedorActual.razon_social" placeholder="Empresa S.A.S">
-        </div>
-        <div class="form-group" style="flex: 1; min-width: 150px;">
-          <label>NIT / RUT *</label>
-          <input type="text" class="input-neumorphic" [(ngModel)]="proveedorActual.nit" placeholder="900.123.456-7">
-        </div>
-      </div>
-
-      <div class="form-fila">
-        <div class="form-group" style="flex: 1;">
-          <label>Contacto Principal</label>
-          <input type="text" class="input-neumorphic" [(ngModel)]="proveedorActual.contacto" placeholder="Nombre completo">
-        </div>
-        <div class="form-group" style="flex: 1;">
-          <label>Teléfono</label>
-          <input type="text" class="input-neumorphic" [(ngModel)]="proveedorActual.telefono" placeholder="300 000 0000">
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>Correo Electrónico (Para órdenes de compra)</label>
-        <input type="email" class="input-neumorphic" [(ngModel)]="proveedorActual.email" placeholder="ventas@empresa.com">
-      </div>
-
-      <div class="form-group">
-        <label>Dirección</label>
-        <input type="text" class="input-neumorphic" [(ngModel)]="proveedorActual.direccion" placeholder="Calle/Carrera">
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-volver btn-pill" (click)="cerrarModal()">Volver</button>
-      <button class="btn-save btn-pill" (click)="guardarProveedor()" [disabled]="isSaving">
-        @if(isSaving) {
-          <i class="fas fa-spinner fa-spin"></i> Guardando...
-        } @else {
-          Guardar Proveedor
-        }
-      </button>
-    </div>
-  </div>
-</div>
-}
-
-<!-- HTML MODAL REGISTRAR PAGO -->
-@if(showModalPago && cuentaSeleccionada) {
-<div class="view-switch-panel fade-in">
-  <div class="neu-card" style="max-width: 800px; margin: 0 auto; max-width: 450px; text-align: center;">
-    <div class="modal-header modal-header-center">
-      <i class="fas fa-money-check-alt icon-success"></i>
-    </div>
-    <div class="panel-body">
-      <h1 class="modal-title">REGISTRAR PAGO</h1>
-      <p class="text-muted" style="margin-bottom: 1rem;">¿Confirmas el pago total de la factura <strong>{{cuentaSeleccionada.factura}}</strong> por valor de <strong>{{cuentaSeleccionada.monto | currency:'COP':'symbol':'1.0-0'}}</strong> a {{cuentaSeleccionada.proveedor}}?</p>
-      
-      <div class="modal-footer">
-        <button class="btn-volver btn-pill" (click)="cerrarPago()">Cancelar</button>
-        <button class="btn-save btn-pill" (click)="confirmarPago()" [disabled]="isSaving">
-          @if(isSaving) {
-            <i class="fas fa-spinner fa-spin"></i> Procesando...
-          } @else {
-            Confirmar Pago
-          }
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-}
-
-<!-- HTML MODAL EVALUACION -->
-@if(showModalEvaluacion && evaluacionSeleccionada) {
-<div class="view-switch-panel fade-in">
-  <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
-    <div class="panel-header mb-4">
-      <h1>EVALUAR PROVEEDOR</h1>
-      <button class="btn-close" (click)="cerrarEvaluar()">&times;</button>
-    </div>
-    <div class="panel-body">
-      <p class="text-muted" style="text-align: center; margin-bottom: 1.5rem;">Evaluación para: <strong>{{evaluacionSeleccionada.proveedor}}</strong></p>
-      
-      <div class="form-group" style="text-align: center;">
-        <label>Calificación (1 a 5 Estrellas)</label>
-        <input type="number" class="input-neumorphic monto-input" [(ngModel)]="nuevaCalificacion" min="1" max="5">
-      </div>
-
-      <div class="form-group">
-        <label>Comentarios de Desempeño</label>
-        <textarea class="input-neumorphic" rows="3" [(ngModel)]="nuevoComentario" placeholder="Ej: Entregas rápidas, buena garantía..."></textarea>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-volver btn-pill" (click)="cerrarEvaluar()">Volver</button>
-      <button class="btn-save btn-pill" (click)="guardarEvaluacion()" [disabled]="isSaving">
-        @if(isSaving) {
-          <i class="fas fa-spinner fa-spin"></i> Guardando...
-        } @else {
-          Guardar Evaluación
-        }
-      </button>
-    </div>
-  </div>
-</div>
-}
-
-
-

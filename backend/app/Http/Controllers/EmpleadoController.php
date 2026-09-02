@@ -45,16 +45,24 @@ class EmpleadoController extends Controller
             'tipo_contrato' => 'required|string',
             'fecha_contratacion' => 'required|date',
             'fecha_fin_contrato' => 'nullable|date|after_or_equal:fecha_contratacion',
-            'salario' => 'nullable|numeric'
+            'salario' => 'nullable|numeric',
+            'eps' => 'nullable|string|max:100',
+            'fondo_pension' => 'nullable|string|max:100',
+            'fondo_cesantias' => 'nullable|string|max:100',
+            'arl' => 'nullable|string|max:100',
+            'caja_compensacion' => 'nullable|string|max:100'
         ]);
 
         $empresaId = auth()->user()->empresa_id;
-        
         $usuario = User::where('id', $usuarioId)->where('empresa_id', $empresaId)->firstOrFail();
 
         if ($usuario->perfil_formalizado) {
             return response()->json(['error' => 'El usuario ya está formalizado'], 400);
         }
+
+        $empresa = \App\Models\Empresa::find($empresaId);
+        $arl = $request->arl ?: ($empresa->arl ?? 'SURA');
+        $caja = $request->caja_compensacion ?: ($empresa->caja_compensacion ?? 'Compensar');
 
         // 1. Crear el registro en empleados
         $empleado = Empleado::create([
@@ -67,13 +75,34 @@ class EmpleadoController extends Controller
             'fecha_contratacion' => $request->fecha_contratacion,
             'fecha_fin_contrato' => $request->fecha_fin_contrato,
             'salario' => $request->salario,
+            'eps' => $request->eps,
+            'fondo_pension' => $request->fondo_pension,
+            'fondo_cesantias' => $request->fondo_cesantias,
+            'arl' => $arl,
+            'caja_compensacion' => $caja,
             'estado' => 'activo'
         ]);
 
-        // 2. Obtener el Cargo para heredar sus permisos (rol)
+        // 2. Sincronizar en tabla afiliaciones para autogestión
+        if ($request->eps || $request->fondo_pension || $arl) {
+            DB::table('afiliaciones')->updateOrInsert(
+                ['user_id' => $usuario->id],
+                [
+                    'eps' => $request->eps,
+                    'arl' => $arl,
+                    'afondo_pension' => $request->fondo_pension,
+                    'fondo_cesantias' => $request->fondo_cesantias,
+                    'estado' => 'aprobado',
+                    'updated_at' => now(),
+                    'created_at' => now()
+                ]
+            );
+        }
+
+        // 3. Obtener el Cargo para heredar sus permisos (rol)
         $cargo = \App\Models\Cargo::findOrFail($request->cargo_id);
 
-        // 3. Actualizar el usuario para desbloquearlo y asignarle su nivel de seguridad
+        // 4. Actualizar el usuario para desbloquearlo y asignarle su nivel de seguridad
         $usuario->perfil_formalizado = true;
         $usuario->rol_id = $cargo->rol_id;
         $usuario->save();
@@ -191,7 +220,7 @@ class EmpleadoController extends Controller
         return response()->json(['message' => 'El empleado ha sido inactivado correctamente.']);
     }
 
-    // Actualiza el perfil laboral y los módulos permitidos de un empleado formalizado
+    // Actualiza el perfil laboral, seguridad social y los módulos permitidos de un empleado formalizado
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -201,13 +230,19 @@ class EmpleadoController extends Controller
             'tipo_contrato' => 'required|string',
             'fecha_contratacion' => 'required|date',
             'salario' => 'nullable|numeric',
-            'modulos_permitidos' => 'nullable|array'
+            'modulos_permitidos' => 'nullable|array',
+            'eps' => 'nullable|string|max:100',
+            'fondo_pension' => 'nullable|string|max:100',
+            'fondo_cesantias' => 'nullable|string|max:100',
+            'arl' => 'nullable|string|max:100',
+            'caja_compensacion' => 'nullable|string|max:100',
+            'estado' => 'nullable|string|in:activo,inactivo,en vacaciones,permiso,incapacitado,licencia'
         ]);
 
         $empresaId = auth()->user()->empresa_id;
         $empleado = Empleado::where('id', $id)->where('empresa_id', $empresaId)->firstOrFail();
 
-        $empleado->update([
+        $updateData = [
             'sede_id' => $request->sede_id,
             'area_id' => $request->area_id,
             'cargo_id' => $request->cargo_id,
@@ -215,17 +250,43 @@ class EmpleadoController extends Controller
             'fecha_contratacion' => $request->fecha_contratacion,
             'salario' => $request->salario,
             'modulos_permitidos' => $request->modulos_permitidos
-        ]);
+        ];
+
+        if ($request->has('eps')) $updateData['eps'] = $request->eps;
+        if ($request->has('fondo_pension')) $updateData['fondo_pension'] = $request->fondo_pension;
+        if ($request->has('fondo_cesantias')) $updateData['fondo_cesantias'] = $request->fondo_cesantias;
+        if ($request->has('arl')) $updateData['arl'] = $request->arl;
+        if ($request->has('caja_compensacion')) $updateData['caja_compensacion'] = $request->caja_compensacion;
+        if ($request->has('estado') && !empty($request->estado)) $updateData['estado'] = $request->estado;
+
+        $empleado->update($updateData);
+
+        // Sincronizar con tabla afiliaciones para reflejo instantáneo en Autogestión
+        if ($empleado->usuario_id) {
+            $afilUpdates = ['updated_at' => now()];
+            if (array_key_exists('eps', $updateData)) $afilUpdates['eps'] = $updateData['eps'];
+            if (array_key_exists('fondo_pension', $updateData)) $afilUpdates['afondo_pension'] = $updateData['fondo_pension'];
+            if (array_key_exists('fondo_cesantias', $updateData)) $afilUpdates['fondo_cesantias'] = $updateData['fondo_cesantias'];
+            if (array_key_exists('arl', $updateData)) $afilUpdates['arl'] = $updateData['arl'];
+
+            DB::table('afiliaciones')->updateOrInsert(
+                ['user_id' => $empleado->usuario_id],
+                $afilUpdates
+            );
+        }
 
         // Sincronizar el rol correspondiente al cargo seleccionado en el usuario
         $cargo = \App\Models\Cargo::find($request->cargo_id);
         if ($cargo && $empleado->usuario) {
             $empleado->usuario->rol_id = $cargo->rol_id;
+            if ($request->has('estado')) {
+                $empleado->usuario->activo = ($request->estado !== 'inactivo');
+            }
             $empleado->usuario->save();
         }
 
         return response()->json([
-            'message' => 'Perfil del empleado y permisos de módulos actualizados exitosamente.',
+            'message' => 'Perfil del empleado, seguridad social y permisos actualizados exitosamente.',
             'empleado' => $empleado->load(['usuario', 'area', 'cargo'])
         ]);
     }

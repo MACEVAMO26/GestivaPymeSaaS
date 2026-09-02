@@ -23,20 +23,44 @@ class AutogestionController extends Controller
 
     // --- GESTIÓN DE AFILIACIONES PROPIAS ---
     // Obtiene los datos de afiliación del usuario autenticado, incluyendo la ARL y
-    // Caja de Compensación global configurada por RRHH para toda la empresa.
+    // Caja de Compensación configuradas por la empresa o en formalización.
     public function misAfiliaciones(Request $request)
     {
         $user = $request->user();
+        $empleado = \App\Models\Empleado::where('usuario_id', $user->id)->first();
         $afiliacion = DB::table('afiliaciones')->where('user_id', $user->id)->first();
 
         // Leer la configuración global de Seguridad Social de la empresa
         $empresa = DB::table('empresa')->where('id', $user->empresa_id)->first();
 
+        // Priorizar datos actualizados de Formalización/Empleado si existen
+        $eps = $empleado?->eps ?: ($afiliacion?->eps ?? null);
+        $afondo_pension = $empleado?->fondo_pension ?: ($afiliacion?->afondo_pension ?? null);
+        $fondo_cesantias = $empleado?->fondo_cesantias ?: ($afiliacion?->fondo_cesantias ?? null);
+        $arl = $empleado?->arl ?: ($afiliacion?->arl ?: ($empresa?->arl ?? null));
+        $caja = $empleado?->caja_compensacion ?: ($empresa?->caja_compensacion ?? null);
+
+        $afiliacionData = [
+            'id' => $afiliacion->id ?? null,
+            'user_id' => $user->id,
+            'eps' => $eps,
+            'arl' => $arl,
+            'afondo_pension' => $afondo_pension,
+            'fondo_cesantias' => $fondo_cesantias,
+            'estado' => $afiliacion->estado ?? 'aprobado',
+            'notas_rechazo' => $afiliacion->notas_rechazo ?? null,
+            'fecha_contratacion' => $empleado?->fecha_contratacion ?: ($afiliacion?->fecha_contratacion ?? null),
+            'finalizacion_contrato' => $empleado?->fecha_fin_contrato ?: ($afiliacion?->finalizacion_contrato ?? null),
+            'renovacion_contrato' => $afiliacion?->renovacion_contrato ?? null,
+            'veces_modificada' => $afiliacion->veces_modificada ?? 0,
+            'documento_soporte_url' => $afiliacion->documento_soporte_url ?? null
+        ];
+
         return response()->json([
-            'afiliacion'              => $afiliacion,
+            'afiliacion'              => $afiliacionData,
             'modulo_rrhh_activo'      => $this->empresaTieneRRHH($user),
-            'arl_empresa'             => $empresa->arl ?? null,
-            'caja_compensacion_empresa' => $empresa->caja_compensacion ?? null,
+            'arl_empresa'             => $arl,
+            'caja_compensacion_empresa' => $caja,
         ]);
     }
 

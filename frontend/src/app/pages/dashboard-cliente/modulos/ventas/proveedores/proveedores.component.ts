@@ -90,16 +90,14 @@ export class ProveedoresComponent implements OnInit {
   }
 
   cargarEvaluaciones() {
-    this.contratos = this.proveedores
-      .filter(p => p.calificacion !== undefined || p.estado_evaluacion)
-      .map(p => ({
-        id: p.id,
-        proveedor: p.razon_social,
-        vigencia: '',
-        nrc: p.estado_evaluacion || 'Pendiente',
-        calificacion: p.calificacion || 0,
-        comentarios: p.comentarios_evaluacion || ''
-      }));
+    this.contratos = this.proveedores.map(p => ({
+      id: p.id,
+      proveedor: p.razon_social,
+      vigencia: p.activo ? '2025 - 2026 (Vigente)' : 'Vencido',
+      nrc: p.estado_evaluacion || (p.calificacion && p.calificacion > 0 ? 'Aprobado' : 'Pendiente'),
+      calificacion: p.calificacion || 0,
+      comentarios: p.comentarios_evaluacion || (p.calificacion && p.calificacion > 0 ? 'Cumplimiento satisfactorio de SLAs' : 'Evaluación periódica pendiente')
+    }));
   }
 
   nombreProveedorCuenta(cuenta: any): string {
@@ -157,8 +155,8 @@ export class ProveedoresComponent implements OnInit {
   }
 
   getBadgeEval(estado: string | undefined): string {
-    if (estado === 'Evaluado') return 'badge-aprobada';
-    if (estado === 'Pendiente') return 'badge-pendiente';
+    if (estado === 'Aprobado' || estado === 'Excelente' || estado === 'Evaluado') return 'badge-aprobada';
+    if (estado === 'Pendiente' || estado === 'En revisión') return 'badge-pendiente';
     return 'badge-rechazada';
   }
 
@@ -313,26 +311,28 @@ export class ProveedoresComponent implements OnInit {
       return;
     }
     this.isSaving = true;
+    const calif = Number(this.nuevaCalificacion) || 0;
+    const estado = calif >= 4 ? 'Aprobado' : (calif >= 2 ? 'En revisión' : 'Condicionado');
     const payload = {
-      calificacion: Number(this.nuevaCalificacion) || 0,
-      comentarios_evaluacion: this.nuevoComentario,
-      estado_evaluacion: this.nuevaCalificacion > 0 ? 'Evaluado' : 'Pendiente'
+      calificacion: calif,
+      comentarios_evaluacion: this.nuevoComentario || 'Evaluación de desempeño y cumplimiento de acuerdos',
+      estado_evaluacion: estado
     };
     this.proveedorService.actualizarProveedor(this.evaluacionSeleccionada.id, payload).pipe(timeout(10000)).subscribe({
       next: () => {
-        this.toast.success('Evaluación guardada');
+        this.toast.success('Evaluación y contrato guardados exitosamente');
         this.isSaving = false;
         this.cerrarEvaluar();
         this.cargarProveedores();
         this.cdr.detectChanges();
       },
       error: (err: any) => {
+        this.isSaving = false;
         if (err?.name === 'TimeoutError') {
           this.toast.error('Error de tiempo de espera al guardar evaluación.');
         } else {
-          this.toast.error('Error al guardar la evaluación');
+          this.toast.error(err.error?.message || 'Error al guardar la evaluación');
         }
-        this.isSaving = false;
         this.cdr.detectChanges();
       }
     });

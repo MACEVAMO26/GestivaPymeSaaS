@@ -98,207 +98,81 @@
     <!-- HTML COLUMNA DERECHA -->
     <div class="right-column">
       
-      <!-- HTML AFILIACIONES -->
+      <!-- HTML AFILIACIONES (SEGURIDAD SOCIAL GESTIONADA POR EMPRESA) -->
       <div class="neu-dark-panel form-card">
-        <div class="card-header">
-          <h3>Mis Afiliaciones (Seguridad Social)</h3>
-          @if (afiliacion?.estado === 'aprobado') {
-            <span class="status-badge approved">Verificado</span>
-          } @else if (afiliacion?.estado === 'pendiente') {
-            <span class="status-badge pending">Pendiente de Aprobación</span>
-          } @else if (afiliacion?.estado === 'rechazado') {
-            <span class="status-badge rejected">Rechazado</span>
-          } @else {
-            <span class="status-badge new">No registradas</span>
-          }
+        <div class="card-header flex-between mb-3">
+          <h3 class="subtitulo" style="margin: 0;">Seguridad Social y Afiliaciones</h3>
+          <span class="status-badge approved">Cobertura Activa</span>
         </div>
-        
-        @if (afiliacion?.estado === 'rechazado' && afiliacion?.notas_rechazo) {
-          <div class="alert-box error">
-            <strong>Motivo del rechazo:</strong> {{ afiliacion.notas_rechazo }}
-          </div>
-        }
 
-        @if (!isHR && !moduloRRHH && vecesModificadas >= 2) {
-          <div class="alert-box error">
-            <strong>Límite alcanzado.</strong> Tus afiliaciones solo pueden modificarse 2 veces. Contacta a Gestión Humana o Gerencia para más cambios.
-          </div>
-        } @else if (!isHR && !moduloRRHH) {
-          <div class="alert-box warning">
-            Tu empresa no tiene el módulo Gestión Humana: tus afiliaciones pueden modificarse hasta
-            <strong>{{ 2 - vecesModificadas }} vez/veces más</strong> ({{ vecesModificadas }}/2 usadas). Con Gestión Humana, el cambio es ilimitado y lo revisa RRHH.
-          </div>
-        }
+        <p class="descripcion-general mb-4" style="text-align: left;">
+          Tu seguridad social es gestionada y pagada por la empresa conforme a tu contratación laboral. Si requieres actualizar alguna entidad, solicita el cambio con Gestión Humana o en tu formalización.
+        </p>
 
-        <form (ngSubmit)="guardarAfiliaciones()" class="grid-form">
-          <!-- EPS (Seleccionable por el empleado) -->
+        <!-- CUADRITO DE ENTIDADES DE SEGURIDAD SOCIAL -->
+        <div class="grid-form">
+          <!-- ARL (100% Empresa) -->
           <div class="form-group">
-            <label>EPS</label>
-            <select [(ngModel)]="formAfiliacion.eps" name="eps" required
-                    [ngClass]="{'estado-pendiente': formAfiliacion.estado === 'pendiente', 'estado-aprobado': formAfiliacion.estado === 'aprobado'}">
-              <option value="" disabled selected>Seleccione EPS...</option>
-              <option value="Sura">EPS Sura</option>
-              <option value="Sanitas">EPS Sanitas</option>
-              <option value="Compensar">Compensar EPS</option>
-              <option value="SaludTotal">Salud Total</option>
-              <option value="NuevaEPS">Nueva EPS</option>
-              <option value="Famisanar">Famisanar</option>
-              <option value="Aliansalud">Aliansalud</option>
-            </select>
-          </div>
-          
-          <!-- ARL (Fija por la empresa, solo lectura) -->
-          <div class="form-group">
-            <label>ARL <span class="hint-text-small">(Asignada por Empresa)</span></label>
-            <div class="input-readonly-pill" title="La ARL la determina la empresa">
-              {{ arlEmpresa || 'No asignada por la Empresa' }}
+            <label>ARL <span class="hint-text-small">(Aporte 100% Empresa)</span></label>
+            <div class="input-readonly-pill" title="La ARL es cubierta en su totalidad por la empresa">
+              <i class="fas fa-shield-alt"></i> {{ arlEmpresa || formAfiliacion.arl || 'SURA' }}
             </div>
           </div>
-          
-          <!-- Fondo de Pensión (Seleccionable por el empleado) -->
+
+          <!-- Caja de Compensación (100% Empresa) -->
           <div class="form-group">
-            <label>Fondo de Pensión</label>
-            <select [(ngModel)]="formAfiliacion.afondo_pension" name="afondo_pension" required
-                    [ngClass]="{'estado-pendiente': formAfiliacion.estado === 'pendiente', 'estado-aprobado': formAfiliacion.estado === 'aprobado'}">
-              <option value="" disabled selected>Seleccione Fondo...</option>
-              <option value="Porvenir">Porvenir</option>
-              <option value="Proteccion">Protección</option>
-              <option value="Colfondos">Colfondos</option>
-              <option value="Skandia">Skandia</option>
-              <option value="Colpensiones">Colpensiones (Fondo Público)</option>
-            </select>
+            <label>Caja de Compensación <span class="hint-text-small">(Aporte 100% Empresa)</span></label>
+            <div class="input-readonly-pill" title="La Caja de Compensación es cubierta en su totalidad por la empresa">
+              <i class="fas fa-users"></i> {{ cajaCompensacionEmpresa || 'Compensar' }}
+            </div>
           </div>
 
-          <!-- Fondo de Cesantías (Seleccionable por el empleado) -->
+          <!-- EPS -->
+          <div class="form-group">
+            <label>Entidad Promotora de Salud (EPS)</label>
+            <div class="input-readonly-pill" title="Entidad promotora de salud asignada">
+              <i class="fas fa-heartbeat"></i> {{ formAfiliacion.eps || 'Sura' }}
+            </div>
+          </div>
+
+          <!-- Fondo de Pensión -->
+          <div class="form-group">
+            <label>Fondo de Pensiones (AFP)</label>
+            <div class="input-readonly-pill" title="Fondo de pensiones asignado">
+              <i class="fas fa-piggy-bank"></i> {{ formAfiliacion.afondo_pension || 'Protección' }}
+            </div>
+          </div>
+
+          <!-- Fondo de Cesantías -->
           <div class="form-group">
             <label>Fondo de Cesantías</label>
-            <select [(ngModel)]="formAfiliacion.fondo_cesantias" name="fondo_cesantias" required
-                    [ngClass]="{'estado-pendiente': formAfiliacion.estado === 'pendiente', 'estado-aprobado': formAfiliacion.estado === 'aprobado'}">
-              <option value="" disabled selected>Seleccione Fondo de Cesantías...</option>
-              <option value="Porvenir">Porvenir</option>
-              <option value="Proteccion">Protección</option>
-              <option value="Colfondos">Colfondos</option>
-              <option value="FNA">Fondo Nacional del Ahorro (FNA)</option>
-            </select>
+            <div class="input-readonly-pill" title="Fondo de cesantías asignado">
+              <i class="fas fa-landmark"></i> {{ formAfiliacion.fondo_cesantias || 'Protección' }}
+            </div>
           </div>
 
-          <!-- Caja de Compensación (Fija por la empresa, solo lectura) -->
+          <!-- Estado de Cobertura -->
           <div class="form-group">
-            <label>Caja de Compensación <span class="hint-text-small">(Asignada por Empresa)</span></label>
-            <div class="input-readonly-pill" title="La Caja de Compensación la determina la empresa">
-              {{ cajaCompensacionEmpresa || 'No asignada por la Empresa' }}
+            <label>Estado de Afiliación</label>
+            <div class="input-readonly-pill estado-aprobado" style="font-weight: 500;">
+              <i class="fas fa-check-circle"></i> Activa / Al día
             </div>
           </div>
+        </div>
 
-          <!-- Estado Afiliación -->
-          <div class="form-group">
-            <label>Estado Afiliación</label>
-            <select [(ngModel)]="formAfiliacion.estado_afiliacion" name="estado_afiliacion" required
-                    [ngClass]="{'estado-pendiente': formAfiliacion.estado === 'pendiente', 'estado-aprobado': formAfiliacion.estado === 'aprobado'}">
-              <option [ngValue]="true">Activa</option>
-              <option [ngValue]="false">Inactiva</option>
-            </select>
+        @if (formAfiliacion.fecha_contratacion) {
+          <div class="mt-3 p-3 neumorphic-panel-inner" style="background: rgba(255,255,255,0.3); border-radius: 8px;">
+            <span class="descripcion-general" style="display: block; font-size: 11px;">
+              <i class="fas fa-calendar-check"></i> Vinculado formalmente desde: <strong>{{ formAfiliacion.fecha_contratacion | date:'longDate' }}</strong>
+            </span>
           </div>
+        }
 
-          @if (!isHR) {
-            <div class="form-group">
-              <label>Documento de soporte del cambio {{ !moduloRRHH ? '*' : '' }}</label>
-              <input type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" (change)="onAfiliacionFileSelected($event)" class="file-input">
-              <small class="hint-text">Adjunta el formulario de traslado EPS/Pensión (obligatorio sin Gestión Humana).</small>
-            </div>
-          }
-          @if (isHR) {
-            <hr class="separator-line">
-            <h4 class="section-title">Gestión Interna (Exclusivo RRHH)</h4>
-            
-            <div class="form-group">
-              <label>Fecha de Contratación</label>
-              <input type="date" [(ngModel)]="formAfiliacion.fecha_contratacion" name="fecha_contratacion"
-                     [ngClass]="{'estado-aprobado': formAfiliacion.fecha_contratacion}">
-            </div>
-            <div class="form-group">
-              <label>Finalización de Contrato <span class="hint-text-danger">(Oculto al empleado)</span></label>
-              <input type="date" [(ngModel)]="formAfiliacion.finalizacion_contrato" name="finalizacion_contrato"
-                     [ngClass]="{'estado-aprobado': formAfiliacion.finalizacion_contrato}">
-            </div>
-            <div class="form-group">
-              <label>Renovación de Contrato</label>
-              <input type="date" [(ngModel)]="formAfiliacion.renovacion_contrato" name="renovacion_contrato"
-                     [ngClass]="{'estado-aprobado': formAfiliacion.renovacion_contrato}">
-            </div>
-            <div class="form-group">
-              <label>Estado de Afiliación</label>
-              <select [(ngModel)]="formAfiliacion.estado" name="estado">
-                <option value="nuevo">Nuevo / Abierto</option>
-                <option value="pendiente">Pendiente (En Revisión)</option>
-                <option value="aprobado">Aprobado</option>
-                <option value="rechazado">Rechazado</option>
-              </select>
-            </div>
-          } @else {
-            @if (formAfiliacion.fecha_contratacion || formAfiliacion.renovacion_contrato) {
-              <hr class="separator-line">
-            }
-            @if (formAfiliacion.fecha_contratacion) {
-              <div class="form-group">
-                <label>Fecha de Contratación</label>
-                <input type="date" [value]="formAfiliacion.fecha_contratacion" disabled
-                       class="estado-aprobado">
-              </div>
-            }
-            @if (formAfiliacion.renovacion_contrato) {
-              <div class="form-group">
-                <label>Renovación de Contrato</label>
-                <input type="date" [value]="formAfiliacion.renovacion_contrato" disabled
-                       class="estado-aprobado">
-                @if (cantidadRenovaciones > 0) {
-                  <span class="renovaciones-msg">
-                    ⏳ Usted ha tenido {{ cantidadRenovaciones }} renovaciones de contrato.
-                  </span>
-                }
-              </div>
-            }
-          }
-          
-          <div class="form-actions">
-            @if (isHR) {
-              <button type="button" class="btn-save btn-pill" (click)="gestionarAfiliacionAdmin()" [disabled]="isSavingAdmin">
-                <span *ngIf="!isSavingAdmin">Guardar Gestión (RRHH)</span>
-                <span *ngIf="isSavingAdmin" class="loading-text">
-                  <svg class="icon-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Guardando...
-                </span>
-              </button>
-            } @else {
-              @if (formAfiliacion.estado !== 'pendiente') {
-                <button type="submit" class="btn-save btn-pill" [disabled]="isSaving || !puedeModificarAfiliaciones">
-                  <span *ngIf="!isSaving">{{ formAfiliacion.estado === 'nuevo' ? 'Guardar Afiliaciones' : 'Actualizar Afiliaciones' }}</span>
-                  <span *ngIf="isSaving" class="loading-text">
-                    <svg class="icon-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Guardando...
-                  </span>
-                </button>
-                <button type="button" class="btn-save btn-pill btn-cert" (click)="descargarCertificado()">
-                  <i class="fas fa-file-pdf"></i> Certificado Laboral
-                </button>
-
-                @if (formAfiliacion.estado === 'aprobado' || formAfiliacion.estado === 'rechazado') {
-                  <p class="nota-estado">Nota: Si cambia sus afiliaciones actuales, volverán al estado <strong>Pendiente de Aprobación</strong> por RRHH.</p>
-                }
-              } @else {
-                <span class="espera-aprobacion">
-                  En espera de aprobación
-                </span>
-              }
-            }
-          </div>
-        </form>
+        <div class="form-actions mt-4 flex-between">
+          <button type="button" class="btn-save btn-pill btn-cert" (click)="descargarCertificado()">
+            <i class="fas fa-file-pdf"></i> Descargar Certificado Laboral
+          </button>
+        </div>
       </div>
 
       <!-- HTML VACACIONES Y TIEMPOS -->

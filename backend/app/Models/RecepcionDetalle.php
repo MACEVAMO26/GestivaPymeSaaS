@@ -20,7 +20,6 @@ class RecepcionDetalle extends Model
         'recepcion_id',
         'producto_id',
         'cantidad_recibida',
-        'estado_calidad'
     ];
 
     // --- RELACIONES ---

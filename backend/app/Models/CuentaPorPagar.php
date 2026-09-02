@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class CuentaPorPagar extends Model
 {
+    protected $table = 'cuentas_por_pagar';
+
     protected $fillable = [
         'proveedor_id',
         'factura_numero',
@@ -17,8 +19,15 @@ class CuentaPorPagar extends Model
         'estado',
     ];
 
+    protected $casts = [
+        'total' => 'float',
+        'saldo_pendiente' => 'float',
+        'fecha_emision' => 'date',
+        'fecha_vencimiento' => 'date',
+    ];
+
     public function proveedor()
     {
-        return $this->belongsTo(Proveedor::class);
+        return $this->belongsTo(Proveedor::class, 'proveedor_id');
     }
 }

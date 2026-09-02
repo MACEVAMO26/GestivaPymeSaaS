@@ -119,6 +119,7 @@
         <button class="btn-cerrar" (click)="cerrarModalFormalizar()">×</button>
       </div>
       <div class="panel-body">
+        <div class="form-row-divider mb-3">
           <div class="form-group">
             <label>Sede *</label>
             <select [(ngModel)]="formalizarForm.sede_id" class="neu-input">
@@ -126,13 +127,16 @@
               <option *ngFor="let s of sedes" [value]="s.id">{{ s.nombre }}</option>
             </select>
           </div>
-        <div class="form-group">
-          <label>Área *</label>
-          <select [(ngModel)]="formalizarForm.area_id" class="neu-input">
-            <option value="">Seleccione el área</option>
-            <option *ngFor="let a of areas" [value]="a.id">{{ a.nombre }}</option>
-          </select>
+          <div class="form-group">
+            <label>Área *</label>
+            <select [(ngModel)]="formalizarForm.area_id" class="neu-input">
+              <option value="">Seleccione el área</option>
+              <option *ngFor="let a of areas" [value]="a.id">{{ a.nombre }}</option>
+            </select>
+          </div>
         </div>
+
+        <div class="form-row-divider mb-3">
           <div class="form-group">
             <label>Cargo *</label>
             <select [(ngModel)]="formalizarForm.cargo_id" class="neu-input" [disabled]="!formalizarForm.area_id">
@@ -140,27 +144,73 @@
               <option *ngFor="let c of getCargosPorArea(formalizarForm.area_id)" [value]="c.id">{{ c.nombre }}</option>
             </select>
           </div>
-        <div class="form-group">
-          <label>Tipo de Contrato *</label>
-          <select [(ngModel)]="formalizarForm.tipo_contrato" class="neu-input">
-            <option value="">Seleccione el tipo</option>
-            <option value="Indefinido">Indefinido</option>
-            <option value="Fijo">Fijo</option>
-            <option value="Por Obra">Por Obra</option>
-            <option value="Práctica">Práctica</option>
-            <option value="Aprendizaje">Aprendizaje</option>
-          </select>
+          <div class="form-group">
+            <label>Tipo de Contrato *</label>
+            <select [(ngModel)]="formalizarForm.tipo_contrato" class="neu-input">
+              <option value="Indefinido">Indefinido</option>
+              <option value="Fijo">Fijo</option>
+              <option value="Por Obra">Por Obra</option>
+              <option value="Práctica">Práctica</option>
+              <option value="Aprendizaje">Aprendizaje</option>
+            </select>
+          </div>
         </div>
-        <div class="form-group">
-          <label>Fecha de Contratación *</label>
-          <input type="date" [(ngModel)]="formalizarForm.fecha_contratacion" class="neu-input" />
+
+        <div class="form-row-divider mb-3">
+          <div class="form-group">
+            <label>Fecha de Contratación *</label>
+            <input type="date" [(ngModel)]="formalizarForm.fecha_contratacion" class="neu-input" />
+          </div>
+          <div class="form-group">
+            <label>Salario Mensual ($)</label>
+            <input type="number" [(ngModel)]="formalizarForm.salario" class="neu-input" placeholder="0.00" />
+          </div>
         </div>
-        <div class="form-group">
-          <label>Salario (opcional)</label>
-          <input type="number" [(ngModel)]="formalizarForm.salario" class="neu-input" placeholder="0.00" />
+
+        <!-- SECCIÓN SEGURIDAD SOCIAL (EMPRESA / LEY) -->
+        <div class="mt-3 p-3 neumorphic-panel-inner bg-cream">
+          <label class="form-label text-azul" style="font-weight: bold; margin-bottom: 0.5rem; display: block;">
+            <i class="fas fa-shield-alt"></i> Seguridad Social y Afiliaciones (Asignada por Empresa)
+          </label>
+          
+          <div class="form-row-divider mb-2">
+            <div class="form-group">
+              <label>EPS *</label>
+              <select [(ngModel)]="formalizarForm.eps" class="neu-input">
+                <option *ngFor="let eps of listaEPS" [value]="eps">{{ eps }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Fondo de Pensión *</label>
+              <select [(ngModel)]="formalizarForm.fondo_pension" class="neu-input">
+                <option *ngFor="let pen of listaPensiones" [value]="pen">{{ pen }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row-divider">
+            <div class="form-group">
+              <label>Fondo de Cesantías</label>
+              <select [(ngModel)]="formalizarForm.fondo_cesantias" class="neu-input">
+                <option *ngFor="let ces of listaCesantias" [value]="ces">{{ ces }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>ARL (Empresa)</label>
+              <select [(ngModel)]="formalizarForm.arl" class="neu-input">
+                <option *ngFor="let arl of listaARL" [value]="arl">{{ arl }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Caja Compensación</label>
+              <select [(ngModel)]="formalizarForm.caja_compensacion" class="neu-input">
+                <option *ngFor="let caja of listaCajas" [value]="caja">{{ caja }}</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer mt-4">
         <button class="btn-general-2 btn-pill" (click)="cerrarModalFormalizar()">Cancelar</button>
         <button class="btn-general-1 btn-pill" (click)="submitFormalizar()" [disabled]="isSubmitting">
           {{ isSubmitting ? 'Guardando...' : 'Formalizar' }}
@@ -171,9 +221,9 @@
 
   <!-- MODAL EDICIÓN EMPLEADO FORMALIZADO Y MÓDULOS -->
   <div class="modal-backdrop" *ngIf="isEditarEmpleadoModalOpen" (click)="cerrarModalEditarEmpleado()">
-    <div class="modal-card neumorphic-panel" (click)="$event.stopPropagation()" style="max-width: 680px; max-height: 90vh; overflow-y: auto;">
+    <div class="modal-card neumorphic-panel" (click)="$event.stopPropagation()" style="max-width: 720px; max-height: 90vh; overflow-y: auto;">
       <div class="modal-header flex-between mb-3">
-        <h2 class="subtitulo" style="margin: 0;">Editar Perfil y Módulos Autorizados</h2>
+        <h2 class="subtitulo" style="margin: 0;">Editar Perfil, Seguridad Social y Permisos</h2>
         <button type="button" class="btn-icon text-muted" (click)="cerrarModalEditarEmpleado()">✕</button>
       </div>
 
@@ -230,6 +280,49 @@
           <div class="form-group">
             <label class="form-label">Salario Mensual ($):</label>
             <input type="number" class="input-neumorphic" [(ngModel)]="editarEmpleadoForm.salario" name="salario" min="0">
+          </div>
+        </div>
+
+        <!-- SECCIÓN SEGURIDAD SOCIAL -->
+        <div class="mt-3 p-3 neumorphic-panel-inner bg-cream">
+          <label class="form-label text-azul" style="font-weight: bold; margin-bottom: 0.5rem; display: block;">
+            <i class="fas fa-shield-alt"></i> Seguridad Social (Sincronizada con Autogestión):
+          </label>
+
+          <div class="form-row-divider mb-2">
+            <div class="form-group">
+              <label class="form-label">EPS:</label>
+              <select class="input-neumorphic" [(ngModel)]="editarEmpleadoForm.eps" name="eps">
+                <option *ngFor="let eps of listaEPS" [value]="eps">{{ eps }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Fondo de Pensión:</label>
+              <select class="input-neumorphic" [(ngModel)]="editarEmpleadoForm.fondo_pension" name="fondo_pension">
+                <option *ngFor="let pen of listaPensiones" [value]="pen">{{ pen }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row-divider">
+            <div class="form-group">
+              <label class="form-label">Fondo de Cesantías:</label>
+              <select class="input-neumorphic" [(ngModel)]="editarEmpleadoForm.fondo_cesantias" name="fondo_cesantias">
+                <option *ngFor="let ces of listaCesantias" [value]="ces">{{ ces }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">ARL (Empresa):</label>
+              <select class="input-neumorphic" [(ngModel)]="editarEmpleadoForm.arl" name="arl">
+                <option *ngFor="let arl of listaARL" [value]="arl">{{ arl }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Caja Compensación:</label>
+              <select class="input-neumorphic" [(ngModel)]="editarEmpleadoForm.caja_compensacion" name="caja_compensacion">
+                <option *ngFor="let caja of listaCajas" [value]="caja">{{ caja }}</option>
+              </select>
+            </div>
           </div>
         </div>
 

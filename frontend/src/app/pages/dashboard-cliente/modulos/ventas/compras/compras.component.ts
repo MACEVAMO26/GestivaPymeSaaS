@@ -93,9 +93,18 @@ export class ComprasComponent implements OnInit {
 
   estadoOrden(orden: any): string {
     const e = orden.estado || '';
-    if (e === 'recibida' || e === 'Recibido') return 'Recibido';
-    if (e === 'anulada' || e === 'Anulado') return 'Anulado';
+    if (e === 'recibida' || e === 'recibida_total' || e === 'Recibido') return 'Recibido';
+    if (e === 'recibida_parcial') return 'Recibido Parcial';
+    if (e === 'aprobada' || e === 'Aprobado') return 'Aprobado';
+    if (e === 'anulada' || e === 'Anulado' || e === 'rechazada') return 'Anulado';
     return 'Pendiente';
+  }
+
+  getBadgeClass(estado: string): string {
+    if (estado === 'Recibido' || estado === 'Aprobado') return 'badge-aprobada';
+    if (estado === 'Recibido Parcial') return 'badge-secundario';
+    if (estado === 'Anulado') return 'badge-rechazada';
+    return 'badge-pendiente';
   }
 
   switchTab(tab: string) {
@@ -112,12 +121,6 @@ export class ComprasComponent implements OnInit {
       this.numeroOrden(o).toLowerCase().includes(term) ||
       this.nombreProveedor(o).toLowerCase().includes(term)
     );
-  }
-
-  getBadgeClass(estado: string): string {
-    if (estado === 'Recibido') return 'badge-aprobada';
-    if (estado === 'Anulado') return 'badge-rechazada';
-    return 'badge-pendiente';
   }
 
   // --- LOGICA MODAL ORDEN ---

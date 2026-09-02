@@ -47,4 +47,14 @@ class Empleado extends Model
     {
         return $this->belongsTo(Cargo::class, 'cargo_id');
     }
+
+    public function sede()
+    {
+        return $this->belongsTo(Sede::class, 'sede_id');
+    }
+
+    public function empresa()
+    {
+        return $this->belongsTo(Empresa::class, 'empresa_id');
+    }
 }

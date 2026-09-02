@@ -203,7 +203,18 @@
 
   <!-- TAB AUSENTES -->
   <div class="neumorphic-panel fade-in" *ngIf="currentTab === 'ausentes'">
-    <h2 class="subtitulo">PERSONAL AUSENTE / VACACIONES</h2>
+    <div class="flex-between mb-3" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h2 class="subtitulo" style="margin: 0;">PERSONAL AUSENTE Y NOVEDADES LABORALES</h2>
+        <p class="descripcion-general" style="text-align: left; margin-bottom: 0;">
+          Registro y seguimiento de ausencias justificadas (Vacaciones, Incapacidades Médicas, Licencias y Permisos).
+        </p>
+      </div>
+      <button class="btn-add btn-pill" (click)="abrirModalNovedad()">
+        <i class="fas fa-plus-circle"></i> + Registrar Novedad / Ausencia
+      </button>
+    </div>
+
     <div class="table-container">
       <table class="data-table">
         <thead>
@@ -211,22 +222,32 @@
             <th>Cod. Emp</th>
             <th>Documento</th>
             <th>Nombre Completo</th>
-            <th>Área</th>
-            <th>Cargo</th>
-            <th>Estado</th>
+            <th>Área / Cargo</th>
+            <th>Novedad / Estado</th>
+            <th>Razón Válida / Justificación</th>
+            <th class="text-center">Acciones</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let emp of empleadosAusentes">
             <td>{{ emp.codigo_empleado || 'N/A' }}</td>
             <td>{{ emp.usuario?.documento }}</td>
-            <td>{{ emp.usuario?.nombres }} {{ emp.usuario?.apellidos }}</td>
-            <td>{{ emp.area?.nombre || 'Sin Asignar' }}</td>
-            <td>{{ emp.cargo?.nombre || 'Sin Asignar' }}</td>
-            <td><span class="badge badge-pendiente">{{ emp.estado }}</span></td>
+            <td><strong>{{ emp.usuario?.nombres }} {{ emp.usuario?.apellidos }}</strong></td>
+            <td>{{ emp.area?.nombre || 'Sin Área' }} <br><small class="text-muted-small">{{ emp.cargo?.nombre || 'Sin Cargo' }}</small></td>
+            <td>
+              <span class="badge" [ngClass]="obtenerClaseAusencia(emp)">
+                <i [class]="obtenerIconoAusencia(emp)"></i> {{ emp.estado }}
+              </span>
+            </td>
+            <td>{{ obtenerMotivoAusencia(emp) }}</td>
+            <td class="text-center">
+              <button class="btn-general-1 btn-pill btn-action" (click)="reincorporarEmpleado(emp)" title="Reincorporar a estado Activo">
+                <i class="fas fa-user-check"></i> Reincorporar
+              </button>
+            </td>
           </tr>
           <tr *ngIf="empleadosAusentes.length === 0">
-            <td colspan="6" class="text-center" style="padding: 2rem;">No hay empleados ausentes.</td>
+            <td colspan="7" class="text-center" style="padding: 2rem;">No hay empleados ausentes en este momento.</td>
           </tr>
         </tbody>
       </table>
@@ -354,4 +375,66 @@
     </div>
   </div>
   }
+
+  <!-- MODAL REGISTRAR NOVEDAD / AUSENCIA -->
+  <div class="modal-backdrop" *ngIf="isNovedadModalOpen" (click)="cerrarModalNovedad()">
+    <div class="modal-card neumorphic-panel" (click)="$event.stopPropagation()" style="max-width: 650px; max-height: 90vh; overflow-y: auto;">
+      <div class="modal-header flex-between mb-3" style="display: flex; justify-content: space-between; align-items: center;">
+        <h2 class="subtitulo" style="margin: 0;">Registrar Novedad / Ausencia Laboral</h2>
+        <button type="button" class="btn-icon text-muted" (click)="cerrarModalNovedad()">✕</button>
+      </div>
+
+      <p class="descripcion-general mb-3" style="text-align: left;">
+        Registra una ausencia justificada con su respectivo soporte y motivo válido para el control del personal.
+      </p>
+
+      <form (ngSubmit)="guardarNovedad()">
+        <div class="form-row-divider mb-3">
+          <div class="form-group">
+            <label class="form-label">Empleado *</label>
+            <select class="input-neumorphic" [(ngModel)]="novedadForm.empleado_id" name="empleado_id" required>
+              <option value="">Seleccione Empleado...</option>
+              <option *ngFor="let emp of todosEmpleados" [value]="emp.id">
+                {{ emp.usuario?.documento }} - {{ emp.usuario?.nombres }} {{ emp.usuario?.apellidos }} ({{ emp.cargo?.nombre || 'General' }})
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tipo de Novedad / Razón Válida *</label>
+            <select class="input-neumorphic" [(ngModel)]="novedadForm.tipo_novedad" name="tipo_novedad" required>
+              <option value="incapacitado">Incapacidad Médica General EPS</option>
+              <option value="licencia">Licencia de Maternidad / Paternidad / Luto</option>
+              <option value="permiso">Permiso por Calamidad Doméstica / Fuerza Mayor</option>
+              <option value="en vacaciones">Vacaciones Aprobadas (Disfrute)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row-divider mb-3">
+          <div class="form-group">
+            <label class="form-label">Fecha Inicio *</label>
+            <input type="date" class="input-neumorphic" [(ngModel)]="novedadForm.fecha_inicio" name="fecha_inicio" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Fecha Fin (si aplica)</label>
+            <input type="date" class="input-neumorphic" [(ngModel)]="novedadForm.fecha_fin" name="fecha_fin">
+          </div>
+        </div>
+
+        <div class="form-group mb-4">
+          <label class="form-label">Motivo Detallado y Justificación Válida *</label>
+          <textarea class="input-neumorphic" rows="3" [(ngModel)]="novedadForm.motivo" name="motivo" placeholder="Ej. Incapacidad médica expedida por EPS Sura por 5 días / Licencia de maternidad legal..." required></textarea>
+        </div>
+
+        <div class="modal-footer flex-between mt-4" style="display: flex; justify-content: space-between; align-items: center;">
+          <button type="button" class="btn-volver btn-pill" (click)="cerrarModalNovedad()">Cancelar</button>
+          <button type="submit" class="btn-save btn-pill" [disabled]="isSubmitting">
+            <i class="fas fa-save"></i> {{ isSubmitting ? 'Guardando...' : 'Guardar Novedad' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>

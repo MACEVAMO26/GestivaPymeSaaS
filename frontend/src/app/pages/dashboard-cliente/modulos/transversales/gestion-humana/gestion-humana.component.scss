@@ -285,12 +285,13 @@ label, td, th, p {
   font-weight: bold;
   text-transform: uppercase;
 }
-.badge-activo   { background: #6B8F71; color: #fff; }
-.badge-inactivo { background: #de3737; color: #fff; }
-
-.tabs-nav-wrapper a, .tabs-nav-wrapper button, .tabs-nav-wrapper span {
-  font-weight: bold !important;
-}
+.badge-activo       { background: #6B8F71; color: #fff; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 500; text-transform: uppercase; }
+.badge-inactivo     { background: #de3737; color: #fff; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 500; text-transform: uppercase; }
+.badge-vacaciones   { background: #7C6FA6; color: #fff; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 500; text-transform: uppercase; }
+.badge-incapacidad  { background: #B5654A; color: #fff; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 500; text-transform: uppercase; }
+.badge-licencia     { background: #8E5B75; color: #fff; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 500; text-transform: uppercase; }
+.badge-permiso      { background: #C9A227; color: #fff; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 500; text-transform: uppercase; }
+.badge-pendiente    { background: #A38B6D; color: #fff; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 500; text-transform: uppercase; }
 
 .form-row-divider {
   display: flex;

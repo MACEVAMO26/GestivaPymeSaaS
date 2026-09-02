@@ -183,7 +183,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('servicios', ServicioController::class);
 
     // Cuentas por pagar
-    Route::get('cuentas-por-pagar', [\App\Http\Controllers\CuentaPorPagarController::class, 'index']);
+    Route::apiResource('cuentas-por-pagar', \App\Http\Controllers\CuentaPorPagarController::class);
     Route::post('cuentas-por-pagar/{id}/abonos', [\App\Http\Controllers\CuentaPorPagarController::class, 'registrarAbono']);
 
 

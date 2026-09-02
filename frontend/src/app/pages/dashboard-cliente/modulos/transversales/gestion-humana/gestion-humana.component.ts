@@ -59,8 +59,18 @@ export class GestionHumanaComponent implements OnInit {
   categoriaDocumento: string = 'Otros';
   archivoSeleccionado: any = null;
   documentosEmpleado: any[] = [];
-
   categoriasDocumento: string[] = ['Hoja de Vida', 'Contrato', 'Cédula', 'Seguridad Social', 'Estudios', 'Certificaciones', 'Otros'];
+
+  // Novedades y Ausencias
+  isNovedadModalOpen: boolean = false;
+  novedadForm: any = {
+    empleado_id: '',
+    tipo_novedad: 'incapacitado',
+    motivo: '',
+    fecha_inicio: '',
+    fecha_fin: '',
+    soporte: ''
+  };
 
   // Configuración
   configuracionRRHH: any = { arl: '', caja_compensacion: '' };
@@ -495,10 +505,148 @@ export class GestionHumanaComponent implements OnInit {
       error: (err: any) => {
         if (err?.name === 'TimeoutError') {
           this.toast.error('Tiempo de espera agotado');
+        } else {
+          this.toast.error('No se pudo generar el certificado');
         }
-        this.toast.error('No se pudo generar el certificado');
         this.cdr.detectChanges();
       }
     });
+  }
+
+  // --- NOVEDADES Y GESTIÓN DE AUSENCIAS ---
+  abrirModalNovedad(emp?: any) {
+    this.novedadForm = {
+      empleado_id: emp ? emp.id : (this.empleadosActivos[0]?.id || ''),
+      tipo_novedad: 'incapacitado',
+      motivo: '',
+      fecha_inicio: new Date().toISOString().slice(0, 10),
+      fecha_fin: '',
+      soporte: ''
+    };
+    this.isNovedadModalOpen = true;
+  }
+
+  cerrarModalNovedad() {
+    this.isNovedadModalOpen = false;
+  }
+
+  guardarNovedad() {
+    if (!this.novedadForm.empleado_id || !this.novedadForm.tipo_novedad) {
+      this.toast.warning('Seleccione el empleado y el tipo de novedad');
+      return;
+    }
+    if (!this.novedadForm.motivo.trim()) {
+      this.toast.warning('Describa el motivo o razón válida de la ausencia');
+      return;
+    }
+
+    const empId = this.novedadForm.empleado_id;
+    const emp = this.todosEmpleados.find((e: any) => e.id == empId);
+    if (!emp) return;
+
+    this.isSubmitting = true;
+
+    // Si es vacación, también registramos la solicitud en backend
+    if (this.novedadForm.tipo_novedad === 'en vacaciones' && emp.usuario_id) {
+      this.http.post('/api/vacaciones', {
+        usuario_id: emp.usuario_id,
+        fecha_inicio: this.novedadForm.fecha_inicio || new Date().toISOString().slice(0, 10),
+        fecha_fin: this.novedadForm.fecha_fin || new Date().toISOString().slice(0, 10),
+        tipo: 'Disfrute Legal',
+        observaciones: this.novedadForm.motivo
+      }).subscribe();
+    }
+
+    // Actualizar estado del empleado
+    this.http.put(`/api/empleados/${empId}`, {
+      sede_id: emp.sede_id || 2,
+      area_id: emp.area_id || 17,
+      cargo_id: emp.cargo_id || 31,
+      tipo_contrato: emp.tipo_contrato || 'Indefinido',
+      fecha_contratacion: emp.fecha_contratacion ? emp.fecha_contratacion.substring(0, 10) : '2025-01-01',
+      salario: emp.salario,
+      estado: this.novedadForm.tipo_novedad
+    }).pipe(timeout(15000)).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.cerrarModalNovedad();
+        this.toast.success('Novedad de ausencia registrada con éxito');
+        this.cargarEmpleados();
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        this.isSubmitting = false;
+        if (err?.name === 'TimeoutError') {
+          this.toast.error('Tiempo de espera agotado');
+        } else {
+          this.toast.error('Error al registrar la novedad');
+        }
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  reincorporarEmpleado(emp: any) {
+    if (!emp?.id) return;
+    this.isSubmitting = true;
+    this.http.put(`/api/empleados/${emp.id}`, {
+      sede_id: emp.sede_id || 2,
+      area_id: emp.area_id || 17,
+      cargo_id: emp.cargo_id || 31,
+      tipo_contrato: emp.tipo_contrato || 'Indefinido',
+      fecha_contratacion: emp.fecha_contratacion ? emp.fecha_contratacion.substring(0, 10) : '2025-01-01',
+      salario: emp.salario,
+      estado: 'activo'
+    }).pipe(timeout(15000)).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.toast.success('Empleado reincorporado a sus labores activas');
+        this.cargarEmpleados();
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.isSubmitting = false;
+        this.toast.error('Error al reincorporar el empleado');
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  obtenerMotivoAusencia(emp: any): string {
+    if (!emp) return 'Novedad laboral';
+    switch (emp.estado) {
+      case 'en vacaciones':
+        return 'Vacaciones reglamentarias de ley en curso';
+      case 'incapacitado':
+        return 'Incapacidad médica general expedida por EPS';
+      case 'licencia':
+        return 'Licencia remunerada (Maternidad / Paternidad / Luto)';
+      case 'permiso':
+        return 'Permiso laboral justificado por calamidad o fuerza mayor';
+      default:
+        return 'Ausencia temporal justificada';
+    }
+  }
+
+  obtenerIconoAusencia(emp: any): string {
+    if (!emp) return 'fas fa-user-clock';
+    switch (emp.estado) {
+      case 'en vacaciones': return 'fas fa-umbrella-beach';
+      case 'incapacitado': return 'fas fa-user-injured';
+      case 'licencia': return 'fas fa-baby';
+      case 'permiso': return 'fas fa-clipboard-list';
+      default: return 'fas fa-user-clock';
+    }
+  }
+
+  obtenerClaseAusencia(emp: any): string {
+    if (!emp) return 'badge-pendiente';
+    switch (emp.estado) {
+      case 'en vacaciones': return 'badge-vacaciones';
+      case 'incapacitado': return 'badge-incapacidad';
+      case 'licencia': return 'badge-licencia';
+      case 'permiso': return 'badge-permiso';
+      default: return 'badge-pendiente';
+    }
   }
 }

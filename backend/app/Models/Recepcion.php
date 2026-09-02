@@ -20,8 +20,8 @@ class Recepcion extends Model
     protected $fillable = [
         'orden_compra_id',
         'usuario_id',
-        'fecha_recepcion',
-        'observaciones'
+        'tipo_recepcion',
+        'fecha_hora',
     ];
 
     // --- RELACIONES ---

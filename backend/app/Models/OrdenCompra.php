@@ -15,7 +15,7 @@ class OrdenCompra extends Model
     protected $table = 'ordenes_compra';
 
     // --- TIMESTAMPS ---
-    public $timestamps = false;
+    public $timestamps = true;
 
     // --- CAMPOS ---
 
@@ -27,6 +27,11 @@ class OrdenCompra extends Model
         'justificacion_rechazo',
         'motivo_anulacion',
         'total',
+    ];
+
+    protected $casts = [
+        'total' => 'float',
+        'fecha_requerida' => 'date',
     ];
 
     // --- RELACIONES ---
