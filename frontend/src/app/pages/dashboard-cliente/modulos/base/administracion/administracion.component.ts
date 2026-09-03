@@ -40,24 +40,23 @@ export class AdministracionComponent implements OnInit, AfterViewInit {
     if (!esGerente) {
       this.toastService.error('Acceso denegado. Solo el Gerente puede administrar el contrato.');
       
-        let ruta = '/inicio';
-        if (user && user.empresa) {
-            if (user.empresa.dominio) {
-                ruta = '/' + user.empresa.dominio + '/inicio';
-            } else if (user.empresa.razon_social) {
-                const slug = user.empresa.razon_social.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '');
-                ruta = '/' + slug + '/inicio';
-            }
+      let ruta = '/inicio';
+      if (user && user.empresa) {
+        if (user.empresa.dominio) {
+          ruta = '/' + user.empresa.dominio + '/inicio';
+        } else if (user.empresa.razon_social) {
+          const slug = user.empresa.razon_social.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '');
+          ruta = '/' + slug + '/inicio';
         }
-        this.router.navigate([ruta]);
-
+      }
+      this.router.navigate([ruta]);
       return;
     }
 
     if (user && user.empresa) {
       this.userEmpresa = user.empresa;
     }
-    this.cargarContratoActivo();
+    this.cargarEmpresaYContrato();
   }
 
   ngAfterViewInit(): void {
@@ -94,8 +93,30 @@ export class AdministracionComponent implements OnInit, AfterViewInit {
     };
   }
 
-  cargarContratoActivo() {
+  cargarEmpresaYContrato() {
     this.isLoading = true;
+    const user = this.authService.getUser();
+    if (user?.empresa?.id) {
+      this.http.get(`/api/empresas/${user.empresa.id}`, this.getHeaders()).subscribe({
+        next: (emp: any) => {
+          this.userEmpresa = emp;
+          const currentUser = this.authService.getUser();
+          if (currentUser) {
+            currentUser.empresa = emp;
+            sessionStorage.setItem('current_user', JSON.stringify(currentUser));
+          }
+          this.cargarContratoActivo();
+        },
+        error: () => {
+          this.cargarContratoActivo();
+        }
+      });
+    } else {
+      this.cargarContratoActivo();
+    }
+  }
+
+  cargarContratoActivo() {
     this.http.get('/api/saas/contratos/activo', this.getHeaders()).subscribe({
       next: (res: any) => {
         this.contratoActivo = res;

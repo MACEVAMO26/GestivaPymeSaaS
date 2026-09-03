@@ -77,11 +77,11 @@
                       </td>
                       <td>
                         <strong>{{proveedor.contacto || 'N/A'}}</strong><br>
-                        <span class="text-xs">📞 {{proveedor.telefono || 'N/A'}}</span>
+                        <span class="text-xs"><i class="fas fa-phone text-muted mr-1"></i> {{proveedor.telefono || 'N/A'}}</span>
                       </td>
                       <td>
-                        <span class="text-xs">✉️ {{proveedor.email || 'N/A'}}</span><br>
-                        <span class="text-xs">📍 {{proveedor.direccion || 'N/A'}}</span>
+                        <span class="text-xs"><i class="fas fa-envelope text-muted mr-1"></i> {{proveedor.email || 'N/A'}}</span><br>
+                        <span class="text-xs"><i class="fas fa-map-marker-alt text-muted mr-1"></i> {{proveedor.direccion || 'N/A'}}</span>
                       </td>
                       <td>
                         <span class="badge" [ngClass]="getBadgeEval(proveedor.estado_evaluacion || 'No Evaluado')">
@@ -89,15 +89,17 @@
                         </span>
                       </td>
                       <td>
-                        <div class="acciones-fila">
-                          <button class="btn-icon" (click)="abrirModal(proveedor)" title="Editar">✏️</button>
+                        <div class="acciones-fila" style="display: flex; gap: 0.4rem; justify-content: center; align-items: center;">
+                          <button class="btn-action-circle btn-circle-edit" (click)="abrirModal(proveedor)" title="Editar Proveedor">
+                            <i class="fas fa-edit"></i>
+                          </button>
                           <app-solicitud-inactivacion [area]="'v_prov'" [entidad]="'proveedores'" [entidadId]="proveedor.id"
-                            [nombreEntidad]="proveedor.razon_social"></app-solicitud-inactivacion>
-                          <button class="btn-icon text-danger" (click)="eliminarProveedor(proveedor.id)" title="Eliminar" [disabled]="deletingId === proveedor.id">
+                            [nombreEntidad]="proveedor.razon_social" [iconOnly]="true"></app-solicitud-inactivacion>
+                          <button class="btn-action-circle btn-circle-delete" (click)="eliminarProveedor(proveedor.id)" title="Eliminar Proveedor" [disabled]="deletingId === proveedor.id">
                             @if(deletingId === proveedor.id) {
                               <i class="fas fa-spinner fa-spin"></i>
                             } @else {
-                              🗑️
+                              <i class="fas fa-trash"></i>
                             }
                           </button>
                         </div>

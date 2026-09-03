@@ -307,7 +307,7 @@ class DatosPruebaSeeder extends Seeder
                 ]
             );
             SolicitudRespuesta::firstOrCreate(
-                ['solicitud_id' => $solEjecutada->id, 'usuario_id' => $ana->id, 'mensaje' => 'Â¿Confirmas que el cliente ya fue notificado del cierre?', 'created_at' => now()->subDays(2)->addHours(2)],
+                ['solicitud_id' => $solEjecutada->id, 'usuario_id' => $ana->id, 'mensaje' => '¿Confirmas que el cliente ya fue notificado del cierre?', 'created_at' => now()->subDays(2)->addHours(2)],
                 ['updated_at' => now()->subDays(2)->addHours(2)]
             );
             SolicitudRespuesta::firstOrCreate(

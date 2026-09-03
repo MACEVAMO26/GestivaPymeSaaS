@@ -2,8 +2,8 @@
   @if(!isEmbedded) {
     <!-- HTML ENCABEZADO -->
     <div class="module-header text-center mb-4 relative">
-      <h1>CRM - Gestión de Clientes</h1>
-      <p class="descripcion-general">Vista 360º de las interacciones, tickets y servicios prestados a los clientes.</p>
+      <h1>CRM - Gestión y Vista 360° de Clientes</h1>
+      <p class="descripcion-general">Consulta el historial cronológico unificado de ventas, cotizaciones, pedidos y servicios de cada cliente.</p>
     </div>
   }
 
@@ -16,15 +16,18 @@
       </div>
     }
 
+    <!-- BUSCADOR DE CLIENTES -->
     <div class="neumorphic-panel fade-in">
-      <h2 class="subtitulo">Buscador de Clientes</h2>
+      <h2 class="subtitulo">Directorio de Clientes</h2>
       <div class="search-filter-bar mb-4">
         <div class="search-group">
           <i class="fas fa-search search-icon"></i>
-          <input type="text" class="input-neumorphic" [(ngModel)]="busqueda" (keyup.enter)="buscar()" (ngModelChange)="buscar()" placeholder="Buscar cliente por nombre o documento...">
+          <input type="text" class="input-neumorphic" [(ngModel)]="busqueda" (keyup.enter)="buscar()" (ngModelChange)="buscar()" placeholder="Buscar cliente por nombre, NIT, cédula, ciudad o email...">
         </div>
         <div class="filter-group-btn">
-          <button type="button" class="btn-general-1 btn-pill" (click)="buscar()">Buscar</button>
+          <button type="button" class="btn-general-1 btn-pill" (click)="buscar()">
+            <i class="fas fa-search"></i> Buscar
+          </button>
         </div>
       </div>
 
@@ -38,17 +41,21 @@
           <table class="data-table neumorphic-table">
             <thead>
               <tr>
-                <th>CLIENTE</th>
+                <th>CLIENTE / RAZÓN SOCIAL</th>
                 <th>DOCUMENTO</th>
                 <th>CONTACTO</th>
-                <th>TIPO</th>
+                <th>CIUDAD</th>
+                <th>MEMBRESÍA</th>
                 <th class="col-accion">ACCIÓN</th>
               </tr>
             </thead>
             <tbody>
               @for(cli of resultados; track cli.id) {
                 <tr [class.fila-seleccionada]="clienteSeleccionado?.id === cli.id" (click)="seleccionarCliente(cli)" style="cursor: pointer;">
-                  <td><strong>{{nombreCliente(cli)}}</strong></td>
+                  <td>
+                    <strong>{{nombreCliente(cli)}}</strong>
+                    <div class="text-xs text-muted">{{cli.tipo_cliente || 'Natural'}}</div>
+                  </td>
                   <td>{{getDocumentoFormateado(cli)}}</td>
                   <td>
                     <div class="contact-stack">
@@ -56,21 +63,24 @@
                       <span class="contact-email">{{cli.email || '--'}}</span>
                     </div>
                   </td>
-                  <td>{{cli.tipo_cliente || 'Natural'}}</td>
+                  <td>{{cli.ciudad || 'Bogotá D.C.'}}</td>
+                  <td>
+                    <span class="badge badge-primary">{{cli.membresia || 'Estándar'}}</span>
+                  </td>
                   <td class="col-accion">
                     <div class="actions-cell">
-                      <button type="button" class="btn-action-360" (click)="seleccionarCliente(cli); $event.stopPropagation()">
-                        <i class="fas fa-eye"></i> Ver 360°
+                      <button type="button" class="btn-action-circle btn-circle-360" (click)="seleccionarCliente(cli); $event.stopPropagation()" title="Ver Vista 360°">
+                        <i class="fas fa-eye"></i>
                       </button>
                       <app-solicitud-inactivacion [area]="'s_crm'" [entidad]="'clientes'" [entidadId]="cli.id"
-                        [nombreEntidad]="nombreCliente(cli)" (click)="$event.stopPropagation()"></app-solicitud-inactivacion>
+                        [nombreEntidad]="nombreCliente(cli)" [iconOnly]="true" (click)="$event.stopPropagation()"></app-solicitud-inactivacion>
                     </div>
                   </td>
                 </tr>
               }
               @if (resultados.length === 0) {
                 <tr>
-                  <td colspan="5" class="text-center py-8 text-gray-500">
+                  <td colspan="6" class="text-center py-8 text-gray-500">
                     No se encontraron clientes con el criterio de búsqueda.
                   </td>
                 </tr>
@@ -81,45 +91,259 @@
       }
     </div>
 
+    <!-- FICHA Y VISTA 360° DEL CLIENTE SELECCIONADO -->
     @if(clienteSeleccionado) {
       <div class="neumorphic-panel fade-in mt-4">
-        <div class="panel-header-flex">
+        
+        <!-- HEADER 360 PERFIL -->
+        <div class="panel-header-flex mb-3 pb-3" style="border-bottom: 2px solid rgba(0,0,0,0.05);">
           <div>
-            <h2 class="subtitulo" style="margin: 0;">Historial y Detalle del Cliente (Vista 360°)</h2>
-            <p class="cliente-seleccionado-info">Cliente: <strong>{{nombreCliente(clienteSeleccionado)}}</strong> &bull; {{getDocumentoFormateado(clienteSeleccionado)}}</p>
+            <h2 class="subtitulo" style="margin: 0; font-size: 15px; font-weight: bold;">
+              <i class="fas fa-id-card text-azul"></i> Vista 360°: {{nombreCliente(clienteSeleccionado)}}
+            </h2>
+            <p class="cliente-seleccionado-info">
+              <strong>{{getDocumentoFormateado(clienteSeleccionado)}}</strong> · 
+              📍 {{clienteSeleccionado.direccion || 'Sin dirección'}} ({{clienteSeleccionado.ciudad || 'Colombia'}}) · 
+              📞 {{clienteSeleccionado.telefono || 'Sin teléfono'}} · 
+              ✉️ {{clienteSeleccionado.email || 'Sin email'}}
+            </p>
           </div>
-          <button class="btn-save btn-pill" (click)="nuevaVisita()">
-            <i class="fas fa-plus"></i> Nueva Visita
-          </button>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <span class="badge" [ngClass]="getBadgeEstado(clienteSeleccionado.estado_financiero || 'Al día')">
+              Financiero: {{clienteSeleccionado.estado_financiero || 'Al día'}}
+            </span>
+            <button class="btn-save btn-pill" (click)="nuevaVisita()">
+              <i class="fas fa-plus"></i> Nueva Visita / Ticket
+            </button>
+          </div>
         </div>
 
-        <div class="table-container" style="margin-top: 1.5rem;">
-          <table class="data-table neumorphic-table">
-            <thead>
-              <tr>
-                <th>CONSECUTIVO</th>
-                <th>SERVICIO</th>
-                <th>FECHA SOLICITADA</th>
-                <th>ESTADO</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for(tk of historialTickets; track tk.id) {
-                <tr>
-                  <td><strong>{{tk.consecutivo || ('TICK-' + tk.id)}}</strong></td>
-                  <td>{{tk.servicio_requerido || '--'}}</td>
-                  <td>{{tk.fecha_solicitada || '--'}}</td>
-                  <td><span class="badge" [ngClass]="getBadgeEstado(tk.estado)">{{tk.estado || 'Pendiente'}}</span></td>
-                </tr>
+        @if(cargando360) {
+          <div class="text-center py-8">
+            <i class="fas fa-spinner fa-spin fa-2x text-azul mb-2"></i>
+            <p class="text-muted">Cargando métricas e historial 360°...</p>
+          </div>
+        } @else if(historial360) {
+          
+          <!-- KPI METRIC CARDS 360 -->
+          <div class="kpi-grid-360 mb-4" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem;">
+            
+            <div class="neumorphic-panel-inner text-center p-3">
+              <span class="text-xs text-muted font-bold d-block">Total Facturado</span>
+              <strong class="text-positivo text-lg d-block mt-1">
+                {{historial360.metricas.total_compras | currency:'COP':'symbol':'1.0-0'}}
+              </strong>
+            </div>
+
+            <div class="neumorphic-panel-inner text-center p-3">
+              <span class="text-xs text-muted font-bold d-block">Ventas / Facturas</span>
+              <strong class="text-azul text-lg d-block mt-1">
+                {{historial360.metricas.cantidad_ventas}}
+              </strong>
+            </div>
+
+            <div class="neumorphic-panel-inner text-center p-3">
+              <span class="text-xs text-muted font-bold d-block">Cotizaciones / Pedidos</span>
+              <strong class="text-dark text-lg d-block mt-1">
+                {{historial360.metricas.cantidad_cotizaciones}}
+              </strong>
+            </div>
+
+            <div class="neumorphic-panel-inner text-center p-3">
+              <span class="text-xs text-muted font-bold d-block">Tickets de Servicios</span>
+              <strong class="text-azul text-lg d-block mt-1">
+                {{historial360.metricas.cantidad_servicios}}
+              </strong>
+            </div>
+
+            <div class="neumorphic-panel-inner text-center p-3">
+              <span class="text-xs text-muted font-bold d-block">Satisfacción Servicio</span>
+              <strong class="text-warning text-lg d-block mt-1" style="color: #f59e0b;">
+                ⭐ {{historial360.metricas.calificacion_promedio}} / 5.0
+              </strong>
+            </div>
+
+            <div class="neumorphic-panel-inner text-center p-3">
+              <span class="text-xs text-muted font-bold d-block">Pedidos Activos</span>
+              <strong class="text-info text-lg d-block mt-1" style="color: #45a1ae;">
+                {{historial360.metricas.pedidos_activos}}
+              </strong>
+            </div>
+
+          </div>
+
+          <!-- SUB-TABS 360 -->
+          <div class="subtabs-360-nav mb-3" style="display: flex; gap: 0.5rem; border-bottom: 2px solid rgba(0,0,0,0.05); padding-bottom: 0.5rem; flex-wrap: wrap;">
+            <button type="button" class="btn-subtab" [class.btn-subtab-active]="subTab360 === 'timeline'" (click)="subTab360 = 'timeline'">
+              <i class="fas fa-stream"></i> Línea de Tiempo Cronológica ({{historial360.timeline.length}})
+            </button>
+            <button type="button" class="btn-subtab" [class.btn-subtab-active]="subTab360 === 'ventas'" (click)="subTab360 = 'ventas'">
+              <i class="fas fa-shopping-cart"></i> Ventas & Facturas ({{historial360.ventas.length}})
+            </button>
+            <button type="button" class="btn-subtab" [class.btn-subtab-active]="subTab360 === 'cotizaciones'" (click)="subTab360 = 'cotizaciones'">
+              <i class="fas fa-file-invoice-dollar"></i> Cotizaciones & Pedidos ({{historial360.cotizaciones.length}})
+            </button>
+            <button type="button" class="btn-subtab" [class.btn-subtab-active]="subTab360 === 'servicios'" (click)="subTab360 = 'servicios'">
+              <i class="fas fa-tools"></i> Servicios & Soporte ({{historial360.tickets.length}})
+            </button>
+          </div>
+
+          <!-- PESTAÑA 1: LÍNEA DE TIEMPO CRONOLÓGICA UNIFICADA -->
+          @if(subTab360 === 'timeline') {
+            <div class="timeline-container fade-in mt-3">
+              @for(item of historial360.timeline; track $index) {
+                <div class="timeline-item p-3 mb-3 neumorphic-panel-inner" style="border-left: 4px solid;" [style.border-left-color]="item.color">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; flex-wrap: wrap; gap: 0.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <span class="badge" [ngClass]="getBadgeEstado(item.estado)">
+                        <i [class]="item.icono"></i> {{item.tipo}}
+                      </span>
+                      <strong class="text-sm font-bold text-dark">{{item.titulo}}</strong>
+                    </div>
+                    <span class="text-xs text-muted font-bold">
+                      <i class="far fa-clock"></i> {{item.fecha || 'Fecha reciente'}}
+                    </span>
+                  </div>
+
+                  <p class="text-xs text-muted" style="margin: 0.25rem 0;">{{item.descripcion}}</p>
+
+                  @if(item.calificacion_tecnico) {
+                    <div class="stars-gold text-xs mt-1">
+                      @for(s of getStarArray(item.calificacion_tecnico); track s) { <i class="fas fa-star"></i> }
+                      @if(item.feedback_tecnico) {
+                        <span class="text-muted ml-2">"{{item.feedback_tecnico}}"</span>
+                      }
+                    </div>
+                  }
+
+                  @if(item.equipo_recibido) {
+                    <div class="text-xs text-azul mt-1">
+                      <i class="fas fa-laptop"></i> Equipo en Taller: {{item.equipo_recibido}} - Falla: {{item.falla_reportada}}
+                    </div>
+                  }
+
+                  @if(item.monto > 0) {
+                    <div class="text-right text-xs font-bold text-positivo mt-1">
+                      Monto: {{item.monto | currency:'COP':'symbol':'1.0-0'}}
+                    </div>
+                  }
+                </div>
               }
-              @if(historialTickets.length === 0) {
-                <tr>
-                  <td colspan="4" class="text-center py-8 text-gray-500">Este cliente aún no tiene tickets de servicio registrados.</td>
-                </tr>
+              @if(historial360.timeline.length === 0) {
+                <div class="empty-state">No hay eventos registrados en la línea de tiempo para este cliente.</div>
               }
-            </tbody>
-          </table>
-        </div>
+            </div>
+          }
+
+          <!-- PESTAÑA 2: VENTAS & FACTURAS -->
+          @if(subTab360 === 'ventas') {
+            <div class="table-container fade-in mt-3">
+              <table class="data-table neumorphic-table">
+                <thead>
+                  <tr>
+                    <th>FACTURA</th>
+                    <th>FECHA</th>
+                    <th>MÉTODO PAGO</th>
+                    <th>ESTADO</th>
+                    <th>SUBTOTAL</th>
+                    <th>TOTAL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for(v of historial360.ventas; track v.id) {
+                    <tr>
+                      <td><strong>{{v.factura_consecutivo}}</strong></td>
+                      <td>{{v.created_at | date:'yyyy-MM-dd HH:mm'}}</td>
+                      <td>{{v.metodo_pago}}</td>
+                      <td><span class="badge badge-success">{{v.estado || 'Pagado'}}</span></td>
+                      <td>{{v.subtotal | currency:'COP':'symbol':'1.0-0'}}</td>
+                      <td class="text-positivo font-bold">{{v.total | currency:'COP':'symbol':'1.0-0'}}</td>
+                    </tr>
+                  }
+                  @if(historial360.ventas.length === 0) {
+                    <tr><td colspan="6" class="text-center py-8 text-gray-500">No hay ventas registradas para este cliente.</td></tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+
+          <!-- PESTAÑA 3: COTIZACIONES & PEDIDOS -->
+          @if(subTab360 === 'cotizaciones') {
+            <div class="table-container fade-in mt-3">
+              <table class="data-table neumorphic-table">
+                <thead>
+                  <tr>
+                    <th>TIPO / NÚMERO</th>
+                    <th>FECHA</th>
+                    <th>ESTADO</th>
+                    <th>TOTAL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for(c of historial360.cotizaciones; track c.id) {
+                    <tr>
+                      <td><strong>{{(c.tipo | uppercase)}} #{{c.id}}</strong></td>
+                      <td>{{c.fecha_hora || (c.created_at | date:'yyyy-MM-dd HH:mm')}}</td>
+                      <td><span class="badge" [ngClass]="getBadgeEstado(c.estado)">{{c.estado}}</span></td>
+                      <td class="text-positivo font-bold">{{c.total | currency:'COP':'symbol':'1.0-0'}}</td>
+                    </tr>
+                  }
+                  @if(historial360.cotizaciones.length === 0) {
+                    <tr><td colspan="4" class="text-center py-8 text-gray-500">No hay cotizaciones o pedidos registrados para este cliente.</td></tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+
+          <!-- PESTAÑA 4: SERVICIOS & SOPORTE -->
+          @if(subTab360 === 'servicios') {
+            <div class="table-container fade-in mt-3">
+              <table class="data-table neumorphic-table">
+                <thead>
+                  <tr>
+                    <th>TICKET</th>
+                    <th>SERVICIO REQUERIDO</th>
+                    <th>FECHA</th>
+                    <th>ESTADO</th>
+                    <th>EVALUACIÓN</th>
+                    <th>COSTO</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for(tk of historial360.tickets; track tk.id) {
+                    <tr>
+                      <td><strong>{{tk.consecutivo}}</strong></td>
+                      <td>
+                        {{tk.servicio_requerido}}
+                        @if(tk.equipo_recibido) {
+                          <div class="text-xs text-azul"><i class="fas fa-laptop"></i> {{tk.equipo_recibido}}</div>
+                        }
+                      </td>
+                      <td>{{tk.fecha_solicitada}} <br><span class="text-xs text-muted">{{tk.hora_sugerida}}</span></td>
+                      <td><span class="badge" [ngClass]="getBadgeEstado(tk.estado)">{{tk.estado}}</span></td>
+                      <td>
+                        @if(tk.calificacion_tecnico) {
+                          <span class="stars-gold text-xs">
+                            @for(s of getStarArray(tk.calificacion_tecnico); track s) { <i class="fas fa-star"></i> }
+                          </span>
+                        } @else {
+                          <span class="text-muted text-xs">Sin calificar</span>
+                        }
+                      </td>
+                      <td class="text-positivo font-bold">{{tk.costo_total | currency:'COP':'symbol':'1.0-0'}}</td>
+                    </tr>
+                  }
+                  @if(historial360.tickets.length === 0) {
+                    <tr><td colspan="6" class="text-center py-8 text-gray-500">No hay tickets de servicios registrados para este cliente.</td></tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+
+        }
       </div>
     }
   </div>

@@ -95,20 +95,21 @@ class SaasContratoController extends Controller
             return response()->json(['message' => 'Empresa no encontrada'], 404);
         }
 
-        // Simular guardado de imagen y generación de PDF (Mock por ahora, pero guardaremos el string en bd o lo subiremos a cloudinary)
-        // Por ahora guardamos el base64 en firma_gerente_url para visualizarlo directamente
+        // Guardamos el base64 en firma_gerente_url y sincronizamos los campos de auditoría del contrato
         $empresa->contrato_id = $request->contrato_id;
         $empresa->fecha_firma = now();
         $empresa->firma_gerente_url = $request->firma_base64; 
-        
-        // Aquí podrías generar un PDF con DomPDF usando el contrato + la firma
-        // $empresa->contrato_pdf_url = 'url_al_pdf_generado';
+        $empresa->contrato_aceptado = true;
+        $empresa->contrato_fecha_aceptacion = now();
+        $empresa->contrato_ip_aceptacion = $request->ip();
+        $empresa->contrato_firma_path = $request->firma_base64;
 
         $empresa->save();
 
         return response()->json([
             'message' => 'Contrato firmado con éxito.',
-            'fecha_firma' => $empresa->fecha_firma
+            'fecha_firma' => $empresa->fecha_firma,
+            'firma_gerente_url' => $empresa->firma_gerente_url
         ]);
     }
 }

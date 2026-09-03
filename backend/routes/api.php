@@ -177,6 +177,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     Route::apiResource('categorias', CategoriaController::class);
+    Route::get('clientes/{id}/historial-360', [ClienteController::class, 'historial360']);
     Route::apiResource('clientes', ClienteController::class);
     Route::apiResource('proveedores', ProveedorController::class);
     Route::apiResource('productos', ProductoController::class)->only(['index', 'store']);
@@ -220,6 +221,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/servicios-tickets', [\App\Http\Controllers\TicketServicioController::class, 'store']);
     Route::put('/servicios-tickets/{id}/estado', [\App\Http\Controllers\TicketServicioController::class, 'cambiarEstado']);
     Route::post('/servicios-tickets/{id}/materiales', [\App\Http\Controllers\TicketServicioController::class, 'agregarMaterial']);
+    Route::delete('/servicios-tickets/{id}/materiales/{materialId}', [\App\Http\Controllers\TicketServicioController::class, 'eliminarMaterial']);
+    Route::post('/servicios-tickets/{id}/calificar', [\App\Http\Controllers\TicketServicioController::class, 'calificar']);
 
     // --- TURNOS ---
 

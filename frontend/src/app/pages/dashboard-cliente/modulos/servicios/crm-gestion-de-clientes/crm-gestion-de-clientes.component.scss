@@ -209,7 +209,38 @@ th.col-accion, td.col-accion {
   white-space: nowrap;
 }
 
-/* Botón Ver 360° */
+/* Botones Redondos Pequeños de Acción (Sin Texto) */
+.btn-action-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  font-size: 11px;
+  transition: all 0.2s ease;
+  box-shadow: 2px 2px 5px $shadow-dark, -2px -2px 5px $shadow-light;
+
+  &:hover {
+    transform: translateY(-1px) scale(1.08);
+    box-shadow: 3px 3px 6px $shadow-dark, -2px -2px 5px $shadow-light;
+  }
+
+  &:active {
+    box-shadow: inset 2px 2px 4px rgba(0,0,0,0.2);
+  }
+}
+
+.btn-circle-360 {
+  background: #3aa0ac;
+  color: #ffffff;
+  border: 1px solid #2e8b96;
+  &:hover { background: #2e8b96; }
+}
+
+/* Botón Ver 360° clásico */
 .btn-action-360 {
   background: #3aa0ac;
   color: #ffffff;
@@ -332,4 +363,64 @@ th.col-accion, td.col-accion {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* SUBTABS 360 */
+.btn-subtab {
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  border: 1px solid $shadow-dark;
+  background: $bg-color;
+  color: $text-muted;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 2px 2px 4px $shadow-dark, -2px -2px 4px $shadow-light;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  &:hover {
+    color: $text-dark;
+  }
+
+  &.btn-subtab-active {
+    background: $btn-add;
+    color: #000;
+    font-weight: bold;
+    box-shadow: inset 2px 2px 4px rgba(0,0,0,0.2);
+    border-color: color.adjust($btn-add, $lightness: -10%);
+  }
+}
+
+.stars-gold {
+  color: #f59e0b;
+}
+
+.text-positivo {
+  color: $btn-save;
+  font-weight: bold;
+}
+
+.text-azul {
+  color: #2e8b96;
+  font-weight: 600;
+}
+
+.text-sm {
+  font-size: 13px;
+}
+
+.text-lg {
+  font-size: 16px;
+}
+
+.timeline-item {
+  border-radius: 10px;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateX(4px);
+  }
 }

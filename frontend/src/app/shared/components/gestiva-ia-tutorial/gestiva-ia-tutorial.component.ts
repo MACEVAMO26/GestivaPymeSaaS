@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, OnDestroy, OnChanges, SimpleChanges, inject, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, OnChanges, SimpleChanges, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
 import { HttpClient } from '@angular/common/http';
@@ -55,7 +55,7 @@ export class GestivaIaTutorialComponent implements OnInit, OnDestroy, OnChanges 
   private generarPasos() {
     this.pasos = [];
     this.pasos.push({
-      title: 'Â¡Hola! Soy Gestiva',
+      title: '¡Hola! Soy Gestiva',
       description: 'Tu inteligencia artificial personal. Estoy aquí para ayudarte a configurar y sacar el máximo provecho de tu nueva plataforma. Vamos a repasar brevemente los módulos que tienes activos.'
     });
 
@@ -90,7 +90,7 @@ export class GestivaIaTutorialComponent implements OnInit, OnDestroy, OnChanges 
     });
 
     this.pasos.push({
-      title: 'Â¡Todo listo para empezar!',
+      title: '¡Todo listo para empezar!',
       description: 'A medida que uses la plataforma, estaré analizando métricas en segundo plano. Me verás ocasionalmente por aquí dándote sugerencias.'
     });
   }

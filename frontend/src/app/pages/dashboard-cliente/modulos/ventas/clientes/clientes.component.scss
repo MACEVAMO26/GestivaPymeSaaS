@@ -252,7 +252,45 @@ th.col-accion, td.col-accion {
   white-space: nowrap;
 }
 
-/* Botón Ver 360° */
+/* Botones Redondos Pequeños de Acción (Sin Texto) */
+.btn-action-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  font-size: 11px;
+  transition: all 0.2s ease;
+  box-shadow: 2px 2px 5px $shadow-dark, -2px -2px 5px $shadow-light;
+
+  &:hover {
+    transform: translateY(-1px) scale(1.08);
+    box-shadow: 3px 3px 6px $shadow-dark, -2px -2px 5px $shadow-light;
+  }
+
+  &:active {
+    box-shadow: inset 2px 2px 4px rgba(0,0,0,0.2);
+  }
+}
+
+.btn-circle-360 {
+  background: #3aa0ac;
+  color: #ffffff;
+  border: 1px solid #2e8b96;
+  &:hover { background: #2e8b96; }
+}
+
+.btn-circle-edit {
+  background: #6b8f71;
+  color: #ffffff;
+  border: 1px solid #54745a;
+  &:hover { background: #55775b; }
+}
+
+/* Botón Ver 360° clásico */
 .btn-action-360 {
   background: #3aa0ac;
   color: #ffffff;
@@ -275,54 +313,6 @@ th.col-accion, td.col-accion {
   &:hover {
     background: #2e8b96;
     transform: translateY(-1px);
-  }
-}
-
-/* Botón Solicitar Inactivación */
-.btn-action-inactivar {
-  background: $bg-color;
-  color: #7a631c;
-  border: 1.5px solid #c9a227;
-  border-radius: 20px;
-  padding: 4px 12px;
-  font-size: 10px;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: bold;
-  text-transform: uppercase;
-  cursor: pointer;
-  white-space: nowrap;
-  box-shadow: 3px 3px 6px $shadow-dark, -2px -2px 5px $shadow-light;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-
-  i { font-size: 10px; color: #c9a227; }
-
-  &:hover {
-    background: color.adjust($bg-color, $lightness: -3%);
-    transform: translateY(-1px);
-  }
-}
-
-/* Botón editar ícono discreto */
-.btn-action-icon-edit {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: none;
-  border: none;
-  color: $text-muted;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 13px;
-
-  &:hover {
-    color: $btn-add;
-    transform: scale(1.15);
   }
 }
 

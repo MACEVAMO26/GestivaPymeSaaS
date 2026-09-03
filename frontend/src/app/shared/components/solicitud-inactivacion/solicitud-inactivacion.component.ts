@@ -19,6 +19,7 @@ export class SolicitudInactivacionComponent implements OnInit {
   @Input() entidadId: number | undefined;
   @Input() nombreEntidad: string = '';
   @Input() label: string = 'Solicitar inactivación';
+  @Input() iconOnly: boolean = true; // Botón redondo pequeño por defecto
 
   private authService = inject(AuthService);
   private solicitudService = inject(SolicitudService);
@@ -184,7 +185,7 @@ export class SolicitudInactivacionComponent implements OnInit {
   }
 
   nombreUsuario(u: any): string {
-    if (!u) return 'â€”';
+    if (!u) return '--';
     return [u.primer_nombre, u.segundo_nombre, u.primer_apellido, u.segundo_apellido].filter(Boolean).join(' ');
   }
 

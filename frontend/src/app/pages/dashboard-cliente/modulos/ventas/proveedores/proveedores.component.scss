@@ -504,3 +504,47 @@ $btn-gen-6: #A38B6D;
 .tabs-nav-wrapper a, .tabs-nav-wrapper button, .tabs-nav-wrapper span {
   font-weight: bold !important;
 }
+
+/* BOTONES CIRCULARES DE ACCIÓN (PEQUEÑOS Y REDONDOS) */
+.btn-action-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  font-size: 11px;
+  transition: all 0.2s ease;
+  box-shadow: 2px 2px 5px $shadow-dark, -2px -2px 5px $shadow-light;
+
+  &:hover {
+    transform: translateY(-1px) scale(1.08);
+    box-shadow: 3px 3px 6px $shadow-dark, -2px -2px 5px $shadow-light;
+  }
+
+  &:active {
+    box-shadow: inset 2px 2px 4px rgba(0,0,0,0.2);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btn-circle-edit {
+  background: #6b8f71;
+  color: #ffffff;
+  border: 1px solid #54745a;
+  &:hover { background: #55775b; }
+}
+
+.btn-circle-delete {
+  background: #de3737;
+  color: #ffffff;
+  border: 1px solid #b82828;
+  &:hover { background: #b82828; }
+}
+

@@ -1017,7 +1017,7 @@ export class SaasAdminComponent implements OnInit {
         const resumen = r
           ? ` Clientes: ${r.clientes} · Proveedores: ${r.proveedores} · Productos: ${r.productos} · Servicios: ${r.servicios} · Empleados: ${r.empleados} · Omitidas: ${r.omitidos}`
           : '';
-        this.toastService.success('✅ ' + res.message + resumen);
+        this.toastService.success(res.message + resumen);
         this.solicitudSeleccionada = res.solicitud;
         this.cargarSolicitudes();
         this.cdr.detectChanges();

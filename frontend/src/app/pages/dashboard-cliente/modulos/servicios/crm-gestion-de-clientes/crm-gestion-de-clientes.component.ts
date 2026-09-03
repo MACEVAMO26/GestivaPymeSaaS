@@ -1,8 +1,7 @@
 import { Component, OnInit, inject, ChangeDetectorRef, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ClienteService, Cliente } from '../../../../../services/cliente.service';
-import { OperariosTicketsService, ServicioTicket } from '../../../../../services/operarios-tickets.service';
+import { ClienteService, Cliente, Historial360Response } from '../../../../../services/cliente.service';
 import { ToastService } from '../../../../../services/toast.service';
 import { SolicitudInactivacionComponent } from '../../../../../shared/components/solicitud-inactivacion/solicitud-inactivacion.component';
 import { timeout } from 'rxjs';
@@ -19,15 +18,17 @@ export class CrmGestionDeClientesComponent implements OnInit {
   @Input() clienteInicial: any = null;
   private cdr = inject(ChangeDetectorRef);
   private clienteService = inject(ClienteService);
-  private ticketsService = inject(OperariosTicketsService);
   private toast = inject(ToastService);
 
   clientes: Cliente[] = [];
   resultados: Cliente[] = [];
   busqueda: string = '';
   buscando: boolean = false;
+  cargando360: boolean = false;
+  
   clienteSeleccionado: Cliente | null = null;
-  historialTickets: ServicioTicket[] = [];
+  historial360: Historial360Response | null = null;
+  subTab360: 'timeline' | 'ventas' | 'cotizaciones' | 'servicios' = 'timeline';
 
   ngOnInit() {
     this.cargarClientes();
@@ -74,7 +75,9 @@ export class CrmGestionDeClientesComponent implements OnInit {
       this.resultados = this.clientes.filter(c =>
         (c.nombres?.toLowerCase().includes(q)) ||
         (c.nombre_razon_social?.toLowerCase().includes(q)) ||
-        (c.documento?.toLowerCase().includes(q))
+        (c.documento?.toLowerCase().includes(q)) ||
+        (c.ciudad?.toLowerCase().includes(q)) ||
+        (c.email?.toLowerCase().includes(q))
       );
     }
     this.buscando = false;
@@ -82,25 +85,22 @@ export class CrmGestionDeClientesComponent implements OnInit {
 
   seleccionarCliente(cliente: Cliente) {
     this.clienteSeleccionado = cliente;
-    this.cargarHistorial(cliente);
+    this.cargarHistorial360(cliente);
   }
 
-  cargarHistorial(cliente: Cliente) {
-    this.ticketsService.getTickets().pipe(timeout(15000)).subscribe({
+  cargarHistorial360(cliente: Cliente) {
+    if (!cliente.id) return;
+    this.cargando360 = true;
+    this.clienteService.getHistorial360(cliente.id).pipe(timeout(15000)).subscribe({
       next: (res) => {
-        const nombre = (cliente.nombres + ' ' + (cliente.apellidos || '')).trim().toLowerCase();
-        const razon = (cliente.nombre_razon_social || '').toLowerCase();
-        this.historialTickets = res.filter(t =>
-          t.cliente_nombre?.toLowerCase().includes(nombre) ||
-          (razon && t.cliente_nombre?.toLowerCase().includes(razon))
-        );
+        this.historial360 = res;
+        this.cargando360 = false;
         this.cdr.detectChanges();
       },
-      error: (err: any) => {
-        if (err?.name === 'TimeoutError') {
-          this.toast.error('Tiempo de espera agotado');
-        }
-        this.historialTickets = [];
+      error: () => {
+        this.toast.error('Error al cargar la vista 360° del cliente');
+        this.historial360 = null;
+        this.cargando360 = false;
         this.cdr.detectChanges();
       }
     });
@@ -129,15 +129,33 @@ export class CrmGestionDeClientesComponent implements OnInit {
 
   getBadgeEstado(estado: string): string {
     switch (estado) {
-      case 'Finalizado': return 'badge-success';
-      case 'Pendiente': return 'badge-warning';
-      case 'Asignado': return 'badge-primary';
-      case 'En Sitio': return 'badge-info';
-      default: return 'badge-secondary';
+      case 'Finalizado':
+      case 'Pagado':
+      case 'Entregado':
+      case 'aprobada':
+      case 'facturada':
+        return 'badge-success';
+      case 'Pendiente':
+      case 'enviada':
+      case 'En preparación':
+      case 'En camino':
+        return 'badge-warning';
+      case 'Asignado':
+      case 'convertida':
+        return 'badge-primary';
+      case 'En Sitio':
+      case 'Recibido':
+        return 'badge-info';
+      default:
+        return 'badge-secondary';
     }
   }
 
+  getStarArray(n: number = 5): number[] {
+    return Array.from({ length: Math.round(n) }, (_, i) => i + 1);
+  }
+
   nuevaVisita() {
-    this.toast.info('Crea un ticket de servicio desde el módulo de Servicios para registrar una nueva visita.');
+    this.toast.info('Para programar una visita, crea un ticket de servicio en el módulo de Servicios.');
   }
 }

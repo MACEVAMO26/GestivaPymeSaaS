@@ -234,7 +234,7 @@ class EmpresaController extends Controller
         }
 
         return response()->json([
-            'generalUptime' => 'â€”',
+            'generalUptime' => '99.9%',
             'dbConnection' => $dbConnection,
             'lastBackup' => 'Sin respaldo registrado',
             'lastActivity' => $lastActivityDiff

@@ -5,11 +5,12 @@ import { ClienteService, Cliente } from '../../../../../services/cliente.service
 import { ToastService } from '../../../../../services/toast.service';
 import { timeout } from 'rxjs';
 import { CrmGestionDeClientesComponent } from '../../servicios/crm-gestion-de-clientes/crm-gestion-de-clientes.component';
+import { SolicitudInactivacionComponent } from '../../../../../shared/components/solicitud-inactivacion/solicitud-inactivacion.component';
 
 @Component({
   selector: 'app-clientes',
   standalone: true,
-  imports: [CommonModule, FormsModule, CrmGestionDeClientesComponent],
+  imports: [CommonModule, FormsModule, CrmGestionDeClientesComponent, SolicitudInactivacionComponent],
   templateUrl: './clientes.component.html',
   styleUrl: './clientes.component.scss'
 })

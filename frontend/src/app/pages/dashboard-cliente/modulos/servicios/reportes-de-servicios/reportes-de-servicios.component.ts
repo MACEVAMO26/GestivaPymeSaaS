@@ -25,9 +25,14 @@ export class ReportesDeServiciosComponent implements OnInit {
   tecnicos: any[] = [];
 
   totalAtendidos: number = 0;
+  totalEnCamino: number = 0;
+  totalRecibidos: number = 0;
+  totalPendientes: number = 0;
   tecnicoTop: string = 'N/A';
   servicioTop: string = 'N/A';
   tasaFinalizacion: number = 0;
+  promedioSatisfaccion: number = 5.0;
+  totalFacturado: number = 0;
 
   ngOnInit() {
     this.cargarDatos();
@@ -71,23 +76,17 @@ export class ReportesDeServiciosComponent implements OnInit {
             })).filter((t: any) => t.nombre);
             this.calcular();
             this.cargando = false;
-        this.cdr.detectChanges();
+            this.cdr.detectChanges();
           },
-          error: (err: any) => {
-        if (err?.name === 'TimeoutError') {
-          console.error('Tiempo de espera agotado');
-        }
+          error: () => {
             this.tecnicos = [];
             this.calcular();
             this.cargando = false;
-        this.cdr.detectChanges();
+            this.cdr.detectChanges();
           }
         });
       },
-      error: (err: any) => {
-        if (err?.name === 'TimeoutError') {
-          console.error('Tiempo de espera agotado');
-        }
+      error: () => {
         this.todosTickets = [];
         this.tecnicos = [];
         this.calcular();
@@ -109,7 +108,19 @@ export class ReportesDeServiciosComponent implements OnInit {
 
   calcular() {
     const tickets = this.getTicketsFiltrados();
-    this.totalAtendidos = tickets.filter(t => t.estado === 'Finalizado').length;
+    const finalizados = tickets.filter(t => t.estado === 'Finalizado');
+    this.totalAtendidos = finalizados.length;
+    this.totalEnCamino = tickets.filter(t => t.estado === 'En Camino').length;
+    this.totalRecibidos = tickets.filter(t => t.estado === 'Recibido').length;
+    this.totalPendientes = tickets.filter(t => t.estado === 'Pendiente').length;
+
+    // Total Facturado
+    this.totalFacturado = finalizados.reduce((acc, t) => acc + (Number(t.costo_total) || 0), 0);
+
+    // Promedio de Satisfacción
+    const conCalif = finalizados.filter(t => t.calificacion_tecnico && t.calificacion_tecnico > 0);
+    const suma = conCalif.reduce((acc, t) => acc + (t.calificacion_tecnico || 0), 0);
+    this.promedioSatisfaccion = conCalif.length > 0 ? Number((suma / conCalif.length).toFixed(1)) : 5.0;
 
     // Técnico con más servicios
     const porTecnico = new Map<number, number>();
@@ -142,7 +153,7 @@ export class ReportesDeServiciosComponent implements OnInit {
     // Tasa de finalización
     const noCancelados = tickets.filter(t => t.estado !== 'Cancelado');
     this.tasaFinalizacion = noCancelados.length > 0
-      ? Math.round((tickets.filter(t => t.estado === 'Finalizado').length / noCancelados.length) * 100)
+      ? Math.round((finalizados.length / noCancelados.length) * 100)
       : 0;
   }
 

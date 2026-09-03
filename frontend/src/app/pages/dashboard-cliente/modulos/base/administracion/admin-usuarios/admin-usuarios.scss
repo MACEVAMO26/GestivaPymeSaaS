@@ -605,15 +605,15 @@ $btn-gen-6: #A38B6D;
   background: $bg-color;
   border: none;
   border-radius: 50%;
-  width: 34px;
-  height: 34px;
+  width: 28px;
+  height: 28px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 3px 3px 6px $shadow-dark, -3px -3px 6px $shadow-light;
+  box-shadow: 2px 2px 5px $shadow-dark, -2px -2px 5px $shadow-light;
   transition: all 0.2s ease;
-  font-size: 13px;
+  font-size: 11px;
 
   &:hover {
     box-shadow: inset 2px 2px 4px $shadow-dark, inset -2px -2px 4px $shadow-light;

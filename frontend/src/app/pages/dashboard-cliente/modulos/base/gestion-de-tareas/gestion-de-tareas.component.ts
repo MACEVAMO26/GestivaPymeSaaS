@@ -182,12 +182,12 @@ export class GestionDeTareasComponent implements OnInit {
 
   // --- AYUDAS DE RENDERIZADO ---
   nombreUsuario(u: any): string {
-    if (!u) return 'â€”';
+    if (!u) return '--';
     return [u.primer_nombre, u.segundo_nombre, u.primer_apellido, u.segundo_apellido].filter(Boolean).join(' ');
   }
 
   nombreArea(t: Tarea): string {
-    return (t as any)?.area?.nombre || 'â€”';
+    return (t as any)?.area?.nombre || '--';
   }
 
   etiquetaEstado(estado?: string): string {
@@ -198,7 +198,7 @@ export class GestionDeTareasComponent implements OnInit {
       con_dificultades: 'Con Dificultades',
       terminada: 'Terminada'
     };
-    return mapa[estado || ''] || estado || 'â€”';
+    return mapa[estado || ''] || estado || '--';
   }
 
   claseEstado(estado?: string): string {

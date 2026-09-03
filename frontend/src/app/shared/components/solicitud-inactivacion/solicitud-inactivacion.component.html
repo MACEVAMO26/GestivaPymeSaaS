@@ -1,6 +1,12 @@
-<button type="button" class="btn-solicitar" (click)="abrir()">
-  <i class="fas fa-flag"></i> {{ label }}
-</button>
+@if (iconOnly) {
+  <button type="button" class="btn-action-circle btn-circle-flag" (click)="abrir()" [title]="label">
+    <i class="fas fa-flag"></i>
+  </button>
+} @else {
+  <button type="button" class="btn-solicitar" (click)="abrir()">
+    <i class="fas fa-flag"></i> {{ label }}
+  </button>
+}
 
 @if (isOpen) {
 <div class="sol-overlay fade-in" (click.self)="cerrar()">

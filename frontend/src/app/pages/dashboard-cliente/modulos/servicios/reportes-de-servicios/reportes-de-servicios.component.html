@@ -1,8 +1,8 @@
-﻿<div [ngClass]="isEmbedded ? '' : 'module-container fade-in'">
+<div [ngClass]="isEmbedded ? '' : 'module-container fade-in'">
   @if(!isEmbedded) {
   <div class="module-header text-center mb-4 relative">
     <h1>Reportes y Analíticas de Servicios</h1>
-    <p>Visualice las métricas de eficiencia de los técnicos y servicios más solicitados.</p>
+    <p>Visualice las métricas de eficiencia de los técnicos, estados operativos y servicios más solicitados.</p>
   </div>
   }
 
@@ -16,18 +16,20 @@
     }
 
     <div class="neumorphic-panel fade-in">
-      <h2 class="subtitulo">Filtros de Reporte</h2>
-      <div class="form-grid" style="align-items: end;">
-        <div class="form-group">
+      <h2 class="subtitulo">Filtros de Reporte por Fecha</h2>
+      <div class="form-grid" style="align-items: end; display: flex; gap: 1rem; flex-wrap: wrap;">
+        <div class="form-group" style="flex: 1; min-width: 180px;">
           <label class="form-label">Desde:</label>
           <input type="date" class="input-neumorphic" [(ngModel)]="desde">
         </div>
-        <div class="form-group">
+        <div class="form-group" style="flex: 1; min-width: 180px;">
           <label class="form-label">Hasta:</label>
           <input type="date" class="input-neumorphic" [(ngModel)]="hasta">
         </div>
         <div class="form-group" style="padding-bottom: 0.2rem;">
-          <button type="button" class="btn-general-2 btn-pill" (click)="generarReporte()">Generar Reporte</button>
+          <button type="button" class="btn-general-2 btn-pill" (click)="generarReporte()">
+            <i class="fas fa-filter"></i> Filtrar Métricas
+          </button>
         </div>
       </div>
 
@@ -38,33 +40,55 @@
         </div>
       } @else {
         <div class="mt-4">
-          <h2 class="subtitulo">Métricas Principales</h2>
-          <div class="metrics-grid">
+          <h2 class="subtitulo mb-3">Métricas Generales y Operativas</h2>
+          
+          <div class="metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
 
-            <div class="neumorphic-panel-inner text-center">
-              <p class="metric-label">Total de Tickets Atendidos</p>
-              <strong class="metric-value-accent">{{totalAtendidos}}</strong>
+            <div class="neumorphic-panel-inner text-center p-3">
+              <p class="metric-label text-xs font-bold text-muted">Servicios Finalizados</p>
+              <strong class="metric-value-accent text-lg text-positivo d-block mt-1">{{totalAtendidos}}</strong>
             </div>
 
-            <div class="neumorphic-panel-inner text-center">
-              <p class="metric-label">Técnico con más servicios</p>
-              <strong class="metric-value">{{tecnicoTop}}</strong>
+            <div class="neumorphic-panel-inner text-center p-3">
+              <p class="metric-label text-xs font-bold text-muted">Técnicos En Camino</p>
+              <strong class="metric-value text-lg text-azul d-block mt-1">{{totalEnCamino}}</strong>
             </div>
 
-            <div class="neumorphic-panel-inner text-center">
-              <p class="metric-label">Servicio más demandado</p>
-              <strong class="metric-value">{{servicioTop}}</strong>
+            <div class="neumorphic-panel-inner text-center p-3">
+              <p class="metric-label text-xs font-bold text-muted">Equipos en Taller (Recibidos)</p>
+              <strong class="metric-value text-lg text-dark d-block mt-1">{{totalRecibidos}}</strong>
             </div>
 
-            <div class="neumorphic-panel-inner text-center">
-              <p class="metric-label">Tasa de Finalización</p>
-              <strong class="metric-value-danger">{{tasaFinalizacion}}%</strong>
+            <div class="neumorphic-panel-inner text-center p-3">
+              <p class="metric-label text-xs font-bold text-muted">Pendientes de Asignar</p>
+              <strong class="metric-value text-lg text-danger d-block mt-1">{{totalPendientes}}</strong>
+            </div>
+
+            <div class="neumorphic-panel-inner text-center p-3">
+              <p class="metric-label text-xs font-bold text-muted">Satisfacción Promedio</p>
+              <strong class="metric-value text-lg text-warning d-block mt-1">⭐ {{promedioSatisfaccion}} / 5.0</strong>
+            </div>
+
+            <div class="neumorphic-panel-inner text-center p-3">
+              <p class="metric-label text-xs font-bold text-muted">Tasa de Finalización</p>
+              <strong class="metric-value text-lg text-positivo d-block mt-1">{{tasaFinalizacion}}%</strong>
             </div>
 
           </div>
+
+          <div class="grid-dos-cols mt-4" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div class="neumorphic-panel-inner p-3">
+              <h4 class="text-xs font-bold text-azul mb-2"><i class="fas fa-trophy"></i> Técnico con Más Servicios:</h4>
+              <p class="text-dark font-bold text-md" style="margin: 0;">{{tecnicoTop}}</p>
+            </div>
+            <div class="neumorphic-panel-inner p-3">
+              <h4 class="text-xs font-bold text-azul mb-2"><i class="fas fa-chart-line"></i> Servicio Más Demandado:</h4>
+              <p class="text-dark font-bold text-md" style="margin: 0;">{{servicioTop}}</p>
+            </div>
+          </div>
+
         </div>
       }
     </div>
   </div>
 </div>
-

@@ -17,7 +17,7 @@
     <!-- TABS NEUMORPHIC (ACTUALIZADAS) -->
     <div class="tabs-nav-wrapper">
         <button class="tab-neu-inactive" [class.tab-neu-active]="tabActiva === 'directorio'" (click)="tabActiva = 'directorio'"> <span class="icon">👥</span> Directorio de Clientes </button>
-        <button class="tab-neu-inactive" [class.tab-neu-active]="tabActiva === 'crm'" (click)="tabActiva = 'crm'"> <span class="icon">🤝</span> CRM / Vista 360º </button>
+        <button class="tab-neu-inactive" [class.tab-neu-active]="tabActiva === 'crm'" (click)="tabActiva = 'crm'"> <span class="icon">🤝</span> CRM / Vista 360° </button>
     </div>
 
     @if(tabActiva === 'directorio') {
@@ -68,15 +68,14 @@
                                 <td>{{ cliente.tipo_cliente || 'Natural' }}</td>
                                 <td class="col-accion">
                                     <div class="actions-cell">
-                                        <button type="button" class="btn-action-360" (click)="ver360(cliente)">
-                                            <i class="fas fa-eye"></i> Ver 360°
+                                        <button type="button" class="btn-action-circle btn-circle-360" (click)="ver360(cliente)" title="Ver Vista 360°">
+                                            <i class="fas fa-eye"></i>
                                         </button>
-                                        <button type="button" class="btn-action-inactivar" (click)="solicitarInactivacion(cliente)">
-                                            <i class="fas fa-flag"></i> SOLICITAR INACTIVACIÓN
-                                        </button>
-                                        <button type="button" class="btn-action-icon-edit" title="Editar datos" (click)="abrirModalEditar(cliente)">
+                                        <button type="button" class="btn-action-circle btn-circle-edit" (click)="abrirModalEditar(cliente)" title="Editar Cliente">
                                             <i class="fas fa-edit"></i>
                                         </button>
+                                        <app-solicitud-inactivacion [area]="'s_crm'" [entidad]="'clientes'" [entidadId]="cliente.id"
+                                            [nombreEntidad]="getNombreCliente(cliente)" [iconOnly]="true"></app-solicitud-inactivacion>
                                     </div>
                                 </td>
                             </tr>

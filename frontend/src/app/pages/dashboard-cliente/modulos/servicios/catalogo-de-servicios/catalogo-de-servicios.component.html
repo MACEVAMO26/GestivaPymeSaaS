@@ -1,16 +1,16 @@
 <div class="module-container fade-in">
-  <div [hidden]="(modalAsignacion && ticketSeleccionado) || (modalEjecucion && ticketSeleccionado)" class="main-view-wrapper">
+  <div [hidden]="(modalAsignacion && ticketSeleccionado) || (modalEjecucion && ticketSeleccionado) || (modalCalificacion && ticketParaCalificar)" class="main-view-wrapper">
 
   <div class="module-header text-center mb-4 relative">
-    <h1>Gestión de Servicios (FSM)</h1>
-    <p>Recepción de tickets, despacho de técnicos, ejecución en sitio y estadísticas de rendimiento.</p>
+    <h1>Gestión de Servicios (Field Service & Taller)</h1>
+    <p>Recepción de tickets y equipos, despacho de técnicos en camino, mini-inventario de repuestos y evaluación de satisfacción.</p>
   </div>
 
   <!-- HTML PESTAÑAS -->
   <div class="tabs-nav-wrapper">
     <button class="tab-neu-inactive" [class.tab-neu-active]="activeTab === 'recepcion'" (click)="switchTab('recepcion')"> <span class="icon">📥</span> 1. Recepción (Tickets) </button>
     <button class="tab-neu-inactive" [class.tab-neu-active]="activeTab === 'agenda'" (click)="switchTab('agenda')"> <span class="icon">📅</span> 2. Agenda y Despacho </button>
-    <button class="tab-neu-inactive" [class.tab-neu-active]="activeTab === 'ejecucion'" (click)="switchTab('ejecucion')"> <span class="icon">🛠️</span> 3. Ejecución / Materiales </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="activeTab === 'ejecucion'" (click)="switchTab('ejecucion')"> <span class="icon">🛠️</span> 3. Ejecución / Mini-Inventario </button>
     <button class="tab-neu-inactive" [class.tab-neu-active]="activeTab === 'rendimiento'" (click)="switchTab('rendimiento')"> <span class="icon">📈</span> Rendimiento Técnico </button>
     <button class="tab-neu-inactive" [class.tab-neu-active]="activeTab === 'catalogo'" (click)="switchTab('catalogo')"> <span class="icon">📋</span> Catálogo Tarifado </button>
     <button class="tab-neu-inactive" [class.tab-neu-active]="activeTab === 'operarios'" (click)="switchTab('operarios')"> <span class="icon">👷</span> Gestión de Operarios </button>
@@ -18,13 +18,13 @@
   </div>
 
   <!-- HTML CONTENIDO DE TABS -->
-<div class="tab-content neumorphic-panel-inner p-4">
-  <!-- Botón Volver Inyectado -->
-  <div class="volver-wrapper">
-    <button class="btn-volver btn-pill" onclick="window.history.back()">
-      <i class="fas fa-arrow-left"></i> Volver
-    </button>
-  </div>
+  <div class="tab-content neumorphic-panel-inner p-4">
+    <!-- Botón Volver Inyectado -->
+    <div class="volver-wrapper">
+      <button class="btn-volver btn-pill" onclick="window.history.back()">
+        <i class="fas fa-arrow-left"></i> Volver
+      </button>
+    </div>
     
     <!-- HTML RECEPCION TICKETS -->
     @if(activeTab === 'recepcion') {
@@ -33,19 +33,63 @@
         <!-- HTML FORMULARIO CREACION -->
         <div class="fsm-form-col">
           <h3 class="panel-titulo">Nuevo Ticket de Servicio</h3>
+          
+          <div class="form-modalidad-selector mb-3">
+            <label class="label-xs mb-1 d-block">Modalidad del Servicio:</label>
+            <div class="btn-group-modalidad">
+              <button type="button" class="btn-tipo-pill" [class.btn-tipo-active]="tipoServicio === 'DOMICILIO'" (click)="tipoServicio = 'DOMICILIO'">
+                <i class="fas fa-home"></i> A Domicilio / Terreno
+              </button>
+              <button type="button" class="btn-tipo-pill" [class.btn-tipo-active]="tipoServicio === 'TALLER'" (click)="tipoServicio = 'TALLER'">
+                <i class="fas fa-laptop-medical"></i> Recepción en Taller
+              </button>
+            </div>
+          </div>
+
           <div class="form-group">
             <label>Cliente (Razón Social o Nombre)</label>
-            <input type="text" class="input-neumorphic" [(ngModel)]="formTicket.cliente" placeholder="Ej: Clínica San José">
+            <input type="text" class="input-neumorphic" [(ngModel)]="formTicket.cliente" placeholder="Ej: Clínica San José o Juan Pérez">
           </div>
+
           <div class="form-group">
-            <label>Servicio Requerido (Debe coincidir con catálogo)</label>
-            <select class="input-neumorphic" [(ngModel)]="formTicket.servicio">
-              <option value="">Seleccione un servicio...</option>
+            <label>Servicio Requerido</label>
+            <select class="input-neumorphic" [(ngModel)]="formTicket.servicio" (change)="onServicioSeleccionado()">
+              <option value="">Seleccione un servicio del catálogo...</option>
               @for(cat of catalogo; track cat.id) {
                 <option [value]="cat.nombre">{{cat.nombre}} - {{cat.tarifa | currency:'COP':'symbol':'1.0-0'}}</option>
               }
             </select>
           </div>
+
+          @if(tipoServicio === 'TALLER') {
+            <div class="taller-card-box p-3 mb-3 border-rounded">
+              <h5 class="text-azul text-xs font-bold mb-2"><i class="fas fa-tools"></i> Datos del Equipo Recibido:</h5>
+              <div class="form-fila">
+                <div class="form-group" style="flex: 1;">
+                  <label class="label-xs">Equipo / Marca / Modelo</label>
+                  <input type="text" class="input-neumorphic" [(ngModel)]="formTicket.equipo" placeholder="Ej: Laptop ASUS ZenBook 14">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                  <label class="label-xs">Número de Serie (S/N)</label>
+                  <input type="text" class="input-neumorphic" [(ngModel)]="formTicket.serie" placeholder="Ej: SN-994820">
+                </div>
+              </div>
+              <div class="form-group mt-2">
+                <label class="label-xs">Accesorios Recibidos</label>
+                <input type="text" class="input-neumorphic" [(ngModel)]="formTicket.accesorios" placeholder="Ej: Cargador original, funda, cables...">
+              </div>
+              <div class="form-group mt-2">
+                <label class="label-xs">Falla Reportada por el Cliente</label>
+                <textarea class="input-neumorphic" rows="2" [(ngModel)]="formTicket.falla" placeholder="Describa el problema que presenta el equipo..."></textarea>
+              </div>
+            </div>
+          } @else {
+            <div class="form-group">
+              <label>Dirección / Ubicación del servicio</label>
+              <input type="text" class="input-neumorphic" [(ngModel)]="formTicket.direccion" placeholder="Calle, Carrera, Barrio, Ciudad...">
+            </div>
+          }
+
           <div class="form-fila">
             <div class="form-group" style="flex: 1;">
               <label>Fecha Solicitada</label>
@@ -56,39 +100,108 @@
               <input type="time" class="input-neumorphic" [(ngModel)]="formTicket.hora">
             </div>
           </div>
-          <div class="form-group">
-            <label>Dirección / Ubicación del servicio</label>
-            <input type="text" class="input-neumorphic" [(ngModel)]="formTicket.direccion" placeholder="Calle, Barrio, Ciudad...">
-          </div>
+
           <div style="text-align: right; margin-top: 1rem;">
             <button class="btn-save btn-pill" (click)="crearTicket()" [disabled]="guardando">
               @if(guardando) { <i class="fas fa-spinner fa-spin"></i> Registrando... }
-              @else { Crear Ticket de Servicio }
+              @else { 
+                <i class="fas fa-plus-circle"></i> 
+                {{ tipoServicio === 'TALLER' ? 'Recepcionar Equipo' : 'Crear Ticket de Servicio' }}
+              }
             </button>
           </div>
         </div>
 
         <!-- HTML TABLA TICKETS HISTORICOS -->
         <div class="fsm-historial-col">
-          <h3 class="panel-titulo">Historial de Solicitudes</h3>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+            <h3 class="panel-titulo" style="margin: 0;">Historial de Solicitudes ({{getTicketsFiltrados().length}})</h3>
+            
+            <!-- Filtros de estado -->
+            <div class="filtros-estado-pills">
+              <button class="btn-filtro" [class.btn-filtro-active]="filtroEstado === 'TODOS'" (click)="filtroEstado = 'TODOS'">Todos</button>
+              <button class="btn-filtro" [class.btn-filtro-active]="filtroEstado === 'Pendiente'" (click)="filtroEstado = 'Pendiente'">Pendiente</button>
+              <button class="btn-filtro" [class.btn-filtro-active]="filtroEstado === 'Recibido'" (click)="filtroEstado = 'Recibido'">Recibido</button>
+              <button class="btn-filtro" [class.btn-filtro-active]="filtroEstado === 'En Camino'" (click)="filtroEstado = 'En Camino'">En Camino</button>
+              <button class="btn-filtro" [class.btn-filtro-active]="filtroEstado === 'Finalizado'" (click)="filtroEstado = 'Finalizado'">Finalizado</button>
+            </div>
+          </div>
+
           <div class="table-responsive">
             <table class="premium-table data-table">
               <thead>
                 <tr>
                   <th>TK</th>
-                  <th>CLIENTE</th>
+                  <th>CLIENTE / EQUIPO</th>
                   <th>SERVICIO</th>
+                  <th>TÉCNICO</th>
                   <th>ESTADO</th>
+                  <th>CALIFICACIÓN</th>
+                  <th style="text-align: center;">ACCIÓN</th>
                 </tr>
               </thead>
               <tbody>
-                @for(tk of tickets; track tk.id) {
+                @for(tk of getTicketsFiltrados(); track tk.id) {
                   <tr>
                     <td><strong>{{tk.consecutivo}}</strong></td>
-                    <td>{{tk.cliente_nombre}}</td>
-                    <td>{{tk.servicio_requerido}}</td>
-                    <td><span class="badge" [ngClass]="getBadgeEstado(tk.estado)">{{tk.estado}}</span></td>
+                    <td>
+                      <strong>{{tk.cliente_nombre}}</strong>
+                      @if(tk.equipo_recibido) {
+                        <div class="text-xs text-azul"><i class="fas fa-laptop"></i> {{tk.equipo_recibido}}</div>
+                      }
+                    </td>
+                    <td>
+                      {{tk.servicio_requerido}}
+                      <div class="text-xs text-muted">📍 {{tk.direccion}}</div>
+                    </td>
+                    <td>
+                      <span class="text-xs font-semibold" [class.text-muted]="!tk.tecnico_id" [class.text-azul]="tk.tecnico_id">
+                        {{nombreTecnico(tk.tecnico_id)}}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="badge" [ngClass]="getBadgeEstado(tk.estado)">
+                        <i [class]="getIconoEstado(tk.estado)"></i> {{tk.estado}}
+                      </span>
+                    </td>
+                    <td>
+                      @if(tk.estado === 'Finalizado') {
+                        <div class="calificacion-mini-display">
+                          <div class="stars-gold text-xs" [title]="'Técnico: ' + (tk.calificacion_tecnico || 5) + ' estrellas'">
+                            @for(star of getStarArray(tk.calificacion_tecnico || 5); track star) {
+                              <i class="fas fa-star"></i>
+                            }
+                            <span class="text-muted ml-1 font-bold">{{tk.calificacion_tecnico || 5}}/5</span>
+                          </div>
+                          @if(tk.feedback_tecnico) {
+                            <div class="feedback-snippet text-xs text-muted" [title]="tk.feedback_tecnico">
+                              "{{tk.feedback_tecnico.slice(0, 35)}}..."
+                            </div>
+                          }
+                        </div>
+                      } @else {
+                        <span class="text-xs text-muted">En proceso</span>
+                      }
+                    </td>
+                    <td style="text-align: center;">
+                      @if(tk.estado === 'Finalizado') {
+                        <button class="btn-action-circle btn-circle-star" (click)="abrirModalCalificacion(tk)" title="Calificar / Evaluar al Técnico y al Cliente">
+                          <i class="fas fa-star"></i>
+                        </button>
+                      } @else if(tk.estado === 'Pendiente' || tk.estado === 'Recibido') {
+                        <button class="btn-action-circle btn-circle-truck" (click)="abrirAsignacion(tk)" title="Despachar o Asignar Técnico">
+                          <i class="fas fa-truck"></i>
+                        </button>
+                      } @else {
+                        <button class="btn-action-circle btn-circle-tools" (click)="abrirEjecucion(tk)" title="Ver Mini-Inventario y Ejecución">
+                          <i class="fas fa-tools"></i>
+                        </button>
+                      }
+                    </td>
                   </tr>
+                }
+                @if(getTicketsFiltrados().length === 0) {
+                  <tr><td colspan="7" class="tabla-vacia">No hay tickets registrados en este filtro.</td></tr>
                 }
               </tbody>
             </table>
@@ -100,7 +213,9 @@
     <!-- HTML AGENDA DESPACHO -->
     @if(activeTab === 'agenda') {
       <div class="neumorphic-panel fade-in">
-        <p class="descripcion-general" style="margin-bottom: 1.5rem;">Asigna los tickets pendientes a tus técnicos en campo. Visualiza la carga de trabajo diaria.</p>
+        <p class="descripcion-general" style="margin-bottom: 1.5rem;">
+          Despacha a tus técnicos en campo o asigna servicios de taller. Monitorea su estado operativo en tiempo real.
+        </p>
         
         <div class="table-responsive">
           <table class="premium-table data-table">
@@ -110,27 +225,53 @@
                 <th>CLIENTE / LUGAR</th>
                 <th>FECHA / HORA</th>
                 <th>TÉCNICO ASIGNADO</th>
-                <th>ESTADO</th>
-                <th style="text-align: center;">DESPACHO</th>
+                <th>ESTADO ACTUAL</th>
+                <th style="text-align: center;">ACCIONES DE DESPACHO</th>
               </tr>
             </thead>
             <tbody>
-              @for(tk of ticketsPendientes; track tk.id) {
-                <tr>
-                  <td><strong>{{tk.consecutivo}}</strong></td>
-                  <td>{{tk.cliente_nombre}}<br><span class="text-muted text-xs">📍 {{tk.direccion}}</span></td>
-                  <td>{{tk.fecha_solicitada}} a las {{tk.hora_sugerida}}</td>
-                  <td class="text-azul" style="font-weight: bold;">{{nombreTecnico(tk.tecnico_id)}}</td>
-                  <td><span class="badge" [ngClass]="getBadgeEstado(tk.estado)">{{tk.estado}}</span></td>
-                  <td style="text-align: center;">
-                    <button class="btn-add btn-pill btn-xs" (click)="abrirAsignacion(tk)" [disabled]="!puedeAsignarOperarios()" [title]="puedeAsignarOperarios() ? 'Asignar / Despachar Técnico' : 'Solo el Jefe de Servicios o Coordinador de Operativos puede asignar operarios'">
-                      <i class="fas fa-truck"></i> Asignar
-                    </button>
-                  </td>
-                </tr>
-              }
-              @if(ticketsPendientes.length === 0) {
-                <tr><td colspan="6" class="tabla-vacia">No hay tickets pendientes de asignar.</td></tr>
+              @for(tk of tickets; track tk.id) {
+                @if(tk.estado !== 'Finalizado' && tk.estado !== 'Cancelado') {
+                  <tr>
+                    <td><strong>{{tk.consecutivo}}</strong></td>
+                    <td>
+                      <strong>{{tk.cliente_nombre}}</strong>
+                      <br><span class="text-muted text-xs">📍 {{tk.direccion}}</span>
+                      @if(tk.equipo_recibido) {
+                        <br><span class="text-azul text-xs"><i class="fas fa-laptop"></i> {{tk.equipo_recibido}}</span>
+                      }
+                    </td>
+                    <td>{{tk.fecha_solicitada}} <br><span class="text-xs text-muted">{{tk.hora_sugerida}}</span></td>
+                    <td class="text-azul" style="font-weight: bold;">
+                      {{nombreTecnico(tk.tecnico_id)}}
+                    </td>
+                    <td>
+                      <span class="badge" [ngClass]="getBadgeEstado(tk.estado)">
+                        <i [class]="getIconoEstado(tk.estado)"></i> {{tk.estado}}
+                      </span>
+                    </td>
+                    <td style="text-align: center;">
+                      <div class="btn-group-acciones" style="display: flex; gap: 0.35rem; justify-content: center;">
+                        <button class="btn-action-circle btn-circle-user" (click)="abrirAsignacion(tk)" [disabled]="!puedeAsignarOperarios()" title="Asignar Operario Técnico">
+                          <i class="fas fa-user-edit"></i>
+                        </button>
+                        @if(tk.tecnico_id && tk.estado === 'Asignado') {
+                          <button class="btn-action-circle btn-circle-truck" (click)="cambiarEstadoDirecto(tk, 'En Camino')" title="Marcar Técnico en Camino">
+                            <i class="fas fa-truck"></i>
+                          </button>
+                        }
+                        @if(tk.estado === 'En Camino') {
+                          <button class="btn-action-circle btn-circle-map" (click)="cambiarEstadoDirecto(tk, 'En Sitio')" title="Marcar Llegada a Sitio">
+                            <i class="fas fa-map-marker-alt"></i>
+                          </button>
+                        }
+                        <button class="btn-action-circle btn-circle-tools" (click)="abrirEjecucion(tk)" title="Cerrar Servicio / Mini Inventario">
+                          <i class="fas fa-tools"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
               }
             </tbody>
           </table>
@@ -138,25 +279,61 @@
       </div>
     }
 
-    <!-- EJECUCIÓN / MATERIALES -->
+    <!-- EJECUCIÓN / MINI-INVENTARIO -->
     @if(activeTab === 'ejecucion') {
       <div class="neumorphic-panel fade-in">
-        <p class="text-muted" style="margin-bottom: 1.5rem;">Panel operativo del técnico. Permite cerrar servicios en sitio descontando automáticamente el material del inventario.</p>
+        <div class="header-section-mini mb-4">
+          <h2 class="subtitulo"><i class="fas fa-boxes"></i> Panel de Ejecución y Mini-Inventario de Materiales</h2>
+          <p class="text-muted text-xs">
+            Gestiona los repuestos, herramientas y materiales que el técnico lleva al servicio. Al finalizar, el sistema descuenta automáticamente el stock de la empresa y registra el movimiento de inventario.
+          </p>
+        </div>
         
         <div class="ejecucion-grid">
           @for(tk of tickets; track tk.id) {
-            @if(tk.estado === 'Asignado' || tk.estado === 'En Sitio') {
+            @if(tk.estado === 'Asignado' || tk.estado === 'En Camino' || tk.estado === 'En Sitio' || tk.estado === 'Recibido') {
               <div class="neumorphic-panel ticket-card">
-                <div style="display: flex; justify-content: space-between;">
-                  <h3 style="margin: 0;">{{tk.consecutivo}}</h3>
-                  <span class="badge" [ngClass]="getBadgeEstado(tk.estado)">{{tk.estado}}</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                  <h3 style="margin: 0; font-size: 14px; font-weight: bold;">{{tk.consecutivo}}</h3>
+                  <span class="badge" [ngClass]="getBadgeEstado(tk.estado)">
+                    <i [class]="getIconoEstado(tk.estado)"></i> {{tk.estado}}
+                  </span>
                 </div>
+                
                 <p class="ticket-dato"><strong>Cliente:</strong> {{tk.cliente_nombre}}</p>
                 <p class="ticket-dato"><strong>Servicio:</strong> {{tk.servicio_requerido}}</p>
                 <p class="ticket-dato"><strong>Técnico:</strong> {{nombreTecnico(tk.tecnico_id)}}</p>
+                <p class="ticket-dato"><strong>Lugar:</strong> {{tk.direccion}}</p>
+
+                @if(tk.equipo_recibido) {
+                  <div class="card-equipo-mini p-2 mt-2 mb-2 bg-gray-50 border-rounded text-xs">
+                    <div><strong>Equipo:</strong> {{tk.equipo_recibido}}</div>
+                    <div><strong>S/N:</strong> {{tk.serie_equipo || 'N/A'}}</div>
+                    <div><strong>Falla:</strong> {{tk.falla_reportada || 'N/A'}}</div>
+                  </div>
+                }
+
+                <!-- Mini inventario asignado -->
+                <div class="mini-inventario-preview p-2 mt-2 mb-3 border-rounded bg-white">
+                  <span class="label-xs text-azul font-bold d-block mb-1">
+                    <i class="fas fa-toolbox"></i> Repuestos / Materiales Asignados ({{tk.materiales?.length || 0}}):
+                  </span>
+                  @if(tk.materiales && tk.materiales.length > 0) {
+                    <ul class="lista-materiales-xs" style="padding-left: 1.2rem; margin: 0; font-size: 11px;">
+                      @for(mat of tk.materiales; track mat.id) {
+                        <li>
+                          <strong>{{mat.cantidad}}x</strong> {{mat.producto?.nombre || nombreProducto(mat.producto_id)}}
+                          <span class="text-muted">({{mat.estado_material || 'Llevado'}})</span>
+                        </li>
+                      }
+                    </ul>
+                  } @else {
+                    <span class="text-muted text-xs">Sin materiales cargados aún</span>
+                  }
+                </div>
                 
-                <button class="btn-general-5 btn-pill btn-block" style="margin-top: 1rem;" (click)="abrirEjecucion(tk)">
-                  <i class="fas fa-tools"></i> Registrar Ejecución
+                <button class="btn-general-5 btn-pill btn-block" (click)="abrirEjecucion(tk)">
+                  <i class="fas fa-tools"></i> Gestionar Materiales y Cerrar
                 </button>
               </div>
             }
@@ -175,7 +352,10 @@
           <div style="display: flex; flex-direction: column; gap: 0.5rem;">
             @for(tec of tecnicos; track tec.id) {
               <div class="tech-card" [class.tech-card-active]="tecnicoDashboard?.id === tec.id" (click)="seleccionarTecnicoRender(tec)">
-                <strong>{{tec.nombre}}</strong>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <strong>{{tec.nombre}}</strong>
+                  <span class="stars-gold text-xs">⭐ {{tec.promedioEstrellas || '5.0'}}</span>
+                </div>
                 <div class="text-muted text-xs">{{tec.cargo}}</div>
               </div>
             } @empty {
@@ -190,8 +370,18 @@
         <!-- HTML DASHBOARD GRAFICO -->
         <div class="rendimiento-dashboard neumorphic-panel-inner">
           @if(tecnicoDashboard) {
-            <h1 class="rendimiento-titulo">Rendimiento: <span class="text-azul">{{tecnicoDashboard.nombre}}</span></h1>
-            <p class="text-muted" style="margin-bottom: 2rem;">Métricas en vivo de servicios finalizados, satisfacción de cliente y control de quejas basadas en el Field Service.</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap;">
+              <div>
+                <h1 class="rendimiento-titulo" style="margin: 0;">Rendimiento: <span class="text-azul">{{tecnicoDashboard.nombre}}</span></h1>
+                <p class="text-muted text-xs" style="margin: 0.25rem 0 0 0;">Métricas en vivo de satisfacción, puntualidad y cumplimiento del servicio.</p>
+              </div>
+              <div class="rating-badge-large p-2 border-rounded text-center bg-white">
+                <span class="text-xs text-muted d-block">Calificación Promedio</span>
+                <div class="stars-gold font-bold text-lg">
+                  ⭐ {{tecnicoDashboard.promedioEstrellas}} / 5.0
+                </div>
+              </div>
+            </div>
             
             <div class="chart-container">
               
@@ -199,7 +389,7 @@
               <div class="bar-row">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                   <span class="bar-label">Servicios Finalizados</span>
-                  <span class="valor-ok">{{tecnicoDashboard.rendimiento.cumplidas}} / {{tecnicoDashboard.rendimiento.total}}</span>
+                  <span class="valor-ok font-bold">{{tecnicoDashboard.rendimiento.cumplidas}} / {{tecnicoDashboard.rendimiento.total}}</span>
                 </div>
                 <div class="progress-bg">
                   <div class="progress-fill progress-fill-ok" [style.width]="getPorcentaje(tecnicoDashboard.rendimiento.cumplidas, tecnicoDashboard.rendimiento.total) + '%'"></div>
@@ -209,8 +399,8 @@
               <!-- HTML BARRA CITAS SATISFACTORIAS -->
               <div class="bar-row">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                  <span class="bar-label">Servicios Satisfactorios (SLA)</span>
-                  <span class="valor-info">{{tecnicoDashboard.rendimiento.satisfactorias}}</span>
+                  <span class="bar-label">Servicios Satisfactorios (SLA >= 4 ⭐)</span>
+                  <span class="valor-info font-bold">{{tecnicoDashboard.rendimiento.satisfactorias}}</span>
                 </div>
                 <div class="progress-bg">
                   <div class="progress-fill progress-fill-info" [style.width]="getPorcentaje(tecnicoDashboard.rendimiento.satisfactorias, tecnicoDashboard.rendimiento.cumplidas) + '%'"></div>
@@ -220,20 +410,42 @@
               <!-- HTML BARRA QUEJAS GARANTIAS -->
               <div class="bar-row">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                  <span class="bar-label">Quejas / Devoluciones por Garantía</span>
-                  <span class="valor-alerta">{{tecnicoDashboard.rendimiento.quejas}}</span>
+                  <span class="bar-label">Incidencias / Quejas</span>
+                  <span class="valor-alerta font-bold">{{tecnicoDashboard.rendimiento.quejas}}</span>
                 </div>
                 <div class="progress-bg">
-                  <div class="progress-fill progress-fill-alerta" [style.width]="getPorcentaje(tecnicoDashboard.rendimiento.quejas, 20) + '%'"></div>
+                  <div class="progress-fill progress-fill-alerta" [style.width]="getPorcentaje(tecnicoDashboard.rendimiento.quejas, 10) + '%'"></div>
                 </div>
-                <small class="text-muted">La barra roja debe mantenerse lo más baja posible (Límite alerta: 20)</small>
               </div>
 
             </div>
+
+            <!-- FEEDBACKS RECIENTES DE CLIENTES -->
+            <div class="feedbacks-section mt-4">
+              <h4 class="text-xs font-bold text-dark mb-2"><i class="fas fa-comments"></i> Comentarios y Valoraciones de Clientes:</h4>
+              @if(tecnicoDashboard.feedbacks && tecnicoDashboard.feedbacks.length > 0) {
+                <div class="feedback-cards-grid" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                  @for(fb of tecnicoDashboard.feedbacks; track fb.cliente) {
+                    <div class="feedback-card p-2 bg-white border-rounded">
+                      <div style="display: flex; justify-content: space-between;">
+                        <strong class="text-xs">{{fb.cliente}}</strong>
+                        <span class="stars-gold text-xs">
+                          @for(s of getStarArray(fb.estrellas); track s) { <i class="fas fa-star"></i> }
+                        </span>
+                      </div>
+                      <p class="text-muted text-xs" style="margin: 0.25rem 0 0 0;">"{{fb.comentario}}"</p>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <p class="text-muted text-xs">Sin comentarios registrados aún para este técnico.</p>
+              }
+            </div>
+
           } @else {
             <div class="empty-state" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 4rem 0;">
               <i class="fas fa-chart-line fa-3x mb-4" style="opacity: 0.5;"></i>
-              <p class="text-muted">No hay técnicos registrados o seleccionados.</p>
+              <p class="text-muted">Seleccione un técnico para visualizar sus métricas.</p>
             </div>
           }
         </div>
@@ -266,7 +478,7 @@
                   <td class="text-positivo">{{cat.tarifa | currency:'COP':'symbol':'1.0-0'}}</td>
                   <td style="text-align: center;">
                     <app-solicitud-inactivacion [area]="'s_cat'" [entidad]="'servicios'" [entidadId]="cat.id"
-                      [nombreEntidad]="cat.nombre"></app-solicitud-inactivacion>
+                      [nombreEntidad]="cat.nombre" [iconOnly]="true"></app-solicitud-inactivacion>
                   </td>
                 </tr>
               }
@@ -276,7 +488,7 @@
       </div>
     }
 
-      @if(activeTab === 'operarios') {
+    @if(activeTab === 'operarios') {
       <div class="neumorphic-panel fade-in">
         <app-gestion-de-operarios [isEmbedded]="true"></app-gestion-de-operarios>
       </div>
@@ -290,27 +502,27 @@
   </div>
 </div>
 
-<!-- HTML MODALES -->
-
-  </div>
+<!-- ================= MODALES ================= -->
 
 <!-- HTML MODAL ASIGNACION AGENDA -->
 @if (modalAsignacion && ticketSeleccionado) {
 <div class="view-switch-panel fade-in">
   <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
     <div class="panel-header mb-4">
-      <h1>DESPACHAR TÉCNICO</h1>
+      <h1>DESPACHAR TÉCNICO A SERVICIO</h1>
       <button class="btn-close" (click)="cerrarAsignacion()">&times;</button>
     </div>
     <div class="panel-body">
-      <p class="text-muted" style="margin-bottom: 1rem;">Ticket: <strong>{{ticketSeleccionado.consecutivo}}</strong> ({{ticketSeleccionado.servicio_requerido}})</p>
+      <p class="text-muted" style="margin-bottom: 1rem;">
+        Ticket: <strong>{{ticketSeleccionado.consecutivo}}</strong> — {{ticketSeleccionado.servicio_requerido}} ({{ticketSeleccionado.cliente_nombre}})
+      </p>
       
       <div class="form-group">
         <label>Seleccione Técnico Disponible</label>
         <select class="input-neumorphic" [(ngModel)]="tecnicoSeleccionado">
-          <option value="">-- Seleccionar --</option>
+          <option value="">-- Seleccionar Operario Técnico --</option>
           @for(tec of tecnicos; track tec.id) {
-            <option [value]="tec.id">{{tec.nombre}}</option>
+            <option [value]="tec.id">{{tec.nombre}} ({{tec.cargo}})</option>
           }
         </select>
       </div>
@@ -318,74 +530,221 @@
     </div>
     <div class="modal-footer">
       <button class="btn-volver btn-pill" (click)="cerrarAsignacion()">Cancelar</button>
-      <button class="btn-save btn-pill" (click)="guardarAsignacion()" [disabled]="guardando || !tecnicoSeleccionado">
+      <button class="btn-save btn-pill" (click)="guardarAsignacion('Asignado')" [disabled]="guardando || !tecnicoSeleccionado">
         @if(guardando) { <i class="fas fa-spinner fa-spin"></i> Asignando... }
-        @else { Confirmar Despacho }
+        @else { <i class="fas fa-user-check"></i> Asignar a Técnico }
+      </button>
+      <button class="btn-general-3 btn-pill" (click)="guardarAsignacion('En Camino')" [disabled]="guardando || !tecnicoSeleccionado">
+        <i class="fas fa-truck"></i> Despachar (En Camino)
       </button>
     </div>
   </div>
 </div>
 }
 
-<!-- HTML MODAL EJECUCION MATERIALES -->
+<!-- HTML MODAL EJECUCION & MINI-INVENTARIO -->
 @if (modalEjecucion && ticketSeleccionado) {
 <div class="view-switch-panel fade-in">
-  <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
-    <div class="panel-header mb-4">
-      <h1>CERRAR SERVICIO ({{ticketSeleccionado.consecutivo}})</h1>
+  <div class="neu-card" style="max-width: 900px; margin: 0 auto;">
+    <div class="panel-header mb-3">
+      <h1>CERRAR Y EJECUTAR SERVICIO ({{ticketSeleccionado.consecutivo}})</h1>
       <button class="btn-close" (click)="cerrarEjecucion()">&times;</button>
     </div>
     <div class="panel-body">
       
+      <div class="grid-dos-cols" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+        <div>
+          <h4 class="text-xs font-bold text-azul mb-2"><i class="fas fa-info-circle"></i> Datos del Servicio:</h4>
+          <p class="text-xs" style="margin: 0.25rem 0;"><strong>Cliente:</strong> {{ticketSeleccionado.cliente_nombre}}</p>
+          <p class="text-xs" style="margin: 0.25rem 0;"><strong>Servicio:</strong> {{ticketSeleccionado.servicio_requerido}}</p>
+          <p class="text-xs" style="margin: 0.25rem 0;"><strong>Técnico:</strong> {{nombreTecnico(ticketSeleccionado.tecnico_id)}}</p>
+          <p class="text-xs" style="margin: 0.25rem 0;"><strong>Dirección:</strong> {{ticketSeleccionado.direccion}}</p>
+        </div>
+        <div>
+          <div class="form-group">
+            <label class="label-xs">Tiempo Real de Ejecución (Minutos)</label>
+            <input type="number" class="input-neumorphic" [(ngModel)]="tiempoEjecucion" min="15">
+          </div>
+          <div class="form-group mt-2">
+            <label class="label-xs">Tarifa / Mano de Obra ($ COP)</label>
+            <input type="number" class="input-neumorphic" [(ngModel)]="costoManoObra" min="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- CAJA DE MINI INVENTARIO -->
       <div class="material-box">
-        <h4>Material Utilizado (Descuento de Inventario)</h4>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <h4 style="margin: 0;"><i class="fas fa-boxes"></i> Mini-Inventario: Repuestos y Materiales Utilizados</h4>
+          <span class="badge badge-info text-xs">Total Materiales: {{getTotalMateriales() | currency:'COP':'symbol':'1.0-0'}}</span>
+        </div>
         
         <div style="display: flex; gap: 0.5rem; align-items: flex-end; margin-bottom: 1rem;">
           <div class="form-group" style="flex: 2; margin: 0;">
-            <label class="label-xs">Repuesto / Item</label>
+            <label class="label-xs">Seleccionar Repuesto / Producto de Inventario</label>
             <select class="input-neumorphic" [(ngModel)]="materialSeleccionado">
-              <option value="">Seleccionar...</option>
+              <option value="">Seleccionar producto del stock...</option>
               @for(inv of inventario; track inv.id) {
-                <option [value]="inv.producto_id">{{nombreProducto(inv.producto_id)}} (Stock: {{stockProducto(inv.producto_id)}})</option>
+                <option [value]="inv.producto_id">
+                  {{nombreProducto(inv.producto_id)}} (Stock Disp: {{stockProducto(inv.producto_id)}} | {{precioProducto(inv.producto_id) | currency:'COP':'symbol':'1.0-0'}})
+                </option>
               }
             </select>
           </div>
           <div class="form-group" style="flex: 1; margin: 0;">
-            <label class="label-xs">Cant.</label>
+            <label class="label-xs">Cantidad</label>
             <input type="number" class="input-neumorphic" [(ngModel)]="cantidadMaterial" min="1">
           </div>
-          <button class="btn-add btn-pill btn-xs" (click)="agregarMaterial()">+</button>
+          <button class="btn-add btn-pill" style="height: 38px;" (click)="agregarMaterial()">
+            <i class="fas fa-plus"></i> Agregar
+          </button>
         </div>
 
-        <!-- HTML LISTA MATERIALES DESCONTAR -->
+        <!-- LISTA MATERIALES DESCONTAR -->
         @if(materialesUsados.length > 0) {
-          <ul class="text-muted text-xs" style="padding-left: 1.5rem; margin: 0;">
-            @for(mat of materialesUsados; track mat.producto_id) {
-              <li>{{mat.cantidad}}x {{nombreProducto(mat.producto_id)}}</li>
-            }
-          </ul>
+          <div class="table-responsive">
+            <table class="data-table text-xs">
+              <thead>
+                <tr>
+                  <th>ITEM / REPUESTO</th>
+                  <th>CANT.</th>
+                  <th>PRECIO UNIT.</th>
+                  <th>SUBTOTAL</th>
+                  <th style="text-align: center;">QUITAR</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for(mat of materialesUsados; track $index) {
+                  <tr>
+                    <td>{{mat.producto?.nombre || nombreProducto(mat.producto_id)}}</td>
+                    <td><strong>{{mat.cantidad}}</strong></td>
+                    <td>{{(mat.precio_unitario || precioProducto(mat.producto_id)) | currency:'COP':'symbol':'1.0-0'}}</td>
+                    <td class="text-positivo">{{((mat.precio_unitario || precioProducto(mat.producto_id)) * mat.cantidad) | currency:'COP':'symbol':'1.0-0'}}</td>
+                    <td style="text-align: center;">
+                      <button class="btn-volver btn-pill btn-xs" (click)="eliminarMaterial(mat, $index)">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <p class="text-muted text-xs" style="margin: 0;">No se han asignado materiales adicionales a este servicio.</p>
         }
       </div>
 
-      <p class="text-danger text-xs" style="text-align: center;">* Al finalizar, el servicio pasará a facturación y los materiales se descontarán del inventario central de forma irreversible.</p>
+      <!-- NOTAS TÉCNICAS -->
+      <div class="form-group mb-3">
+        <label class="label-xs">Notas Técnicas de Entrega y Cierre</label>
+        <textarea class="input-neumorphic" rows="2" [(ngModel)]="notasEjecucion" placeholder="Detalle de trabajos realizados, pruebas de funcionamiento..."></textarea>
+      </div>
+
+      <!-- SECCIÓN DE CALIFICACIONES MUTUAS -->
+      <div class="calificaciones-box p-3 border-rounded mb-3 bg-white" style="border: 1px solid #e2e8f0;">
+        <h4 class="text-xs font-bold text-azul mb-3"><i class="fas fa-star"></i> Evaluación Mutua del Servicio:</h4>
+        
+        <div class="grid-dos-cols" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+          <!-- Calificar al Técnico -->
+          <div class="calificar-card p-3 border-rounded bg-gray-50">
+            <label class="label-xs font-bold d-block mb-1">⭐ Calificación al Técnico (Calidad y Puntualidad):</label>
+            <div class="star-rating-selector mb-2">
+              @for(star of [1, 2, 3, 4, 5]; track star) {
+                <i class="fas fa-star star-interactive" [class.star-active]="calificacionTecnico >= star" (click)="setStarsTecnico(star)"></i>
+              }
+              <span class="font-bold text-xs ml-2">{{calificacionTecnico}}/5</span>
+            </div>
+            <input type="text" class="input-neumorphic text-xs" [(ngModel)]="feedbackTecnico" placeholder="Comentarios sobre el trabajo del técnico...">
+          </div>
+
+          <!-- Calificar al Cliente -->
+          <div class="calificar-card p-3 border-rounded bg-gray-50">
+            <label class="label-xs font-bold d-block mb-1">⭐ Calificación al Cliente (Atención y Facilidades):</label>
+            <div class="star-rating-selector mb-2">
+              @for(star of [1, 2, 3, 4, 5]; track star) {
+                <i class="fas fa-star star-interactive" [class.star-active]="calificacionCliente >= star" (click)="setStarsCliente(star)"></i>
+              }
+              <span class="font-bold text-xs ml-2">{{calificacionCliente}}/5</span>
+            </div>
+            <input type="text" class="input-neumorphic text-xs" [(ngModel)]="feedbackCliente" placeholder="Comentarios sobre la recepción del cliente...">
+          </div>
+        </div>
+      </div>
+
+      <!-- RESUMEN FINAL DE COSTOS -->
+      <div class="costo-total-bar p-3 border-rounded mb-3" style="background: #eef7ee; display: flex; justify-content: space-between; align-items: center;">
+        <span class="font-bold text-dark">COSTO TOTAL DEL SERVICIO:</span>
+        <span class="text-positivo font-bold" style="font-size: 16px;">
+          {{getCostoTotalCalculado() | currency:'COP':'symbol':'1.0-0'}}
+        </span>
+      </div>
+
+      <p class="text-danger text-xs" style="text-align: center; margin: 0;">
+        * Al finalizar, los materiales se descontarán automáticamente del inventario central de la empresa.
+      </p>
 
     </div>
     <div class="modal-footer">
       <button class="btn-volver btn-pill" (click)="cerrarEjecucion()">Cancelar</button>
       <button class="btn-save btn-pill" (click)="finalizarServicio()" [disabled]="guardando">
         @if(guardando) { <i class="fas fa-spinner fa-spin"></i> Finalizando... }
-        @else { Firmar y Finalizar Servicio }
+        @else { <i class="fas fa-check-double"></i> Confirmar y Finalizar Servicio }
       </button>
     </div>
   </div>
 </div>
 }
 
+<!-- HTML MODAL CALIFICACION INDEPENDIENTE -->
+@if (modalCalificacion && ticketParaCalificar) {
+<div class="view-switch-panel fade-in">
+  <div class="neu-card" style="max-width: 700px; margin: 0 auto;">
+    <div class="panel-header mb-3">
+      <h1>CALIFICAR SERVICIO ({{ticketParaCalificar.consecutivo}})</h1>
+      <button class="btn-close" (click)="cerrarModalCalificacion()">&times;</button>
+    </div>
+    <div class="panel-body">
+      <p class="text-muted text-xs mb-3">
+        Servicio: <strong>{{ticketParaCalificar.servicio_requerido}}</strong> para <strong>{{ticketParaCalificar.cliente_nombre}}</strong>.
+      </p>
 
+      <!-- Calificar Técnico -->
+      <div class="calificar-card p-3 border-rounded bg-gray-50 mb-3">
+        <label class="label-xs font-bold d-block mb-1">
+          <i class="fas fa-user-tie text-azul"></i> Calificación al Técnico ({{nombreTecnico(ticketParaCalificar.tecnico_id)}}):
+        </label>
+        <div class="star-rating-selector mb-2">
+          @for(star of [1, 2, 3, 4, 5]; track star) {
+            <i class="fas fa-star star-interactive" [class.star-active]="calificacionTecnico >= star" (click)="setStarsTecnico(star)"></i>
+          }
+          <span class="font-bold text-xs ml-2">{{calificacionTecnico}}/5 Estrellas</span>
+        </div>
+        <textarea class="input-neumorphic text-xs" rows="2" [(ngModel)]="feedbackTecnico" placeholder="Comentarios de satisfacción sobre el técnico..."></textarea>
+      </div>
 
+      <!-- Calificar Cliente -->
+      <div class="calificar-card p-3 border-rounded bg-gray-50 mb-3">
+        <label class="label-xs font-bold d-block mb-1">
+          <i class="fas fa-building text-azul"></i> Calificación al Cliente ({{ticketParaCalificar.cliente_nombre}}):
+        </label>
+        <div class="star-rating-selector mb-2">
+          @for(star of [1, 2, 3, 4, 5]; track star) {
+            <i class="fas fa-star star-interactive" [class.star-active]="calificacionCliente >= star" (click)="setStarsCliente(star)"></i>
+          }
+          <span class="font-bold text-xs ml-2">{{calificacionCliente}}/5 Estrellas</span>
+        </div>
+        <textarea class="input-neumorphic text-xs" rows="2" [(ngModel)]="feedbackCliente" placeholder="Comentarios y reporte de perfil del cliente..."></textarea>
+      </div>
 
-
-
-
-
-
+    </div>
+    <div class="modal-footer">
+      <button class="btn-volver btn-pill" (click)="cerrarModalCalificacion()">Cancelar</button>
+      <button class="btn-save btn-pill" (click)="guardarCalificacion()" [disabled]="guardando">
+        @if(guardando) { <i class="fas fa-spinner fa-spin"></i> Guardando... }
+        @else { <i class="fas fa-star"></i> Guardar Calificaciones }
+      </button>
+    </div>
+  </div>
+</div>
+}

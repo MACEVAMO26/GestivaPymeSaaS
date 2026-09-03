@@ -78,7 +78,7 @@ export class DashboardClienteComponent implements OnInit {
       };
     });
 
-    // Plan según el tipo de empresaÁreal del usuario
+    // Plan según el tipo de empresa real del usuario
     if (this.user?.rol?.nombre === 'Auditor') {
       this.planActual = 'AUDITORIA';
     } else {
@@ -86,7 +86,7 @@ export class DashboardClienteComponent implements OnInit {
       this.planActual = this.calcularPlan(tipoEmpresaUsuario);
     }
 
-    // Consultar los módulosÁreales asignados al usuario (autenticado)
+    // Consultar los módulos reales asignados al usuario (autenticado)
     if (this.user?.empresa_id) {
       this.modulosService.getMisModulos().subscribe({
         next: (resp) => {
@@ -119,7 +119,7 @@ export class DashboardClienteComponent implements OnInit {
                 }
               });
             } else if (['rrhh', 'finanzas', 'addons', 'base'].includes(paqueteId)) {
-              // Módulo completo: revisar si tiene algún submódulo ACTIVO en la BDÁreal
+              // Módulo completo: revisar si tiene algún submódulo ACTIVO en la BD real
               const isActivo = subs.some((s: any) => s.activo);
               if (isActivo) {
                 let id = paqueteId;
@@ -198,7 +198,7 @@ export class DashboardClienteComponent implements OnInit {
     const ordenDeseado = [
       'd_ini', // Inicio
       'd_adm', // Administración
-      'd_tar', // Gestión de TÁreas
+      'd_tar', // Gestión de Tareas
       'd_gia', // Gestiva IA
       'd_for', // Formalización de usuarios
       'rrhh',  // Gestión Humana

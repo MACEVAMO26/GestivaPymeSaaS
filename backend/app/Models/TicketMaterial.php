@@ -14,7 +14,16 @@ class TicketMaterial extends Model
     protected $fillable = [
         'ticket_id',
         'producto_id',
-        'cantidad'
+        'cantidad',
+        'precio_unitario',
+        'subtotal',
+        'estado_material'
+    ];
+
+    protected $casts = [
+        'cantidad' => 'float',
+        'precio_unitario' => 'float',
+        'subtotal' => 'float'
     ];
 
     public function ticket()

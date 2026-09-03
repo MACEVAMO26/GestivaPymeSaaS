@@ -22,6 +22,39 @@ export interface Cliente {
   created_at?: string;
 }
 
+export interface Historial360Response {
+  cliente: Cliente;
+  metricas: {
+    total_compras: number;
+    cantidad_ventas: number;
+    cantidad_cotizaciones: number;
+    cantidad_servicios: number;
+    servicios_finalizados: number;
+    calificacion_promedio: number;
+    pedidos_activos: number;
+  };
+  ventas: any[];
+  cotizaciones: any[];
+  tickets: any[];
+  timeline: Array<{
+    tipo: 'VENTA' | 'PEDIDO' | 'COTIZACION' | 'SERVICIO';
+    icono: string;
+    color: string;
+    fecha: string;
+    titulo: string;
+    descripcion: string;
+    monto: number;
+    estado: string;
+    calificacion_tecnico?: number;
+    feedback_tecnico?: string;
+    calificacion_cliente?: number;
+    feedback_cliente?: string;
+    equipo_recibido?: string;
+    falla_reportada?: string;
+    detalles?: any[];
+  }>;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -33,12 +66,20 @@ export class ClienteService {
     return this.http.get<Cliente[]>(this.apiUrl);
   }
 
-  crearCliente(cliente: Cliente): Observable<Cliente> {
-    return this.http.post<Cliente>(this.apiUrl, cliente);
+  getCliente(id: number): Observable<Cliente> {
+    return this.http.get<Cliente>(`${this.apiUrl}/${id}`);
   }
 
-  actualizarCliente(id: number, cliente: Cliente): Observable<Cliente> {
-    return this.http.put<Cliente>(`${this.apiUrl}/${id}`, cliente);
+  getHistorial360(id: number): Observable<Historial360Response> {
+    return this.http.get<Historial360Response>(`${this.apiUrl}/${id}/historial-360`);
+  }
+
+  crearCliente(cliente: Cliente): Observable<any> {
+    return this.http.post<any>(this.apiUrl, cliente);
+  }
+
+  actualizarCliente(id: number, cliente: Cliente): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${id}`, cliente);
   }
 
   eliminarCliente(id: number): Observable<any> {
