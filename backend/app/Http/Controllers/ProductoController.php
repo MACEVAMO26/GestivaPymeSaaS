@@ -14,12 +14,13 @@ class ProductoController extends Controller
     public function index()
     {
         $user = Auth::user();
-        if (!$user) {
+        $empresaId = request()->header('X-Empresa-Id') ?? ($user?->empresa_id ?? null);
+        if (!$empresaId) {
             return response()->json(['message' => 'No autorizado'], 401);
         }
 
         $productos = Producto::with('categoria')
-            ->where('empresa_id', $user->empresa_id)
+            ->where('empresa_id', $empresaId)
             ->where('activo', true)
             ->get();
 
@@ -40,8 +41,9 @@ class ProductoController extends Controller
         ]);
 
         $user = Auth::user();
+        $empresaId = request()->header('X-Empresa-Id') ?? ($user?->empresa_id ?? null);
         $data = $request->except('imagen');
-        $data['empresa_id'] = $user->empresa_id;
+        $data['empresa_id'] = $empresaId;
         $data['activo'] = true;
 
         if ($request->hasFile('imagen')) {

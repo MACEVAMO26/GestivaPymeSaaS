@@ -19,4 +19,18 @@ class MovimientoInventario extends Model
         'justificacion',
         'fecha_hora'
     ];
+
+    protected $casts = [
+        'fecha_hora' => 'datetime',
+    ];
+
+    public function producto()
+    {
+        return $this->belongsTo(Producto::class, 'producto_id');
+    }
+
+    public function usuario()
+    {
+        return $this->belongsTo(User::class, 'usuario_id');
+    }
 }

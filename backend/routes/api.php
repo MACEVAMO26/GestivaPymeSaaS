@@ -189,8 +189,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // --- OPERACIONES COMERCIALES ---
 
-    Route::apiResource('ordenes-compra', OrdenCompraController::class)->only(['index', 'store']);
-    Route::apiResource('recepciones', \App\Http\Controllers\RecepcionController::class)->only(['index', 'store']);
+    Route::apiResource('ordenes-compra', OrdenCompraController::class);
+    Route::apiResource('recepciones', \App\Http\Controllers\RecepcionController::class)->only(['index', 'store', 'show']);
     Route::apiResource('cotizaciones-pedidos', CotizacionPedidoController::class)->only(['index', 'store']);
     Route::put('cotizaciones-pedidos/{id}/estado', [CotizacionPedidoController::class, 'cambiarEstado']);
     Route::apiResource('movimientos-inventario', MovimientoInventarioController::class)->only(['index', 'store']);

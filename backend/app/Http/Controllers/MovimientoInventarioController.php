@@ -15,13 +15,23 @@ class MovimientoInventarioController extends Controller
             return response()->json(['error' => 'No autorizado'], 401);
         }
 
-        $movimientos = MovimientoInventario::orderBy('id', 'desc')
+        $empresaId = request()->header('X-Empresa-Id') ?? ($user->empresa_id ?? null);
+
+        $movimientos = MovimientoInventario::with(['producto', 'usuario'])
+            ->when($empresaId, function ($q) use ($empresaId) {
+                $q->whereHas('producto', function ($pq) use ($empresaId) {
+                    $pq->where('empresa_id', $empresaId);
+                });
+            })
+            ->orderBy('id', 'desc')
             ->get()
             ->map(function ($m) {
                 return [
                     'id' => $m->id,
                     'inventario_id' => $m->producto_id,
+                    'producto_nombre' => $m->producto?->nombre ?? 'Producto #' . $m->producto_id,
                     'usuario_id' => $m->usuario_id,
+                    'usuario_nombre' => $m->usuario?->name ?? 'Sistema',
                     'tipo_movimiento' => $m->tipo,
                     'cantidad' => $m->cantidad,
                     'observaciones' => $m->justificacion,

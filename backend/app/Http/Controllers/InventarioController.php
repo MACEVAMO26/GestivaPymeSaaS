@@ -11,10 +11,12 @@ class InventarioController extends Controller
     // Obtiene la lista de inventario incluyendo los detalles del producto asociado
     public function index()
     {
-        $empresaId = auth()->user()?->empresa_id;
+        $empresaId = request()->header('X-Empresa-Id') ?? (auth()->user()?->empresa_id ?? null);
         return Inventario::with('producto')
-            ->whereHas('producto', function ($q) use ($empresaId) {
-                $q->where('empresa_id', $empresaId);
+            ->when($empresaId, function ($q) use ($empresaId) {
+                $q->whereHas('producto', function ($pq) use ($empresaId) {
+                    $pq->where('empresa_id', $empresaId);
+                });
             })
             ->get();
     }

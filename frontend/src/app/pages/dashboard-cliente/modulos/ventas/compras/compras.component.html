@@ -1,261 +1,353 @@
 <div class="module-container fade-in">
-  <div [hidden]="(showModalOrden) || (showModalRecepcion)" class="main-view-wrapper">
-  <div class="module-header">
-    <h1>Compras</h1>
-    <p>Gestión de órdenes de compra, recepciones y abastecimiento.</p>
-  </div>
+  <div [hidden]="(showModalOrden) || (showModalRecepcion) || (showModalDetalleOrden && ordenSeleccionadaDetalle)" class="main-view-wrapper">
+    <div class="module-header">
+      <h1>Gestión de Compras y Abastecimiento</h1>
+      <p>Administración integral de órdenes de compra, recepciones de inventario y pedidos a proveedores.</p>
+    </div>
 
-  <!-- HTML TABS NAVEGACION -->
-  <div class="tabs-nav-wrapper">
-    <button class="tab-neu-inactive" 
-            [class.tab-neu-active]="activeTab === 'ordenes'" 
-            (click)="switchTab('ordenes')"> <span class="icon">📌</span> Órdenes de Compra </button>
-    <button class="tab-neu-inactive" 
-            [class.tab-neu-active]="activeTab === 'recepcion'" 
-            (click)="switchTab('recepcion')"> <span class="icon">📥</span> Recepción de Mercancía </button>
-  </div>
+    <!-- HTML TABS NAVEGACION -->
+    <div class="tabs-nav-wrapper">
+      <button class="tab-neu-inactive" 
+              [class.tab-neu-active]="activeTab === 'ordenes'" 
+              (click)="switchTab('ordenes')">
+        <span class="icon">📌</span> Órdenes de Compra
+      </button>
+      <button class="tab-neu-inactive" 
+              [class.tab-neu-active]="activeTab === 'recepcion'" 
+              (click)="switchTab('recepcion')">
+        <span class="icon">📥</span> Recepción de Mercancía
+      </button>
+    </div>
 
-<!-- HTML CONTENIDO PRINCIPAL -->
-  <div class="tab-content neumorphic-panel-inner p-4">
-  <!-- Botón Volver Inyectado -->
-  <div class="volver-wrapper">
-    <button class="btn-volver btn-pill" onclick="window.history.back()">
-      <i class="fas fa-arrow-left"></i> Volver
-    </button>
-  </div>
-    
-    <!-- HTML ORDENES DE COMPRA -->
-    @if(activeTab === 'ordenes') {
-      <div class="neumorphic-panel fade-in">
-        <div class="action-bar">
-          <input type="text" 
-                 class="search-input input-neumorphic" 
-                 placeholder="Buscar por número, proveedor..."
-                 [(ngModel)]="searchTerm">
-                 
-          <button class="btn-add btn-pill" (click)="abrirModalOrden()">
-            <i class="fas fa-plus"></i> Nueva Orden
-          </button>
-        </div>
-
-        <div class="table-responsive">
-          <table class="premium-table data-table">
-            <thead>
-              <tr>
-                <th>NÚMERO ORDEN</th>
-                <th>PROVEEDOR</th>
-                <th>FECHA</th>
-                <th>TOTAL</th>
-                <th>ESTADO</th>
-                <th>ACCIONES</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for(orden of ordenesFiltradas; track orden.id) {
-                <tr>
-                  <td><strong>{{numeroOrden(orden)}}</strong></td>
-                  <td>{{nombreProveedor(orden)}}</td>
-                  <td>{{orden.created_at | date:'shortDate'}}</td>
-                  <td>{{orden.total | currency:'COP':'symbol':'1.0-0'}}</td>
-                  <td>
-                    <span class="badge" [ngClass]="getBadgeClass(estadoOrden(orden))">
-                      {{estadoOrden(orden)}}
-                    </span>
-                  </td>
-<td>
-                    <div class="acciones-fila">
-                      <button class="btn-icon" title="Ver Detalle"><i class="fas fa-eye"></i></button>
-                      <button class="btn-icon text-danger" title="Anular" *ngIf="estadoOrden(orden) === 'Pendiente'"><i class="fas fa-ban"></i></button>
-                    </div>
-                  </td>
-                </tr>
-              }
-              @if(ordenesFiltradas.length === 0) {
-                <tr>
-                  <td colspan="6" style="padding: 0;">
-                    <div class="empty-state">
-                      No hay órdenes de compra registradas.
-                    </div>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+    <!-- HTML CONTENIDO PRINCIPAL -->
+    <div class="tab-content neumorphic-panel-inner p-4">
+      <!-- Botón Volver -->
+      <div class="volver-wrapper">
+        <button class="btn-volver btn-pill" onclick="window.history.back()">
+          <i class="fas fa-arrow-left"></i> Volver
+        </button>
       </div>
-    }
+      
+      <!-- TAB ORDENES DE COMPRA -->
+      @if(activeTab === 'ordenes') {
+        <div class="neumorphic-panel fade-in">
+          <div class="action-bar">
+            <input type="text" 
+                   class="search-input input-neumorphic" 
+                   placeholder="Buscar por número, proveedor..."
+                   [(ngModel)]="searchTerm"
+                   (input)="filtrarOrdenes()">
+                   
+            <button class="btn-add btn-pill" (click)="abrirModalOrden()">
+              <i class="fas fa-plus"></i> Nueva Orden de Compra
+            </button>
+          </div>
 
-    <!-- HTML RECEPCION MERCANCIA -->
-    @if(activeTab === 'recepcion') {
-      <div class="neumorphic-panel fade-in">
-<div class="neumorphic-panel recepcion-panel">
-          <h2 class="subtitulo">Recibir Mercancía</h2>
-          <div class="recepcion-fila">
-            <div class="form-group" style="flex: 2; min-width: 200px;">
-              <label>Seleccionar Orden Pendiente *</label>
-              <select class="input-neumorphic" [(ngModel)]="ordenSeleccionadaRecepcion">
-                <option value="null" disabled selected>Buscar orden...</option>
-                @for(o of ordenes; track o.id) {
-                  @if(estadoOrden(o) === 'Pendiente') {
-                    <option [value]="o.id">{{numeroOrden(o)}} - {{nombreProveedor(o)}}</option>
+          <div class="table-responsive">
+            <table class="premium-table data-table">
+              <thead>
+                <tr>
+                  <th>NÚMERO ORDEN</th>
+                  <th>PROVEEDOR</th>
+                  <th>FECHA EMISIÓN</th>
+                  <th>TOTAL</th>
+                  <th>ESTADO</th>
+                  <th style="text-align: center;">ACCIONES</th>
+                </tr>
+              </thead>
+              <tbody>
+                @if(ordenesFiltradas.length === 0) {
+                  <tr>
+                    <td colspan="6" style="padding: 2rem; text-align: center;">
+                      <div class="empty-state">
+                        No hay órdenes de compra registradas.
+                      </div>
+                    </td>
+                  </tr>
+                } @else {
+                  @for(orden of ordenesFiltradas; track orden.id) {
+                    <tr>
+                      <td><strong>{{numeroOrden(orden)}}</strong></td>
+                      <td>
+                        <strong>{{nombreProveedor(orden)}}</strong><br>
+                        <span class="text-muted text-xs">NIT: {{orden.proveedor?.nit || 'N/A'}}</span>
+                      </td>
+                      <td>{{(orden.created_at || orden.fecha_requerida) | date:'mediumDate'}}</td>
+                      <td style="font-weight: bold;">{{orden.total | currency:'COP':'symbol':'1.0-0'}}</td>
+                      <td>
+                        <span class="badge" [ngClass]="getBadgeClass(estadoOrden(orden))">
+                          {{estadoOrden(orden)}}
+                        </span>
+                      </td>
+                      <td style="text-align: center;">
+                        <div class="acciones-fila" style="justify-content: center;">
+                          <button class="btn-icon" (click)="verDetalle(orden)" title="Ver Detalle Completo">
+                            <i class="fas fa-eye"></i>
+                          </button>
+                          @if(estadoOrden(orden) === 'Pendiente') {
+                            <button class="btn-icon text-danger" title="Anular Orden" (click)="anularOrden(orden)" [disabled]="anulandoId === orden.id">
+                              @if(anulandoId === orden.id) {
+                                <i class="fas fa-spinner fa-spin"></i>
+                              } @else {
+                                <i class="fas fa-ban"></i>
+                              }
+                            </button>
+                          }
+                        </div>
+                      </td>
+                    </tr>
                   }
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+
+      <!-- TAB RECEPCION MERCANCIA -->
+      @if(activeTab === 'recepcion') {
+        <div class="neumorphic-panel fade-in">
+          <div class="neumorphic-panel recepcion-panel mb-4">
+            <h2 class="subtitulo">Registrar Ingreso a Bodega</h2>
+            <div class="recepcion-fila">
+              <div class="form-group" style="flex: 2; min-width: 200px;">
+                <label>Seleccionar Orden de Compra Pendiente *</label>
+                <select class="input-neumorphic" [(ngModel)]="ordenSeleccionadaRecepcion">
+                  <option [value]="null" disabled selected>Buscar orden de compra...</option>
+                  @for(o of ordenes; track o.id) {
+                    @if(estadoOrden(o) === 'Pendiente' || estadoOrden(o) === 'Aprobado') {
+                      <option [value]="o.id">{{numeroOrden(o)}} - {{nombreProveedor(o)}} ({{o.total | currency:'COP':'symbol':'1.0-0'}})</option>
+                    }
+                  }
+                </select>
+              </div>
+            </div>
+            
+            <div class="recepcion-accion mt-3">
+              <button class="btn-save btn-pill" (click)="abrirModalRecepcion()" [disabled]="!ordenSeleccionadaRecepcion">
+                <i class="fas fa-dolly"></i> Procesar Recepción e Ingresar a Stock
+              </button>
+            </div>
+          </div>
+
+          <h2 class="subtitulo">Historial de Recepciones</h2>
+          <div class="table-responsive">
+            <table class="premium-table data-table">
+              <thead>
+                <tr>
+                  <th>FECHA RECEPCIÓN</th>
+                  <th>ORDEN ASOCIADA</th>
+                  <th>PROVEEDOR</th>
+                  <th>TIPO RECEPCIÓN</th>
+                  <th>ESTADO INVENTARIO</th>
+                </tr>
+              </thead>
+              <tbody>
+                @if(recepciones.length === 0) {
+                  <tr>
+                    <td colspan="5" style="padding: 2rem; text-align: center;">
+                      <div class="empty-state">
+                        No hay recepciones de mercancía registradas.
+                      </div>
+                    </td>
+                  </tr>
+                } @else {
+                  @for(r of recepciones; track r.id) {
+                    <tr>
+                      <td>{{ (r.fecha_hora || r.fecha_recepcion || r.created_at) | date:'mediumDate' }}</td>
+                      <td><strong>{{ numeroOrden(r.orden_compra || { id: r.orden_compra_id }) }}</strong></td>
+                      <td>{{ r.orden_compra?.proveedor?.razon_social || nombreProveedor(r.orden_compra) || '-' }}</td>
+                      <td>
+                        <span class="badge badge-secundario">{{ r.tipo_recepcion || 'Total' }}</span>
+                      </td>
+                      <td>
+                        <span class="badge badge-aprobada"><i class="fas fa-check-double"></i> Stock Ingresado</span>
+                      </td>
+                    </tr>
+                  }
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- HTML MODAL NUEVA ORDEN DE COMPRA -->
+  @if(showModalOrden) {
+    <div class="view-switch-panel fade-in">
+      <div class="neu-card" style="max-width: 850px; margin: 0 auto;">
+        <div class="panel-header mb-4">
+          <h1>Nueva Orden de Compra</h1>
+          <button class="btn-close" (click)="cerrarModalOrden()">&times;</button>
+        </div>
+        <div class="panel-body">
+          <div class="form-fila">
+            <div class="form-group" style="flex: 2; min-width: 200px;">
+              <label>Proveedor *</label>
+              <select class="input-neumorphic" [(ngModel)]="formOrden.proveedor">
+                <option value="" disabled selected>Seleccione un proveedor</option>
+                @for(prov of proveedoresDisponibles; track prov.id) {
+                  <option [value]="prov.id">{{prov.razon_social}} (NIT: {{prov.nit}})</option>
                 }
               </select>
             </div>
             <div class="form-group" style="flex: 1; min-width: 150px;">
-              <label>Número de Factura Proveedor</label>
-              <input type="text" class="input-neumorphic" placeholder="Ej. FV-10293">
+              <label>Fecha Requerida de Entrega</label>
+              <input type="date" class="input-neumorphic" [(ngModel)]="formOrden.fechaEsperada">
             </div>
           </div>
           
-          <div class="form-group" style="margin-top: 1rem;">
-            <label>Observaciones de Recepción</label>
-            <input type="text" class="input-neumorphic" placeholder="Ej. Mercancía recibida en buen estado. Faltó 1 caja de cables.">
+          <!-- Detalle interactivo de productos -->
+          <div class="product-box neumorphic-panel p-3 mb-3">
+            <h4 style="margin-bottom: 0.8rem; font-size: 0.95rem; font-weight: bold;">Agregar Productos al Pedido</h4>
+            <div class="producto-fila d-flex gap-2">
+              <select class="input-neumorphic" style="flex: 3;" [(ngModel)]="productoActualCompra" (change)="alCambiarProducto()">
+                <option value="" disabled selected>Seleccionar producto del catálogo...</option>
+                @for(prod of productosDisponibles; track prod.id) {
+                  <option [value]="prod.id">{{prod.nombre}} (Precio Ref: {{prod.precio_compra | currency:'COP':'symbol':'1.0-0'}})</option>
+                }
+              </select>
+              <input type="number" class="input-neumorphic" placeholder="Cant." style="flex: 1; min-width: 70px;" [(ngModel)]="cantidadActualCompra" min="1">
+              <input type="number" class="input-neumorphic" placeholder="Costo Unit ($)" style="flex: 2; min-width: 110px;" [(ngModel)]="precioActualCompra">
+              <button class="btn-add btn-pill btn-agregar" style="white-space: nowrap;" (click)="agregarAlCarrito()">
+                <i class="fas fa-cart-plus"></i> Agregar
+              </button>
+            </div>
+            
+            <div class="producto-lista mt-3">
+              @for(item of carritoCompras; track item.id; let idx = $index) {
+                <div class="cart-item d-flex justify-content-between align-items-center p-2 mb-2" style="border-bottom: 1px solid rgba(0,0,0,0.05);">
+                  <span>
+                    <strong>{{item.nombre}}</strong> — {{item.cantidad}} un. x {{item.precio_compra | currency:'COP':'symbol':'1.0-0'}} = <strong>{{item.subtotal | currency:'COP':'symbol':'1.0-0'}}</strong>
+                  </span>
+                  <button class="btn-icon text-danger" (click)="removerDelCarrito(idx)" title="Eliminar ítem">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              }
+            </div>
+            
+            @if(carritoCompras.length === 0) {
+              <p class="text-muted text-xs mt-2">No has agregado productos a esta orden aún.</p>
+            }
           </div>
-          
-          <div class="recepcion-accion">
-            <button class="btn-save btn-pill" (click)="abrirModalRecepcion()">Completar Recepción</button>
+
+          <div class="form-fila">
+            <div class="form-group" style="flex: 1;">
+              <label>Monto Total Liquidado ($)</label>
+              <input type="text" class="input-neumorphic" [value]="formOrden.total | currency:'COP':'symbol':'1.0-0'" readonly style="font-weight: bold; font-size: 1.1rem; color: #45a1ae;">
+            </div>
+            <div class="form-group" style="flex: 2;">
+              <label>Condiciones / Observaciones</label>
+              <input type="text" class="input-neumorphic" [(ngModel)]="formOrden.observaciones" placeholder="Ej. Facturación a 30 días, entrega en sede principal">
+            </div>
           </div>
         </div>
+        
+        <div class="modal-footer">
+          <button class="btn-volver btn-pill" (click)="cerrarModalOrden()">Volver</button>
+          <button class="btn-save btn-pill" (click)="guardarOrden()" [disabled]="guardando || carritoCompras.length === 0">
+            @if(guardando) {
+              <i class="fas fa-spinner fa-spin"></i> Generando...
+            } @else {
+              Generar Orden y Crear Factura CxP
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 
-        <h2 class="subtitulo">Últimas Recepciones</h2>
-        <div class="table-responsive">
-          <table class="premium-table data-table">
-            <thead>
-              <tr>
-                <th>FECHA RECIBIDO</th>
-                <th>ORDEN ASOCIADA</th>
-                <th>PROVEEDOR</th>
-                <th>ESTADO INVENTARIO</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for(r of recepciones; track r.id) {
+  <!-- HTML MODAL RECEPCION -->
+  @if(showModalRecepcion) {
+    <div class="view-switch-panel fade-in">
+      <div class="neu-card" style="max-width: 500px; margin: 0 auto; text-align: center;">
+        <div class="modal-header modal-header-center">
+          <i class="fas fa-box-open icon-success"></i>
+        </div>
+        <div class="panel-body">
+          <h1 class="modal-title">¿Confirmar Ingreso a Bodega?</h1>
+          <p class="text-muted" style="margin-bottom: 1.5rem;">
+            Al confirmar la recepción, las cantidades de los productos en la orden ingresarán automáticamente al <strong>stock disponible</strong> de tu inventario.
+          </p>
+          
+          <div class="modal-footer">
+            <button class="btn-volver btn-pill" (click)="cerrarModalRecepcion()">Cancelar</button>
+            <button class="btn-save btn-pill" (click)="recibirOrden()" [disabled]="guardando">
+              @if(guardando) {
+                <i class="fas fa-spinner fa-spin"></i> Procesando...
+              } @else {
+                Confirmar e Ingresar a Stock
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- HTML MODAL VER DETALLE ORDEN -->
+  @if(showModalDetalleOrden && ordenSeleccionadaDetalle) {
+    <div class="view-switch-panel fade-in">
+      <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+        <div class="panel-header mb-4">
+          <h1>Detalle de Orden: {{numeroOrden(ordenSeleccionadaDetalle)}}</h1>
+          <button class="btn-close" (click)="cerrarModalDetalle()">&times;</button>
+        </div>
+        <div class="panel-body">
+          <div class="form-fila mb-3">
+            <div style="flex: 1;">
+              <span class="text-muted text-xs">PROVEEDOR:</span><br>
+              <strong>{{nombreProveedor(ordenSeleccionadaDetalle)}}</strong><br>
+              <span class="text-xs">NIT: {{ordenSeleccionadaDetalle.proveedor?.nit || 'N/A'}}</span><br>
+              <span class="text-xs">Email: {{ordenSeleccionadaDetalle.proveedor?.email || 'N/A'}}</span>
+            </div>
+            <div style="flex: 1; text-align: right;">
+              <span class="text-muted text-xs">ESTADO:</span><br>
+              <span class="badge" [ngClass]="getBadgeClass(estadoOrden(ordenSeleccionadaDetalle))">
+                {{estadoOrden(ordenSeleccionadaDetalle)}}
+              </span><br>
+              <span class="text-xs text-muted">Fecha: {{(ordenSeleccionadaDetalle.created_at || ordenSeleccionadaDetalle.fecha_requerida) | date:'mediumDate'}}</span>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="premium-table data-table">
+              <thead>
                 <tr>
-                  <td>{{ r.fecha_recepcion | date:'shortDate' }}</td>
-                  <td>{{ numeroOrden(r.orden_compra) }}</td>
-                  <td>{{ nombreProveedor(r.orden_compra) }}</td>
-                  <td>
-                    <span class="badge badge-success">Ingresado</span>
+                  <th>PRODUCTO</th>
+                  <th style="text-align: center;">CANTIDAD</th>
+                  <th style="text-align: right;">COSTO UNIT.</th>
+                  <th style="text-align: right;">SUBTOTAL</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for(det of (ordenSeleccionadaDetalle.detalles || []); track det.id) {
+                  <tr>
+                    <td><strong>{{det.producto?.nombre || 'Producto #' + det.producto_id}}</strong></td>
+                    <td style="text-align: center;">{{det.cantidad}}</td>
+                    <td style="text-align: right;">{{det.precio_unitario | currency:'COP':'symbol':'1.0-0'}}</td>
+                    <td style="text-align: right; font-weight: bold;">{{(det.subtotal || (det.cantidad * det.precio_unitario)) | currency:'COP':'symbol':'1.0-0'}}</td>
+                  </tr>
+                }
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="3" style="text-align: right; font-weight: bold;">TOTAL ORDEN:</td>
+                  <td style="text-align: right; font-weight: bold; color: #45a1ae; font-size: 1.1rem;">
+                    {{ordenSeleccionadaDetalle.total | currency:'COP':'symbol':'1.0-0'}}
                   </td>
                 </tr>
-              }
-              @if(recepciones.length === 0) {
-                <tr>
-                  <td colspan="4" class="tabla-vacia">No hay recepciones registradas.</td>
-                </tr>
-              }
-            </tbody>
-          </table>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-volver btn-pill" (click)="cerrarModalDetalle()">Cerrar</button>
         </div>
       </div>
-    }
-  </div>
+    </div>
+  }
 </div>
-
-  </div>
-
-<!-- HTML MODAL NUEVA ORDEN -->
-@if(showModalOrden) {
-<div class="view-switch-panel fade-in">
-  <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
-    <div class="panel-header mb-4">
-      <h1>Nueva Orden de Compra</h1>
-      <button class="btn-close" (click)="cerrarModalOrden()">&times;</button>
-    </div>
-    <div class="panel-body">
-      <div class="form-group">
-        <label>Proveedor *</label>
-        <select class="input-neumorphic" [(ngModel)]="formOrden.proveedor">
-          <option value="" disabled selected>Seleccione un proveedor</option>
-          @for(prov of proveedoresDisponibles; track prov.id) {
-            <option [value]="prov.id">{{prov.razon_social}} ({{prov.nit}})</option>
-          }
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Fecha Esperada de Entrega</label>
-        <input type="date" class="input-neumorphic" [(ngModel)]="formOrden.fechaEsperada">
-      </div>
-      
-      <!-- Detalle simulado de productos -->
-      <div class="product-box">
-        <h4>Detalle de Productos</h4>
-        <div class="producto-fila">
-          <select class="input-neumorphic" style="flex: 2;" [(ngModel)]="productoActualCompra">
-            <option value="" disabled selected>Buscar producto...</option>
-            @for(prod of productosDisponibles; track prod.id) {
-              <option [value]="prod.id">{{prod.nombre}} (Stock: {{prod.stock_inicial}})</option>
-            }
-          </select>
-          <input type="number" class="input-neumorphic" placeholder="Cant." style="flex: 1;" [(ngModel)]="cantidadActualCompra">
-          <input type="number" class="input-neumorphic" placeholder="Costo Unit ($)" style="flex: 1;" [(ngModel)]="precioActualCompra">
-          <button class="btn-add btn-pill btn-agregar" (click)="agregarAlCarrito()">Agregar</button>
-        </div>
-        
-        <div class="producto-lista">
-          @for(item of carritoCompras; track item.id; let idx = $index) {
-            <div class="cart-item">
-              <span>{{item.nombre}} - {{item.cantidad}} x {{item.precio_compra | currency:'COP':'symbol':'1.0-0'}} = <strong>{{item.subtotal | currency:'COP':'symbol':'1.0-0'}}</strong></span>
-              <button class="btn-icon text-danger" (click)="removerDelCarrito(idx)"><i class="fas fa-times"></i></button>
-            </div>
-          }
-        </div>
-        
-        @if(carritoCompras.length === 0) {
-          <p class="descripcion-general">No hay productos agregados.</p>
-        }
-      </div>
-
-      <div class="form-group">
-        <label>Monto Total Estimado ($)</label>
-        <input type="number" class="input-neumorphic" [(ngModel)]="formOrden.total" placeholder="0.00">
-      </div>
-      <div class="form-group">
-        <label>Condiciones / Observaciones</label>
-        <textarea class="input-neumorphic" rows="2" [(ngModel)]="formOrden.observaciones" placeholder="Ej. Pago a 30 días..."></textarea>
-      </div>
-    </div>
-    
-    <div class="modal-footer">
-      <button class="btn-volver btn-pill" (click)="cerrarModalOrden()">Volver</button>
-      <button class="btn-save btn-pill" (click)="guardarOrden()" [disabled]="guardando">
-        @if(guardando) {
-          <i class="fas fa-spinner fa-spin"></i> Guardando...
-        } @else {
-          Generar Orden
-        }
-      </button>
-    </div>
-  </div>
-</div>
-}
-
-<!-- HTML MODAL RECEPCION -->
-@if(showModalRecepcion) {
-<div class="view-switch-panel fade-in">
-  <div class="neu-card" style="max-width: 800px; margin: 0 auto; max-width: 400px; text-align: center;">
-    <div class="modal-header modal-header-center">
-      <i class="fas fa-box-open icon-success"></i>
-    </div>
-    <div class="panel-body">
-      <h1>¿Confirmar Recepción?</h1>
-      <p class="text-muted" style="margin-bottom: 2rem;">Al confirmar, los productos de la orden ingresarán automáticamente al stock del sistema de inventario.</p>
-      
-      <div class="modal-footer">
-        <button class="btn-volver btn-pill" (click)="cerrarModalRecepcion()">Cancelar</button>
-        <button class="btn-save btn-pill" (click)="recibirOrden()" [disabled]="guardando">
-          @if(guardando) {
-            <i class="fas fa-spinner fa-spin"></i> Procesando...
-          } @else {
-            Sí, Confirmar Ingreso
-          }
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-}
-
-
-

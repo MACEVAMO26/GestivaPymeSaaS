@@ -35,6 +35,11 @@ export class ComprasComponent implements OnInit {
   productosDisponibles: Producto[] = [];
   recepciones: any[] = [];
 
+  // Variables Detalle Orden
+  showModalDetalleOrden: boolean = false;
+  ordenSeleccionadaDetalle: any = null;
+  anulandoId: number | null = null;
+
   // Variables Recepcion
   ordenSeleccionadaRecepcion: any = null;
   showModalRecepcion: boolean = false;
@@ -267,6 +272,41 @@ export class ComprasComponent implements OnInit {
           this.toast.error('Error al registrar la recepción');
         }
         this.guardando = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  alCambiarProducto() {
+    const prod = this.productosDisponibles.find(p => p.id == this.productoActualCompra);
+    if (prod && prod.precio_compra) {
+      this.precioActualCompra = Number(prod.precio_compra);
+    }
+  }
+
+  verDetalle(orden: any) {
+    this.ordenSeleccionadaDetalle = orden;
+    this.showModalDetalleOrden = true;
+  }
+
+  cerrarModalDetalle() {
+    this.showModalDetalleOrden = false;
+    this.ordenSeleccionadaDetalle = null;
+  }
+
+  anularOrden(orden: any) {
+    if (!orden?.id) return;
+    this.anulandoId = orden.id;
+    this.compraService.anularOrden(orden.id).pipe(timeout(10000)).subscribe({
+      next: () => {
+        this.toast.success(`Orden ${this.numeroOrden(orden)} anulada correctamente`);
+        this.anulandoId = null;
+        this.cargarDatos();
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        this.anulandoId = null;
+        this.toast.error(err.error?.message || 'Error al anular la orden');
         this.cdr.detectChanges();
       }
     });

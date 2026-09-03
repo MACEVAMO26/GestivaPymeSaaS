@@ -37,68 +37,87 @@ class VentaController extends Controller
         ]);
 
         try {
-            DB::beginTransaction();
+            $empresaId = request()->header('X-Empresa-Id') ?? (auth()->user()?->empresa_id ?? null);
 
-            $subtotal = 0;
-            foreach ($request->productos as $p) {
-                $subtotal += $p['cantidad'] * $p['precio_unitario'];
-            }
+            $venta = DB::transaction(function () use ($request, $empresaId) {
+                $subtotal = 0;
+                foreach ($request->productos as $p) {
+                    $subtotal += $p['cantidad'] * $p['precio_unitario'];
+                }
 
-            // Siguiente consecutivo de factura por empresa
-            $consecutivo = (Venta::where('empresa_id', auth()->user()?->empresa_id)
-                ->max('factura_consecutivo') ?? 0) + 1;
+                // Siguiente consecutivo de factura por empresa formateado (e.g. FAC-001)
+                $lastVenta = Venta::where('empresa_id', $empresaId)->orderBy('id', 'desc')->first();
+                $nextNum = 1;
+                if ($lastVenta && !empty($lastVenta->factura_consecutivo)) {
+                    if (preg_match('/(\d+)/', (string)$lastVenta->factura_consecutivo, $matches)) {
+                        $nextNum = ((int)$matches[1]) + 1;
+                    }
+                }
+                $consecutivo = 'FAC-' . str_pad($nextNum, 3, '0', STR_PAD_LEFT);
 
-            $venta = Venta::create([
-                'factura_consecutivo' => $consecutivo,
-                'cliente_id' => $request->cliente_id,
-                'subtotal' => $subtotal,
-                'impuestos' => 0,
-                'descuentos' => 0,
-                'total' => $subtotal,
-                'metodo_pago' => $request->metodo_pago,
-                'estado' => 'Completada',
-                'estado_paquete' => 'Preparando',
-                'vendedor_id' => Auth::id(),
-                'empresa_id' => auth()->user()?->empresa_id ?? null
-            ]);
-
-            foreach ($request->productos as $p) {
-                VentaDetalle::create([
-                    'venta_id' => $venta->id,
-                    'producto_id' => $p['id'],
-                    'cantidad' => $p['cantidad'],
-                    'precio_unitario' => $p['precio_unitario'],
-                    'subtotal' => $p['cantidad'] * $p['precio_unitario']
+                $v = Venta::create([
+                    'factura_consecutivo' => $consecutivo,
+                    'cliente_id' => $request->cliente_id,
+                    'subtotal' => $subtotal,
+                    'impuestos' => 0,
+                    'descuentos' => 0,
+                    'total' => $subtotal,
+                    'metodo_pago' => $request->metodo_pago,
+                    'estado' => 'Completada',
+                    'estado_paquete' => 'Preparando',
+                    'vendedor_id' => Auth::id(),
+                    'empresa_id' => $empresaId
                 ]);
 
-                // Descontar inventario (esquema real: stock_actual)
-                $inventario = Inventario::where('producto_id', $p['id'])->first();
-                if ($inventario) {
-                    $inventario->stock_actual -= $p['cantidad'];
-                    $inventario->save();
+                foreach ($request->productos as $p) {
+                    VentaDetalle::create([
+                        'venta_id' => $v->id,
+                        'producto_id' => $p['id'],
+                        'cantidad' => $p['cantidad'],
+                        'precio_unitario' => $p['precio_unitario'],
+                        'subtotal' => $p['cantidad'] * $p['precio_unitario']
+                    ]);
+
+                    // Descontar inventario (esquema real: stock_actual)
+                    DB::table('inventario')->where('producto_id', $p['id'])->update([
+                        'stock_actual' => DB::raw('stock_actual - ' . (int)$p['cantidad']),
+                        'updated_at' => now()
+                    ]);
+                    $inventario = Inventario::where('producto_id', $p['id'])->first();
+
+                    // Registrar movimiento de salida en inventario
+                    \App\Models\MovimientoInventario::create([
+                        'producto_id' => $p['id'],
+                        'usuario_id' => Auth::id() ?? 1,
+                        'tipo' => 'salida',
+                        'cantidad' => (int)$p['cantidad'],
+                        'justificacion' => 'Venta Factura #' . $consecutivo,
+                        'fecha_hora' => now()->toDateTimeString(),
+                    ]);
 
                     // Notificación de stock bajo (umbral = stock_minimo)
-                    if ($inventario->stock_actual <= $inventario->stock_minimo) {
+                    if ($inventario && $inventario->stock_actual <= $inventario->stock_minimo) {
                         $producto = \App\Models\Producto::find($p['id']);
                         \App\Models\Notificacion::create([
-                            'usuario_id' => Auth::id(),
+                            'usuario_id' => Auth::id() ?? 1,
                             'titulo' => 'Alerta de Stock Bajo',
                             'descripcion' => 'El producto "' . ($producto ? $producto->nombre : 'ID '.$p['id']) . '" tiene un stock bajo (' . $inventario->stock_actual . ' unidades restantes).',
-                            'leida' => false
+                            'leida' => '0',
+                            'fecha_hora' => now(),
                         ]);
                     }
                 }
-            }
 
-            DB::commit();
+                return $v;
+            });
 
             // Enviar correo al cliente
             $cliente = Cliente::find($request->cliente_id);
-            if ($cliente && $cliente->email) {
+            if ($cliente && $cliente->email && !empty(config('mail.mailers.smtp.username'))) {
                 try {
                     Mail::to($cliente->email)->send(new ReciboVentaMail($venta, $cliente));
-                } catch (\Exception $e) {
-                    \Log::error('No se pudo enviar recibo de venta: ' . $e->getMessage());
+                } catch (\Throwable $e) {
+                    \Log::warning('No se pudo enviar recibo de venta: ' . $e->getMessage());
                 }
             }
 
@@ -108,8 +127,7 @@ class VentaController extends Controller
             ], 201);
 
         } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['message' => 'Error al registrar la venta', 'error' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Error al registrar la venta: ' . $e->getMessage()], 500);
         }
     }
 
@@ -125,11 +143,11 @@ class VentaController extends Controller
         $venta->save();
 
         $cliente = Cliente::find($request->cliente_id);
-        if ($cliente && $cliente->email) {
+        if ($cliente && $cliente->email && !empty(config('mail.mailers.smtp.username'))) {
             try {
                 Mail::to($cliente->email)->send(new ReciboVentaMail($venta, $cliente, true));
-            } catch (\Exception $e) {
-                \Log::error('No se pudo enviar actualización de estado de paquete: ' . $e->getMessage());
+            } catch (\Throwable $e) {
+                \Log::warning('No se pudo enviar actualización de estado de paquete: ' . $e->getMessage());
             }
         }
 
@@ -141,32 +159,46 @@ class VentaController extends Controller
     {
         $venta = Venta::findOrFail($id);
 
-        if ($venta->estado === 'Anulada') {
+        if (strtolower($venta->estado) === 'anulada') {
             return response()->json(['message' => 'La venta ya está anulada.'], 422);
         }
 
         try {
-            DB::beginTransaction();
+            $ventaActualizada = DB::transaction(function () use ($venta) {
+                // Restaurar el inventario de cada detalle
+                $detalles = VentaDetalle::where('venta_id', $venta->id)->get();
+                foreach ($detalles as $detalle) {
+                    $prodId = (int)$detalle->producto_id;
+                    $cant = (int)$detalle->cantidad;
 
-            // Restaurar el inventario de cada detalle
-            $detalles = VentaDetalle::where('venta_id', $venta->id)->get();
-            foreach ($detalles as $detalle) {
-                $inventario = Inventario::where('producto_id', $detalle->producto_id)->first();
-                if ($inventario) {
-                    $inventario->stock_actual += $detalle->cantidad;
-                    $inventario->save();
+                    DB::table('inventario')->where('producto_id', $prodId)->update([
+                        'stock_actual' => DB::raw('stock_actual + ' . $cant),
+                        'updated_at' => now()
+                    ]);
+
+                    // Registrar movimiento de retorno al inventario por anulación
+                    \App\Models\MovimientoInventario::create([
+                        'producto_id' => $prodId,
+                        'usuario_id' => Auth::id() ?? 1,
+                        'tipo' => 'entrada',
+                        'cantidad' => $cant,
+                        'justificacion' => 'Anulacion Venta ' . $venta->factura_consecutivo,
+                        'fecha_hora' => now()->toDateTimeString(),
+                    ]);
                 }
-            }
 
-            $venta->estado = 'Anulada';
-            $venta->estado_paquete = null;
-            $venta->save();
+                DB::table('ventas')->where('id', $venta->id)->update([
+                    'estado' => 'Anulada',
+                    'updated_at' => now(),
+                ]);
 
-            DB::commit();
-            return response()->json(['message' => 'Venta anulada correctamente.', 'venta' => $venta]);
+                $venta->refresh();
+                return $venta;
+            });
+
+            return response()->json(['message' => 'Venta anulada correctamente.', 'venta' => $ventaActualizada]);
         } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['message' => 'Error al anular la venta', 'error' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Error al anular la venta: ' . $e->getMessage()], 500);
         }
     }
 }

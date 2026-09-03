@@ -11,12 +11,13 @@ class ServicioController extends Controller
     public function index()
     {
         $user = Auth::user();
-        if (!$user) {
-            return response()->json(['error' => 'No autorizado'], 401);
+        $empresaId = request()->header('X-Empresa-Id') ?? ($user?->empresa_id ?? null);
+        if (!$empresaId) {
+            return response()->json(['error' => 'Empresa no especificada'], 400);
         }
 
         $servicios = Servicio::with('categoria')
-            ->where('empresa_id', $user->empresa_id)
+            ->where('empresa_id', $empresaId)
             ->where('activo', 1)
             ->orderBy('id', 'desc')
             ->get();
@@ -27,8 +28,9 @@ class ServicioController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        if (!$user) {
-            return response()->json(['error' => 'No autorizado'], 401);
+        $empresaId = request()->header('X-Empresa-Id') ?? ($user?->empresa_id ?? null);
+        if (!$empresaId) {
+            return response()->json(['error' => 'Empresa no especificada'], 400);
         }
 
         $validated = $request->validate([
@@ -40,7 +42,7 @@ class ServicioController extends Controller
         ]);
 
         $servicio = Servicio::create([
-            'empresa_id' => $user->empresa_id,
+            'empresa_id' => $empresaId,
             'categoria_id' => $validated['categoria_id'] ?? null,
             'nombre' => $validated['nombre'],
             'descripcion' => $validated['descripcion'] ?? null,

@@ -169,8 +169,9 @@
         }
 
         <div class="form-actions mt-4 flex-between">
-          <button type="button" class="btn-save btn-pill btn-cert" (click)="descargarCertificado()">
-            <i class="fas fa-file-pdf"></i> Descargar Certificado Laboral
+          <button type="button" class="btn-save btn-pill btn-cert" (click)="descargarCertificado()" [disabled]="isGeneratingCert">
+            <i class="fas" [ngClass]="isGeneratingCert ? 'fa-spinner fa-spin' : 'fa-file-pdf'"></i>
+            {{ isGeneratingCert ? 'Generando Certificado...' : 'Descargar / Imprimir Certificado Laboral' }}
           </button>
         </div>
       </div>

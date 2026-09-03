@@ -227,8 +227,43 @@ export class AutogestionComponent implements OnInit {
     });
   }
 
+  isGeneratingCert = false;
+
   descargarCertificado() {
-    this.toast.success('Generando certificado laboral...');
+    if (!this.usuarioActual?.id) {
+      this.toast.warning('No se pudo identificar el usuario actual');
+      return;
+    }
+
+    this.isGeneratingCert = true;
+    this.toast.info('Generando tu certificado laboral oficial en PDF...');
+
+    this.empleadoService.descargarCertificado(this.usuarioActual.id).subscribe({
+      next: (blob: any) => {
+        this.isGeneratingCert = false;
+        const file = new Blob([blob], { type: 'application/pdf' });
+        const fileURL = URL.createObjectURL(file);
+        
+        // Abrir en nueva pestaña para vista previa e impresión
+        window.open(fileURL, '_blank');
+        
+        // Descargar automáticamente como archivo PDF
+        const a = document.createElement('a');
+        a.href = fileURL;
+        a.download = `Certificado_Laboral_${this.usuarioActual.documento || this.usuarioActual.id}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        this.toast.success('Certificado laboral generado exitosamente');
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.isGeneratingCert = false;
+        this.toast.error('No se pudo generar el certificado. Verifica que tu formalización esté completa.');
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   descargarContrato() {

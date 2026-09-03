@@ -93,4 +93,32 @@ class OrdenCompraController extends Controller
 
         return response()->json($orden->load(['detalles.producto', 'proveedor']), 201);
     }
+
+    // Muestra el detalle completo de una orden de compra
+    public function show($id)
+    {
+        $orden = OrdenCompra::with(['proveedor', 'detalles.producto', 'usuario'])->findOrFail($id);
+        return response()->json($orden);
+    }
+
+    // Anula una orden de compra en estado pendiente
+    public function destroy($id)
+    {
+        $orden = OrdenCompra::findOrFail($id);
+        if ($orden->estado !== 'pendiente' && $orden->estado !== 'Pendiente') {
+            return response()->json(['message' => 'Solo se pueden anular órdenes de compra en estado pendiente.'], 422);
+        }
+
+        $orden->estado = 'anulada';
+        $orden->save();
+
+        // Anular también la cuenta por pagar asociada si aún no tiene abonos
+        $cpp = CuentaPorPagar::where('factura_numero', 'FAC-OC-' . str_pad($orden->id, 4, '0', STR_PAD_LEFT))->first();
+        if ($cpp && $cpp->saldo_pendiente == $cpp->total) {
+            $cpp->estado = 'Anulada';
+            $cpp->save();
+        }
+
+        return response()->json(['message' => 'Orden de compra anulada correctamente.', 'orden' => $orden]);
+    }
 }

@@ -54,6 +54,14 @@ export class CompraService {
     return this.http.post<OrdenCompra>('/api/ordenes-compra', orden);
   }
 
+  getOrden(id: number): Observable<OrdenCompra> {
+    return this.http.get<OrdenCompra>(`/api/ordenes-compra/${id}`);
+  }
+
+  anularOrden(id: number): Observable<any> {
+    return this.http.delete(`/api/ordenes-compra/${id}`);
+  }
+
   getRecepciones(): Observable<Recepcion[]> {
     return this.http.get<Recepcion[]>('/api/recepciones');
   }
