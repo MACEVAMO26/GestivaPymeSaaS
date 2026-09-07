@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef } from '@angular/core';
+import { Title, Meta } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-landing',
@@ -29,6 +30,8 @@ export class LandingComponent implements OnInit {
   http = inject(HttpClient);
   cdr = inject(ChangeDetectorRef);
   private router = inject(Router);
+  private titleService = inject(Title);
+  private metaService = inject(Meta);
 
   goToLogin() {
     this.router.navigate(['/login']);
@@ -36,6 +39,13 @@ export class LandingComponent implements OnInit {
 
   // Inicializa el componente y despierta al servidor
   ngOnInit(): void {
+    // Configurar SEO dinámico
+    this.titleService.setTitle('GestivaPyme | Software de Gestión, Facturación y ERP para Pymes');
+    this.metaService.updateTag({
+      name: 'description',
+      content: 'GestivaPyme es el software ERP y administrativo en la nube para pymes y emprendedores. Controla inventario, clientes 360, cotizaciones, ventas, compras, servicios técnicos FSM y finanzas.'
+    });
+
     // Ping "Ninja" para despertar a Render de su inactividad gratuita
     this.http.get('/api/ping').subscribe({
       next: () => console.log('Servidor despertado'),

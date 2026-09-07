@@ -1,0 +1,10 @@
+# Robots.txt para GestivaPyme SaaS
+User-agent: *
+Allow: /
+Allow: /assets/
+Disallow: /dashboard/
+Disallow: /saas-admin/
+Disallow: /api/
+
+# Sitemap de páginas públicas
+Sitemap: https://gestiva-pyme-saas.vercel.app/sitemap.xml
