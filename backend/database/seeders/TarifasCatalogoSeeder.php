@@ -19,7 +19,7 @@ class TarifasCatalogoSeeder extends Seeder
                 'nombre' => 'Plan Emprendedor',
                 'tipo' => 'plan',
                 'mecanismo' => 'fijo',
-                'valor' => 70000.00,
+                'valor' => 80000.00,
                 'activo' => true
             ],
             [
@@ -27,7 +27,7 @@ class TarifasCatalogoSeeder extends Seeder
                 'nombre' => 'Plan Pyme',
                 'tipo' => 'plan',
                 'mecanismo' => 'fijo',
-                'valor' => 150000.00,
+                'valor' => 160000.00,
                 'activo' => true
             ],
             [
@@ -35,7 +35,7 @@ class TarifasCatalogoSeeder extends Seeder
                 'nombre' => 'Plan Empresarial',
                 'tipo' => 'plan',
                 'mecanismo' => 'fijo',
-                'valor' => 280000.00,
+                'valor' => 300000.00,
                 'activo' => true
             ],
             
