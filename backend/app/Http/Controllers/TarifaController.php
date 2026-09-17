@@ -11,7 +11,7 @@ class TarifaController extends Controller
     {
         $tarifa = Tarifa::first();
         if (!$tarifa) {
-            $tarifa = Tarifa::create(['plan_mensual' => 70000, 'modulo_extra' => 20000, 'addon_extra' => 10000]);
+            $tarifa = Tarifa::create(['plan_mensual' => 80000, 'modulo_extra' => 20000, 'addon_extra' => 10000]);
         }
         return response()->json($tarifa);
     }
