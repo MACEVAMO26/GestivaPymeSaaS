@@ -19,7 +19,7 @@ class TarifasCatalogoSeeder extends Seeder
                 'nombre' => 'Plan Emprendedor',
                 'tipo' => 'plan',
                 'mecanismo' => 'fijo',
-                'valor' => 80000.00,
+                'valor' => 90000.00,
                 'activo' => true
             ],
             [
@@ -27,7 +27,7 @@ class TarifasCatalogoSeeder extends Seeder
                 'nombre' => 'Plan Pyme',
                 'tipo' => 'plan',
                 'mecanismo' => 'fijo',
-                'valor' => 160000.00,
+                'valor' => 280000.00,
                 'activo' => true
             ],
             [
@@ -35,7 +35,7 @@ class TarifasCatalogoSeeder extends Seeder
                 'nombre' => 'Plan Empresarial',
                 'tipo' => 'plan',
                 'mecanismo' => 'fijo',
-                'valor' => 300000.00,
+                'valor' => 1800000.00,
                 'activo' => true
             ],
             
@@ -45,7 +45,7 @@ class TarifasCatalogoSeeder extends Seeder
                 'nombre' => 'IA Gemini - Modo Simple (por usuario)',
                 'tipo' => 'ia_plan',
                 'mecanismo' => 'por_usuario',
-                'valor' => 6000.00,
+                'valor' => 7500.00,
                 'activo' => true
             ],
             [
@@ -53,7 +53,7 @@ class TarifasCatalogoSeeder extends Seeder
                 'nombre' => 'IA Gemini - Modo Avanzado (por usuario)',
                 'tipo' => 'ia_plan',
                 'mecanismo' => 'por_usuario',
-                'valor' => 18000.00,
+                'valor' => 22500.00,
                 'activo' => true
             ],
             
@@ -63,7 +63,7 @@ class TarifasCatalogoSeeder extends Seeder
                 'nombre' => 'Gestión Humana y Turnos (RRHH)',
                 'tipo' => 'modulo_adicional',
                 'mecanismo' => 'fijo',
-                'valor' => 20000.00,
+                'valor' => 25000.00,
                 'activo' => true
             ],
             [
@@ -71,7 +71,7 @@ class TarifasCatalogoSeeder extends Seeder
                 'nombre' => 'Caja y Pre-facturación (Finanzas)',
                 'tipo' => 'modulo_adicional',
                 'mecanismo' => 'fijo',
-                'valor' => 20000.00,
+                'valor' => 25000.00,
                 'activo' => true
             ],
             
@@ -81,7 +81,7 @@ class TarifasCatalogoSeeder extends Seeder
                 'nombre' => 'Conector WhatsApp Business API',
                 'tipo' => 'addon',
                 'mecanismo' => 'fijo',
-                'valor' => 10000.00,
+                'valor' => 12500.00,
                 'activo' => true
             ],
             [
@@ -89,7 +89,7 @@ class TarifasCatalogoSeeder extends Seeder
                 'nombre' => 'Conector Facturación Electrónica DIAN',
                 'tipo' => 'addon',
                 'mecanismo' => 'fijo',
-                'valor' => 15000.00,
+                'valor' => 18750.00,
                 'activo' => true
             ],
             [
@@ -97,7 +97,7 @@ class TarifasCatalogoSeeder extends Seeder
                 'nombre' => 'Conector API de IA Propia (BYOK)',
                 'tipo' => 'addon',
                 'mecanismo' => 'fijo',
-                'valor' => 25000.00,
+                'valor' => 31250.00,
                 'activo' => true
             ],
             
