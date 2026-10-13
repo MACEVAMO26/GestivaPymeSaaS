@@ -1,5 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { NavigationStart, Router, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { ToastComponent } from './components/toast/toast.component';
 import { AuthService } from './services/auth.service';
 
@@ -17,27 +18,21 @@ export class AppComponent implements OnInit {
   private router = inject(Router);
 
   ngOnInit() {
-    // Aterrizaje Forzoso en el Dashboard al cargar la aplicación si hay sesión.
-    if (this.authService.getToken()) {
-      const currentUrl = window.location.pathname;
-      const user = this.authService.getUser();
-      
-      if (user && (currentUrl === '/' || currentUrl === '/login')) {
-        if (user.empresa_id === null) {
-          this.router.navigate(['/saas-admin']);
-        } else {
-          let ruta = '/inicio';
-          if (user.empresa) {
-            if (user.empresa.dominio) {
-              ruta = '/' + user.empresa.dominio + '/inicio';
-            } else if (user.empresa.razon_social) {
-              const slug = user.empresa.razon_social.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '');
-              ruta = '/' + slug + '/inicio';
-            }
-          }
-          this.router.navigate([ruta]);
-        }
-      }
+    // Si el usuario navega o retrocede hacia el Landing ('/') o al Login ('/login'),
+    // se cierra inmediatamente cualquier sesión activa por seguridad.
+    this.verificarCierrePorRutaPublica(window.location.pathname);
+
+    this.router.events
+      .pipe(filter((event): event is NavigationStart => event instanceof NavigationStart))
+      .subscribe((event) => {
+        const cleanPath = event.url.split('?')[0].split('#')[0];
+        this.verificarCierrePorRutaPublica(cleanPath);
+      });
+  }
+
+  private verificarCierrePorRutaPublica(path: string): void {
+    if ((path === '/' || path === '' || path === '/login' || path.startsWith('/login/')) && this.authService.getToken()) {
+      this.authService.logout(false);
     }
   }
 }

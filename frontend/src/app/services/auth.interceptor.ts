@@ -27,9 +27,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   return next(clonedReq).pipe(
     catchError((error: HttpErrorResponse) => {
       // Si el servidor responde que no estamos autorizados (token inválido/vencido o DB reiniciada)
-      if (error.status === 401) {
-        authService.logout();
-        router.navigate(['/login']);
+      if (error.status === 401 && !req.url.includes('/logout') && !req.url.includes('/login')) {
+        authService.clearSessionStorage();
+        router.navigate(['/login'], { replaceUrl: true });
       }
       return throwError(() => error);
     })

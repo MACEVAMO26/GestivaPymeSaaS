@@ -11,11 +11,10 @@ export const authGuard: CanActivateFn = (route, state) => {
   // La lógica de decisión del portero
   if (authService.getToken()) {
     // Si existe un token en el sessionStorage, el usuario puede pasar.
-    const token = sessionStorage.getItem('auth_token');
     return true;
   } else {
-    // Si NO existe un token, lo redirigimos a la página de login.
-    router.navigate(['/login']);
+    // Si NO existe un token, lo redirigimos a la página de login reemplazando el historial.
+    router.navigate(['/login'], { replaceUrl: true });
     // Y le negamos el acceso a la ruta que intentaba visitar.
     return false;
   }

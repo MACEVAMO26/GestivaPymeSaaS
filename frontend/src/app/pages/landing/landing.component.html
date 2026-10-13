@@ -12,7 +12,29 @@
         <a href="#precios" class="nav-link">Precios</a>
         <a routerLink="/login" (click)="goToLogin(); $event.preventDefault()" class="nav-btn-login">Iniciar Sesión</a>
       </div>
+      <button
+        type="button"
+        class="mobile-menu-btn"
+        (click)="toggleMobileMenu()"
+        aria-label="Abrir menú de navegación"
+      >
+        @if (!isMobileMenuOpen) {
+          <span>☰</span>
+        } @else {
+          <span>✕</span>
+        }
+      </button>
     </div>
+
+    @if (isMobileMenuOpen) {
+      <div class="mobile-menu-dropdown">
+        <a href="#nosotros" class="mobile-nav-link" (click)="closeMobileMenu()">Quiénes Somos</a>
+        <a href="#servicios" class="mobile-nav-link" (click)="closeMobileMenu()">Qué Ofrecemos</a>
+        <a href="#compromiso" class="mobile-nav-link" (click)="closeMobileMenu()">Compromiso Social</a>
+        <a href="#precios" class="mobile-nav-link" (click)="closeMobileMenu()">Precios</a>
+        <a routerLink="/login" (click)="goToLogin(); $event.preventDefault()" class="mobile-nav-btn-login">Iniciar Sesión</a>
+      </div>
+    }
   </div>
 </nav>
 
@@ -36,8 +58,8 @@
           para solucionar las necesidades reales de los emprendedores 
           <span class="text-flag">colombianos</span>.
         </p>
-        <div class="hero-actions" style="position: relative; z-index: 20;">
-          <a routerLink="/login" class="btn-start" style="cursor: pointer;">
+        <div class="hero-actions">
+          <a routerLink="/login" (click)="goToLogin(); $event.preventDefault()" class="btn-start">
             Empieza Ahora
           </a>
         </div>
@@ -158,7 +180,7 @@
             <span class="price-period"> COP / mes</span>
           </div>
           <div class="referral-banner banner-blue">
-            <span class="text-xs font-medium">🤝 <strong>¿Vienes referido o traes a un amigo?</strong> Obtén <strong>10% de descuento</strong></span>
+            <span class="font-medium">🤝 <strong>¿Vienes referido o traes a un amigo?</strong> Obtén <strong>10% de descuento</strong></span>
           </div>
           <ul class="pricing-features">
             <li><span class="check-icon">✓</span> Hasta 5 usuarios en el sistema</li>
@@ -166,7 +188,7 @@
             <li><span class="check-icon">✓</span> Inventario, compras, clientes y reportes</li>
             <li><span class="check-icon">✓</span> <strong>Plan Anual:</strong> ¡1 mes GRATIS + 5% EXTRA referidos!</li>
           </ul>
-          <a routerLink="/login" class="pricing-btn btn-emprendedor mt-auto">Elegir Plan</a>
+          <a routerLink="/login" (click)="goToLogin(); $event.preventDefault()" class="pricing-btn btn-emprendedor mt-auto">Elegir Plan</a>
         </div>
 
         <!-- Plan Pyme -->
@@ -182,7 +204,7 @@
             <span class="price-period"> COP / mes</span>
           </div>
           <div class="referral-banner banner-amber">
-            <span class="text-xs font-medium">🤝 <strong>¿Vienes referido o traes a un amigo?</strong> Obtén <strong>10% de descuento</strong></span>
+            <span class="font-medium">🤝 <strong>¿Vienes referido o traes a un amigo?</strong> Obtén <strong>10% de descuento</strong></span>
           </div>
           <ul class="pricing-features">
             <li><span class="check-icon">✓</span> Hasta 15 usuarios simultáneos</li>
@@ -190,7 +212,7 @@
             <li><span class="check-icon">✓</span> Soporte técnico prioritario</li>
             <li><span class="check-icon">✓</span> <strong>Plan Anual:</strong> ¡1 mes GRATIS + 5% EXTRA referidos!</li>
           </ul>
-          <a routerLink="/login" class="pricing-btn btn-pyme mt-auto">Elegir Plan</a>
+          <a routerLink="/login" (click)="goToLogin(); $event.preventDefault()" class="pricing-btn btn-pyme mt-auto">Elegir Plan</a>
         </div>
 
         <!-- Plan Empresarial -->
@@ -202,7 +224,7 @@
             <span class="price-period"> COP / mes</span>
           </div>
           <div class="referral-banner banner-emerald">
-            <span class="text-xs font-medium">🤝 <strong>¿Vienes referido o traes a un amigo?</strong> Obtén <strong>10% de descuento</strong></span>
+            <span class="font-medium">🤝 <strong>¿Vienes referido o traes a un amigo?</strong> Obtén <strong>10% de descuento</strong></span>
           </div>
           <ul class="pricing-features">
             <li><span class="check-icon">✓</span> Hasta 50 usuarios y máximo rendimiento</li>
@@ -210,7 +232,7 @@
             <li><span class="check-icon">✓</span> Auditoría de acciones y soporte integral 24/7</li>
             <li><span class="check-icon">✓</span> <strong>Plan Anual:</strong> ¡1 mes GRATIS + 5% EXTRA referidos!</li>
           </ul>
-          <a routerLink="/login" class="pricing-btn btn-empresarial mt-auto">Elegir Plan</a>
+          <a routerLink="/login" (click)="goToLogin(); $event.preventDefault()" class="pricing-btn btn-empresarial mt-auto">Elegir Plan</a>
         </div>
 
       </div>

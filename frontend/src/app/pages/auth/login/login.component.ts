@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { AccessibilityService, DaltonismMode } from '../../../services/accessibility/accessibility.service';
@@ -16,7 +16,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
 
   // --- VARIABLES DE ESTADO ---
   credentials = {
@@ -38,6 +38,13 @@ export class LoginComponent {
   isRecovering = false;
   recoveryMessage = '';
   recoveryError = '';
+
+  ngOnInit(): void {
+    // Si el usuario llega al login (por botón atrás o navegación directa) teniendo sesión abierta, se cierra de inmediato
+    if (this.authService.getToken()) {
+      this.authService.logout(false);
+    }
+  }
 
   abrirModalRecuperar() {
     this.recoveryEmail = this.credentials.email || '';
@@ -123,8 +130,8 @@ export class LoginComponent {
 
         const user = response.user;
         if (user && user.empresa_id === null) {
-          console.log("NAVIGATING TO /saas-admin");
-          window.location.href = '/saas-admin';
+          console.log("NAVIGATING TO /saas-admin/dashboard");
+          this.router.navigate(['/saas-admin', 'dashboard']);
         } else {
           let ruta = '/inicio';
           if (user.empresa && user.empresa.dominio) {
@@ -136,7 +143,7 @@ export class LoginComponent {
             ruta = '/' + slug + '/inicio';
           }
           console.log("NAVIGATING TO", ruta);
-          window.location.href = ruta;
+          this.router.navigateByUrl(ruta);
         }
       },
       error: (err) => {

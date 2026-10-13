@@ -58,6 +58,9 @@ class AuthController extends Controller
             ]);
         }
 
+        // Cierra cualquier sesión previa abierta por este usuario en otros navegadores o pestañas
+        $user->tokens()->delete();
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         // Cargar módulos activos para evitar llamadas extras en el frontend

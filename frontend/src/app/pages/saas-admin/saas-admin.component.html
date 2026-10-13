@@ -4,28 +4,18 @@
     <div class="header-left">
       <div class="logo-container flex flex-col items-center justify-center pt-2">
         <img src="assets/images/Logos/GESTIVAPYME(7).png" alt="GestivaPyme" class="brand-logo" />
-        <span
-          class="badge mt-0.5"
-          style="
-            color: #000000 !important;
-            font-weight: 900 !important;
-            font-size: 8px !important;
-            padding: 1px 4px !important;
-            letter-spacing: 0.5px;
-          "
-          >ADMINISTRADOR</span
-        >
+        <span class="badge mt-0.5">ADMINISTRADOR</span>
       </div>
     </div>
 
     <div class="header-right">
       <div class="welcome-text">
-        <h1 class="text-[14px] font-bold text-white mb-0">Hola, {{ userName }}</h1>
-        <p class="text-[10px] text-gray-400">Panel de Control de GestivaPyme.</p>
+        <h1 class="text-base font-bold text-white mb-0">Hola, {{ userName }}</h1>
+        <p class="text-sm text-slate-200">Panel de Control de GestivaPyme.</p>
       </div>
       <div class="topbar-actions flex items-center gap-4">
         <!-- Perfil y Logout -->
-        <div class="user-profile">
+        <div class="user-profile" (click)="logout()" title="Cerrar Sesión">
           @if (userAvatar) {
             <img
               [src]="userAvatar"
@@ -35,7 +25,7 @@
           } @else {
             <div class="avatar">{{ userInitials }}</div>
           }
-          <button class="btn-logout" (click)="logout()">Cerrar Sesión</button>
+          <button type="button" class="btn-logout" (click)="logout(); $event.stopPropagation()">Cerrar Sesión</button>
         </div>
 
         <!-- Botón Accesibilidad Daltonismo -->
@@ -69,47 +59,37 @@
           <!-- Menú Desplegable -->
           @if (isAccessibilityMenuOpen) {
             <div
-              class="saas-access-menu absolute right-0 top-12 mt-2 w-56 bg-gray-800 rounded-lg shadow-xl border border-gray-700 overflow-hidden z-50"
+              class="saas-access-menu absolute right-0 top-12 mt-2 w-56 bg-gray-800 rounded-lg shadow-xl border border-slate-500 overflow-hidden z-50"
             >
-              <div class="saas-access-header bg-gray-900 p-3 border-b border-gray-700">
+              <div class="saas-access-header bg-gray-900 p-3 border-b border-slate-500">
                 <p class="saas-access-title text-sm font-semibold text-white m-0">Daltonismo</p>
               </div>
               <div class="flex flex-col">
                 <button
                   (click)="setDaltonismMode('normal')"
-                  [style.background-color]="
-                    accessibilityService.currentMode() === 'normal' ? '#334155' : 'transparent'
-                  "
-                  class="text-left px-4 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors border-b border-gray-700/50"
+                  [class.active]="accessibilityService.currentMode() === 'normal'"
+                  class="saas-access-btn"
                 >
                   Vista Normal (Desactivado)
                 </button>
                 <button
                   (click)="setDaltonismMode('protanopia')"
-                  [style.background-color]="
-                    accessibilityService.currentMode() === 'protanopia' ? '#334155' : 'transparent'
-                  "
-                  class="text-left px-4 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors border-b border-gray-700/50"
+                  [class.active]="accessibilityService.currentMode() === 'protanopia'"
+                  class="saas-access-btn"
                 >
                   Protanopía (Rojo débil)
                 </button>
                 <button
                   (click)="setDaltonismMode('deuteranopia')"
-                  [style.background-color]="
-                    accessibilityService.currentMode() === 'deuteranopia'
-                      ? '#334155'
-                      : 'transparent'
-                  "
-                  class="text-left px-4 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors border-b border-gray-700/50"
+                  [class.active]="accessibilityService.currentMode() === 'deuteranopia'"
+                  class="saas-access-btn"
                 >
                   Deuteranopía (Verde débil)
                 </button>
                 <button
                   (click)="setDaltonismMode('tritanopia')"
-                  [style.background-color]="
-                    accessibilityService.currentMode() === 'tritanopia' ? '#334155' : 'transparent'
-                  "
-                  class="text-left px-4 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors"
+                  [class.active]="accessibilityService.currentMode() === 'tritanopia'"
+                  class="saas-access-btn"
                 >
                   Tritanopía (Azul débil)
                 </button>
@@ -408,20 +388,20 @@
               <h2 class="text-[16px] font-bold text-white tracking-wide uppercase mb-2">
                 Módulo de Soporte Técnico
               </h2>
-              <p class="text-gray-400 font-medium">
+              <p class="text-slate-200 font-medium">
                 Gestión de tickets de soporte de empresas cliente
               </p>
             </div>
           </div>
 
           <div
-            class="bg-gray-800/50 rounded-xl overflow-hidden border border-gray-700/50 mt-6 shadow-xl relative backdrop-blur-sm"
+            class="bg-gray-800/50 rounded-xl overflow-hidden border border-slate-500/50 mt-6 shadow-xl relative backdrop-blur-sm"
           >
             <div class="overflow-x-auto">
               <table class="saas-table w-full text-left border-collapse">
                 <thead>
                   <tr
-                    class="bg-gray-900/50 text-gray-300 text-sm tracking-wider uppercase border-b border-gray-700"
+                    class="bg-gray-900/50 text-gray-300 text-sm tracking-wider uppercase border-b border-slate-500"
                   >
                     <th class="px-2 py-4 font-semibold">ID</th>
                     <th class="px-2 py-4 font-semibold">Empresa</th>
@@ -435,14 +415,14 @@
                 <tbody class="divide-y divide-gray-800/50">
                   @for (ticket of ticketsSoporte; track ticket.id) {
                     <tr class="hover:bg-gray-700/30 transition-colors duration-200">
-                      <td class="px-2 py-4 text-gray-400 text-sm">#{{ ticket.id }}</td>
+                      <td class="px-2 py-4 text-slate-200 text-sm">#{{ ticket.id }}</td>
                       <td class="px-2 py-4 font-medium text-white">
                         {{ ticket.empresa?.razon_social || 'Desconocida' }}
                       </td>
                       <td class="px-2 py-4 text-gray-300">{{ ticket.asunto }}</td>
                       <td class="px-2 py-4">
                         <span
-                          class="px-3 py-1 rounded-full text-xs font-semibold
+                          class="px-3 py-1 rounded-full text-sm font-semibold
                           {{
                             ticket.prioridad === 'Alta'
                               ? 'bg-red-500/20 text-red-400 border border-red-500/30'
@@ -456,7 +436,7 @@
                       </td>
                       <td class="px-2 py-4">
                         <span
-                          class="px-3 py-1 rounded-full text-xs font-semibold
+                          class="px-3 py-1 rounded-full text-sm font-semibold
                           {{
                             ticket.estado === 'Abierto'
                               ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
@@ -468,7 +448,7 @@
                           {{ ticket.estado }}
                         </span>
                       </td>
-                      <td class="px-2 py-4 text-gray-400 text-sm">
+                      <td class="px-2 py-4 text-slate-200 text-sm">
                         {{ ticket.created_at | date: 'dd/MM/yyyy HH:mm' }}
                       </td>
                       <td class="px-2 py-4 text-center">
@@ -484,7 +464,7 @@
                   }
                   @if (ticketsSoporte.length === 0) {
                     <tr>
-                      <td colspan="7" class="p-8 text-center text-gray-500">
+                      <td colspan="7" class="p-8 text-center text-slate-200">
                         <svg
                           class="w-12 h-12 mx-auto mb-3 opacity-50"
                           fill="none"
@@ -516,7 +496,7 @@
             <h2 class="text-[16px] font-bold text-white tracking-wide text-center uppercase mb-2">
               Seguridad y Perfil
             </h2>
-            <p class="text-gray-400 text-center text-sm">
+            <p class="text-slate-200 text-center text-sm">
               Gestiona tus credenciales de acceso y datos principales.
             </p>
           </div>
@@ -540,8 +520,8 @@
                 </div>
               }
 
-              <h3 class="text-[13px] text-white font-bold mb-1">{{ userName }}</h3>
-              <p class="text-sm text-gray-400 mb-6">{{ userEmail }}</p>
+              <h3 class="text-base text-white font-bold mb-1">{{ userName }}</h3>
+              <p class="text-sm text-slate-200 mb-6">{{ userEmail }}</p>
 
               <input
                 type="file"
@@ -574,7 +554,7 @@
                 </svg>
                 Cambiar Avatar
               </button>
-              <p class="text-[10px] text-gray-500 mt-2 text-center">
+              <p class="text-sm text-slate-200 mt-2 text-center">
                 Formato recomendado: PNG, JPG. Máximo 2MB.
               </p>
             </div>
@@ -583,7 +563,7 @@
             <div class="col-span-1 md:col-span-2 flex flex-col gap-6">
               <!-- Datos Básicos -->
               <div class="bg-[#0f172a] rounded-2xl p-6 shadow-inner border border-gray-800">
-                <h3 class="text-white font-bold text-[13px] mb-4 flex items-center gap-2">
+                <h3 class="text-white font-bold text-base mb-4 flex items-center gap-2">
                   <svg
                     class="w-5 h-5 text-blue-400"
                     fill="none"
@@ -602,28 +582,28 @@
 
                 <form (ngSubmit)="actualizarPerfil()" class="flex flex-col gap-4">
                   <div class="flex flex-col gap-1">
-                    <label class="text-xs font-semibold text-gray-400 uppercase tracking-wide"
+                    <label class="text-sm font-semibold text-slate-200 uppercase tracking-wide"
                       >Nombre a mostrar</label
                     >
                     <input
                       type="text"
                       [(ngModel)]="profileForm.nombres"
                       name="nombres"
-                      class="bg-gray-900 border border-gray-700 text-white rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500 transition-colors"
+                      class="bg-gray-900 border border-slate-500 text-white rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500 transition-colors"
                       placeholder="Ej: SAdmin SaaS"
                       required
                     />
                   </div>
 
                   <div class="flex flex-col gap-1">
-                    <label class="text-xs font-semibold text-gray-400 uppercase tracking-wide"
+                    <label class="text-sm font-semibold text-slate-200 uppercase tracking-wide"
                       >Correo Electrónico (Acceso)</label
                     >
                     <input
                       type="email"
                       [(ngModel)]="profileForm.email"
                       name="email"
-                      class="bg-gray-900 border border-gray-700 text-white rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500 transition-colors"
+                      class="bg-gray-900 border border-slate-500 text-white rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500 transition-colors"
                       placeholder="tu-correo@gestivapyme.com"
                       required
                     />
@@ -650,7 +630,7 @@
                 class="bg-[#0f172a] rounded-2xl p-6 shadow-inner border border-red-500/20 relative overflow-hidden"
               >
                 <h3
-                  class="text-red-400 font-bold text-[13px] mb-2 flex items-center gap-2 relative z-10"
+                  class="text-red-400 font-bold text-base mb-2 flex items-center gap-2 relative z-10"
                 >
                   <svg
                     class="w-5 h-5"
@@ -667,7 +647,7 @@
                   </svg>
                   Seguridad de Acceso
                 </h3>
-                <p class="text-gray-400 text-sm text-justify mb-6 relative z-10">
+                <p class="text-slate-200 text-sm text-justify mb-6 relative z-10">
                   Si crees que tu cuenta ha sido comprometida o simplemente deseas renovar tu clave
                   por seguridad, puedes forzar un reseteo.
                   <br /><br />
@@ -712,7 +692,7 @@
             <h2 class="text-[16px] font-bold text-white tracking-wide text-center uppercase m-0">
               Directorio de Empresas Cliente
             </h2>
-            <p class="text-gray-400 text-center text-sm m-0">
+            <p class="text-slate-200 text-center text-sm m-0">
               Administra el portafolio global de empresas y sus estados en el sistema.
             </p>
             <button (click)="abrirModal()" class="btn-new mt-2">+ Nueva Empresa</button>
@@ -743,7 +723,7 @@
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   ></path>
                 </svg>
-                <span class="text-gray-400 font-semibold tracking-wide"
+                <span class="text-slate-200 font-semibold tracking-wide"
                   >Cargando base de datos...</span
                 >
               </div>
@@ -995,7 +975,7 @@
             <h2 class="text-[16px] font-bold text-white mb-2 tracking-wide text-center uppercase">
               Bandeja de Solicitudes
             </h2>
-            <p class="text-gray-400 text-center text-sm">
+            <p class="text-slate-200 text-center text-sm">
               Centro de atención para requerimientos, soporte técnico y comunicación con clientes.
             </p>
           </div>
@@ -1007,15 +987,14 @@
                 type="text"
                 [(ngModel)]="filtroEmpresaSolicitud"
                 placeholder="Buscar por nombre de empresa..."
-                class="w-full bg-[#0f172a] border border-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500 transition-colors"
+                class="w-full bg-[#0f172a] border border-slate-500 text-white rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500 transition-colors"
               />
             </div>
             <div class="w-full sm:w-48">
               <input
                 type="date"
                 [(ngModel)]="filtroFechaSolicitud"
-                class="w-full bg-[#0f172a] border border-orange-500/40 text-white rounded-lg px-4 py-2 focus:outline-none focus:border-orange-500 transition-colors"
-                style="color-scheme: dark"
+                class="dark-date-input w-full bg-[#0f172a] border border-orange-500/40 text-white rounded-lg px-4 py-2 focus:outline-none focus:border-orange-500 transition-colors"
                 title="Filtrar por fecha"
               />
             </div>
@@ -1076,7 +1055,7 @@
             <h2 class="text-[16px] font-bold text-white tracking-wide text-center uppercase mb-2">
               CONFIGURACIÓN Y CONTROL DE IA
             </h2>
-            <p class="text-gray-400 text-center text-sm mb-6">
+            <p class="text-slate-200 text-center text-sm mb-6">
               Gestiona las llaves de acceso, los modos de operación y las tareas permitidas por cada
               empresa en el sistema.
             </p>
@@ -1092,10 +1071,10 @@
                   >
                     1
                   </div>
-                  <h3 class="text-[13px] font-bold text-white">Seleccionar Empresa</h3>
+                  <h3 class="text-base font-bold text-white">Seleccionar Empresa</h3>
                 </div>
                 <select
-                  class="bg-gray-900 border border-gray-700 text-white rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500 transition-colors w-full"
+                  class="bg-gray-900 border border-slate-500 text-white rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500 transition-colors w-full"
                   [(ngModel)]="iaConfigSeleccionada.empresaId"
                 >
                   <option [ngValue]="null">-- Seleccione una empresa --</option>
@@ -1117,14 +1096,14 @@
                   >
                     2
                   </div>
-                  <h3 class="text-[13px] font-bold text-white">Conectar Proveedor de IA</h3>
+                  <h3 class="text-base font-bold text-white">Conectar Proveedor de IA</h3>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label class="form-label text-gray-400 text-sm block mb-2">Proveedor</label>
+                    <label class="form-label text-slate-200 text-sm block mb-2">Proveedor</label>
                     <select
-                      class="bg-gray-900 border border-gray-700 text-white rounded-lg px-4 py-2.5 focus:outline-none focus:border-purple-500 transition-colors w-full"
+                      class="bg-gray-900 border border-slate-500 text-white rounded-lg px-4 py-2.5 focus:outline-none focus:border-purple-500 transition-colors w-full"
                       [(ngModel)]="iaConfigSeleccionada.proveedor"
                     >
                       <option value="gemini">Google Gemini</option>
@@ -1134,14 +1113,14 @@
                     </select>
                   </div>
                   <div>
-                    <label class="form-label text-gray-400 text-sm block mb-2">API Key</label>
+                    <label class="form-label text-slate-200 text-sm block mb-2">API Key</label>
                     <input
                       type="password"
-                      class="bg-gray-900 border border-gray-700 text-white rounded-lg px-4 py-2.5 focus:outline-none focus:border-purple-500 transition-colors w-full"
+                      class="bg-gray-900 border border-slate-500 text-white rounded-lg px-4 py-2.5 focus:outline-none focus:border-purple-500 transition-colors w-full"
                       placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxx"
                       [(ngModel)]="iaConfigSeleccionada.apiKey"
                     />
-                    <p class="text-xs text-gray-500 mt-1">
+                    <p class="text-sm text-slate-200 mt-1">
                       La llave se cifra localmente. Nunca la compartas.
                     </p>
                   </div>
@@ -1158,13 +1137,13 @@
                   >
                     3
                   </div>
-                  <h3 class="text-[13px] font-bold text-white">Modo de Operación y Permisos</h3>
+                  <h3 class="text-base font-bold text-white">Modo de Operación y Permisos</h3>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   <!-- Modos -->
                   <div>
-                    <label class="form-label text-gray-400 text-sm block mb-3"
+                    <label class="form-label text-slate-200 text-sm block mb-3"
                       >Nivel de Integración</label
                     >
                     <div class="flex flex-col gap-3">
@@ -1177,11 +1156,11 @@
                           name="iaMode"
                           value="apagado"
                           [(ngModel)]="iaConfigSeleccionada.modo"
-                          class="form-radio text-gray-500 bg-dark-bg border-gray-600"
+                          class="form-radio text-slate-200 bg-dark-bg border-gray-600"
                         />
                         <div>
                           <span class="text-gray-300 font-medium">Apagado (Off Total)</span>
-                          <p class="text-xs text-gray-500 mt-0.5">
+                          <p class="text-sm text-slate-200 mt-0.5">
                             Módulo desactivado por completo.
                           </p>
                         </div>
@@ -1199,7 +1178,7 @@
                         />
                         <div>
                           <span class="text-blue-400 font-medium">Modo Simple</span>
-                          <p class="text-xs text-gray-500 mt-0.5">
+                          <p class="text-sm text-slate-200 mt-0.5">
                             La IA solo recomienda y sugiere acciones.
                           </p>
                         </div>
@@ -1217,7 +1196,7 @@
                         />
                         <div>
                           <span class="text-purple-400 font-medium">Modo Avanzado (Ejecutor)</span>
-                          <p class="text-xs text-gray-500 mt-0.5">
+                          <p class="text-sm text-slate-200 mt-0.5">
                             La IA actúa por sí sola. Genera cobro por tokens.
                           </p>
                         </div>
@@ -1227,7 +1206,7 @@
 
                   <!-- Tareas -->
                   <div>
-                    <label class="form-label text-gray-400 text-sm block mb-3"
+                    <label class="form-label text-slate-200 text-sm block mb-3"
                       >Tareas Permitidas</label
                     >
                     <div class="flex flex-col gap-3">
@@ -1310,7 +1289,7 @@
             <h2 class="text-[16px] font-bold text-white tracking-wide text-center uppercase mb-2">
               Bandeja de Suscripciones
             </h2>
-            <p class="text-gray-400 text-center text-sm mb-6">
+            <p class="text-slate-200 text-center text-sm mb-6">
               Control financiero, métricas de retención mensual (MRR) y gestión de pagos.
             </p>
           </div>
@@ -1320,32 +1299,32 @@
               <h3 class="panel-title mb-6">Métricas Financieras (MRR)</h3>
 
               <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                <div class="bg-gray-800 border border-gray-700 p-4 rounded-lg text-center">
-                  <span class="text-xs text-gray-400 uppercase tracking-wider block mb-1"
+                <div class="bg-gray-800 border border-slate-500 p-4 rounded-lg text-center">
+                  <span class="text-sm text-slate-200 uppercase tracking-wider block mb-1"
                     >MRR (Ingreso Mensual)</span
                   >
                   <span class="text-xl text-green-400 font-medium font-inter"
                     >${{ statsSuscripciones.mrr | number: '1.0-0' }}</span
                   >
                 </div>
-                <div class="bg-gray-800 border border-gray-700 p-4 rounded-lg text-center">
-                  <span class="text-xs text-gray-400 uppercase tracking-wider block mb-1"
+                <div class="bg-gray-800 border border-slate-500 p-4 rounded-lg text-center">
+                  <span class="text-sm text-slate-200 uppercase tracking-wider block mb-1"
                     >Clientes Activos</span
                   >
                   <span class="text-xl text-blue-400 font-medium font-inter">{{
                     statsSuscripciones.clientesActivos
                   }}</span>
                 </div>
-                <div class="bg-gray-800 border border-gray-700 p-4 rounded-lg text-center">
-                  <span class="text-xs text-gray-400 uppercase tracking-wider block mb-1"
+                <div class="bg-gray-800 border border-slate-500 p-4 rounded-lg text-center">
+                  <span class="text-sm text-slate-200 uppercase tracking-wider block mb-1"
                     >Clientes en Mora</span
                   >
                   <span class="text-xl text-red-400 font-medium font-inter">{{
                     statsSuscripciones.clientesMora
                   }}</span>
                 </div>
-                <div class="bg-gray-800 border border-gray-700 p-4 rounded-lg text-center">
-                  <span class="text-xs text-gray-400 uppercase tracking-wider block mb-1"
+                <div class="bg-gray-800 border border-slate-500 p-4 rounded-lg text-center">
+                  <span class="text-sm text-slate-200 uppercase tracking-wider block mb-1"
                     >Crecimiento (Mes)</span
                   >
                   <span class="text-xl text-purple-400 font-medium font-inter"
@@ -1384,9 +1363,9 @@
               </div>
               @if (suscripcionesList.length > 0) {
                 <div class="table-responsive overflow-x-auto">
-                  <table class="data-table font-inter text-xs w-full text-center">
+                  <table class="data-table font-inter text-sm w-full text-center">
                     <thead>
-                      <tr class="bg-gray-800 text-gray-400">
+                      <tr class="bg-gray-800 text-slate-200">
                         <th
                           class="px-2 py-4 font-semibold uppercase tracking-wider text-center whitespace-nowrap"
                         >
@@ -1457,7 +1436,7 @@
                           </td>
                           <td class="px-2 py-4 text-center whitespace-nowrap">
                             <span
-                              class="px-2 py-0.5 rounded-full font-bold uppercase text-[10px] bg-blue-900/30 text-blue-400"
+                              class="px-2 py-0.5 rounded-full font-bold uppercase text-sm bg-blue-900/30 text-blue-400"
                             >
                               {{ sus.plan }}
                             </span>
@@ -1474,25 +1453,25 @@
                               <div class="space-y-1">
                                 @for (paq of sus.paquetesAdicionales.split(', '); track $index) {
                                   <div
-                                    class="text-emerald-400 font-semibold text-[11px] bg-emerald-950/20 px-2 py-0.5 rounded inline-block"
+                                    class="text-emerald-400 font-semibold text-sm bg-emerald-950/20 px-2 py-0.5 rounded inline-block"
                                   >
                                     {{ paq }}
                                   </div>
                                 }
                               </div>
                             } @else {
-                              <span class="text-gray-500 italic">Ninguno</span>
+                              <span class="text-slate-200 italic">Ninguno</span>
                             }
                           </td>
                           <td class="px-2 py-4 text-center whitespace-nowrap">
                             @if (sus.descuentos !== 'Ninguno') {
                               <span
-                                class="text-yellow-400 font-semibold text-[11px] bg-yellow-950/20 px-2 py-0.5 rounded inline-block"
+                                class="text-yellow-400 font-semibold text-sm bg-yellow-950/20 px-2 py-0.5 rounded inline-block"
                               >
                                 {{ sus.descuentos }}
                               </span>
                             } @else {
-                              <span class="text-gray-500 italic">Ninguno</span>
+                              <span class="text-slate-200 italic">Ninguno</span>
                             }
                           </td>
                           <td class="px-2 py-4 text-center whitespace-nowrap">
@@ -1505,7 +1484,7 @@
                           >
                             ${{ sus.proximoPagoTotal | number: '1.0-0' }} COP
                           </td>
-                          <td class="px-2 py-4 text-center text-gray-400 whitespace-nowrap">
+                          <td class="px-2 py-4 text-center text-slate-200 whitespace-nowrap">
                             {{ sus.fechaProximoPago }}
                           </td>
                           <td class="px-2 py-4 text-center whitespace-nowrap">
@@ -1523,7 +1502,7 @@
                               </span>
                             } @else {
                               <span
-                                class="px-2 py-0.5 rounded-full font-semibold uppercase bg-gray-500/20 text-gray-400"
+                                class="px-2 py-0.5 rounded-full font-semibold uppercase bg-gray-500/20 text-slate-200"
                               >
                                 Inactiva
                               </span>
@@ -1537,7 +1516,7 @@
                                 title="Gestionar Tarifas"
                               >
                                 <svg
-                                  class="w-5 h-5 text-gray-400"
+                                  class="w-5 h-5 text-slate-200"
                                   fill="none"
                                   stroke="currentColor"
                                   viewBox="0 0 24 24"
@@ -1613,7 +1592,7 @@
                   </h2>
                   <button
                     (click)="cerrarCarritoSuscripcion()"
-                    class="text-gray-400 hover:text-white transition-colors"
+                    class="text-slate-200 hover:text-white transition-colors"
                   >
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -1635,7 +1614,7 @@
                         (click)="activeTabCarrito = 'plan_base'"
                         [class.border-emerald-500]="activeTabCarrito === 'plan_base'"
                         [class.text-emerald-400]="activeTabCarrito === 'plan_base'"
-                        class="px-4 py-2 border-b-2 border-transparent font-semibold text-xs uppercase tracking-wider text-gray-400 hover:text-white transition-colors whitespace-nowrap"
+                        class="px-4 py-2 border-b-2 border-transparent font-semibold text-sm uppercase tracking-wider text-slate-200 hover:text-white transition-colors whitespace-nowrap"
                       >
                         1. Plan & Base
                       </button>
@@ -1643,7 +1622,7 @@
                         (click)="activeTabCarrito = 'modulos'"
                         [class.border-emerald-500]="activeTabCarrito === 'modulos'"
                         [class.text-emerald-400]="activeTabCarrito === 'modulos'"
-                        class="px-4 py-2 border-b-2 border-transparent font-semibold text-xs uppercase tracking-wider text-gray-400 hover:text-white transition-colors whitespace-nowrap"
+                        class="px-4 py-2 border-b-2 border-transparent font-semibold text-sm uppercase tracking-wider text-slate-200 hover:text-white transition-colors whitespace-nowrap"
                       >
                         2. Módulos Adicionales
                       </button>
@@ -1651,7 +1630,7 @@
                         (click)="activeTabCarrito = 'ia'"
                         [class.border-emerald-500]="activeTabCarrito === 'ia'"
                         [class.text-emerald-400]="activeTabCarrito === 'ia'"
-                        class="px-4 py-2 border-b-2 border-transparent font-semibold text-xs uppercase tracking-wider text-gray-400 hover:text-white transition-colors whitespace-nowrap"
+                        class="px-4 py-2 border-b-2 border-transparent font-semibold text-sm uppercase tracking-wider text-slate-200 hover:text-white transition-colors whitespace-nowrap"
                       >
                         3. Inteligencia Artificial
                       </button>
@@ -1659,7 +1638,7 @@
                         (click)="activeTabCarrito = 'addons'"
                         [class.border-emerald-500]="activeTabCarrito === 'addons'"
                         [class.text-emerald-400]="activeTabCarrito === 'addons'"
-                        class="px-4 py-2 border-b-2 border-transparent font-semibold text-xs uppercase tracking-wider text-gray-400 hover:text-white transition-colors whitespace-nowrap"
+                        class="px-4 py-2 border-b-2 border-transparent font-semibold text-sm uppercase tracking-wider text-slate-200 hover:text-white transition-colors whitespace-nowrap"
                       >
                         4. Conectores (Add-ons)
                       </button>
@@ -1672,7 +1651,7 @@
                     >
                       <div>
                         <label
-                          class="block text-xs uppercase tracking-wider text-gray-400 font-semibold mb-2"
+                          class="block text-sm uppercase tracking-wider text-slate-200 font-semibold mb-2"
                           >Tipo de Empresa</label
                         >
                         <div class="text-sm font-bold text-white">
@@ -1682,7 +1661,7 @@
                               : selectedTipoEmpresa
                           }}
                         </div>
-                        <div class="text-[10px] text-gray-500 mt-1">
+                        <div class="text-sm text-slate-200 mt-1">
                           Definido en el módulo Empresas
                         </div>
                       </div>
@@ -1691,13 +1670,13 @@
 
                       <div>
                         <label
-                          class="block text-xs uppercase tracking-wider text-gray-400 font-semibold mb-2"
+                          class="block text-sm uppercase tracking-wider text-slate-200 font-semibold mb-2"
                           >Plan Adquirido</label
                         >
                         <div class="text-sm font-bold text-blue-400 uppercase">
                           {{ suscripcionEnEdicion?.plan }}
                         </div>
-                        <div class="text-[10px] text-gray-500 mt-1">
+                        <div class="text-sm text-slate-200 mt-1">
                           Definido en el módulo Empresas
                         </div>
                       </div>
@@ -1706,7 +1685,7 @@
 
                       <div>
                         <label
-                          class="block text-xs uppercase tracking-wider text-gray-400 font-semibold mb-2"
+                          class="block text-sm uppercase tracking-wider text-slate-200 font-semibold mb-2"
                           >Descuentos Aplicados</label
                         >
                         <div
@@ -1723,11 +1702,11 @@
                             !suscripcionEnEdicion?.descuentos ||
                             suscripcionEnEdicion!.descuentos === 'Ninguno'
                           "
-                          class="text-sm text-gray-500 italic"
+                          class="text-sm text-slate-200 italic"
                         >
                           Ninguno
                         </div>
-                        <div class="text-[10px] text-gray-500 mt-1">
+                        <div class="text-sm text-slate-200 mt-1">
                           Definido en el módulo Empresas
                         </div>
                       </div>
@@ -1742,7 +1721,7 @@
                             selectedTipoEmpresa
                           )
                         "
-                        class="bg-yellow-950/20 border border-yellow-800/50 p-4 rounded-xl text-yellow-300 text-xs flex items-center gap-3"
+                        class="bg-yellow-950/20 border border-yellow-800/50 p-4 rounded-xl text-yellow-300 text-sm flex items-center gap-3"
                       >
                         <svg
                           class="w-5 h-5 flex-shrink-0"
@@ -1772,7 +1751,7 @@
                         class="bg-gray-800/40 p-4 rounded-xl border border-gray-800 space-y-3"
                       >
                         <label
-                          class="block text-xs uppercase tracking-wider text-gray-400 font-semibold mb-2"
+                          class="block text-sm uppercase tracking-wider text-slate-200 font-semibold mb-2"
                           >Habilitar Módulos Especiales (Transversales)</label
                         >
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -1784,20 +1763,20 @@
                               "
                               [class.border-emerald-500]="cartItemsSelect[item.id]?.active"
                               [class.bg-emerald-950/20]="cartItemsSelect[item.id]?.active"
-                              class="p-3 rounded-xl border border-gray-800 hover:border-gray-700 transition-all cursor-pointer flex justify-between items-center relative"
+                              class="p-3 rounded-xl border border-gray-800 hover:border-slate-500 transition-all cursor-pointer flex justify-between items-center relative"
                             >
                               <div>
-                                <div class="font-semibold text-xs text-white">
+                                <div class="font-semibold text-sm text-white">
                                   {{ item.nombre }}
                                 </div>
-                                <div class="text-[10px] text-gray-400 mt-1">
+                                <div class="text-sm text-slate-200 mt-1">
                                   +${{ item.valor | number: '1.0-0' }} COP / mes
                                 </div>
                               </div>
                               <input
                                 type="checkbox"
                                 [checked]="cartItemsSelect[item.id]?.active"
-                                class="rounded text-emerald-500 border-gray-700 bg-gray-900 pointer-events-none"
+                                class="rounded text-emerald-500 border-slate-500 bg-gray-900 pointer-events-none"
                               />
                             </div>
                           </ng-container>
@@ -1815,10 +1794,10 @@
                         class="flex items-center justify-between p-3 bg-gray-900 rounded-xl border border-gray-800"
                       >
                         <div>
-                          <div class="font-bold text-xs text-white">
+                          <div class="font-bold text-sm text-white">
                             Traer propia API Key (BYOK)
                           </div>
-                          <div class="text-[10px] text-gray-400 mt-1">
+                          <div class="text-sm text-slate-200 mt-1">
                             El cliente provee su credencial y paga su consumo directo. Cobro de
                             conector fijo mensual.
                           </div>
@@ -1836,7 +1815,7 @@
                       <!-- Opción A: Cobro SaaS por usuarios de IA -->
                       <div *ngIf="!iaByokActivo" class="space-y-4">
                         <label
-                          class="block text-xs uppercase tracking-wider text-gray-400 font-semibold mb-2"
+                          class="block text-sm uppercase tracking-wider text-slate-200 font-semibold mb-2"
                           >Configurar Usuarios de IA (Gestiva AI)</label
                         >
 
@@ -1845,16 +1824,16 @@
                           <div class="p-4 bg-gray-900 rounded-xl border border-gray-800">
                             <div class="flex items-center justify-between mb-3">
                               <label
-                                class="flex items-center gap-2 cursor-pointer font-bold text-xs text-white"
+                                class="flex items-center gap-2 cursor-pointer font-bold text-sm text-white"
                               >
                                 <input
                                   type="checkbox"
                                   [(ngModel)]="cartItemsSelect['ia_simple'].active"
-                                  class="rounded text-emerald-500 border-gray-700 bg-gray-900"
+                                  class="rounded text-emerald-500 border-slate-500 bg-gray-900"
                                 />
                                 Modo Simple (Límite 15 acciones/día)
                               </label>
-                              <span class="text-xs text-emerald-400 font-bold font-inter"
+                              <span class="text-sm text-emerald-400 font-bold font-inter"
                                 >$6.000 / mes</span
                               >
                             </div>
@@ -1862,11 +1841,11 @@
                               class="flex items-center justify-between gap-3 mt-4"
                               *ngIf="cartItemsSelect['ia_simple'].active"
                             >
-                              <span class="text-[10px] text-gray-400">Cantidad de usuarios:</span>
+                              <span class="text-sm text-slate-200">Cantidad de usuarios:</span>
                               <input
                                 type="number"
                                 [(ngModel)]="cartItemsSelect['ia_simple'].cantidad"
-                                class="neu-dark-input text-xs w-20 text-center !p-1.5"
+                                class="neu-dark-input text-sm w-20 text-center !p-1.5"
                                 min="1"
                               />
                             </div>
@@ -1876,16 +1855,16 @@
                           <div class="p-4 bg-gray-900 rounded-xl border border-gray-800">
                             <div class="flex items-center justify-between mb-3">
                               <label
-                                class="flex items-center gap-2 cursor-pointer font-bold text-xs text-white"
+                                class="flex items-center gap-2 cursor-pointer font-bold text-sm text-white"
                               >
                                 <input
                                   type="checkbox"
                                   [(ngModel)]="cartItemsSelect['ia_avanzada'].active"
-                                  class="rounded text-emerald-500 border-gray-700 bg-gray-900"
+                                  class="rounded text-emerald-500 border-slate-500 bg-gray-900"
                                 />
                                 Modo Avanzado (Bolsa de 2M tokens/mes)
                               </label>
-                              <span class="text-xs text-emerald-400 font-bold font-inter"
+                              <span class="text-sm text-emerald-400 font-bold font-inter"
                                 >$18.000 / mes</span
                               >
                             </div>
@@ -1893,11 +1872,11 @@
                               class="flex items-center justify-between gap-3 mt-4"
                               *ngIf="cartItemsSelect['ia_avanzada'].active"
                             >
-                              <span class="text-[10px] text-gray-400">Cantidad de usuarios:</span>
+                              <span class="text-sm text-slate-200">Cantidad de usuarios:</span>
                               <input
                                 type="number"
                                 [(ngModel)]="cartItemsSelect['ia_avanzada'].cantidad"
-                                class="neu-dark-input text-xs w-20 text-center !p-1.5"
+                                class="neu-dark-input text-sm w-20 text-center !p-1.5"
                                 min="1"
                               />
                             </div>
@@ -1908,18 +1887,18 @@
                       <!-- Opción B: Formulario BYOK -->
                       <div *ngIf="iaByokActivo" class="space-y-4">
                         <label
-                          class="block text-xs uppercase tracking-wider text-gray-400 font-semibold mb-2"
+                          class="block text-sm uppercase tracking-wider text-slate-200 font-semibold mb-2"
                           >Credenciales API Propia del Cliente</label
                         >
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label class="block text-[10px] text-gray-400 mb-1"
+                            <label class="block text-sm text-slate-200 mb-1"
                               >Proveedor de IA</label
                             >
                             <select
                               [(ngModel)]="iaByokProveedor"
-                              class="neu-dark-input text-xs w-full !p-1.5"
+                              class="neu-dark-input text-sm w-full !p-1.5"
                             >
                               <option value="gemini">Google Gemini</option>
                               <option value="openai">OpenAI (GPT)</option>
@@ -1927,22 +1906,22 @@
                             </select>
                           </div>
                           <div>
-                            <label class="block text-[10px] text-gray-400 mb-1"
+                            <label class="block text-sm text-slate-200 mb-1"
                               >Modelo Específico</label
                             >
                             <input
                               type="text"
                               [(ngModel)]="iaByokModelo"
-                              class="neu-dark-input text-xs w-full !p-1.5"
+                              class="neu-dark-input text-sm w-full !p-1.5"
                               placeholder="Ej: gemini-3.5-flash"
                             />
                           </div>
                           <div class="md:col-span-2">
-                            <label class="block text-[10px] text-gray-400 mb-1">API Key</label>
+                            <label class="block text-sm text-slate-200 mb-1">API Key</label>
                             <input
                               type="password"
                               [(ngModel)]="iaByokKey"
-                              class="neu-dark-input text-xs w-full !p-1.5"
+                              class="neu-dark-input text-sm w-full !p-1.5"
                               placeholder="{{
                                 iaByokKeyExists
                                   ? '●●●●●●●● (Ya guardada. Deja en blanco para no cambiar)'
@@ -1960,7 +1939,7 @@
                       class="bg-gray-800/40 p-4 rounded-xl border border-gray-800 space-y-3"
                     >
                       <label
-                        class="block text-xs uppercase tracking-wider text-gray-400 font-semibold mb-2"
+                        class="block text-sm uppercase tracking-wider text-slate-200 font-semibold mb-2"
                         >Seleccionar Conectores e Integraciones Externas</label
                       >
                       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -1972,18 +1951,18 @@
                             "
                             [class.border-emerald-500]="cartItemsSelect[item.id]?.active"
                             [class.bg-emerald-950/20]="cartItemsSelect[item.id]?.active"
-                            class="p-3 rounded-xl border border-gray-800 hover:border-gray-700 transition-all cursor-pointer flex justify-between items-center relative"
+                            class="p-3 rounded-xl border border-gray-800 hover:border-slate-500 transition-all cursor-pointer flex justify-between items-center relative"
                           >
                             <div>
-                              <div class="font-semibold text-xs text-white">{{ item.nombre }}</div>
-                              <div class="text-[10px] text-gray-400 mt-1">
+                              <div class="font-semibold text-sm text-white">{{ item.nombre }}</div>
+                              <div class="text-sm text-slate-200 mt-1">
                                 +${{ item.valor | number: '1.0-0' }} COP / mes
                               </div>
                             </div>
                             <input
                               type="checkbox"
                               [checked]="cartItemsSelect[item.id]?.active"
-                              class="rounded text-emerald-500 border-gray-700 bg-gray-900 pointer-events-none"
+                              class="rounded text-emerald-500 border-slate-500 bg-gray-900 pointer-events-none"
                             />
                           </div>
                         </ng-container>
@@ -1994,21 +1973,21 @@
                   <!-- PARTE DERECHA: RESUMEN DE COMPRA (INLINE CHECKOUT) - 1 COLUMNA -->
                   <div class="space-y-6">
                     <div
-                      class="bg-gray-800/70 p-5 rounded-xl border border-gray-700 shadow-lg space-y-4"
+                      class="bg-gray-800/70 p-5 rounded-xl border border-slate-500 shadow-lg space-y-4"
                     >
                       <h3
-                        class="text-xs uppercase tracking-wider text-gray-400 font-semibold border-b border-gray-700 pb-2"
+                        class="text-sm uppercase tracking-wider text-slate-200 font-semibold border-b border-slate-500 pb-2"
                       >
                         Resumen de Suscripción
                       </h3>
 
                       <!-- Datos de Empresa -->
                       <div>
-                        <div class="text-[10px] text-gray-500">CLIENTE</div>
+                        <div class="text-sm text-slate-200">CLIENTE</div>
                         <div class="font-bold text-white text-sm">
                           {{ suscripcionEnEdicion?.nombreEmpresa }}
                         </div>
-                        <div class="text-[10px] text-gray-400 mt-1">
+                        <div class="text-sm text-slate-200 mt-1">
                           Paquete Base:
                           <span class="text-emerald-400 font-semibold">{{
                             selectedTipoEmpresa
@@ -2016,11 +1995,11 @@
                         </div>
                       </div>
 
-                      <hr class="border-gray-700" />
+                      <hr class="border-slate-500" />
 
                       <!-- Detalle del Carrito -->
                       <div class="space-y-2 max-h-[30vh] overflow-y-auto pr-1">
-                        <div class="text-[10px] text-gray-500">CONCEPTOS DE COBRO</div>
+                        <div class="text-sm text-slate-200">CONCEPTOS DE COBRO</div>
 
                         <ng-container *ngFor="let item of catalogoTarifas">
                           <div
@@ -2029,13 +2008,13 @@
                               item.tipo !== 'descuento' &&
                               item.id !== 'addon_byok_ia'
                             "
-                            class="flex justify-between items-start text-xs text-gray-300"
+                            class="flex justify-between items-start text-sm text-gray-300"
                           >
                             <span class="flex-1 pr-2">
                               {{ item.nombre }}
                               <span
                                 *ngIf="item.mecanismo === 'por_usuario'"
-                                class="text-[10px] text-gray-500 block"
+                                class="text-sm text-slate-200 block"
                               >
                                 ({{ cartItemsSelect[item.id].cantidad }} usuarios x ${{
                                   item.valor | number: '1.0-0'
@@ -2056,17 +2035,17 @@
                         <!-- Add-on BYOK si aplica -->
                         <div
                           *ngIf="iaByokActivo"
-                          class="flex justify-between items-start text-xs text-gray-300"
+                          class="flex justify-between items-start text-sm text-gray-300"
                         >
                           <span class="flex-1 pr-2">Conector API de IA Propia (BYOK)</span>
                           <span class="font-inter font-semibold text-gray-200">$25.000</span>
                         </div>
                       </div>
 
-                      <hr class="border-gray-700" />
+                      <hr class="border-slate-500" />
 
                       <!-- Subtotal y Descuentos -->
-                      <div class="space-y-1.5 text-xs text-gray-300">
+                      <div class="space-y-1.5 text-sm text-gray-300">
                         <div class="flex justify-between">
                           <span>Sin descuento:</span>
                           <span class="font-inter font-semibold"
@@ -2085,17 +2064,17 @@
                         </div>
                       </div>
 
-                      <hr class="border-gray-700" />
+                      <hr class="border-slate-500" />
 
                       <!-- Gran Total MRR -->
                       <div
                         class="bg-gray-900/60 p-3 rounded-lg border border-gray-800 flex justify-between items-center"
                       >
                         <div>
-                          <div class="text-[10px] text-gray-400 uppercase tracking-wider block">
+                          <div class="text-sm text-slate-200 uppercase tracking-wider block">
                             Total Mensual (MRR)
                           </div>
-                          <span class="text-xs text-gray-500">(Calculado automáticamente)</span>
+                          <span class="text-sm text-slate-200">(Calculado automáticamente)</span>
                         </div>
                         <span class="text-xl font-bold font-inter text-green-400">
                           ${{ totalSuscripcion | number: '1.0-0' }}
@@ -2107,7 +2086,7 @@
                         <button
                           (click)="guardarCarritoSuscripcion()"
                           [disabled]="guardandoSuscripcion"
-                          class="w-full py-2.5 bg-[#066810] hover:bg-[#05570d] text-white text-xs font-bold uppercase rounded-full shadow-md transition-colors text-center disabled:opacity-50 flex items-center justify-center gap-2"
+                          class="w-full py-2.5 bg-[#066810] hover:bg-[#05570d] text-white text-sm font-bold uppercase rounded-full shadow-md transition-colors text-center disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                           <span
                             *ngIf="guardandoSuscripcion"
@@ -2117,7 +2096,7 @@
                         </button>
                         <button
                           (click)="cerrarCarritoSuscripcion()"
-                          class="w-full py-2.5 bg-[#de3737] hover:bg-[#c62828] text-white text-xs font-bold uppercase rounded-full shadow-md transition-colors text-center"
+                          class="w-full py-2.5 bg-[#de3737] hover:bg-[#c62828] text-white text-sm font-bold uppercase rounded-full shadow-md transition-colors text-center"
                         >
                           Volver
                         </button>
@@ -2137,7 +2116,7 @@
             <h2 class="text-[16px] font-bold text-white tracking-wide text-center uppercase mb-2">
               GESTIÓN DE PAQUETES Y MÓDULOS POR EMPRESA
             </h2>
-            <p class="text-gray-400 text-center text-sm mb-6">
+            <p class="text-slate-200 text-center text-sm mb-6">
               Asignación estratégica de permisos y configuración de servidores cliente.
             </p>
 
@@ -2145,10 +2124,10 @@
             <div class="flex flex-wrap justify-center items-center gap-6">
               <!-- Monitor Global (Siempre visible) -->
               <div
-                class="bg-gray-800 border border-gray-700 p-3 rounded-lg flex items-center gap-4 shadow-sm"
+                class="bg-gray-800 border border-slate-500 p-3 rounded-lg flex items-center gap-4 shadow-sm"
               >
                 <div class="flex flex-col">
-                  <span class="text-xs text-gray-400 uppercase tracking-wider"
+                  <span class="text-sm text-slate-200 uppercase tracking-wider"
                     >Servidor Principal</span
                   >
                   <div class="flex items-center gap-2 mt-1">
@@ -2179,7 +2158,7 @@
                   class="bg-[#0f172a] border border-[#1e293b] p-3 rounded-lg flex items-center gap-4 shadow-sm"
                 >
                   <div class="flex flex-col">
-                    <span class="text-xs text-blue-300 uppercase tracking-wider"
+                    <span class="text-sm text-blue-300 uppercase tracking-wider"
                       >Servidor Empresarial</span
                     >
                     <div class="flex items-center gap-2 mt-1">
@@ -2189,7 +2168,7 @@
                   </div>
                   <div class="h-8 w-px bg-[#1e293b]"></div>
                   <div class="flex flex-col">
-                    <span class="text-xs text-gray-400 uppercase tracking-wider"
+                    <span class="text-sm text-slate-200 uppercase tracking-wider"
                       >Última Actividad</span
                     >
                     <span class="text-sm text-gray-300 mt-1">{{ serverStatus.lastActivity }}</span>
@@ -2201,7 +2180,7 @@
 
           <!-- Selector de Empresas -->
           <div
-            class="mb-6 bg-gray-900 p-4 rounded-lg border border-gray-700 flex flex-col md:flex-row items-start md:items-center gap-4"
+            class="mb-6 bg-gray-900 p-4 rounded-lg border border-slate-500 flex flex-col md:flex-row items-start md:items-center gap-4"
           >
             <label class="text-gray-300 font-inter font-bold whitespace-nowrap"
               >Empresa a gestionar:</label
@@ -2221,7 +2200,7 @@
             <div class="grid grid-cols-1 gap-6">
               <!-- MÓDULOS BASE INCLUIDOS -->
               <div class="soft-ui-card">
-                <div class="flex items-center gap-3 mb-6 border-b border-gray-700/50 pb-4">
+                <div class="flex items-center gap-3 mb-6 border-b border-slate-500/50 pb-4">
                   <div
                     class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-400"
                   >
@@ -2236,7 +2215,7 @@
                   </div>
                   <h4 class="text-white font-inter font-bold text-lg">MÓDULOS BASE INCLUIDOS</h4>
                   <span
-                    class="ml-auto text-xs font-bold text-green-500 bg-green-500/10 px-3 py-1 rounded-full"
+                    class="ml-auto text-sm font-bold text-green-500 bg-green-500/10 px-3 py-1 rounded-full"
                     >Siempre Activos</span
                   >
                 </div>
@@ -2244,7 +2223,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <!-- Administración -->
                   <div
-                    class="bg-gray-800/40 border border-gray-700/50 p-4 rounded-xl flex items-center gap-4 hover:bg-gray-800/80 transition-colors"
+                    class="bg-gray-800/40 border border-slate-500/50 p-4 rounded-xl flex items-center gap-4 hover:bg-gray-800/80 transition-colors"
                   >
                     <div
                       class="w-10 h-10 rounded-lg bg-gray-700/50 flex items-center justify-center text-gray-300 shrink-0"
@@ -2270,13 +2249,13 @@
                     </div>
                     <div>
                       <h5 class="text-white font-semibold text-sm">Administración</h5>
-                      <p class="text-xs text-gray-400 mt-0.5">Gestión de Accesos y Roles</p>
+                      <p class="text-sm text-slate-200 mt-0.5">Gestión de Accesos y Roles</p>
                     </div>
                   </div>
 
                   <!-- Formalización -->
                   <div
-                    class="bg-gray-800/40 border border-gray-700/50 p-4 rounded-xl flex items-center gap-4 hover:bg-gray-800/80 transition-colors"
+                    class="bg-gray-800/40 border border-slate-500/50 p-4 rounded-xl flex items-center gap-4 hover:bg-gray-800/80 transition-colors"
                   >
                     <div
                       class="w-10 h-10 rounded-lg bg-gray-700/50 flex items-center justify-center text-cyan-400 shrink-0"
@@ -2297,13 +2276,13 @@
                     </div>
                     <div>
                       <h5 class="text-white font-semibold text-sm">Formalización</h5>
-                      <p class="text-xs text-gray-400 mt-0.5">Perfil laboral de empleados</p>
+                      <p class="text-sm text-slate-200 mt-0.5">Perfil laboral de empleados</p>
                     </div>
                   </div>
 
                   <!-- Autogestión -->
                   <div
-                    class="bg-gray-800/40 border border-gray-700/50 p-4 rounded-xl flex items-center gap-4 hover:bg-gray-800/80 transition-colors"
+                    class="bg-gray-800/40 border border-slate-500/50 p-4 rounded-xl flex items-center gap-4 hover:bg-gray-800/80 transition-colors"
                   >
                     <div
                       class="w-10 h-10 rounded-lg bg-gray-700/50 flex items-center justify-center text-blue-400 shrink-0"
@@ -2324,13 +2303,13 @@
                     </div>
                     <div>
                       <h5 class="text-white font-semibold text-sm">Autogestión</h5>
-                      <p class="text-xs text-gray-400 mt-0.5">Portal de uso personal</p>
+                      <p class="text-sm text-slate-200 mt-0.5">Portal de uso personal</p>
                     </div>
                   </div>
 
                   <!-- Tareas -->
                   <div
-                    class="bg-gray-800/40 border border-gray-700/50 p-4 rounded-xl flex items-center gap-4 hover:bg-gray-800/80 transition-colors"
+                    class="bg-gray-800/40 border border-slate-500/50 p-4 rounded-xl flex items-center gap-4 hover:bg-gray-800/80 transition-colors"
                   >
                     <div
                       class="w-10 h-10 rounded-lg bg-gray-700/50 flex items-center justify-center text-orange-400 shrink-0"
@@ -2351,13 +2330,13 @@
                     </div>
                     <div>
                       <h5 class="text-white font-semibold text-sm">Gestión de Tareas</h5>
-                      <p class="text-xs text-gray-400 mt-0.5">Checklist y asignación</p>
+                      <p class="text-sm text-slate-200 mt-0.5">Checklist y asignación</p>
                     </div>
                   </div>
 
                   <!-- Gestiva IA -->
                   <div
-                    class="bg-gray-800/40 border border-gray-700/50 p-4 rounded-xl flex items-center gap-4 hover:bg-gray-800/80 transition-colors"
+                    class="bg-gray-800/40 border border-slate-500/50 p-4 rounded-xl flex items-center gap-4 hover:bg-gray-800/80 transition-colors"
                   >
                     <div
                       class="w-10 h-10 rounded-lg bg-gray-700/50 flex items-center justify-center text-purple-400 shrink-0"
@@ -2378,7 +2357,7 @@
                     </div>
                     <div>
                       <h5 class="text-white font-semibold text-sm">Gestiva AI</h5>
-                      <p class="text-xs text-gray-400 mt-0.5">Asistente de inteligencia</p>
+                      <p class="text-sm text-slate-200 mt-0.5">Asistente de inteligencia</p>
                     </div>
                   </div>
                 </div>
@@ -2474,14 +2453,14 @@
                         <h4 class="text-white font-inter font-bold text-lg">
                           {{ paquete.nombre }}
                         </h4>
-                        <p class="text-sm text-gray-400 mt-1">{{ paquete.descripcion }}</p>
+                        <p class="text-sm text-slate-200 mt-1">{{ paquete.descripcion }}</p>
                       </div>
                     </div>
 
                     <!-- MASTER SWITCH SOFT UI Y CHEVRON -->
                     <div class="flex items-center gap-4">
                       <div class="flex items-center gap-3" (click)="$event.stopPropagation()">
-                        <span class="text-xs text-gray-400 font-bold tracking-wider">TODO</span>
+                        <span class="text-sm text-slate-200 font-bold tracking-wider">TODO</span>
                         <button
                           (click)="togglePaqueteCompleto(paquete.id, !paquete.activo)"
                           [class]="'soft-ui-toggle ' + (paquete.activo ? 'active' : 'inactive')"
@@ -2490,7 +2469,7 @@
                         </button>
                       </div>
                       <div
-                        class="text-gray-400 transition-transform duration-300"
+                        class="text-slate-200 transition-transform duration-300"
                         [class.rotate-180]="paquetesExpandidos[paquete.id]"
                       >
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -2595,7 +2574,7 @@
           } @else {
             <div class="empty-state mt-8">
               <svg
-                class="w-12 h-12 mb-4 text-gray-500 mx-auto"
+                class="w-12 h-12 mb-4 text-slate-200 mx-auto"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke-width="1.5"
@@ -2626,7 +2605,7 @@
             class="bg-[#0f172a] rounded-2xl p-6 shadow-inner border border-gray-800 w-full overflow-x-auto"
           >
             <div
-              class="mb-8 flex flex-col sm:flex-row justify-center items-center gap-4 border-b border-gray-700 pb-4 relative"
+              class="mb-8 flex flex-col sm:flex-row justify-center items-center gap-4 border-b border-slate-500 pb-4 relative"
             >
               <div class="flex gap-4">
                 <button
@@ -2648,7 +2627,7 @@
               @if (comercialTab === 'interesados') {
                 <button
                   (click)="cargarLeads()"
-                  class="ml-auto flex items-center gap-2 text-xs font-semibold text-cyan-300 bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 px-4 py-2 rounded-lg transition-colors mt-4 sm:mt-0"
+                  class="ml-auto flex items-center gap-2 text-sm font-semibold text-cyan-300 bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 px-4 py-2 rounded-lg transition-colors mt-4 sm:mt-0"
                 >
                   <i class="fas fa-sync-alt"></i> Actualizar lista
                 </button>
@@ -2660,7 +2639,7 @@
                 <table class="w-full text-left border-collapse">
                   <thead>
                     <tr
-                      class="border-b border-gray-700 text-white text-base uppercase tracking-wider"
+                      class="border-b border-slate-500 text-white text-base uppercase tracking-wider"
                     >
                       <th class="py-3 px-2 font-bold uppercase tracking-wider text-center">
                         Nombre
@@ -2794,7 +2773,7 @@
                     }
                     @if (leads.length === 0) {
                       <tr>
-                        <td colspan="7" class="text-center text-gray-500 py-8">
+                        <td colspan="7" class="text-center text-slate-200 py-8">
                           No hay interesados registrados aún.
                         </td>
                       </tr>
@@ -2820,10 +2799,10 @@
                     </svg>
                   </div>
                   <div>
-                    <h3 class="text-[13px] font-bold text-white tracking-wide mb-1">
+                    <h3 class="text-base font-bold text-white tracking-wide mb-1">
                       Campaña de Correo
                     </h3>
-                    <p class="text-sm text-gray-400">
+                    <p class="text-sm text-slate-200">
                       Envía correos masivos a todos los interesados registrados.
                     </p>
                   </div>
@@ -2836,7 +2815,7 @@
                       type="text"
                       [(ngModel)]="asuntoBrevo"
                       placeholder="Ej. ¡Descubre nuestras nuevas funciones!"
-                      class="saas-input w-full bg-[#111827] text-white border-gray-700 focus:border-cyan-500"
+                      class="saas-input w-full bg-[#111827] text-white border-slate-500 focus:border-cyan-500"
                     />
                   </div>
 
@@ -2846,7 +2825,7 @@
                       [(ngModel)]="mensajeBrevo"
                       rows="8"
                       placeholder="Redacta el mensaje aquí..."
-                      class="saas-input w-full bg-[#111827] text-white border-gray-700 focus:border-cyan-500 resize-none font-inter text-sm"
+                      class="saas-input w-full bg-[#111827] text-white border-slate-500 focus:border-cyan-500 resize-none font-inter text-sm"
                     ></textarea>
                   </div>
 
@@ -2858,7 +2837,7 @@
                       type="file"
                       (change)="onFileSelected($event)"
                       accept="image/*,.pdf"
-                      class="saas-input w-full bg-[#111827] text-white border-gray-700 focus:border-cyan-500 font-inter text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-cyan-500/20 file:text-cyan-400 hover:file:bg-cyan-500/30"
+                      class="saas-input w-full bg-[#111827] text-white border-slate-500 focus:border-cyan-500 font-inter text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-cyan-500/20 file:text-cyan-400 hover:file:bg-cyan-500/30"
                     />
                   </div>
 
@@ -2921,7 +2900,7 @@
             <h2 class="text-[16px] font-bold text-white tracking-wide text-center uppercase mb-2">
               Contratos Legales y Términos SAAS
             </h2>
-            <p class="text-gray-400 text-center text-sm mb-6">
+            <p class="text-slate-200 text-center text-sm mb-6">
               Redacta y actualiza el contrato maestro que firmarán todas las empresas. Al publicar
               una nueva versión, se notificará a los gerentes.
             </p>
@@ -2932,7 +2911,7 @@
             <div
               class="bg-[#0f172a] rounded-2xl p-6 shadow-inner border border-gray-800 flex flex-col h-full"
             >
-              <h3 class="text-white font-bold text-[13px] mb-4 flex items-center gap-2">
+              <h3 class="text-white font-bold text-base mb-4 flex items-center gap-2">
                 <svg
                   class="w-5 h-5 text-fuchsia-400"
                   fill="none"
@@ -2951,27 +2930,27 @@
 
               <div class="flex-1 flex flex-col gap-4">
                 <div>
-                  <label class="text-xs font-semibold text-gray-400 uppercase tracking-wide"
+                  <label class="text-sm font-semibold text-slate-200 uppercase tracking-wide"
                     >Versión (Ej: 1.0)</label
                   >
                   <input
                     type="text"
                     [(ngModel)]="nuevoContrato.version"
-                    class="bg-gray-900 border border-gray-700 text-white rounded-lg px-4 py-2 mt-1 w-full focus:outline-none focus:border-blue-500 transition-colors"
+                    class="bg-gray-900 border border-slate-500 text-white rounded-lg px-4 py-2 mt-1 w-full focus:outline-none focus:border-blue-500 transition-colors"
                     placeholder="1.0"
                   />
                 </div>
 
                 <div class="flex-1 flex flex-col">
-                  <label class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1"
+                  <label class="text-sm font-semibold text-slate-200 uppercase tracking-wide mb-1"
                     >Contenido Legal</label
                   >
                   <textarea
                     [(ngModel)]="nuevoContrato.contenido"
-                    class="bg-gray-900 border border-gray-700 text-gray-300 rounded-lg px-4 py-3 w-full h-full min-h-[300px] resize-none focus:outline-none focus:border-blue-500 transition-colors text-sm font-mono leading-relaxed"
+                    class="bg-gray-900 border border-slate-500 text-gray-300 rounded-lg px-4 py-3 w-full h-full min-h-[300px] resize-none focus:outline-none focus:border-blue-500 transition-colors text-sm font-mono leading-relaxed"
                     placeholder="Escribe aquí los términos legales..."
                   ></textarea>
-                  <p class="text-xs text-gray-500 mt-2">
+                  <p class="text-sm text-slate-200 mt-2">
                     Puedes usar etiquetas HTML básicas como &lt;b&gt;, &lt;br&gt;, &lt;h1&gt; para
                     dar formato.
                   </p>
@@ -3028,7 +3007,7 @@
 
             <!-- Derecha: Historial -->
             <div class="bg-[#0f172a] rounded-2xl p-6 shadow-inner border border-gray-800">
-              <h3 class="text-white font-bold text-[13px] mb-4 flex items-center gap-2">
+              <h3 class="text-white font-bold text-base mb-4 flex items-center gap-2">
                 <svg
                   class="w-5 h-5 text-emerald-400"
                   fill="none"
@@ -3049,7 +3028,7 @@
                 <table class="saas-table w-full text-left border-collapse text-sm">
                   <thead>
                     <tr
-                      class="bg-gray-900/50 text-gray-300 tracking-wider uppercase border-b border-gray-700"
+                      class="bg-gray-900/50 text-gray-300 tracking-wider uppercase border-b border-slate-500"
                     >
                       <th class="px-2 py-3 font-semibold">Versión</th>
                       <th class="px-2 py-3 font-semibold whitespace-normal">Fecha Publicación</th>
@@ -3060,18 +3039,18 @@
                     @for (contrato of contratosHistory; track contrato.id) {
                       <tr class="hover:bg-gray-700/30 transition-colors">
                         <td class="px-2 py-3 font-bold text-white">v{{ contrato.version }}</td>
-                        <td class="px-2 py-3 text-gray-400">
+                        <td class="px-2 py-3 text-slate-200">
                           {{ contrato.created_at | date: 'dd/MM/yyyy HH:mm' }}
                         </td>
                         <td class="px-2 py-3 text-center">
                           @if (contrato.es_activo) {
                             <span
-                              class="px-2 py-1 rounded text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                              class="px-2 py-1 rounded text-sm font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
                               >ACTIVO</span
                             >
                           } @else {
                             <span
-                              class="px-2 py-1 rounded text-xs font-bold bg-gray-500/20 text-gray-400 border border-gray-500/30"
+                              class="px-2 py-1 rounded text-sm font-bold bg-gray-500/20 text-slate-200 border border-gray-500/30"
                               >HISTÓRICO</span
                             >
                           }
@@ -3080,7 +3059,7 @@
                     }
                     @if (contratosHistory.length === 0) {
                       <tr>
-                        <td colspan="3" class="p-6 text-center text-gray-500">
+                        <td colspan="3" class="p-6 text-center text-slate-200">
                           No hay historial de contratos.
                         </td>
                       </tr>
@@ -3097,7 +3076,7 @@
     <footer class="mt-10 py-6 border-t border-white/5 flex flex-col items-center justify-center gap-2">
       <img src="assets/images/Logos/GESTIVAPYME(6).png" alt="GestivaPyme Logo" 
            class="h-6 opacity-50 grayscale transition-all duration-500 hover:opacity-100 hover:grayscale-0 hover:scale-105 cursor-default">
-      <p class="text-[10px] text-gray-500 m-0">
+      <p class="text-sm text-slate-200 m-0">
         COPYRIGHT © 2026 GestivaPyme S.A.S. Todos los derechos reservados.
       </p>
     </footer>
@@ -3136,13 +3115,13 @@
             <button
               type="button"
               (click)="generarDominio()"
-              class="text-xs text-emerald-400 hover:text-emerald-300 font-semibold underline bg-transparent border-none cursor-pointer p-0 m-0"
+              class="text-sm text-emerald-400 hover:text-emerald-300 font-semibold underline bg-transparent border-none cursor-pointer p-0 m-0"
             >
               Autogenerar
             </button>
           </label>
           <div class="flex items-center">
-            <span class="text-gray-400 text-sm mr-2 select-none">gestivapyme.com/</span>
+            <span class="text-slate-200 text-sm mr-2 select-none">gestivapyme.com/</span>
             <input
               type="text"
               [(ngModel)]="nuevaEmpresa.dominio"
@@ -3151,7 +3130,7 @@
               placeholder="ej: miempresa"
             />
           </div>
-          <span class="text-xs text-gray-500 mt-1 block"
+          <span class="text-sm text-slate-200 mt-1 block"
             >Deja vacío para autogenerar. Dale clic varias veces a "Autogenerar" para ver más
             opciones.</span
           >
@@ -3284,7 +3263,7 @@
             <button
               type="button"
               (click)="agregarDescuentoEmpresaForm()"
-              class="text-xs bg-yellow-900/50 hover:bg-yellow-800/50 text-yellow-300 border border-yellow-800 px-2 py-1 rounded transition-colors"
+              class="text-sm bg-yellow-900/50 hover:bg-yellow-800/50 text-yellow-300 border border-yellow-800 px-2 py-1 rounded transition-colors"
             >
               + Añadir
             </button>
@@ -3319,7 +3298,7 @@
               </div>
             }
             @if (listaDescuentosEmpresa.length === 0) {
-              <p class="text-xs text-gray-500 italic">No hay descuentos aplicados.</p>
+              <p class="text-sm text-slate-200 italic">No hay descuentos aplicados.</p>
             }
           </div>
         </div>
@@ -3387,7 +3366,7 @@
   @if (isModalTicketOpen && ticketSeleccionado) {
     <div class="saas-modal-overlay">
       <div class="saas-modal-content max-w-xl">
-        <div class="flex justify-between items-center mb-6 border-b border-gray-700/50 pb-4">
+        <div class="flex justify-between items-center mb-6 border-b border-slate-500/50 pb-4">
           <h2 class="text-[16px] font-bold text-white flex items-center gap-2">
             <svg
               class="w-6 h-6 text-indigo-400"
@@ -3406,7 +3385,7 @@
           </h2>
           <button
             (click)="cerrarModalTicket()"
-            class="text-gray-400 hover:text-white transition-colors"
+            class="text-slate-200 hover:text-white transition-colors"
           >
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
@@ -3419,14 +3398,14 @@
           </button>
         </div>
 
-        <div class="mb-4 p-4 bg-gray-800/50 rounded-lg border border-gray-700/50">
-          <p class="text-sm text-gray-400 mb-1">Empresa:</p>
+        <div class="mb-4 p-4 bg-gray-800/50 rounded-lg border border-slate-500/50">
+          <p class="text-sm text-slate-200 mb-1">Empresa:</p>
           <p class="text-white font-medium mb-3">{{ ticketSeleccionado.empresa?.razon_social }}</p>
 
-          <p class="text-sm text-gray-400 mb-1">Asunto:</p>
+          <p class="text-sm text-slate-200 mb-1">Asunto:</p>
           <p class="text-white font-medium mb-3">{{ ticketSeleccionado.asunto }}</p>
 
-          <p class="text-sm text-gray-400 mb-1">Descripción del problema:</p>
+          <p class="text-sm text-slate-200 mb-1">Descripción del problema:</p>
           <p class="text-gray-300 bg-gray-900/50 p-3 rounded text-sm">
             {{ ticketSeleccionado.mensaje }}
           </p>
@@ -3443,7 +3422,7 @@
           ></textarea>
         </div>
 
-        <div class="flex justify-end gap-3 pt-4 border-t border-gray-700/50">
+        <div class="flex justify-end gap-3 pt-4 border-t border-slate-500/50">
           <button
             (click)="cerrarModalTicket()"
             class="px-4 py-2 glass-btn-gray text-white rounded font-medium transition-colors"
@@ -3490,10 +3469,10 @@
   @if (isModalSolicitudOpen && solicitudSeleccionada) {
     <div class="saas-modal-overlay">
       <div class="saas-modal-content max-w-2xl">
-        <h2 class="text-[16px] font-bold text-white mb-6 border-b border-gray-700 pb-2">
+        <h2 class="text-[16px] font-bold text-white mb-6 border-b border-slate-500 pb-2">
           Detalle de la Solicitud
           <span
-            class="ml-3 px-3 py-1 bg-cyan-500/20 text-cyan-400 text-xs rounded-full uppercase"
+            class="ml-3 px-3 py-1 bg-cyan-500/20 text-cyan-400 text-sm rounded-full uppercase"
             >{{ formatTipo(solicitudSeleccionada.tipo) | uppercase }}</span
           >
         </h2>
@@ -3514,7 +3493,7 @@
               {{ solicitudSeleccionada.banco_origen || 'No especificado' }}<br /><br />
               @if (solicitudSeleccionada.comprobante_path) {
                 <strong class="text-white">Comprobante Adjunto:</strong>
-                <div class="mt-2 bg-[#111827] border border-gray-700 rounded p-4 text-center">
+                <div class="mt-2 bg-[#111827] border border-slate-500 rounded p-4 text-center">
                   <a
                     [href]="getArchivoUrl(solicitudSeleccionada.comprobante_path)"
                     target="_blank"
@@ -3543,7 +3522,7 @@
           @if (solicitudSeleccionada.tipo === 'cambio_datos') {
             <div class="mb-4">
               <strong class="text-white">Datos a Modificar:</strong>
-              <div class="mt-2 bg-[#111827] border border-gray-700 rounded p-4">
+              <div class="mt-2 bg-[#111827] border border-slate-500 rounded p-4">
                 @if (solicitudSeleccionada.datosPropuestos) {
                   <ul class="space-y-2 text-sm">
                     @if (solicitudSeleccionada.datosPropuestos.razon_social) {
@@ -3554,7 +3533,7 @@
                           class="rounded bg-gray-800 border-gray-600 text-cyan-500 focus:ring-cyan-500 cursor-pointer w-4 h-4"
                         />
                         <div>
-                          <span class="text-gray-400">Razón Social:</span>
+                          <span class="text-slate-200">Razón Social:</span>
                           <span class="text-white font-medium">{{
                             solicitudSeleccionada.datosPropuestos.razon_social
                           }}</span>
@@ -3569,7 +3548,7 @@
                           class="rounded bg-gray-800 border-gray-600 text-cyan-500 focus:ring-cyan-500 cursor-pointer w-4 h-4"
                         />
                         <div>
-                          <span class="text-gray-400">NIT:</span>
+                          <span class="text-slate-200">NIT:</span>
                           <span class="text-white font-medium">{{
                             solicitudSeleccionada.datosPropuestos.nit
                           }}</span>
@@ -3584,7 +3563,7 @@
                           class="rounded bg-gray-800 border-gray-600 text-cyan-500 focus:ring-cyan-500 cursor-pointer w-4 h-4"
                         />
                         <div>
-                          <span class="text-gray-400">Teléfono:</span>
+                          <span class="text-slate-200">Teléfono:</span>
                           <span class="text-white font-medium">{{
                             solicitudSeleccionada.datosPropuestos.telefono
                           }}</span>
@@ -3599,7 +3578,7 @@
                           class="rounded bg-gray-800 border-gray-600 text-cyan-500 focus:ring-cyan-500 cursor-pointer w-4 h-4"
                         />
                         <div>
-                          <span class="text-gray-400">Dirección:</span>
+                          <span class="text-slate-200">Dirección:</span>
                           <span class="text-white font-medium">{{
                             solicitudSeleccionada.datosPropuestos.direccion
                           }}</span>
@@ -3614,23 +3593,23 @@
                           class="rounded bg-gray-800 border-gray-600 text-cyan-500 focus:ring-cyan-500 cursor-pointer w-4 h-4"
                         />
                         <div class="flex items-center gap-2">
-                          <span class="text-gray-400">Color Primario:</span>
+                          <span class="text-slate-200">Color Primario:</span>
                           <span class="text-white font-medium">{{
                             solicitudSeleccionada.datosPropuestos.color_primario
                           }}</span>
-                          <div
-                            class="w-4 h-4 rounded-full border border-gray-500 shadow-sm"
-                            [style.backgroundColor]="
-                              solicitudSeleccionada.datosPropuestos.color_primario
-                            "
-                          ></div>
+                          <input
+                            type="color"
+                            [value]="solicitudSeleccionada.datosPropuestos.color_primario"
+                            disabled
+                            class="w-5 h-5 rounded border border-slate-500 bg-transparent p-0 cursor-default"
+                          />
                         </div>
                       </li>
                     }
                   </ul>
 
                   @if (solicitudSeleccionada.datosPropuestos.temp_logo) {
-                    <div class="mt-4 pt-4 border-t border-gray-700 flex items-start gap-3">
+                    <div class="mt-4 pt-4 border-t border-slate-500 flex items-start gap-3">
                       <input
                         type="checkbox"
                         [(ngModel)]="camposAprobados['temp_logo']"
@@ -3650,7 +3629,7 @@
                   }
 
                   @if (solicitudSeleccionada.datosPropuestos.temp_doc) {
-                    <div class="mt-4 pt-4 border-t border-gray-700">
+                    <div class="mt-4 pt-4 border-t border-slate-500">
                       <a
                         [href]="getArchivoUrl(solicitudSeleccionada.datosPropuestos.temp_doc, true)"
                         target="_blank"
@@ -3675,7 +3654,7 @@
                     </div>
                   }
                 } @else {
-                  <p class="text-gray-500 italic text-sm">
+                  <p class="text-slate-200 italic text-sm">
                     La solicitud no contiene datos estructurados.
                   </p>
                 }
@@ -3686,7 +3665,7 @@
           @if (solicitudSeleccionada.tipo === 'soporte') {
             <div class="mb-4">
               <strong class="text-white">Mensaje del Cliente:</strong>
-              <div class="mt-2 bg-[#111827] border border-gray-700 rounded p-4">
+              <div class="mt-2 bg-[#111827] border border-slate-500 rounded p-4">
                 <p class="text-gray-300 m-0 whitespace-pre-wrap">
                   {{
                     solicitudSeleccionada.datosPropuestos?.mensaje ||
@@ -3833,11 +3812,11 @@
               [(ngModel)]="mensajeRespuesta"
               rows="3"
               placeholder="Ej: Comprobante ilegible, vuelve a subirlo..."
-              class="saas-input w-full bg-[#111827] text-white border-gray-700 focus:border-cyan-500 resize-none"
+              class="saas-input w-full bg-[#111827] text-white border-slate-500 focus:border-cyan-500 resize-none"
             ></textarea>
           </div>
 
-          <div class="flex items-center justify-end gap-4 mt-6 pt-4 border-t border-gray-700">
+          <div class="flex items-center justify-end gap-4 mt-6 pt-4 border-t border-slate-500">
             <button (click)="cerrarModalSolicitud()" class="saas-btn-cancel">Cancelar</button>
             <button
               (click)="procesarSolicitud('rechazado')"
@@ -3872,7 +3851,7 @@
             </button>
           </div>
         } @else {
-          <div class="mt-6 pt-4 border-t border-gray-700 text-center">
+          <div class="mt-6 pt-4 border-t border-slate-500 text-center">
             <span
               class="inline-block px-4 py-2 bg-gray-800 text-gray-300 rounded-full text-sm font-semibold mb-6"
             >
@@ -3899,7 +3878,7 @@
           viewBox="0 0 24 24"
           stroke-width="2"
           stroke="currentColor"
-          style="width: 48px; height: 48px"
+          class="w-12 h-12"
         >
           <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
         </svg>
@@ -3924,14 +3903,14 @@
     <div class="soft-ui-panel-dark w-full max-w-md p-6 relative animate-fade-in-up">
       <button
         (click)="cerrarAddonModal()"
-        class="absolute top-4 right-4 text-gray-400 hover:text-white"
+        class="absolute top-4 right-4 text-slate-200 hover:text-white"
       >
         &times;
       </button>
-      <h3 class="text-[13px] font-bold text-white mb-2">
+      <h3 class="text-base font-bold text-white mb-2">
         {{ editingAddonId ? 'Editar Conector / API' : 'Crear Nuevo Conector / API' }}
       </h3>
-      <p class="text-gray-400 text-sm mb-6">
+      <p class="text-slate-200 text-sm mb-6">
         {{
           editingAddonId
             ? 'Actualiza el nombre de este conector en el catálogo.'
@@ -3968,11 +3947,11 @@
     <div class="neu-dark-panel w-full max-w-lg p-6 relative animate-fade-in-up">
       <button
         (click)="cerrarModalNotas()"
-        class="absolute top-4 right-4 text-gray-400 hover:text-white"
+        class="absolute top-4 right-4 text-slate-200 hover:text-white"
       >
         &times;
       </button>
-      <h3 class="text-[13px] font-bold text-white mb-2 flex items-center gap-2">
+      <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
         <svg class="w-6 h-6 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
             stroke-linecap="round"
@@ -3983,7 +3962,7 @@
         </svg>
         Notas: {{ leadSeleccionadoParaNotas?.nombre }}
       </h3>
-      <p class="text-gray-400 text-sm mb-6">
+      <p class="text-slate-200 text-sm mb-6">
         Agrega apuntes sobre este interesado. Las notas se eliminan a los 3 meses.
       </p>
 
@@ -4002,19 +3981,19 @@
 
       <div class="space-y-3 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
         @for (nota of leadSeleccionadoParaNotas?.notas; track nota.id) {
-          <div class="bg-gray-800/50 p-3 rounded-lg border border-gray-700 relative group">
+          <div class="bg-gray-800/50 p-3 rounded-lg border border-slate-500 relative group">
             <p class="text-gray-300 text-sm pr-6">{{ nota.texto }}</p>
-            <span class="text-xs text-gray-500 mt-1 block">{{ nota.fecha | date: 'short' }}</span>
+            <span class="text-sm text-slate-200 mt-1 block">{{ nota.fecha | date: 'short' }}</span>
             <button
               (click)="eliminarNota(nota.id)"
               class="absolute top-2 right-2 text-red-500/50 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
             >
-              <i class="fas fa-trash text-xs"></i>
+              <i class="fas fa-trash text-sm"></i>
             </button>
           </div>
         }
         @if (!leadSeleccionadoParaNotas?.notas?.length) {
-          <p class="text-center text-gray-500 text-sm py-4">No hay notas registradas.</p>
+          <p class="text-center text-slate-200 text-sm py-4">No hay notas registradas.</p>
         }
       </div>
     </div>
@@ -4048,7 +4027,7 @@
             </svg>
             Catálogo de Precios Base
           </h2>
-          <p class="text-gray-400 text-sm mb-6">
+          <p class="text-slate-200 text-sm mb-6">
             Establece los valores (COP) que el sistema cobrará. Los porcentajes se aplican como
             descuento.
           </p>
@@ -4056,7 +4035,7 @@
           @for (grupo of gruposTarifas; track grupo.titulo) {
             <div class="mb-5">
               <h3
-                class="text-xs uppercase tracking-wider text-gray-500 font-semibold mb-3 border-b border-gray-800 pb-2"
+                class="text-sm uppercase tracking-wider text-slate-200 font-semibold mb-3 border-b border-gray-800 pb-2"
               >
                 {{ grupo.titulo }}
               </h3>
@@ -4068,14 +4047,14 @@
                     <label class="flex-1 text-sm text-gray-300">{{ item.nombre }}</label>
                     <div class="relative w-44">
                       <span
-                        class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs font-semibold"
+                        class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-200 text-sm font-semibold"
                         >{{ item.tipo === 'descuento' ? '%' : '$' }}</span
                       >
                       <input
                         type="number"
                         [(ngModel)]="item.valor"
                         [disabled]="!item.activo"
-                        class="neu-dark-input w-full pl-8 pr-3 py-1.5 text-xs text-right"
+                        class="neu-dark-input w-full pl-8 pr-3 py-1.5 text-sm text-right"
                       />
                     </div>
                   </div>
@@ -4133,7 +4112,7 @@
                 />
               </svg>
             </div>
-            <h3 class="text-[13px] font-bold text-white">{{ confirmModalTitle }}</h3>
+            <h3 class="text-base font-bold text-white">{{ confirmModalTitle }}</h3>
           </div>
           <p class="text-gray-300 text-sm mb-6">{{ confirmModalMessage }}</p>
           <div class="flex justify-end gap-3">

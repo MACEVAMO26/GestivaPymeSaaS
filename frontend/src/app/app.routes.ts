@@ -1,10 +1,12 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './services/auth.guard';
+import { LandingComponent } from './pages/landing/landing.component';
+import { LoginComponent } from './pages/auth/login/login.component';
 
 export const routes: Routes = [
-    { path: '', loadComponent: () => import('./pages/landing/landing.component').then(m => m.LandingComponent) },
-    { path: 'login', loadComponent: () => import('./pages/auth/login/login.component').then(m => m.LoginComponent) },
-    { path: 'login/:empresa', loadComponent: () => import('./pages/auth/login/login.component').then(m => m.LoginComponent) },
+    { path: '', component: LandingComponent },
+    { path: 'login', component: LoginComponent },
+    { path: 'login/:empresa', component: LoginComponent },
     { path: 'saas-admin', redirectTo: 'saas-admin/dashboard', pathMatch: 'full' },
     { path: 'saas-admin/:vista', loadComponent: () => import('./pages/saas-admin/saas-admin.component').then(m => m.SaasAdminComponent), canActivate: [authGuard] },
     

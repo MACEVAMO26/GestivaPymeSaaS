@@ -1,15 +1,15 @@
 /* --- 1. VARIABLES GLOBALES --- */
 $bg-glass: #0f172a;
-$border-glass: #1f2937;
-$text-muted: #6b7280;
-$text-light: #d1d5db;
+$border-glass: #475569;
+$text-muted: #cbd5e1;
+$text-light: #f1f5f9;
 $text-white: #ffffff;
 $accent-green: #34d399;
 $accent-fuchsia: #e879f9;
-$alert-red-bg: rgba(239, 68, 68, 0.1);
-$alert-red-text: #f87171;
-$alert-blue-bg: rgba(59, 130, 246, 0.1);
-$alert-blue-text: #60a5fa;
+$alert-red-bg: rgba(239, 68, 68, 0.15);
+$alert-red-text: #fca5a5;
+$alert-blue-bg: rgba(59, 130, 246, 0.15);
+$alert-blue-text: #93c5fd;
 
 /* --- 2. LAYOUT PRINCIPAL --- */
 .saas-layout {
@@ -17,7 +17,7 @@ $alert-blue-text: #60a5fa;
   flex-direction: column;
   gap: 2rem;
   width: 100%;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   
   @media (min-width: 1024px) {
     flex-direction: row;
@@ -40,7 +40,7 @@ $alert-blue-text: #60a5fa;
 .glass-panel {
   background: linear-gradient(135deg, #0d3454 0%, #19527f 100%);
   border-radius: 20px;
-  border: 1px solid transparent;
+  border: 2px solid #38bdf8;
   padding: 1.5rem;
   box-shadow:
     4px 4px 10px rgba(0, 0, 0, 0.4),
@@ -55,7 +55,7 @@ $alert-blue-text: #60a5fa;
   padding: 1.5rem;
   border-radius: 1rem;
   background-color: $bg-glass;
-  border: 1px solid $border-glass;
+  border: 2px solid $border-glass;
   box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
 }
 
@@ -66,7 +66,7 @@ $alert-blue-text: #60a5fa;
   margin-bottom: 1.5rem;
   
   .action-title {
-    font-size: 1.25rem;
+    font-size: 18px;
     font-weight: 700;
     color: $text-white;
     text-transform: uppercase;
@@ -84,13 +84,13 @@ $alert-blue-text: #60a5fa;
   }
   
   .action-badge {
-    background-color: #1f2937;
-    color: $text-light;
-    font-size: 0.75rem;
+    background-color: #1e293b;
+    color: $text-white;
+    font-size: 14px;
     font-weight: 700;
-    padding: 0.25rem 0.75rem;
+    padding: 0.3rem 0.85rem;
     border-radius: 9999px;
-    border: 1px solid #374151;
+    border: 2px solid #64748b;
   }
 }
 
@@ -112,9 +112,9 @@ $alert-blue-text: #60a5fa;
   .metric-card {
     background: #111827;
     border-radius: 20px;
-    border: 1px solid transparent;
+    border: 2px solid #475569;
     padding: 1.25rem;
-    height: 140px;
+    min-height: 150px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -139,9 +139,9 @@ $alert-blue-text: #60a5fa;
       justify-content: center;
       
       .label {
-        color: #94a3b8;
-        font-size: 10px;
-        font-weight: 500;
+        color: #e2e8f0;
+        font-size: 14px;
+        font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
@@ -150,8 +150,8 @@ $alert-blue-text: #60a5fa;
         color: white;
         font-size: 22px;
         line-height: 1.1;
-        margin-top: 2px;
-        font-weight: 600;
+        margin-top: 4px;
+        font-weight: 700;
       }
     }
   }
@@ -178,23 +178,23 @@ $alert-blue-text: #60a5fa;
   margin-top: 0.5rem;
 }
 
-.chart-bar-1 { flex: 1; background: rgba(168, 85, 247, 0.2); height: 20%; border-radius: 3px 3px 0 0; }
-.chart-bar-2 { flex: 1; background: rgba(168, 85, 247, 0.3); height: 35%; border-radius: 3px 3px 0 0; }
-.chart-bar-3 { flex: 1; background: rgba(168, 85, 247, 0.5); height: 60%; border-radius: 3px 3px 0 0; }
-.chart-bar-4 { flex: 1; background: rgba(168, 85, 247, 0.8); height: 85%; border-radius: 3px 3px 0 0; }
-.chart-bar-5 { flex: 1; background: #8b5cf6; height: 100%; border-radius: 3px 3px 0 0; }
+.chart-bar-1 { flex: 1; background: rgba(168, 85, 247, 0.45); height: 20%; border-radius: 3px 3px 0 0; }
+.chart-bar-2 { flex: 1; background: rgba(168, 85, 247, 0.6); height: 35%; border-radius: 3px 3px 0 0; }
+.chart-bar-3 { flex: 1; background: rgba(168, 85, 247, 0.75); height: 60%; border-radius: 3px 3px 0 0; }
+.chart-bar-4 { flex: 1; background: rgba(168, 85, 247, 0.9); height: 85%; border-radius: 3px 3px 0 0; }
+.chart-bar-5 { flex: 1; background: #a855f7; height: 100%; border-radius: 3px 3px 0 0; }
 
 .chart-labels {
   display: flex;
   width: 100%;
   justify-content: space-between;
-  color: #94a3b8;
-  font-size: 9px;
+  color: #f1f5f9;
+  font-size: 14px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-top: 6px;
-  span { color: #cbd5e1; }
+  span { color: #f1f5f9; }
 }
 
 /* --- 6. RESUMEN DEL SISTEMA Y STATUS CARDS --- */
@@ -202,6 +202,7 @@ $alert-blue-text: #60a5fa;
   margin-top: 2rem;
   
   .welcome-title {
+    font-size: 18px;
     font-weight: 700;
     color: white;
     margin: 0 0 1.25rem 0;
@@ -228,7 +229,7 @@ $alert-blue-text: #60a5fa;
     text-align: center;
     gap: 0.5rem;
     box-shadow: inset 2px 2px 5px rgba(255, 255, 255, 0.05);
-    border: 1px solid transparent;
+    border: 2px solid transparent;
 
     .card-icon {
       width: 24px;
@@ -237,8 +238,8 @@ $alert-blue-text: #60a5fa;
     }
 
     .card-label {
-      font-size: 10px;
-      font-weight: 600;
+      font-size: 14px;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -250,28 +251,28 @@ $alert-blue-text: #60a5fa;
     }
 
     &.active-card {
-      background: rgba(16, 185, 129, 0.1);
-      color: #34d399;
-      border-color: rgba(16, 185, 129, 0.2);
+      background: rgba(16, 185, 129, 0.18);
+      color: #6ee7b7;
+      border-color: #10b981;
     }
 
     &.mora-card {
-      background: rgba(245, 158, 11, 0.1);
-      color: #fbbf24;
-      border-color: rgba(245, 158, 11, 0.2);
+      background: rgba(245, 158, 11, 0.18);
+      color: #fde68a;
+      border-color: #f59e0b;
     }
 
     &.pending-card {
-      background: rgba(59, 130, 246, 0.1);
-      color: #60a5fa;
-      border-color: rgba(59, 130, 246, 0.2);
+      background: rgba(59, 130, 246, 0.18);
+      color: #bfdbfe;
+      border-color: #60a5fa;
     }
   }
 }
 
 .icon-24-inline {
-  width: 19px;
-  height: 19px;
+  width: 20px;
+  height: 20px;
   display: inline-block;
   vertical-align: middle;
 }
@@ -302,23 +303,24 @@ $alert-blue-text: #60a5fa;
     flex: 1;
     h4 {
       font-weight: 700;
-      font-size: 0.875rem;
+      font-size: 16px;
       margin: 0;
-      line-height: 1.25;
+      line-height: 1.3;
     }
     p {
-      color: #9ca3af;
-      font-size: 0.75rem;
-      margin-top: 0.25rem;
+      color: #e2e8f0;
+      font-size: 14px;
+      margin-top: 0.35rem;
       margin-bottom: 0;
+      line-height: 1.45;
     }
   }
   
   .alert-btn {
     width: 100%;
     border-radius: 0.5rem;
-    padding: 0.5rem;
-    font-size: 0.75rem;
+    padding: 0.65rem;
+    font-size: 14px;
     font-weight: 700;
     text-transform: uppercase;
     transition: background-color 0.2s;
@@ -327,50 +329,50 @@ $alert-blue-text: #60a5fa;
   }
   
   &.alert-red {
-    background-color: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    &:hover { background-color: rgba(239, 68, 68, 0.15); }
+    background-color: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.45);
+    &:hover { background-color: rgba(239, 68, 68, 0.22); }
     
     .alert-icon-wrap {
-      background-color: rgba(239, 68, 68, 0.2);
+      background-color: rgba(239, 68, 68, 0.25);
       color: $alert-red-text;
     }
-    .alert-text h4 { color: #fca5a5; }
+    .alert-text h4 { color: #fecaca; }
     .alert-btn {
-      background-color: rgba(239, 68, 68, 0.2);
-      color: $alert-red-text;
-      border: 1px solid rgba(239, 68, 68, 0.5);
-      &:hover { background-color: rgba(239, 68, 68, 0.4); }
+      background-color: rgba(239, 68, 68, 0.28);
+      color: #ffffff;
+      border: 1px solid rgba(248, 113, 113, 0.5);
+      &:hover { background-color: rgba(239, 68, 68, 0.45); }
     }
   }
   
   &.alert-blue {
-    background-color: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.3);
-    &:hover { background-color: rgba(59, 130, 246, 0.15); }
+    background-color: rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.45);
+    &:hover { background-color: rgba(59, 130, 246, 0.22); }
     
     .alert-icon-wrap {
-      background-color: rgba(59, 130, 246, 0.2);
+      background-color: rgba(59, 130, 246, 0.25);
       color: $alert-blue-text;
     }
-    .alert-text h4 { color: #93c5fd; }
+    .alert-text h4 { color: #bfdbfe; }
     .alert-btn {
-      background-color: rgba(59, 130, 246, 0.2);
-      color: $alert-blue-text;
-      border: 1px solid rgba(59, 130, 246, 0.5);
-      &:hover { background-color: rgba(59, 130, 246, 0.4); }
+      background-color: rgba(59, 130, 246, 0.28);
+      color: #ffffff;
+      border: 1px solid rgba(96, 165, 250, 0.5);
+      &:hover { background-color: rgba(59, 130, 246, 0.45); }
     }
   }
   
   &.alert-green {
-    background-color: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.3);
+    background-color: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.45);
     
     .alert-icon-wrap {
-      background-color: rgba(16, 185, 129, 0.2);
+      background-color: rgba(16, 185, 129, 0.25);
       color: $accent-green;
     }
-    .alert-text h4 { color: #6ee7b7; }
+    .alert-text h4 { color: #a7f3d0; }
   }
 }
 
@@ -386,32 +388,32 @@ $alert-blue-text: #60a5fa;
 
 .reminder-input {
   width: 100%;
-  background-color: rgba(31, 41, 55, 0.5);
-  border: 1px solid #374151;
+  background-color: #1e293b;
+  border: 1px solid #475569;
   border-radius: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-  color: #e5e7eb;
+  padding: 0.65rem 2.5rem 0.65rem 0.85rem;
+  font-size: 16px;
+  color: #f8fafc;
   transition: all 0.2s;
   
-  &::placeholder { color: $text-muted; }
+  &::placeholder { color: #cbd5e1; }
   &:focus {
     outline: none;
-    border-color: rgba(16, 185, 129, 0.5);
+    border-color: #10b981;
   }
 }
 
 .reminder-add-btn {
   position: absolute;
-  right: 0.5rem;
-  top: 0.375rem;
-  color: #9ca3af;
+  right: 0.6rem;
+  top: 0.6rem;
+  color: #e2e8f0;
   transition: color 0.2s;
   cursor: pointer;
   background: none;
   border: none;
   
-  svg { width: 1.25rem; height: 1.25rem; }
+  svg { width: 1.35rem; height: 1.35rem; }
   &:hover { color: $accent-green; }
 }
 
@@ -427,30 +429,29 @@ $alert-blue-text: #60a5fa;
     text-align: center;
     padding: 1.5rem 0;
     color: $text-muted;
-    font-size: 0.875rem;
+    font-size: 16px;
     
     i {
       font-size: 1.5rem;
       margin-bottom: 0.5rem;
-      opacity: 0.5;
+      opacity: 0.7;
       display: block;
     }
   }
 }
 
 .reminder-item {
-  background-color: rgba(31, 41, 55, 0.3);
-  border: 1px solid rgba(55, 65, 81, 0.5);
+  background-color: #1e293b;
+  border: 1px solid #475569;
   border-radius: 0.75rem;
-  padding: 0.75rem;
+  padding: 0.85rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   transition: background-color 0.2s;
   
   &:hover {
-    background-color: rgba(31, 41, 55, 0.5);
-    .reminder-done-btn { opacity: 1; }
+    background-color: #334155;
   }
   
   .reminder-item-header {
@@ -460,12 +461,12 @@ $alert-blue-text: #60a5fa;
   }
   
   .reminder-icon {
-    background-color: rgba(55, 65, 81, 0.5);
-    color: #9ca3af;
+    background-color: #334155;
+    color: #e2e8f0;
     padding: 0.5rem;
     border-radius: 0.5rem;
     flex-shrink: 0;
-    svg { width: 1rem; height: 1rem; }
+    svg { width: 1.15rem; height: 1.15rem; }
   }
   
   .reminder-content {
@@ -473,21 +474,21 @@ $alert-blue-text: #60a5fa;
     min-width: 0;
     
     h4 {
-      color: #d1d5db;
+      color: #f8fafc;
       font-weight: 700;
-      font-size: 0.75rem;
+      font-size: 16px;
       margin: 0;
-      line-height: 1.25;
+      line-height: 1.3;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     p {
-      color: $text-muted;
-      font-size: 11px;
+      color: #cbd5e1;
+      font-size: 14px;
       margin-top: 0.25rem;
       margin-bottom: 0;
-      line-height: 1.375;
+      line-height: 1.4;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
@@ -497,23 +498,20 @@ $alert-blue-text: #60a5fa;
   
   .reminder-done-btn {
     width: 100%;
-    background-color: rgba(55, 65, 81, 0.3);
-    color: #9ca3af;
-    border: 1px solid rgba(75, 85, 99, 0.5);
+    background-color: #059669;
+    color: #ffffff;
+    border: 1px solid rgba(16, 185, 129, 0.5);
     border-radius: 0.5rem;
-    padding: 0.375rem;
-    font-size: 10px;
+    padding: 0.5rem;
+    font-size: 14px;
     font-weight: 700;
     text-transform: uppercase;
     transition: all 0.2s;
-    opacity: 0;
+    opacity: 1;
     cursor: pointer;
     
     &:hover, &:focus {
-      background-color: rgba(16, 185, 129, 0.2);
-      color: $accent-green;
-      border-color: rgba(16, 185, 129, 0.5);
-      opacity: 1;
+      background-color: #047857;
     }
   }
 }

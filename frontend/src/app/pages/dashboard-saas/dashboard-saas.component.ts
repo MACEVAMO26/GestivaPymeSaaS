@@ -1,4 +1,5 @@
-import { Component, Input, Output, EventEmitter, inject, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, OnInit, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../services/toast.service';
@@ -16,6 +17,7 @@ export class DashboardSaasComponent implements OnInit {
   
   public toastService = inject(ToastService);
   public recordatoriosService = inject(RecordatoriosService);
+  private destroyRef = inject(DestroyRef);
 
   nuevoRecordatorio: string = '';
   recordatorios: Recordatorio[] = [];
@@ -25,7 +27,7 @@ export class DashboardSaasComponent implements OnInit {
   }
 
   cargarRecordatorios() {
-    this.recordatoriosService.getRecordatorios().subscribe({
+    this.recordatoriosService.getRecordatorios().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.recordatorios = data;
       },

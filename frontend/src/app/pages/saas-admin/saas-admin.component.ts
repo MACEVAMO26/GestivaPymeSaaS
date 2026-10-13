@@ -1,4 +1,5 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, DestroyRef, HostListener } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { DashboardSaasComponent } from '../dashboard-saas/dashboard-saas.component';
 import { FormsModule } from '@angular/forms';
@@ -70,7 +71,7 @@ export class SaasAdminComponent implements OnInit {
   contratosHistory: any[] = [];
   nuevoContrato = {
     version: '1.0',
-    contenido: '<h1 style="text-align: center;">CONTRATO DE PRESTACIÓN DE SERVICIOS SAAS</h1><p>Entre los suscritos a saber: de una parte GESTIVAPYME...</p>'
+    contenido: '<h1>CONTRATO DE PRESTACIÓN DE SERVICIOS SAAS</h1><p>Entre los suscritos a saber: de una parte GESTIVAPYME...</p>'
   };
   isGuardandoContrato = false;
 
@@ -163,7 +164,7 @@ export class SaasAdminComponent implements OnInit {
 
   // --- MÉTODOS DEL CARRITO DE SUSCRIPCIÓN ---
   cargarCatalogoTarifas() {
-    this.tarifaService.getCatalogo().subscribe({
+    this.tarifaService.getCatalogo().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
         this.catalogoTarifas = res;
       },
@@ -415,6 +416,7 @@ export class SaasAdminComponent implements OnInit {
   private empresaService = inject(EmpresaService);
   private tarifaService = inject(TarifaService);
   private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
 
   constructor(
     private authService: AuthService,
@@ -424,29 +426,14 @@ export class SaasAdminComponent implements OnInit {
     private modulosService: ModulosService,
   ) {}
 
-  ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
-      const vista = params.get('vista');
-      if (vista) {
-        this.currentView = vista;
-        localStorage.setItem('saas_current_view', vista);
-        if (vista === 'comercial') {
-          this.cargarLeads();
-        }
-        if (vista === 'control-ia') {
-          this.cargarConfiguracionIA();
-        }
-      } else {
-        const savedView = localStorage.getItem('saas_current_view');
-        if (savedView) {
-          this.currentView = savedView;
-          if (savedView === 'control-ia') {
-            this.cargarConfiguracionIA();
-          }
-        }
-      }
-    });
+  @HostListener('window:pageshow')
+  onPageShow(): void {
+    if (!this.authService.getToken()) {
+      this.router.navigate(['/login'], { replaceUrl: true });
+    }
+  }
 
+  ngOnInit(): void {
     this.user = this.authService.getUser();
     
     // Inicializar datos del perfil
@@ -469,22 +456,53 @@ export class SaasAdminComponent implements OnInit {
           ruta = '/' + slug + '/inicio';
         }
       }
-      this.router.navigate([ruta]);
+      this.router.navigate([ruta], { replaceUrl: true });
+      return;
     }
 
-    this.modulosService.getCatalogoModulos().subscribe(catalog => {
-      // Clonar profundamente para evitar fugas de estado globales (bugfix: evitar que se muestre todo abierto)
-      this.paquetesModulos = JSON.parse(JSON.stringify(catalog)).filter((p: any) => p.id !== 'default');
-    });
-
     if (typeof window !== 'undefined') {
+      if (window.innerWidth <= 768) {
+        this.isSidebarCollapsed = true;
+      }
       this.cargarEmpresas();
       this.cargarSolicitudes();
       this.cargarTicketsSoporte();
-      this.cargarLeads();
       this.cargarSuscripciones();
-      this.cargarCatalogoTarifas();
+    }
+
+    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
+      const vista = params.get('vista');
+      if (vista) {
+        this.currentView = vista;
+        localStorage.setItem('saas_current_view', vista);
+      } else {
+        const savedView = localStorage.getItem('saas_current_view');
+        if (savedView) {
+          this.currentView = savedView;
+        }
+      }
+      this.cargarDatosPorVista(this.currentView);
+    });
+  }
+
+  private cargarDatosPorVista(vista: string): void {
+    if (vista === 'empresas' || vista === 'suscripciones') {
+      if (this.catalogoTarifas.length === 0) {
+        this.cargarCatalogoTarifas();
+      }
+    } else if (vista === 'paquetes') {
+      if (this.paquetesModulos.length === 0) {
+        this.modulosService.getCatalogoModulos().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(catalog => {
+          this.paquetesModulos = JSON.parse(JSON.stringify(catalog)).filter((p: any) => p.id !== 'default');
+        });
+      }
       this.cargarSystemStats();
+    } else if (vista === 'comercial') {
+      this.cargarLeads();
+    } else if (vista === 'control-ia') {
+      this.cargarConfiguracionIA();
+    } else if (vista === 'contratos') {
+      this.cargarContratos();
     }
   }
 
@@ -543,15 +561,15 @@ export class SaasAdminComponent implements OnInit {
   }
 
   cambiarVista(vista: string) {
-    this.router.navigate(['/saas-admin', vista]);
-    if (vista === 'contratos') {
-      this.cargarContratos();
+    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+      this.isSidebarCollapsed = true;
     }
+    this.router.navigate(['/saas-admin', vista], { replaceUrl: true });
   }
 
   // --- MÉTODOS PARA CONTRATOS SAAS ---
   cargarContratos() {
-    this.http.get('/api/saas/contratos', { headers: this.getHeaders() }).subscribe({
+    this.http.get('/api/saas/contratos', { headers: this.getHeaders() }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res: any) => {
         this.contratosHistory = res;
       },
@@ -584,7 +602,7 @@ export class SaasAdminComponent implements OnInit {
 
   // --- MÉTODOS PARA CONTROL DE IA ---
   cargarConfiguracionIA() {
-    this.http.get('/api/saas/ia-config').subscribe({
+    this.http.get('/api/saas/ia-config').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res: any) => {
         const data = res?.data;
         if (data) {
@@ -648,7 +666,7 @@ export class SaasAdminComponent implements OnInit {
     }
     const headers = { Authorization: `Bearer ${token}` };
     const t = new Date().getTime();
-    this.http.get<any[]>(`/api/leads?t=${t}`, { headers }).subscribe({
+    this.http.get<any[]>(`/api/leads?t=${t}`, { headers }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.leads = [...data];
         if (this.leads.length === 0) {
@@ -868,7 +886,7 @@ export class SaasAdminComponent implements OnInit {
   cargarSolicitudes() {
     const token = sessionStorage.getItem('auth_token');
     const headers = { Authorization: `Bearer ${token}` };
-    this.http.get<any[]>('/api/admin-requests', { headers }).subscribe({
+    this.http.get<any[]>('/api/admin-requests', { headers }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.solicitudes = data;
         this.solicitudesPendientes = data.filter((s: any) => s.estado === 'pendiente').length;
@@ -881,7 +899,7 @@ export class SaasAdminComponent implements OnInit {
   cargarTicketsSoporte() {
     const token = sessionStorage.getItem('auth_token');
     const headers = { Authorization: `Bearer ${token}` };
-    this.http.get<any[]>('/api/saas/soporte', { headers }).subscribe({
+    this.http.get<any[]>('/api/saas/soporte', { headers }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.ticketsSoporte = data;
         this.ticketsSoportePendientes = data.filter((t: any) => t.estado === 'Abierto' || t.estado === 'En progreso').length;
@@ -1143,7 +1161,7 @@ export class SaasAdminComponent implements OnInit {
 
   cargarEmpresas() {
     this.isLoadingEmpresas = true;
-    this.empresaService.getEmpresas().subscribe({
+    this.empresaService.getEmpresas().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.isLoadingEmpresas = false;
         this.empresas = data;
@@ -1238,7 +1256,7 @@ export class SaasAdminComponent implements OnInit {
   }
 
   cargarSuscripciones() {
-    this.empresaService.getSuscripcionesStats().subscribe({
+    this.empresaService.getSuscripcionesStats().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.statsSuscripciones = data.stats;
         this.suscripcionesList = data.lista;
@@ -1249,7 +1267,7 @@ export class SaasAdminComponent implements OnInit {
   }
 
   cargarSystemStats() {
-    this.empresaService.getSystemStats().subscribe({
+    this.empresaService.getSystemStats().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.serverStatus = data;
         this.cdr.detectChanges();

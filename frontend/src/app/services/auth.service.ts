@@ -47,17 +47,37 @@ export class AuthService {
     return this.http.post<any>(`${this.apiUrl}/recuperar-password`, { email });
   }
 
-  // 3. Método para cerrar sesión
-  logout(): void {
-    // Limpiamos el almacenamiento local
+  // 3. Método para cerrar sesión de forma inmediata
+  logout(redirectToLogin: boolean = true): void {
+    const token = this.getToken();
+
+    // Limpiamos el almacenamiento local de inmediato para no bloquear la interfaz
+    this.clearSessionStorage();
+
+    // Revocamos el token en el servidor en segundo plano sin bloquear la navegación
+    if (token) {
+      this.http.post(`${this.apiUrl}/logout`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      }).subscribe({
+        next: () => {},
+        error: () => {}
+      });
+    }
+
+    // Redirigimos al usuario a la página de login reemplazando el historial
+    if (redirectToLogin) {
+      this.router.navigate(['/login'], { replaceUrl: true });
+    }
+  }
+
+  // Limpia todos los datos de sesión almacenados en el navegador
+  clearSessionStorage(): void {
     try {
       sessionStorage.removeItem('auth_token');
       sessionStorage.removeItem('current_user');
       sessionStorage.removeItem('modulos_activos');
+      localStorage.removeItem('saas_current_view');
     } catch (e) {}
-
-    // Redirigimos al usuario a la página de login
-    this.router.navigate(['/login']);
   }
 
 

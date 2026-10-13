@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-landing',
@@ -16,6 +17,7 @@ import { Title, Meta } from '@angular/platform-browser';
 export class LandingComponent implements OnInit {
   // --- VARIABLES DE ESTADO ---
   isChatbotOpen = false;
+  isMobileMenuOpen = false;
   botView: 'menu' | 'phone' | 'form' | 'success' = 'menu';
   isSubmitting = false;
   errorMessage = '';
@@ -30,15 +32,35 @@ export class LandingComponent implements OnInit {
   http = inject(HttpClient);
   cdr = inject(ChangeDetectorRef);
   private router = inject(Router);
+  private authService = inject(AuthService);
   private titleService = inject(Title);
   private metaService = inject(Meta);
 
+  // Redirige a la vista de inicio de sesion cerrando el menu movil si estaba abierto
   goToLogin() {
+    this.isMobileMenuOpen = false;
     this.router.navigate(['/login']);
+  }
+
+  // Abre o cierra el menu desplegable en pantallas moviles
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
+
+  // Cierra el menu desplegable movil al seleccionar una seccion
+  closeMobileMenu() {
+    this.isMobileMenuOpen = false;
   }
 
   // Inicializa el componente y despierta al servidor
   ngOnInit(): void {
+    // Si el usuario ingresa o retrocede al Landing teniendo sesión activa, se cierra de inmediato
+    if (this.authService.getToken()) {
+      this.authService.logout(false);
+    }
+
+    window.scrollTo(0, 0);
+
     // Configurar SEO dinámico
     this.titleService.setTitle('GestivaPyme | Software de Gestión, Facturación y ERP para Pymes');
     this.metaService.updateTag({
