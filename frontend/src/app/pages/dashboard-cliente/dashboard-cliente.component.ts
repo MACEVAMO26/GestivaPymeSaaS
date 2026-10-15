@@ -1,4 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -29,6 +30,7 @@ export class DashboardClienteComponent implements OnInit {
   private modulosService = inject(ModulosService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
 
   // --- VARIABLES DE ESTADO ---
   user: any = null;
@@ -63,6 +65,21 @@ export class DashboardClienteComponent implements OnInit {
   ngOnInit(): void {
     this.user = this.authService.getUser();
     this.construirSidebar();
+
+    // Heartbeat de sesión activa: detecta si la sesión fue cerrada remotamente desde otro dispositivo
+    if (typeof window !== 'undefined') {
+      const sessionInterval = setInterval(() => {
+        if (this.authService.getToken()) {
+          this.authService.checkSession().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+            error: () => {}
+          });
+        } else {
+          clearInterval(sessionInterval);
+        }
+      }, 25000);
+
+      this.destroyRef.onDestroy(() => clearInterval(sessionInterval));
+    }
   }
 
   // --- LÓGICA DEL SIDEBAR (CATÁLOGO REAL DESDE LA BD) ---

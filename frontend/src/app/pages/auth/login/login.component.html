@@ -79,6 +79,21 @@
       />
     </div>
 
+    <!-- AVISO DE SESIÓN EXPULSADA REMOTAMENTE -->
+    @if (remoteLogoutNotice) {
+      <div class="alert-remote-logout fade-in" role="alert">
+        <div class="alert-remote-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="icon-remote-warning">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+          </svg>
+        </div>
+        <div class="alert-remote-text">
+          <strong>Sesión cerrada:</strong> {{ remoteLogoutNotice }}
+        </div>
+        <button type="button" class="alert-remote-close" (click)="remoteLogoutNotice = ''" aria-label="Cerrar aviso">✕</button>
+      </div>
+    }
+
     <!-- HTML FORMULARIO ACTIVO -->
     @if (!requiresPasswordChange) {
       <form class="login-form" (ngSubmit)="onSubmit()">
@@ -323,6 +338,42 @@
             </button>
           </div>
         }
+      </div>
+    </div>
+  }
+
+  <!-- HTML MODAL CONTROL DE SESIONES SIMULTÁNEAS -->
+  @if (showSessionConflictModal) {
+    <div class="modal-overlay-susp fade-in" (click)="cancelarConflictoSesion()">
+      <div class="modal-content-susp modal-conflict" (click)="$event.stopPropagation()">
+        <div class="modal-icon-container-conflict">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="icon-xl-conflict"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+            />
+          </svg>
+        </div>
+        <h3 class="modal-title-susp">Sesión Activa Detectada</h3>
+        <p class="modal-desc-susp">{{ sessionConflictMessage }}</p>
+        <p class="modal-desc-sub">Para acceder desde este dispositivo, debes cerrar la sesión que tienes abierta en el otro navegador o equipo.</p>
+        
+        <div class="modal-conflict-actions">
+          <button type="button" class="btn-cancel-conflict" (click)="cancelarConflictoSesion()">
+            Cancelar
+          </button>
+          <button type="button" class="btn-confirm-conflict" (click)="cerrarOtraSesionEIngresar()" [disabled]="isLoading">
+            {{ isLoading ? 'Cerrando sesión remota...' : 'Cerrar la otra sesión e ingresar aquí' }}
+          </button>
+        </div>
       </div>
     </div>
   }

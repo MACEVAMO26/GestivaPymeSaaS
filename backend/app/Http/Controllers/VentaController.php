@@ -70,38 +70,57 @@ class VentaController extends Controller
                 ]);
 
                 foreach ($request->productos as $p) {
+                    $cantSolicitada = (int)$p['cantidad'];
+
+                    // 1. Verificación atómica con bloqueo pesimista (lockForUpdate) para prevenir condiciones de carrera (Race Condition)
+                    $inventario = DB::table('inventario')
+                        ->where('producto_id', $p['id'])
+                        ->lockForUpdate()
+                        ->first();
+
+                    $producto = \App\Models\Producto::find($p['id']);
+                    $nombreProd = $producto ? $producto->nombre : "ID " . $p['id'];
+                    $stockActual = $inventario ? (int)$inventario->stock_actual : 0;
+
+                    if (!$inventario || $stockActual < $cantSolicitada) {
+                        $mensaje = $stockActual <= 0
+                            ? "El producto '{$nombreProd}' ya se encuentra agotado (Stock disponible: 0). No es posible completar la venta."
+                            : "Stock insuficiente para '{$nombreProd}'. Solicitado: {$cantSolicitada}, Disponible: {$stockActual}.";
+
+                        throw new \Exception($mensaje, 422);
+                    }
+
                     VentaDetalle::create([
                         'venta_id' => $v->id,
                         'producto_id' => $p['id'],
-                        'cantidad' => $p['cantidad'],
+                        'cantidad' => $cantSolicitada,
                         'precio_unitario' => $p['precio_unitario'],
-                        'subtotal' => $p['cantidad'] * $p['precio_unitario']
+                        'subtotal' => $cantSolicitada * $p['precio_unitario']
                     ]);
 
-                    // Descontar inventario (esquema real: stock_actual)
+                    // Descontar inventario de forma atómica y consistente
+                    $nuevoStock = $stockActual - $cantSolicitada;
                     DB::table('inventario')->where('producto_id', $p['id'])->update([
-                        'stock_actual' => DB::raw('stock_actual - ' . (int)$p['cantidad']),
+                        'stock_actual' => $nuevoStock,
                         'updated_at' => now()
                     ]);
-                    $inventario = Inventario::where('producto_id', $p['id'])->first();
 
                     // Registrar movimiento de salida en inventario
                     \App\Models\MovimientoInventario::create([
                         'producto_id' => $p['id'],
                         'usuario_id' => Auth::id() ?? 1,
                         'tipo' => 'salida',
-                        'cantidad' => (int)$p['cantidad'],
+                        'cantidad' => $cantSolicitada,
                         'justificacion' => 'Venta Factura #' . $consecutivo,
                         'fecha_hora' => now()->toDateTimeString(),
                     ]);
 
                     // Notificación de stock bajo (umbral = stock_minimo)
-                    if ($inventario && $inventario->stock_actual <= $inventario->stock_minimo) {
-                        $producto = \App\Models\Producto::find($p['id']);
+                    if ($inventario && $nuevoStock <= $inventario->stock_minimo) {
                         \App\Models\Notificacion::create([
                             'usuario_id' => Auth::id() ?? 1,
                             'titulo' => 'Alerta de Stock Bajo',
-                            'descripcion' => 'El producto "' . ($producto ? $producto->nombre : 'ID '.$p['id']) . '" tiene un stock bajo (' . $inventario->stock_actual . ' unidades restantes).',
+                            'descripcion' => 'El producto "' . $nombreProd . '" tiene un stock bajo (' . $nuevoStock . ' unidades restantes).',
                             'leida' => '0',
                             'fecha_hora' => now(),
                         ]);
@@ -127,7 +146,11 @@ class VentaController extends Controller
             ], 201);
 
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Error al registrar la venta: ' . $e->getMessage()], 500);
+            $code = $e->getCode() === 422 ? 422 : 500;
+            return response()->json([
+                'error' => $code === 422 ? 'stock_agotado' : 'error_servidor',
+                'message' => $e->getMessage()
+            ], $code);
         }
     }
 

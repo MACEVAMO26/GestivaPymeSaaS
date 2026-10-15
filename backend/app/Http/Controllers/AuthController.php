@@ -58,7 +58,21 @@ class AuthController extends Controller
             ]);
         }
 
-        // Cierra cualquier sesión previa abierta por este usuario en otros navegadores o pestañas
+        // Limpieza de tokens expirados o abandonados con más de 12 horas sin actividad
+        $user->tokens()->where('created_at', '<', now()->subHours(12))->delete();
+
+        // Control de Sesiones Simultáneas: verificar si ya existe otra sesión activa
+        $tieneSesionActiva = $user->tokens()->exists();
+        $forzarCierre = $request->boolean('force_logout');
+
+        if ($tieneSesionActiva && !$forzarCierre) {
+            return response()->json([
+                'session_conflict' => true,
+                'message' => 'Ya existe una sesión activa para este usuario en otro dispositivo o navegador. Por seguridad, no se permiten sesiones simultáneas.'
+            ], 409);
+        }
+
+        // Cierra cualquier sesión previa abierta por este usuario en otros navegadores o dispositivos
         $user->tokens()->delete();
 
         $token = $user->createToken('auth_token')->plainTextToken;

@@ -1480,9 +1480,16 @@ $sidebar-text-muted: #0f172a;
     rgba(255, 255, 255, 0.28),
     #f1f5f9
   );
-  padding: 0.75rem 1.75rem;
+  height: 2.5rem;
+  min-height: 2.5rem;
+  padding: 0 1.5rem;
   border-radius: 50px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
   font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .saas-btn-submit {
   @include glass-btn(
@@ -1490,10 +1497,16 @@ $sidebar-text-muted: #0f172a;
     rgba(6, 182, 212, 0.42),
     rgba(6, 182, 212, 0.55)
   );
-  padding: 0.75rem 1.75rem;
+  height: 2.5rem;
+  min-height: 2.5rem;
+  padding: 0 1.5rem;
   border-radius: 50px;
-  font-weight: bold;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
   font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .saas-success-overlay {
   position: fixed;
@@ -1839,13 +1852,19 @@ $sidebar-text-muted: #0f172a;
     rgba(255, 255, 255, 0.28),
     #f1f5f9
   );
+  font-family: 'Montserrat', sans-serif;
   font-weight: 600;
   font-size: 14px;
-  padding: 0.55rem 1.25rem;
+  height: 2.5rem;
+  min-height: 2.5rem;
+  padding: 0 1.25rem;
   border-radius: 50px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   &.active {
     @include glass-btn(
       rgba(16, 185, 129, 0.35),
@@ -1859,49 +1878,215 @@ $sidebar-text-muted: #0f172a;
   @extend .soft-ui-input;
 }
 
-.neu-action-btn {
-  @include glass-btn(
-    rgba(255, 255, 255, 0.16),
-    rgba(255, 255, 255, 0.28),
-    rgba(255, 255, 255, 0.35)
-  );
-  padding: 0.5rem;
+/* --- SISTEMA UNIFICADO DE BOTONES DE ACCIÓN (COLUMNA "ACCIONES") --- */
+/* Guarda simetría exacta en todos los módulos (34px x 34px, iconos 18px, tooltips) */
+.saas-action-btn {
+  width: 2.125rem;
+  height: 2.125rem;
+  min-width: 2.125rem;
+  min-height: 2.125rem;
   border-radius: 50%;
-  width: 2.5rem;
-  height: 2.5rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(30, 41, 59, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+  .saas-action-icon,
+  svg {
+    width: 1.125rem;
+    height: 1.125rem;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+
+    .saas-action-icon,
+    svg {
+      transform: scale(1.12);
+    }
+  }
+
+  &:active {
+    transform: translateY(0) scale(0.95);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #38bdf8;
+    outline-offset: 2px;
+  }
+
+  &--blue {
+    color: #60a5fa;
+    border-color: rgba(96, 165, 250, 0.35);
+    &:hover {
+      background: rgba(59, 130, 246, 0.28);
+      border-color: rgba(96, 165, 250, 0.65);
+      color: #93c5fd;
+    }
+  }
+
+  &--emerald, &--green {
+    color: #34d399;
+    border-color: rgba(52, 211, 153, 0.35);
+    &:hover {
+      background: rgba(16, 185, 129, 0.28);
+      border-color: rgba(52, 211, 153, 0.65);
+      color: #6ee7b7;
+    }
+  }
+
+  &--amber, &--yellow {
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.35);
+    &:hover {
+      background: rgba(245, 158, 11, 0.28);
+      border-color: rgba(251, 191, 36, 0.65);
+      color: #fde68a;
+    }
+  }
+
+  &--red, &--rose {
+    color: #f87171;
+    border-color: rgba(248, 113, 113, 0.35);
+    &:hover {
+      background: rgba(239, 68, 68, 0.28);
+      border-color: rgba(248, 113, 113, 0.65);
+      color: #fca5a5;
+    }
+  }
+
+  &--fuchsia, &--purple {
+    color: #e879f9;
+    border-color: rgba(232, 121, 249, 0.35);
+    &:hover {
+      background: rgba(217, 70, 239, 0.28);
+      border-color: rgba(232, 121, 249, 0.65);
+      color: #f0abfc;
+    }
+  }
+
+  &--indigo {
+    color: #818cf8;
+    border-color: rgba(129, 140, 248, 0.35);
+    &:hover {
+      background: rgba(99, 102, 241, 0.28);
+      border-color: rgba(129, 140, 248, 0.65);
+      color: #a5b4fc;
+    }
+  }
+
+  &--slate, &--gray {
+    color: #cbd5e1;
+    border-color: rgba(203, 213, 225, 0.25);
+    &:hover {
+      background: rgba(148, 163, 184, 0.28);
+      border-color: rgba(203, 213, 225, 0.55);
+      color: #ffffff;
+    }
+  }
 }
 
-.neu-action-check {
-  @include glass-btn(
-    rgba(16, 185, 129, 0.28),
-    rgba(16, 185, 129, 0.48),
-    rgba(16, 185, 129, 0.55)
-  );
-  padding: 0.5rem;
-  border-radius: 50%;
-  width: 2.5rem;
+/* --- SISTEMA UNIFICADO DE BOTONES ESTÁNDAR DE MÓDULOS (40px, Montserrat 14px) --- */
+.saas-btn {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
   height: 2.5rem;
+  min-height: 2.5rem;
+  padding: 0 1.25rem;
+  border-radius: 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.3px;
+
+  &--pill {
+    border-radius: 50px;
+  }
+
+  &--primary {
+    @include glass-btn(
+      rgba(16, 185, 129, 0.28),
+      rgba(16, 185, 129, 0.48),
+      rgba(16, 185, 129, 0.55),
+      #ffffff
+    );
+  }
+
+  &--blue {
+    @include glass-btn(
+      rgba(59, 130, 246, 0.24),
+      rgba(59, 130, 246, 0.48),
+      rgba(59, 130, 246, 0.55),
+      #ffffff
+    );
+  }
+
+  &--secondary {
+    @include glass-btn(
+      rgba(148, 163, 184, 0.16),
+      rgba(148, 163, 184, 0.28),
+      rgba(255, 255, 255, 0.22),
+      #e2e8f0
+    );
+  }
+
+  &--danger {
+    @include glass-btn(
+      rgba(225, 29, 72, 0.24),
+      rgba(225, 29, 72, 0.48),
+      rgba(225, 29, 72, 0.55),
+      #ffffff
+    );
+  }
 }
 
-.neu-action-close {
-  @include glass-btn(
-    rgba(225, 29, 72, 0.28),
-    rgba(225, 29, 72, 0.48),
-    rgba(225, 29, 72, 0.55)
-  );
-  padding: 0.5rem;
-  border-radius: 50%;
-  width: 2.5rem;
+/* --- PESTAÑAS (TABS) HORIZONTALES UNIFICADAS (40px, Montserrat 14px) --- */
+.saas-tab-btn {
   height: 2.5rem;
+  min-height: 2.5rem;
+  padding: 0 1.25rem;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #cbd5e1;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  &.active {
+    color: #34d399;
+    border-bottom-color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+  }
 }
 
 /* --- JERARQUÍA TIPOGRÁFICA ACCESIBLE (BASE 16px, MÍNIMO 14px, CONTRASTE >= 3:1) --- */
@@ -1971,10 +2156,16 @@ $sidebar-text-muted: #0f172a;
     rgba(16, 185, 129, 0.48),
     rgba(16, 185, 129, 0.55)
   );
-  padding: 0.6rem 1.5rem;
+  height: 2.5rem;
+  min-height: 2.5rem;
+  padding: 0 1.5rem;
   border-radius: 50px;
   font-weight: 600;
   font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 /* --- CARRITO DE SUSCRIPCIONES & CHECKOUT --- */

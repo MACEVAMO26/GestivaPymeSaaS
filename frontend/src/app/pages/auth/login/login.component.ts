@@ -1,5 +1,5 @@
 import { Component, inject, ChangeDetectorRef, OnInit } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { AccessibilityService, DaltonismMode } from '../../../services/accessibility/accessibility.service';
 import { FormsModule } from '@angular/forms';
@@ -32,6 +32,11 @@ export class LoginComponent implements OnInit {
     newPassword: ''
   };
 
+  // Control de Sesiones Simultáneas
+  showSessionConflictModal = false;
+  sessionConflictMessage = '';
+  remoteLogoutNotice = '';
+
   // Modal Recuperar Contraseña
   showRecoveryModal = false;
   recoveryEmail = '';
@@ -39,11 +44,25 @@ export class LoginComponent implements OnInit {
   recoveryMessage = '';
   recoveryError = '';
 
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  public accessibilityService = inject(AccessibilityService);
+  private cdr = inject(ChangeDetectorRef);
+
   ngOnInit(): void {
     // Si el usuario llega al login (por botón atrás o navegación directa) teniendo sesión abierta, se cierra de inmediato
     if (this.authService.getToken()) {
       this.authService.logout(false);
     }
+
+    // Si viene redirigido porque se inició sesión en otro dispositivo
+    this.route.queryParams.subscribe(params => {
+      if (params['motivo'] === 'sesion_remota') {
+        this.remoteLogoutNotice = 'Tu sesión fue cerrada porque se inició sesión con tu cuenta desde otro dispositivo o navegador.';
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   abrirModalRecuperar() {
@@ -86,11 +105,6 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  private authService = inject(AuthService);
-  private router = inject(Router);
-  public accessibilityService = inject(AccessibilityService);
-  private cdr = inject(ChangeDetectorRef);
-
   // Alterna la visibilidad de la contraseña en el formulario
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
@@ -107,21 +121,38 @@ export class LoginComponent implements OnInit {
     this.isAccessibilityMenuOpen = false;
   }
 
+  // Cierra el modal de advertencia de sesión simultánea
+  cancelarConflictoSesion(): void {
+    this.showSessionConflictModal = false;
+    this.sessionConflictMessage = '';
+  }
+
+  // Cierra la sesión activa en el otro dispositivo e ingresa en este
+  cerrarOtraSesionEIngresar(): void {
+    this.onSubmit(true);
+  }
+
   // Procesa el formulario de login y redirige según el rol
-  onSubmit(): void {
+  onSubmit(forceLogout: boolean = false): void {
     if (this.requiresPasswordChange) {
       this.submitNewPassword();
       return;
     }
 
     this.isLoading = true;
-    this.authService.login(this.credentials).subscribe({
+    const payload = {
+      ...this.credentials,
+      force_logout: forceLogout
+    };
+
+    this.authService.login(payload).subscribe({
       next: (response) => {
         this.isLoading = false;
+        this.showSessionConflictModal = false;
+        this.remoteLogoutNotice = '';
         console.log("LOGIN RESPONSE", response);
 
         // Si el backend exige cambio de clave, mostramos el formulario de cambio
-        // sin usar alert() para no bloquear la detección de cambios de Angular
         if (response.requires_password_change) {
           this.requiresPasswordChange = true;
           this.cdr.detectChanges();
@@ -149,6 +180,15 @@ export class LoginComponent implements OnInit {
       error: (err) => {
         this.isLoading = false;
         console.error("LOGIN ERROR", err);
+
+        // 1. Conflicto por Sesión Simultánea abierta en otro dispositivo
+        if (err.status === 409 && err.error?.session_conflict) {
+          this.sessionConflictMessage = err.error.message || 'Ya existe una sesión activa para este usuario en otro dispositivo. Por seguridad, no se permiten sesiones simultáneas.';
+          this.showSessionConflictModal = true;
+          this.cdr.detectChanges();
+          return;
+        }
+
         if (err.error && err.error.errors) {
           const errors = err.error.errors;
           if (errors.system_suspended) {

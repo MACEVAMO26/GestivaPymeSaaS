@@ -365,7 +365,7 @@
               </div>
             </div>
             <button
-              class="glass-btn-red text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              class="saas-btn saas-btn--danger"
             >
               Revisar Ahora
             </button>
@@ -452,13 +452,18 @@
                         {{ ticket.created_at | date: 'dd/MM/yyyy HH:mm' }}
                       </td>
                       <td class="px-2 py-4 text-center">
-                        <button
-                          (click)="abrirTicket(ticket)"
-                          class="bg-indigo-500/20 hover:bg-indigo-500/40 text-indigo-400 border border-indigo-500/30 px-3 py-1.5 rounded text-sm font-semibold transition-all mr-2"
-                          title="Atender"
-                        >
-                          Atender
-                        </button>
+                        <div class="flex items-center justify-center">
+                          <button
+                            (click)="abrirTicket(ticket)"
+                            class="saas-action-btn saas-action-btn--indigo"
+                            title="Atender ticket #{{ ticket.id }}"
+                            aria-label="Atender ticket"
+                          >
+                            <svg class="saas-action-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a.75.75 0 0 1-.974-.94 5.95 5.95 0 0 0 .54-2.477A8.163 8.163 0 0 1 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
+                            </svg>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   }
@@ -817,14 +822,15 @@
                         }
                       </td>
                       <td class="actions text-center">
-                        <div class="flex items-center gap-1 justify-center">
+                        <div class="flex items-center gap-1.5 justify-center">
                           <!-- Auditoria / Modo Dios -->
                           <button
                             (click)="auditarEmpresa(empresa)"
-                            class="w-7 h-7 rounded-full glass-btn-gray flex items-center justify-center transition-colors hover:border-blue-500/30"
+                            class="saas-action-btn saas-action-btn--blue"
                             title="Auditar Sistema (Modo Dios)"
+                            aria-label="Auditar Sistema"
                           >
-                            <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-[14px] h-[14px] text-blue-400">
+                            <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="saas-action-icon">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
                               <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                             </svg>
@@ -833,15 +839,16 @@
                           <!-- Ir a Suscripción (carga el precio según el plan) -->
                           <button
                             (click)="abrirSuscripcionDeEmpresa(empresa)"
-                            class="w-7 h-7 rounded-full glass-btn-gray flex items-center justify-center transition-colors hover:border-emerald-500/30"
+                            class="saas-action-btn saas-action-btn--emerald"
                             title="Suscripción / Plan"
+                            aria-label="Suscripción y Plan"
                           >
                             <svg
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke-width="2"
                               stroke="currentColor"
-                              class="w-[14px] h-[14px] text-emerald-500"
+                              class="saas-action-icon"
                             >
                               <path
                                 stroke-linecap="round"
@@ -854,15 +861,16 @@
                           <!-- Activar (Check) -->
                           <button
                             (click)="cambiarEstadoEmpresa(empresa, 'activar')"
-                            class="w-7 h-7 rounded-full glass-btn-gray flex items-center justify-center transition-colors hover:border-emerald-500/30"
+                            class="saas-action-btn saas-action-btn--emerald"
                             title="Activar"
+                            aria-label="Activar Empresa"
                           >
                             <svg
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke-width="2"
                               stroke="currentColor"
-                              class="w-[14px] h-[14px] text-emerald-500"
+                              class="saas-action-icon"
                             >
                               <path
                                 stroke-linecap="round"
@@ -875,15 +883,16 @@
                           <!-- Inactivar (Block) -->
                           <button
                             (click)="cambiarEstadoEmpresa(empresa, 'mora')"
-                            class="w-7 h-7 rounded-full glass-btn-gray flex items-center justify-center transition-colors hover:border-amber-500/30"
-                            title="Suspender"
+                            class="saas-action-btn saas-action-btn--amber"
+                            title="Suspender (Mora)"
+                            aria-label="Suspender por Mora"
                           >
                             <svg
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke-width="2"
                               stroke="currentColor"
-                              class="w-[14px] h-[14px] text-amber-500"
+                              class="saas-action-icon"
                             >
                               <path
                                 stroke-linecap="round"
@@ -896,15 +905,16 @@
                           <!-- Inactivar Total (Trash) -->
                           <button
                             (click)="cambiarEstadoEmpresa(empresa, 'inactivar')"
-                            class="w-7 h-7 rounded-full glass-btn-gray flex items-center justify-center transition-colors hover:border-red-500/30"
+                            class="saas-action-btn saas-action-btn--red"
                             title="Inactivar Total"
+                            aria-label="Inactivar Total"
                           >
                             <svg
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke-width="2"
                               stroke="currentColor"
-                              class="w-[14px] h-[14px] text-red-500"
+                              class="saas-action-icon"
                             >
                               <path
                                 stroke-linecap="round"
@@ -917,15 +927,16 @@
                           <!-- Editar (Edit) -->
                           <button
                             (click)="editarEmpresa(empresa)"
-                            class="w-7 h-7 rounded-full glass-btn-gray flex items-center justify-center transition-colors hover:border-fuchsia-500/30"
-                            title="Editar"
+                            class="saas-action-btn saas-action-btn--fuchsia"
+                            title="Editar Datos"
+                            aria-label="Editar Empresa"
                           >
                             <svg
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke-width="2"
                               stroke="currentColor"
-                              class="w-[14px] h-[14px] text-fuchsia-500"
+                              class="saas-action-icon"
                             >
                               <path
                                 stroke-linecap="round"
@@ -938,15 +949,16 @@
                           <!-- Reenviar Credenciales -->
                           <button
                             (click)="reenviarCredenciales(empresa)"
-                            class="w-7 h-7 rounded-full glass-btn-gray flex items-center justify-center transition-colors hover:border-blue-500/30"
+                            class="saas-action-btn saas-action-btn--blue"
                             title="Reenviar credenciales por correo"
+                            aria-label="Reenviar credenciales"
                           >
                             <svg
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke-width="2"
                               stroke="currentColor"
-                              class="w-[14px] h-[14px] text-blue-400"
+                              class="saas-action-icon"
                             >
                               <path
                                 stroke-linecap="round"
@@ -1026,13 +1038,13 @@
                       }
                     </div>
                     <div class="flex flex-col gap-2">
-                      <button (click)="abrirSolicitud(solicitud)" class="btn-view font-inter">
+                      <button (click)="abrirSolicitud(solicitud)" class="saas-btn saas-btn--primary saas-btn--pill">
                         Ver Detalles
                       </button>
                       @if (solicitud.estado === 'pendiente') {
                         <button
                           (click)="marcarComoResueltaRapido(solicitud)"
-                          class="w-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 rounded-[4px] px-4 py-2 font-bold hover:bg-emerald-500/30 transition-colors text-sm uppercase tracking-wide"
+                          class="saas-btn saas-btn--secondary saas-btn--pill"
                         >
                           Resuelta
                         </button>
@@ -1337,7 +1349,7 @@
                 <h3 class="panel-title m-0">Gestión de Tarifas y Suscripciones</h3>
                 <button
                   (click)="abrirModalTarifasGlobales()"
-                  class="flex items-center gap-2 px-4 py-2 glass-btn-gray rounded-lg text-gray-200 font-semibold transition-colors text-sm"
+                  class="saas-btn saas-btn--secondary"
                 >
                   <svg
                     class="w-4 h-4 text-emerald-400"
@@ -1509,14 +1521,15 @@
                             }
                           </td>
                           <td class="px-2 py-4 text-center whitespace-nowrap">
-                            <div class="flex justify-center gap-1">
+                            <div class="flex justify-center gap-1.5">
                               <button
                                 (click)="abrirCarritoSuscripcion(sus)"
-                                class="w-10 h-10 rounded-full glass-btn-gray flex items-center justify-center transition-colors hover:border-gray-500/30"
+                                class="saas-action-btn saas-action-btn--slate"
                                 title="Gestionar Tarifas"
+                                aria-label="Gestionar Tarifas"
                               >
                                 <svg
-                                  class="w-5 h-5 text-slate-200"
+                                  class="saas-action-icon"
                                   fill="none"
                                   stroke="currentColor"
                                   viewBox="0 0 24 24"
@@ -1537,11 +1550,12 @@
                               </button>
                               <button
                                 (click)="renovarSuscripcion(sus.id)"
-                                class="w-10 h-10 rounded-full glass-btn-gray flex items-center justify-center transition-colors hover:border-blue-500/30"
-                                title="Renovar"
+                                class="saas-action-btn saas-action-btn--blue"
+                                title="Renovar Suscripción"
+                                aria-label="Renovar Suscripción"
                               >
                                 <svg
-                                  class="w-5 h-5 text-blue-500"
+                                  class="saas-action-icon"
                                   fill="none"
                                   stroke="currentColor"
                                   viewBox="0 0 24 24"
@@ -1556,11 +1570,12 @@
                               </button>
                               <button
                                 (click)="noRenovarSuscripcion(sus.id)"
-                                class="w-10 h-10 rounded-full glass-btn-gray flex items-center justify-center transition-colors hover:border-red-500/30"
-                                title="Suspender"
+                                class="saas-action-btn saas-action-btn--red"
+                                title="Suspender Suscripción"
+                                aria-label="Suspender Suscripción"
                               >
                                 <svg
-                                  class="w-5 h-5 text-red-500"
+                                  class="saas-action-icon"
                                   fill="none"
                                   stroke="currentColor"
                                   viewBox="0 0 24 24"
@@ -1612,33 +1627,29 @@
                     <div class="flex border-b border-gray-800 gap-2 mb-4 overflow-x-auto pb-1">
                       <button
                         (click)="activeTabCarrito = 'plan_base'"
-                        [class.border-emerald-500]="activeTabCarrito === 'plan_base'"
-                        [class.text-emerald-400]="activeTabCarrito === 'plan_base'"
-                        class="px-4 py-2 border-b-2 border-transparent font-semibold text-sm uppercase tracking-wider text-slate-200 hover:text-white transition-colors whitespace-nowrap"
+                        [class.active]="activeTabCarrito === 'plan_base'"
+                        class="saas-tab-btn"
                       >
                         1. Plan & Base
                       </button>
                       <button
                         (click)="activeTabCarrito = 'modulos'"
-                        [class.border-emerald-500]="activeTabCarrito === 'modulos'"
-                        [class.text-emerald-400]="activeTabCarrito === 'modulos'"
-                        class="px-4 py-2 border-b-2 border-transparent font-semibold text-sm uppercase tracking-wider text-slate-200 hover:text-white transition-colors whitespace-nowrap"
+                        [class.active]="activeTabCarrito === 'modulos'"
+                        class="saas-tab-btn"
                       >
                         2. Módulos Adicionales
                       </button>
                       <button
                         (click)="activeTabCarrito = 'ia'"
-                        [class.border-emerald-500]="activeTabCarrito === 'ia'"
-                        [class.text-emerald-400]="activeTabCarrito === 'ia'"
-                        class="px-4 py-2 border-b-2 border-transparent font-semibold text-sm uppercase tracking-wider text-slate-200 hover:text-white transition-colors whitespace-nowrap"
+                        [class.active]="activeTabCarrito === 'ia'"
+                        class="saas-tab-btn"
                       >
                         3. Inteligencia Artificial
                       </button>
                       <button
                         (click)="activeTabCarrito = 'addons'"
-                        [class.border-emerald-500]="activeTabCarrito === 'addons'"
-                        [class.text-emerald-400]="activeTabCarrito === 'addons'"
-                        class="px-4 py-2 border-b-2 border-transparent font-semibold text-sm uppercase tracking-wider text-slate-200 hover:text-white transition-colors whitespace-nowrap"
+                        [class.active]="activeTabCarrito === 'addons'"
+                        class="saas-tab-btn"
                       >
                         4. Conectores (Add-ons)
                       </button>
@@ -2627,7 +2638,7 @@
               @if (comercialTab === 'interesados') {
                 <button
                   (click)="cargarLeads()"
-                  class="ml-auto flex items-center gap-2 text-sm font-semibold text-cyan-300 bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 px-4 py-2 rounded-lg transition-colors mt-4 sm:mt-0"
+                  class="saas-btn saas-btn--secondary ml-auto"
                 >
                   <i class="fas fa-sync-alt"></i> Actualizar lista
                 </button>
@@ -2690,14 +2701,15 @@
                           >
                         </td>
                         <td class="py-3 px-2">
-                          <div class="flex items-center justify-center gap-3">
+                          <div class="flex items-center justify-center gap-1.5">
                             <button
-                              class="w-10 h-10 rounded-full glass-btn-gray flex items-center justify-center transition-colors hover:border-[#10b981]/30"
+                              class="saas-action-btn saas-action-btn--emerald"
                               title="Marcar Contactado"
+                              aria-label="Marcar como Contactado"
                               (click)="cambiarEstadoLead(lead.id, 'contactado')"
                             >
                               <svg
-                                class="w-5 h-5 text-[#10b981]"
+                                class="saas-action-icon"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
@@ -2711,12 +2723,13 @@
                               </svg>
                             </button>
                             <button
-                              class="w-10 h-10 rounded-full glass-btn-gray flex items-center justify-center transition-colors hover:border-[#f59e0b]/30"
+                              class="saas-action-btn saas-action-btn--amber"
                               title="No Responde"
+                              aria-label="Marcar como No Responde"
                               (click)="cambiarEstadoLead(lead.id, 'archivado')"
                             >
                               <svg
-                                class="w-5 h-5 text-[#f59e0b]"
+                                class="saas-action-icon"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
@@ -2730,12 +2743,13 @@
                               </svg>
                             </button>
                             <button
-                              class="w-10 h-10 rounded-full glass-btn-gray flex items-center justify-center transition-colors hover:border-[#ef4444]/30"
+                              class="saas-action-btn saas-action-btn--red"
                               title="Eliminar"
+                              aria-label="Eliminar Lead"
                               (click)="eliminarLead(lead.id)"
                             >
                               <svg
-                                class="w-5 h-5 text-[#ef4444]"
+                                class="saas-action-icon"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
@@ -2749,12 +2763,13 @@
                               </svg>
                             </button>
                             <button
-                              class="w-10 h-10 rounded-full glass-btn-gray flex items-center justify-center transition-colors hover:border-[#d946ef]/30"
-                              title="Notas"
+                              class="saas-action-btn saas-action-btn--fuchsia"
+                              title="Notas del Lead"
+                              aria-label="Notas del Lead"
                               (click)="abrirModalNotas(lead)"
                             >
                               <svg
-                                class="w-5 h-5 text-[#d946ef]"
+                                class="saas-action-icon"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
@@ -2961,7 +2976,7 @@
                 <button
                   (click)="guardarNuevoContrato()"
                   [disabled]="isGuardandoContrato"
-                  class="glass-btn-blue text-white font-bold py-2.5 px-6 rounded-lg transition-colors flex items-center gap-2"
+                  class="saas-btn saas-btn--blue"
                 >
                   @if (isGuardandoContrato) {
                     <svg
@@ -3425,14 +3440,14 @@
         <div class="flex justify-end gap-3 pt-4 border-t border-slate-500/50">
           <button
             (click)="cerrarModalTicket()"
-            class="px-4 py-2 glass-btn-gray text-white rounded font-medium transition-colors"
+            class="saas-btn saas-btn--secondary"
             [disabled]="isRespondiendoTicket"
           >
             Cancelar
           </button>
           <button
             (click)="responderTicket()"
-            class="px-4 py-2 glass-btn-green text-white rounded font-medium transition-all flex items-center gap-2"
+            class="saas-btn saas-btn--primary"
             [disabled]="isRespondiendoTicket || !respuestaTicket.trim()"
           >
             @if (isRespondiendoTicket) {
@@ -3820,7 +3835,7 @@
             <button (click)="cerrarModalSolicitud()" class="saas-btn-cancel">Cancelar</button>
             <button
               (click)="procesarSolicitud('rechazado')"
-              class="px-6 py-2 glass-btn-red text-white rounded-lg font-bold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              class="saas-btn saas-btn--danger"
               [disabled]="!mensajeRespuesta || mensajeRespuesta.trim() === ''"
             >
               Rechazar
@@ -3836,7 +3851,7 @@
             </button>
             <button
               (click)="procesarSolicitud('aprobado')"
-              class="px-6 py-2 glass-btn-green text-white rounded-lg font-bold flex items-center gap-2 transition-colors"
+              class="saas-btn saas-btn--primary"
             >
               Aprobar
               <svg
@@ -4067,13 +4082,13 @@
         <div class="flex justify-end gap-3 pt-4 border-t border-gray-800 p-6 bg-[#0f172a]">
           <button
             (click)="cerrarModalTarifasGlobales()"
-            class="px-4 py-2 glass-btn-gray text-white rounded-md transition-colors text-sm font-semibold"
+            class="saas-btn saas-btn--secondary"
           >
             Cancelar
           </button>
           <button
             (click)="guardarTarifasCatalogo()"
-            class="px-4 py-2 glass-btn-green text-white rounded-md transition-colors text-sm font-semibold"
+            class="saas-btn saas-btn--primary"
           >
             Actualizar Tarifas
           </button>
@@ -4118,13 +4133,13 @@
           <div class="flex justify-end gap-3">
             <button
               (click)="cerrarConfirmacion()"
-              class="px-4 py-2 glass-btn-gray text-white rounded-md transition-colors text-sm font-semibold"
+              class="saas-btn saas-btn--secondary"
             >
               Cancelar
             </button>
             <button
               (click)="ejecutarConfirmacion()"
-              class="px-4 py-2 glass-btn-red text-white rounded-md transition-colors text-sm font-semibold"
+              class="saas-btn saas-btn--danger"
             >
               Aceptar
             </button>

@@ -63,6 +63,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/export/proveedores', [\App\Http\Controllers\ExportController::class, 'exportProveedores']);
 
     // --- SESION ---
+    Route::get('/session-check', function () {
+        return response()->json(['status' => 'active']);
+    });
     Route::post('/logout', [AuthController::class, 'cerrarSesion']);
     Route::get('/user', function (Request $request) {
         return $request->user()->load(['empresa', 'cargo', 'rol', 'empleado.area', 'empleado.cargo']);

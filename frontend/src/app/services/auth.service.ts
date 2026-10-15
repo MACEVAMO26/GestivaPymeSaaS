@@ -17,7 +17,7 @@ export class AuthService {
   ) { }
 
   // 2. Método para el inicio de sesión
-  login(credentials: {email: string, password: string}): Observable<any> {
+  login(credentials: {email: string, password: string, force_logout?: boolean}): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
       tap(response => {
         // Si requiere cambio de clave, NO guardamos token ni usuario todavía
@@ -45,6 +45,11 @@ export class AuthService {
   // 2.6 Método para solicitar recuperación de contraseña
   recuperarPassword(email: string): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/recuperar-password`, { email });
+  }
+
+  // 2.7 Método de verificación de sesión activa (heartbeat / ping)
+  checkSession(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/session-check`);
   }
 
   // 3. Método para cerrar sesión de forma inmediata

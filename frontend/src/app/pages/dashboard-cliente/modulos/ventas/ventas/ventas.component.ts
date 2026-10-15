@@ -211,6 +211,10 @@ export class VentasComponent implements OnInit {
         this.guardando = false;
         if (err?.name === 'TimeoutError') {
           this.toast.error('Error de tiempo de espera al registrar la venta.');
+        } else if (err.status === 422 || err.error?.error === 'stock_agotado') {
+          this.toast.error(err.error?.message || 'El producto ya se encuentra agotado.');
+          // Refresca catálogo de productos en tiempo real para actualizar el stock visible
+          this.cargarDatosBase();
         } else {
           this.toast.error(err.error?.message || 'Error al registrar la venta');
         }

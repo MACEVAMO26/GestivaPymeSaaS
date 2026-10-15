@@ -483,6 +483,21 @@ export class SaasAdminComponent implements OnInit {
       }
       this.cargarDatosPorVista(this.currentView);
     });
+
+    // Heartbeat de sesión activa: detecta si la sesión fue cerrada remotamente desde otro dispositivo
+    if (typeof window !== 'undefined') {
+      const sessionInterval = setInterval(() => {
+        if (this.authService.getToken()) {
+          this.authService.checkSession().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+            error: () => {}
+          });
+        } else {
+          clearInterval(sessionInterval);
+        }
+      }, 25000);
+
+      this.destroyRef.onDestroy(() => clearInterval(sessionInterval));
+    }
   }
 
   private cargarDatosPorVista(vista: string): void {

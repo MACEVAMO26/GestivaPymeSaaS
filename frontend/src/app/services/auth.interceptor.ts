@@ -29,7 +29,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       // Si el servidor responde que no estamos autorizados (token inválido/vencido o DB reiniciada)
       if (error.status === 401 && !req.url.includes('/logout') && !req.url.includes('/login')) {
         authService.clearSessionStorage();
-        router.navigate(['/login'], { replaceUrl: true });
+        router.navigate(['/login'], { queryParams: { motivo: 'sesion_remota' }, replaceUrl: true });
       }
       return throwError(() => error);
     })
