@@ -198,17 +198,17 @@
       </p>
 
       <div class="permisos-acciones-top" style="display: flex; gap: 10px; margin-bottom: 15px;">
-        <button type="button" class="btn-general-1 btn-pill btn-xs" style="padding: 6px 12px; font-size: 11px;" (click)="seleccionarTodos()">
+        <button type="button" class="btn-general-1 btn-pill btn-xs" style="padding: 6px 12px; font-size: 14px;" (click)="seleccionarTodos()">
           <i class="fas fa-check-square"></i> Seleccionar Todos
         </button>
-        <button type="button" class="btn-general-5 btn-pill btn-xs" style="padding: 6px 12px; font-size: 11px;" (click)="deseleccionarTodos()">
+        <button type="button" class="btn-general-5 btn-pill btn-xs" style="padding: 6px 12px; font-size: 14px;" (click)="deseleccionarTodos()">
           <i class="fas fa-square"></i> Deseleccionar Todos
         </button>
       </div>
 
       <div class="permisos-scroll-container" style="max-height: 60vh; overflow-y: auto;">
         @for (paquete of getPaquetesCatalogo(); track paquete) {
-          <h3 class="panel-title text-left mt-3 mb-2" style="color: #6B8F71; font-size: 13px; text-transform: uppercase; border-bottom: 1px solid #d1d1bc; padding-bottom: 4px;">{{ getPaqueteNombre(paquete) }}</h3>
+          <h3 class="panel-title text-left mt-3 mb-2" style="color: #6B8F71; font-size: 14px; text-transform: uppercase; border-bottom: 1px solid #d1d1bc; padding-bottom: 4px;">{{ getPaqueteNombre(paquete) }}</h3>
           
           <div class="table-container permisos-table-wrap mb-4" style="box-shadow: none; border: 1px solid rgba(0,0,0,0.05); background: transparent;">
             <table class="neu-table permisos-table">

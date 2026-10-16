@@ -386,7 +386,7 @@
           </small>
 
           <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
-            <label *ngFor="let mod of listaModulosDisponibles" class="checkbox-label cursor-pointer p-2 rounded" style="display: flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.4); font-size: 11px;">
+            <label *ngFor="let mod of listaModulosDisponibles" class="checkbox-label cursor-pointer p-2 rounded" style="display: flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.4); font-size: 14px;">
               <input type="checkbox" [checked]="isModuloPermitido(mod.id)" (change)="toggleModuloPermitido(mod.id)">
               <i [class]="mod.icono"></i> {{ mod.nombre }}
             </label>

@@ -21,7 +21,7 @@
   <!-- BARRA DE BÚSQUEDA EN TIEMPO REAL -->
   <div class="search-filter-bar mb-4" *ngIf="!isLoading && usuarios.length > 0" style="display: flex; gap: 1rem; align-items: center; max-width: 520px; margin: 0 auto 1.5rem auto;">
     <div style="position: relative; width: 100%;">
-      <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #666; font-size: 13px;"></i>
+      <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #2d3748; font-size: 14px;"></i>
       <input
         type="text"
         class="input-neumorphic"
@@ -33,7 +33,7 @@
         *ngIf="searchTerm"
         type="button"
         (click)="limpiarBusqueda()"
-        style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #888; cursor: pointer; font-size: 14px;"
+        style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #2d3748; cursor: pointer; font-size: 14px;"
         title="Limpiar búsqueda"
       >
         <i class="fas fa-times"></i>
@@ -62,7 +62,7 @@
     <!-- Búsqueda sin resultados -->
     <div *ngIf="!isLoading && !errorMessage && usuarios.length > 0 && usuariosFiltrados.length === 0" class="empty-state text-center py-6">
       <p style="font-weight: 600; color: #333; margin-bottom: 0.5rem;">No se encontraron usuarios con "{{ searchTerm }}"</p>
-      <button class="btn-pill" (click)="limpiarBusqueda()" style="background: #45a1ae; color: white; padding: 6px 16px; font-size: 12px; border: none; border-radius: 9999px; cursor: pointer;">
+      <button class="btn-pill" (click)="limpiarBusqueda()" style="background: #45a1ae; color: white; padding: 6px 16px; font-size: 14px; border: none; border-radius: 9999px; cursor: pointer;">
         Limpiar búsqueda
       </button>
     </div>
@@ -70,7 +70,7 @@
     <!-- Bloques por Rol -->
     @for (rol of rolesPresentes; track rol) {
       <h3 class="panel-title text-left mt-4 mb-2"
-          style="color: #6B8F71; font-size: 13px; text-transform: uppercase;
+          style="color: #6B8F71; font-size: 14px; text-transform: uppercase;
                  border-bottom: 1px solid #d1d1bc; padding-bottom: 4px; font-weight: bold;">
         {{ rol }}
       </h3>
@@ -98,7 +98,7 @@
                 <td>{{ u.apellidos }}</td>
                 <td>{{ u.email }}</td>
                 <td>
-                  <span style="font-size: 10px; color: #666;">
+                  <span style="font-size: 14px; color: #2d3748;">
                     {{ u.empleado?.area?.nombre || 'Sin Área' }}
                   </span>
                 </td>

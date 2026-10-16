@@ -13,8 +13,8 @@
 $bg-color:    #f5f5dc;
 $shadow-light:#ffffff;
 $shadow-dark: #d1d1bc;
-$text-dark:   #333333;
-$text-muted:  #666666;
+$text-dark: #1a1a1a;
+$text-muted: #2d3748;
 $btn-add:     #45a1ae;
 $btn-volver:  #de3737;
 $btn-save:    #066810;
@@ -31,7 +31,7 @@ $btn-gen-1:   #6B8F71;
 }
 
 .subtitulo, h2.subtitulo {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: left;
@@ -40,7 +40,7 @@ $btn-gen-1:   #6B8F71;
 }
 
 .module-header p, .descripcion-general {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: center;
@@ -50,13 +50,13 @@ $btn-gen-1:   #6B8F71;
 }
 
 .cliente-seleccionado-info {
-  font-size: 11px;
+  font-size: 14px;
   color: $text-muted;
   margin-top: 0.35rem;
   margin-bottom: 0;
 }
 
-p, td, th, li, label, select, input { font-size: 12px; }
+p, td, th, li, label, select, input { font-size: 14px; }
 
 /* --- 3. PANELES NEUMÓRFICOS --- */
 .neumorphic-panel {
@@ -94,7 +94,7 @@ p, td, th, li, label, select, input { font-size: 12px; }
   position: absolute;
   left: 1rem;
   color: $text-muted;
-  font-size: 12px;
+  font-size: 14px;
   pointer-events: none;
   z-index: 1;
 }
@@ -116,7 +116,7 @@ p, td, th, li, label, select, input { font-size: 12px; }
   background: $bg-color;
   box-shadow: inset 6px 6px 10px $shadow-dark, inset -6px -6px 10px $shadow-light;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   color: $text-dark;
   outline: none;
   transition: all 0.2s ease;
@@ -137,7 +137,7 @@ p, td, th, li, label, select, input { font-size: 12px; }
   width: 100%;
   border-collapse: collapse;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   color: $text-dark;
 
   thead tr {
@@ -145,7 +145,7 @@ p, td, th, li, label, select, input { font-size: 12px; }
   }
 
   th {
-    font-size: 11px;
+    font-size: 14px;
     font-weight: bold;
     text-transform: uppercase;
     color: $text-muted;
@@ -171,7 +171,7 @@ p, td, th, li, label, select, input { font-size: 12px; }
   }
 
   td strong {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 600;
     color: $text-dark;
   }
@@ -184,12 +184,12 @@ p, td, th, li, label, select, input { font-size: 12px; }
   gap: 2px;
 
   .contact-phone {
-    font-size: 12px;
+    font-size: 14px;
     color: $text-dark;
   }
 
   .contact-email {
-    font-size: 10px;
+    font-size: 14px;
     color: $text-muted;
   }
 }
@@ -255,7 +255,7 @@ th.col-accion, td.col-accion {
   border: none;
   border-radius: 20px;
   padding: 5px 14px;
-  font-size: 11px;
+  font-size: 14px;
   font-family: 'Montserrat', sans-serif;
   font-weight: 500;
   cursor: pointer;
@@ -266,7 +266,7 @@ th.col-accion, td.col-accion {
   align-items: center;
   gap: 5px;
 
-  i { font-size: 10px; }
+  i { font-size: 14px; }
 
   &:hover {
     background: #2e8b96;
@@ -278,7 +278,7 @@ th.col-accion, td.col-accion {
 .badge {
   padding: 0.35rem 0.85rem;
   border-radius: 9999px;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: bold;
   text-transform: uppercase;
   background: $bg-color;
@@ -291,14 +291,14 @@ th.col-accion, td.col-accion {
 .badge-success   { color: #066810; }
 .badge-warning   { color: #C9A227; }
 .badge-info      { color: #7C6FA6; }
-.badge-secondary { color: #666666; }
+.badge-secondary { color: #2d3748; }
 
 /* --- 8. BOTONES TIPO PÍLDORA --- */
 .btn-neumorphic {
   padding: 0.65rem 1.5rem;
   border-radius: 9999px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -361,7 +361,7 @@ th.col-accion, td.col-accion {
 
 .text-center { text-align: center; }
 .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
-.text-gray-500 { color: $text-muted; font-style: italic; font-size: 12px; }
+.text-gray-500 { color: $text-muted; font-style: italic; font-size: 14px; }
 
 /* --- 10. ANIMACIONES --- */
 .fade-in {
@@ -380,7 +380,7 @@ th.col-accion, td.col-accion {
   border: 1px solid $shadow-dark;
   background: $bg-color;
   color: $text-muted;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   box-shadow: 2px 2px 4px $shadow-dark, -2px -2px 4px $shadow-light;
@@ -417,7 +417,7 @@ th.col-accion, td.col-accion {
 }
 
 .text-sm {
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .text-lg {

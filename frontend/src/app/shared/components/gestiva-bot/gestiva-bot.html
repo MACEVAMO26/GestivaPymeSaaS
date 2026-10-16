@@ -25,7 +25,7 @@
         </div>
       </div>
       <div class="header-actions" style="display: flex; align-items: center; gap: 10px;">
-        <label class="toggle-mode" style="font-size: 10px; color: #aaa; display: flex; align-items: center; cursor: pointer;">
+        <label class="toggle-mode" style="font-size: 14px; color: #cbd5e1; display: flex; align-items: center; cursor: pointer;">
           <input type="checkbox" [(ngModel)]="isAdvancedMode" style="margin-right: 4px;">
           Modo Avanzado
         </label>
@@ -53,7 +53,7 @@
       <div *ngFor="let msg of chatHistory" [ngClass]="msg.role === 'user' ? 'user-message' : 'bot-message'" style="margin-bottom: 10px; padding: 8px; border-radius: 8px; background: rgba(255,255,255,0.05);">
         <strong *ngIf="msg.role === 'user'" style="color: #45a1ae;">Tú:</strong>
         <strong *ngIf="msg.role === 'assistant'" style="color: #10b981;">Gestiva AI:</strong>
-        <p style="margin: 0; font-size: 12px; color: #ddd;">{{ msg.content }}</p>
+        <p style="margin: 0; font-size: 14px; color: #ddd;">{{ msg.content }}</p>
       </div>
 
       <!-- Preguntas precargadas según el módulo (solo se muestran si no hay chat avanzado) -->
@@ -77,7 +77,7 @@
         </div>
       </div>
 
-      <div *ngIf="isLoading" style="text-align: center; color: #aaa; font-size: 11px; font-style: italic;">
+      <div *ngIf="isLoading" style="text-align: center; color: #cbd5e1; font-size: 14px; font-style: italic;">
         Gestiva AI está escribiendo...
       </div>
     </div>

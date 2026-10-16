@@ -533,7 +533,7 @@ $sidebar-text-muted: #0f172a;
         background: transparent;
         border: none;
         color: white;
-        font-weight: 600; font-size: 0.85rem;
+        font-weight: 600; font-size: 14px;
         
         cursor: pointer;
         padding: 0 0.5rem;
@@ -2233,7 +2233,7 @@ $sidebar-text-muted: #0f172a;
     gap: 0.35rem;
     padding: 0.4rem 0.85rem;
     border-radius: 8px;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     color: #f1f5f9;
     background: rgba(30, 41, 59, 0.7);
@@ -2260,7 +2260,7 @@ $sidebar-text-muted: #0f172a;
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: #38bdf8;
     font-weight: 700;
-    font-size: 12px;
+    font-size: 14px;
     letter-spacing: 0.5px;
   }
 }

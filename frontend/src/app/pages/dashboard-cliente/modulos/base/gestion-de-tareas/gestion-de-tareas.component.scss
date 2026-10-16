@@ -4,8 +4,8 @@
 $bg-color: #f5f5dc;
 $shadow-light: #ffffff;
 $shadow-dark: #d1d1bc;
-$text-dark: #333333;
-$text-muted: #666666;
+$text-dark: #1a1a1a;
+$text-muted: #2d3748;
 $btn-add: #45a1ae;
 $btn-volver: #de3737;
 $btn-save: #066810;
@@ -38,7 +38,7 @@ $btn-gen-6: #A38B6D;
 
 /* Subtitulo: 13px, izquierda, mayusculas, sin negrita */
 .subtitulo, h2.subtitulo, h3.subtitulo {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: left;
@@ -48,7 +48,7 @@ $btn-gen-6: #A38B6D;
 
 /* Descripciones y Notas: 10px, centradas, mayusculas */
 .module-header p, .descripcion, .descripcion-general, .subtitle, .header-section p, .nota, .text-muted-small, .badge-small {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: center;
@@ -61,7 +61,7 @@ $btn-gen-6: #A38B6D;
 
 /* Texto general: 12px */
 .form-label, p, td, th, li, label, .text-general {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
 }
 
@@ -92,7 +92,7 @@ $btn-gen-6: #A38B6D;
   background: $bg-color;
   box-shadow: inset 6px 6px 10px $shadow-dark, inset -6px -6px 10px $shadow-light;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   color: $text-dark;
   outline: none;
   transition: all 0.2s ease;
@@ -107,7 +107,7 @@ $btn-gen-6: #A38B6D;
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   
   cursor: pointer;
@@ -153,7 +153,7 @@ $btn-gen-6: #A38B6D;
   padding: 0.6rem 1rem;
   border-radius: 9999px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold !important;
   text-transform: uppercase;
   cursor: pointer;
@@ -173,7 +173,7 @@ $btn-gen-6: #A38B6D;
   padding: 0.6rem 1rem;
   border-radius: 9999px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold !important;
   text-transform: uppercase;
   cursor: pointer;
@@ -224,7 +224,7 @@ $color-vencida:   #de3737;
 
 /* Subtítulo: 13px */
 .subtitulo, h3 {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: left;
@@ -234,14 +234,14 @@ $color-vencida:   #de3737;
 
 /* Texto general: 12px */
 label, td, th, p, .tarea-titulo {
-  font-size: 12px;
+  font-size: 14px;
   color: #333333;
 }
 
 /* Notas/fechas: 10px */
 .tarea-fecha, .tarea-detalle {
-  font-size: 10px;
-  color: #666666;
+  font-size: 14px;
+  color: #2d3748;
 }
 
 /* Kanban board */
@@ -261,7 +261,7 @@ label, td, th, p, .tarea-titulo {
 
 /* Cabecera de columna: 13px, mayúsculas */
 .kanban-header {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   color: #333333;
@@ -274,7 +274,7 @@ label, td, th, p, .tarea-titulo {
 }
 
 .kanban-header .count {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold;
   background: #f5f5dc;
   box-shadow: inset 3px 3px 6px #d1d1bc, inset -3px -3px 6px #ffffff;
@@ -300,7 +300,7 @@ label, td, th, p, .tarea-titulo {
 
 /* Badge prioridad: 10px */
 .badge-prioridad {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: bold;
   padding: 2px 6px;
   border-radius: 9999px;

@@ -44,7 +44,7 @@
     <!-- BARRA DE BÚSQUEDA GLOBAL DE EMPLEADOS -->
     <div class="search-filter-bar mb-4" *ngIf="currentTab === 'activos' || currentTab === 'inactivos' || currentTab === 'ausentes'" style="display: flex; gap: 1rem; align-items: center; max-width: 520px; margin: 0 auto 1.5rem auto;">
       <div style="position: relative; width: 100%;">
-        <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #666; font-size: 13px;"></i>
+        <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #2d3748; font-size: 14px;"></i>
         <input
           type="text"
           class="input-neumorphic"
@@ -57,7 +57,7 @@
           *ngIf="searchTerm"
           type="button"
           (click)="limpiarBusqueda()"
-          style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #888; cursor: pointer; font-size: 14px;"
+          style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #2d3748; cursor: pointer; font-size: 14px;"
           title="Limpiar búsqueda"
         >
           <i class="fas fa-times"></i>
@@ -217,7 +217,7 @@
             <td colspan="7" class="text-center" style="padding: 2rem;">
               No se encontraron empleados activos con "{{ searchTerm }}".
               <br>
-              <button class="btn-pill mt-2" (click)="limpiarBusqueda()" style="background: #45a1ae; color: white; padding: 4px 12px; font-size: 11px; border: none; border-radius: 9999px; cursor: pointer;">
+              <button class="btn-pill mt-2" (click)="limpiarBusqueda()" style="background: #45a1ae; color: white; padding: 4px 12px; font-size: 14px; border: none; border-radius: 9999px; cursor: pointer;">
                 Limpiar búsqueda
               </button>
             </td>
@@ -278,7 +278,7 @@
               <td colspan="6" class="text-center" style="padding: 2rem;">
                 No se encontraron empleados inactivos con "{{ searchTerm }}".
                 <br>
-                <button class="btn-pill mt-2" (click)="limpiarBusqueda()" style="background: #45a1ae; color: white; padding: 4px 12px; font-size: 11px; border: none; border-radius: 9999px; cursor: pointer;">
+                <button class="btn-pill mt-2" (click)="limpiarBusqueda()" style="background: #45a1ae; color: white; padding: 4px 12px; font-size: 14px; border: none; border-radius: 9999px; cursor: pointer;">
                   Limpiar búsqueda
                 </button>
               </td>
@@ -363,7 +363,7 @@
               <td colspan="7" class="text-center" style="padding: 2rem;">
                 No se encontraron empleados ausentes con "{{ searchTerm }}".
                 <br>
-                <button class="btn-pill mt-2" (click)="limpiarBusqueda()" style="background: #45a1ae; color: white; padding: 4px 12px; font-size: 11px; border: none; border-radius: 9999px; cursor: pointer;">
+                <button class="btn-pill mt-2" (click)="limpiarBusqueda()" style="background: #45a1ae; color: white; padding: 4px 12px; font-size: 14px; border: none; border-radius: 9999px; cursor: pointer;">
                   Limpiar búsqueda
                 </button>
               </td>

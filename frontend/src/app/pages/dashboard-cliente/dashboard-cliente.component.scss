@@ -40,7 +40,7 @@ $primary-color: #45a1ae;
         background-color: $bg-base;
         padding: 5px 12px;
         border-radius: 20px;
-        font-size: 11px;
+        font-size: 14px;
         font-weight: 600;
         text-transform: uppercase;
         box-shadow: 3px 3px 6px $shadow-dark, -3px -3px 6px $shadow-light;
@@ -123,7 +123,7 @@ $primary-color: #45a1ae;
         flex-direction: column;
 
         .user-name {
-          font-size: 11px;
+          font-size: 14px;
           font-weight: 600;
         }
 
@@ -326,8 +326,8 @@ $primary-color: #45a1ae;
   }
 
   .footer-text {
-    font-size: 10px;
-    color: #888;
+    font-size: 14px;
+    color: #2d3748;
     margin: 0;
   }
 }

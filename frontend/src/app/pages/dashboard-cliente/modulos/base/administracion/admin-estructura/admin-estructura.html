@@ -115,10 +115,10 @@
                     <td>
                       <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                         @for (mod of area.modulos; track mod.id) {
-                          <span class="badge badge-activo" style="font-size: 10px; padding: 3px 8px;">{{ mod.nombre }}</span>
+                          <span class="badge badge-activo" style="font-size: 14px; padding: 3px 8px;">{{ mod.nombre }}</span>
                         }
                         @if (!area.modulos || area.modulos.length === 0) {
-                          <span style="color: #888; font-size: 11px;">
+                          <span style="color: #2d3748; font-size: 14px;">
                             {{ area.nombre.toLowerCase() === 'gerencia' ? 'Todos los módulos' : 'Ninguno' }}
                           </span>
                         }
@@ -288,17 +288,17 @@
         <!-- HTML SELECTOR DE MÓDULOS POR ÁREA -->
         <div class="form-group mb-4">
           <label class="form-label" style="font-weight: bold; display: block; margin-bottom: 5px;">Módulos Asignados al Área</label>
-          <p style="margin-bottom: 5px; font-size: 12px; color: #888;">Selecciona los módulos a los que tendrán acceso los cargos de esta área.</p>
-          <p style="margin-bottom: 15px; font-size: 11px; color: #aaa;"><em>Nota: Los módulos base (Inicio, Administración, Formalización, Autogestión, Gestiva IA, Tareas) son fijos por sistema y no requieren asignación por área.</em></p>
+          <p style="margin-bottom: 5px; font-size: 14px; color: #2d3748;">Selecciona los módulos a los que tendrán acceso los cargos de esta área.</p>
+          <p style="margin-bottom: 15px; font-size: 14px; color: #2d3748;"><em>Nota: Los módulos base (Inicio, Administración, Formalización, Autogestión, Gestiva IA, Tareas) son fijos por sistema y no requieren asignación por área.</em></p>
           <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; padding: 15px; border-radius: 12px; background: #f5f5dc; box-shadow: inset 4px 4px 8px #d0d0bb, inset -4px -4px 8px #ffffff;">
             @for (mod of modulosDisponiblesParaAreaSeleccionada; track mod.id) {
               <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                 <input type="checkbox" [checked]="isModuloUiSeleccionado(mod.id)" (change)="toggleModuloArea(mod.id)" style="width: 16px; height: 16px; accent-color: #45a1ae;">
-                <span style="font-size: 13px; font-weight: 500;">{{ mod.nombre }}</span>
+                <span style="font-size: 14px; font-weight: 500;">{{ mod.nombre }}</span>
               </label>
             }
             @if (modulosDisponiblesParaAreaSeleccionada.length === 0) {
-              <span style="font-size: 12px; color: #888;">Cargando módulos...</span>
+              <span style="font-size: 14px; color: #2d3748;">Cargando módulos...</span>
             }
           </div>
         </div>

@@ -352,7 +352,7 @@
                     <i class="fas fa-toolbox"></i> Repuestos / Materiales Asignados ({{tk.materiales?.length || 0}}):
                   </span>
                   @if(tk.materiales && tk.materiales.length > 0) {
-                    <ul class="lista-materiales-xs" style="padding-left: 1.2rem; margin: 0; font-size: 11px;">
+                    <ul class="lista-materiales-xs" style="padding-left: 1.2rem; margin: 0; font-size: 14px;">
                       @for(mat of tk.materiales; track mat.id) {
                         <li>
                           <strong>{{mat.cantidad}}x</strong> {{mat.producto?.nombre || nombreProducto(mat.producto_id)}}
@@ -494,7 +494,7 @@
         <!-- BARRA DE BÚSQUEDA DE SERVICIOS -->
         <div class="search-filter-bar mb-4" *ngIf="catalogo.length > 0" style="display: flex; gap: 1rem; align-items: center; max-width: 500px; margin: 0 auto 1.5rem auto;">
           <div style="position: relative; width: 100%;">
-            <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #666; font-size: 13px;"></i>
+            <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #2d3748; font-size: 14px;"></i>
             <input
               type="text"
               class="input-neumorphic"
@@ -507,7 +507,7 @@
               *ngIf="searchTermCatalogo"
               type="button"
               (click)="limpiarBusquedaCatalogo()"
-              style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #888; cursor: pointer; font-size: 14px;"
+              style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #2d3748; cursor: pointer; font-size: 14px;"
               title="Limpiar búsqueda"
             >
               <i class="fas fa-times"></i>
@@ -549,7 +549,7 @@
                   <td colspan="5" class="tabla-vacia" style="padding: 2rem;">
                     No se encontraron servicios con "{{ searchTermCatalogo }}".
                     <br>
-                    <button class="btn-pill mt-2" (click)="limpiarBusquedaCatalogo()" style="background: #45a1ae; color: white; padding: 4px 12px; font-size: 11px; border: none; border-radius: 9999px; cursor: pointer;">
+                    <button class="btn-pill mt-2" (click)="limpiarBusquedaCatalogo()" style="background: #45a1ae; color: white; padding: 4px 12px; font-size: 14px; border: none; border-radius: 9999px; cursor: pointer;">
                       Limpiar búsqueda
                     </button>
                   </td>

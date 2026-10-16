@@ -2,8 +2,8 @@
 $bg-color: #f5f5dc;
 $shadow-light: #ffffff;
 $shadow-dark: #d1d1bc;
-$text-dark: #333333;
-$text-muted: #666666;
+$text-dark: #1a1a1a;
+$text-muted: #2d3748;
 
 .btn-action-circle {
   width: 36px;
@@ -52,7 +52,7 @@ $text-muted: #666666;
   border-radius: 9999px;
   padding: 0.45rem 1rem;
   font-family: 'Montserrat', sans-serif;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: bold;
   text-transform: uppercase;
   cursor: pointer;
@@ -121,7 +121,7 @@ $text-muted: #666666;
 }
 
 .sol-target {
-  font-size: 12px;
+  font-size: 14px;
   color: $text-dark;
   background: rgba(0,0,0,0.03);
   border-radius: 8px;
@@ -141,7 +141,7 @@ $text-muted: #666666;
   border-radius: 8px;
   padding: 0.75rem 1rem;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   color: $text-dark;
   box-shadow: inset 3px 3px 6px $shadow-dark, inset -3px -3px 6px $shadow-light;
   outline: none;
@@ -155,7 +155,7 @@ $text-muted: #666666;
   border-radius: 9999px;
   padding: 0.55rem 1.25rem;
   font-family: 'Montserrat', sans-serif;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: bold;
   text-transform: uppercase;
   cursor: pointer;
@@ -169,7 +169,7 @@ $text-muted: #666666;
   border-radius: 9999px;
   padding: 0.45rem 1rem;
   font-family: 'Montserrat', sans-serif;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: bold;
   text-transform: uppercase;
   cursor: pointer;
@@ -182,7 +182,7 @@ $text-muted: #666666;
   border-radius: 9999px;
   padding: 0.45rem 1rem;
   font-family: 'Montserrat', sans-serif;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: bold;
   text-transform: uppercase;
   cursor: pointer;
@@ -195,7 +195,7 @@ $text-muted: #666666;
   border-radius: 9999px;
   padding: 0.45rem 1rem;
   font-family: 'Montserrat', sans-serif;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: bold;
   text-transform: uppercase;
   cursor: pointer;
@@ -208,7 +208,7 @@ $text-muted: #666666;
 }
 
 .sol-vacio {
-  font-size: 12px;
+  font-size: 14px;
   color: $text-muted;
   text-align: center;
   padding: 0.5rem;
@@ -230,7 +230,7 @@ $text-muted: #666666;
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
-  font-size: 12px;
+  font-size: 14px;
   color: $text-dark;
 }
 
@@ -238,13 +238,13 @@ $text-muted: #666666;
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 14px;
   color: #45a1ae;
   font-weight: 600;
 }
 
 .sol-motivo, .sol-nota {
-  font-size: 12px;
+  font-size: 14px;
   color: $text-dark;
   margin: 0;
 }
@@ -256,7 +256,7 @@ $text-muted: #666666;
   margin-left: 0.5rem;
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
-  font-size: 9px;
+  font-size: 14px;
   font-weight: bold;
   text-transform: uppercase;
 }
@@ -276,7 +276,7 @@ $text-muted: #666666;
 }
 
 .sol-msg {
-  font-size: 12px;
+  font-size: 14px;
   color: $text-dark;
 }
 
@@ -305,7 +305,7 @@ $text-muted: #666666;
 }
 
 .sol-aviso {
-  font-size: 10px;
+  font-size: 14px;
   color: $text-muted;
   margin: 0;
   text-align: center;

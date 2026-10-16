@@ -56,7 +56,7 @@ $color-gen-6: #A38B6D;
 
 @mixin text-subtitle {
   font-family: 'Montserrat', sans-serif;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 400; // Sin negrita
   text-transform: uppercase;
   text-align: left;
@@ -65,14 +65,14 @@ $color-gen-6: #A38B6D;
 
 @mixin text-normal {
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 400;
   color: $text-main;
 }
 
 @mixin text-description {
   font-family: 'Montserrat', sans-serif;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 400;
   color: $text-muted;
 }
@@ -84,7 +84,7 @@ $color-gen-6: #A38B6D;
 @mixin btn-pill-base {
   border-radius: 9999px; // Forma de cápsula completa
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   padding: 8px 24px;
   cursor: pointer;

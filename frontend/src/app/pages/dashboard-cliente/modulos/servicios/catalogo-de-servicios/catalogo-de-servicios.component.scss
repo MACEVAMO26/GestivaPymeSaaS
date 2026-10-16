@@ -4,8 +4,8 @@
 $bg-color: #f5f5dc;
 $shadow-light: #ffffff;
 $shadow-dark: #d1d1bc;
-$text-dark: #333333;
-$text-muted: #666666;
+$text-dark: #1a1a1a;
+$text-muted: #2d3748;
 $btn-add: #45a1ae;
 $btn-volver: #de3737;
 $btn-save: #066810;
@@ -38,7 +38,7 @@ $btn-gen-6: #A38B6D;
 
 /* Subtitulo: 13px, izquierda, mayusculas, sin negrita */
 .subtitulo, h2.subtitulo, h3.subtitulo {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: left;
@@ -48,7 +48,7 @@ $btn-gen-6: #A38B6D;
 
 /* Descripciones y Notas: 10px, centradas, mayusculas */
 .module-header p, .descripcion, .descripcion-general, .subtitle, .header-section p, .nota, .text-muted-small, .badge-small {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: center;
@@ -61,7 +61,7 @@ $btn-gen-6: #A38B6D;
 
 /* Texto general: 12px */
 .form-label, p, td, th, li, label, .text-general {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
 }
 
@@ -92,7 +92,7 @@ $btn-gen-6: #A38B6D;
   background: $bg-color;
   box-shadow: inset 6px 6px 10px $shadow-dark, inset -6px -6px 10px $shadow-light;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   color: $text-dark;
   outline: none;
   transition: all 0.2s ease;
@@ -107,7 +107,7 @@ $btn-gen-6: #A38B6D;
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   
   cursor: pointer;
@@ -153,7 +153,7 @@ $btn-gen-6: #A38B6D;
   padding: 0.6rem 1rem;
   border-radius: 9999px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold !important;
   text-transform: uppercase;
   cursor: pointer;
@@ -173,7 +173,7 @@ $btn-gen-6: #A38B6D;
   padding: 0.6rem 1rem;
   border-radius: 9999px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold !important;
   text-transform: uppercase;
   cursor: pointer;
@@ -210,7 +210,7 @@ $btn-gen-6: #A38B6D;
 
 .text-muted { color: $text-muted; }
 .text-danger { color: $btn-volver; }
-.text-xs { font-size: 12px;
+.text-xs { font-size: 14px;
   font-weight: normal; }
 .text-positivo { color: $btn-save; font-weight: bold; }
 .text-azul { color: $btn-add; }
@@ -256,7 +256,7 @@ $btn-gen-6: #A38B6D;
 
 .panel-titulo {
   margin-top: 0;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
   font-weight: bold;
   text-transform: uppercase;
@@ -270,7 +270,7 @@ $btn-gen-6: #A38B6D;
   gap: 0.5rem;
 
   label {
-    font-size: 12px;
+    font-size: 14px;
   font-weight: normal;
     font-weight: 600;
     color: #4a4a4a;
@@ -285,7 +285,7 @@ $btn-gen-6: #A38B6D;
 }
 
 .label-xs {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
 }
 
@@ -296,7 +296,7 @@ $btn-gen-6: #A38B6D;
   width: 100%;
   border-collapse: collapse;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
   text-align: left;
   color: $text-dark;
@@ -305,7 +305,7 @@ $btn-gen-6: #A38B6D;
   th {
     font-weight: bold;
     text-transform: uppercase;
-    font-size: 12px;
+    font-size: 14px;
   font-weight: normal;
     border-bottom: 2px solid rgba(0,0,0,0.05);
   }
@@ -317,7 +317,7 @@ $btn-gen-6: #A38B6D;
 .badge {
   padding: 0.4rem 1rem;
   border-radius: 9999px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
   font-weight: bold;
   text-transform: uppercase;
@@ -342,7 +342,7 @@ $btn-gen-6: #A38B6D;
 /* BOTONES AUXILIARES */
 .btn-xs {
   padding: 0.5rem 1rem;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: normal;
 }
 
@@ -364,7 +364,7 @@ $btn-gen-6: #A38B6D;
 
 .ticket-dato {
   color: $text-muted;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
   margin: 0.5rem 0;
 }
@@ -483,7 +483,7 @@ $btn-gen-6: #A38B6D;
 .btn-close {
   background: transparent;
   border: none;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: normal;
   cursor: pointer;
   color: $text-muted;
@@ -505,7 +505,7 @@ $btn-gen-6: #A38B6D;
   h4 {
     margin: 0 0 0.5rem 0;
     color: $btn-add;
-    font-size: 12px;
+    font-size: 14px;
   font-weight: normal;
     text-transform: uppercase;
   }
@@ -532,7 +532,7 @@ $btn-gen-6: #A38B6D;
 }
 
 .toast-icon {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
 }
 
@@ -557,7 +557,7 @@ $btn-gen-6: #A38B6D;
 }
 
 .toast-message {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
   color: $text-muted;
   margin: 0.15rem 0 0;
@@ -566,7 +566,7 @@ $btn-gen-6: #A38B6D;
 .toast-close {
   background: transparent;
   border: none;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: normal;
   cursor: pointer;
   color: $text-muted;
@@ -594,7 +594,7 @@ $btn-gen-6: #A38B6D;
   background-color: $bg-color;
   color: $text-muted;
   border: none;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: bold !important;
   padding: 0.8rem 2rem;
   box-shadow: 4px 4px 8px $shadow-dark, -4px -4px 8px $shadow-light;
@@ -607,7 +607,7 @@ $btn-gen-6: #A38B6D;
   color: $btn-add;
   box-shadow: inset 4px 4px 8px $shadow-dark, inset -4px -4px 8px $shadow-light;
   border: none;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold !important;
   padding: 0.8rem 2rem;
   text-decoration: none;
@@ -632,7 +632,7 @@ $btn-gen-6: #A38B6D;
   border: 1px solid $shadow-dark;
   background: $bg-color;
   color: $text-muted;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -664,7 +664,7 @@ $btn-gen-6: #A38B6D;
   border: none;
   background: $bg-color;
   color: $text-muted;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   box-shadow: 2px 2px 4px $shadow-dark, -2px -2px 4px $shadow-light;
@@ -727,7 +727,7 @@ $btn-gen-6: #A38B6D;
 }
 
 .toast-icon {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
 }
 
@@ -752,7 +752,7 @@ $btn-gen-6: #A38B6D;
 }
 
 .toast-message {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
   color: $text-muted;
   margin: 0.15rem 0 0;
@@ -761,7 +761,7 @@ $btn-gen-6: #A38B6D;
 .toast-close {
   background: transparent;
   border: none;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: normal;
   cursor: pointer;
   color: $text-muted;
@@ -789,7 +789,7 @@ $btn-gen-6: #A38B6D;
   background-color: $bg-color;
   color: $text-muted;
   border: none;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: bold !important;
   padding: 0.8rem 2rem;
   box-shadow: 4px 4px 8px $shadow-dark, -4px -4px 8px $shadow-light;
@@ -802,7 +802,7 @@ $btn-gen-6: #A38B6D;
   color: $btn-add;
   box-shadow: inset 4px 4px 8px $shadow-dark, inset -4px -4px 8px $shadow-light;
   border: none;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold !important;
   padding: 0.8rem 2rem;
   text-decoration: none;
@@ -827,7 +827,7 @@ $btn-gen-6: #A38B6D;
   border: 1px solid $shadow-dark;
   background: $bg-color;
   color: $text-muted;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -859,7 +859,7 @@ $btn-gen-6: #A38B6D;
   border: none;
   background: $bg-color;
   color: $text-muted;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   box-shadow: 2px 2px 4px $shadow-dark, -2px -2px 4px $shadow-light;

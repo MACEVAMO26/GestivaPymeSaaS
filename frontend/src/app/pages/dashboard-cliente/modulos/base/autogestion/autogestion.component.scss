@@ -7,8 +7,8 @@ $bg-color: #f5f5dc;
 $bg-base: #f5f5dc;
 $shadow-light: #ffffff;
 $shadow-dark: #d1d1bc;
-$text-dark: #333333;
-$text-muted: #666666;
+$text-dark: #1a1a1a;
+$text-muted: #2d3748;
 $btn-add: #45a1ae;
 $btn-volver: #de3737;
 $btn-save: #066810;
@@ -62,7 +62,7 @@ $btn-contract: #7C6FA6;
   p {
     text-align: center;
     color: $text-muted;
-    font-size: 12px;
+    font-size: 14px;
   }
 }
 
@@ -77,7 +77,7 @@ $btn-contract: #7C6FA6;
 }
 
 .subtitulo, h2.subtitulo, h3.subtitulo {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: left;
@@ -86,7 +86,7 @@ $btn-contract: #7C6FA6;
 }
 
 .module-header p, .descripcion, .descripcion-general, .subtitle, .header-section p, .nota, .text-muted-small, .badge-small {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: center;
@@ -98,7 +98,7 @@ $btn-contract: #7C6FA6;
 }
 
 .form-label, p, td, th, li, label, .text-general {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
 }
 
@@ -128,7 +128,7 @@ $btn-contract: #7C6FA6;
   margin-bottom: 1.5rem;
 
   h3 {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: bold;
     text-transform: uppercase;
     text-align: left;
@@ -137,7 +137,7 @@ $btn-contract: #7C6FA6;
   }
 
   p {
-    font-size: 12px;
+    font-size: 14px;
     color: $text-muted;
     margin-bottom: 1rem;
   }
@@ -162,7 +162,7 @@ $btn-contract: #7C6FA6;
   background: $bg-color;
   box-shadow: inset 6px 6px 10px $shadow-dark, inset -6px -6px 10px $shadow-light;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   color: $text-dark;
   outline: none;
   transition: all 0.2s ease;
@@ -187,7 +187,7 @@ $btn-contract: #7C6FA6;
   flex-direction: column;
 
   label {
-    font-size: 12px;
+    font-size: 14px;
     text-transform: uppercase;
     margin-bottom: 1.25rem;
     color: $text-muted;
@@ -199,7 +199,7 @@ $btn-contract: #7C6FA6;
     border-radius: 8px;
     padding: 0.75rem 1rem;
     font-family: 'Montserrat', sans-serif;
-    font-size: 12px;
+    font-size: 14px;
     color: $text-dark;
     box-shadow: inset 4px 4px 8px $shadow-dark, inset -4px -4px 8px $shadow-light;
     outline: none;
@@ -233,7 +233,7 @@ $btn-contract: #7C6FA6;
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -290,7 +290,7 @@ $btn-contract: #7C6FA6;
   padding: 0.6rem 1rem;
   border-radius: 9999px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold;
   text-transform: uppercase;
   cursor: pointer;
@@ -310,7 +310,7 @@ $btn-contract: #7C6FA6;
   padding: 0.6rem 1rem;
   border-radius: 9999px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold;
   text-transform: uppercase;
   cursor: pointer;
@@ -334,7 +334,7 @@ $btn-contract: #7C6FA6;
 .profile-card { text-align: center; }
 
 .profile-header h3 {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: bold;
   text-transform: uppercase;
   margin-top: 0.5rem;
@@ -357,7 +357,7 @@ $btn-contract: #7C6FA6;
   .profile-avatar-placeholder {
     width: 100%; height: 100%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: bold; color: $btn-cert;
+    font-size: 14px; font-weight: bold; color: $btn-cert;
   }
 
   .edit-overlay {
@@ -378,7 +378,7 @@ $btn-contract: #7C6FA6;
   background-color: $bg-color;
   padding: 0.25rem 1rem;
   border-radius: 20px;
-  font-size: 12px; font-weight: bold; text-transform: uppercase;
+  font-size: 14px; font-weight: bold; text-transform: uppercase;
   color: $btn-cert;
   box-shadow: inset 2px 2px 5px $shadow-dark, inset -2px -2px 5px $shadow-light;
   margin-top: 0.5rem;
@@ -390,7 +390,7 @@ $btn-contract: #7C6FA6;
 
   .detail-item {
     display: flex; align-items: center; gap: 0.5rem;
-    margin-bottom: 0.75rem; font-size: 12px; color: $text-dark;
+    margin-bottom: 0.75rem; font-size: 14px; color: $text-dark;
 
     svg { width: 16px; height: 16px; color: $btn-cert; }
   }
@@ -405,10 +405,10 @@ $btn-contract: #7C6FA6;
   box-shadow: 4px 4px 8px $shadow-dark, -4px -4px 8px $shadow-light;
 
   .doc-info { display: flex; align-items: center; gap: 1rem; }
-  .doc-title { font-size: 12px; font-weight: bold; text-transform: uppercase; color: $text-dark; display: block; }
-  .doc-date { font-size: 12px; color: $text-muted; }
+  .doc-title { font-size: 14px; font-weight: bold; text-transform: uppercase; color: $text-dark; display: block; }
+  .doc-date { font-size: 14px; color: $text-muted; }
   i {
-    font-size: 10px;
+    font-size: 14px;
     &.doc-icon-pdf { color: #de3737; }
     &.doc-icon-ppt { color: #f39c12; }
   }
@@ -417,7 +417,7 @@ $btn-contract: #7C6FA6;
 /* --- 10. BADGES Y ESTADOS --- */
 .status-badge {
   padding: 0.25rem 0.75rem; border-radius: 20px;
-  font-size: 12px; font-weight: bold; text-transform: uppercase;
+  font-size: 14px; font-weight: bold; text-transform: uppercase;
   box-shadow: inset 2px 2px 5px $shadow-dark, inset -2px -2px 5px $shadow-light;
 
   &.approved { color: $btn-save; }
@@ -433,7 +433,7 @@ $btn-contract: #7C6FA6;
 
 /* --- 11. ALERTAS --- */
 .alert-box {
-  padding: 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 10px;
+  padding: 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 14px;
 
   &.error {
     background-color: rgba(#de3737, 0.1);
@@ -453,17 +453,17 @@ $btn-contract: #7C6FA6;
   width: 100%; padding: 0.7rem;
   background: $bg-color; border: none; border-radius: 8px;
   box-shadow: inset 3px 3px 6px $shadow-dark, inset -3px -3px 6px $shadow-light;
-  font-family: 'Montserrat', sans-serif; font-size: 12px; color: $text-dark;
+  font-family: 'Montserrat', sans-serif; font-size: 14px; color: $text-dark;
 }
 
-.hint-text { font-size: 10px; color: $text-muted; }
-.hint-text-small { font-size: 10px; color: $text-muted; font-weight: normal; text-transform: none; font-style: italic; }
-.hint-text-danger { font-size: 10px; color: $btn-volver; }
+.hint-text { font-size: 14px; color: $text-muted; }
+.hint-text-small { font-size: 14px; color: $text-muted; font-weight: normal; text-transform: none; font-style: italic; }
+.hint-text-danger { font-size: 14px; color: $btn-volver; }
 
 .separator-line { border: none; height: 2px; background-color: $shadow-dark; margin: 1.5rem 0; }
 
 .section-title {
-  font-size: 13px; text-align: center; text-transform: uppercase;
+  font-size: 14px; text-align: center; text-transform: uppercase;
   font-weight: bold; color: $text-dark;
 }
 
@@ -473,7 +473,7 @@ $btn-contract: #7C6FA6;
   box-shadow: inset 2px 2px 5px $shadow-dark, inset -2px -2px 5px $shadow-light;
   border-radius: 20px;
   padding: 8px 16px;
-  font-size: 12px;
+  font-size: 14px;
   color: $text-dark;
   font-family: 'Montserrat', sans-serif;
   border: 1px solid rgba(0, 0, 0, 0.06);
@@ -491,8 +491,8 @@ $btn-contract: #7C6FA6;
     border-radius: 12px; text-align: center;
     box-shadow: inset 4px 4px 8px $shadow-dark, inset -4px -4px 8px $shadow-light;
 
-    h4 { font-size: 12px; font-weight: bold; color: $btn-contract; margin: 0; }
-    span { font-size: 12px; text-transform: uppercase; color: $text-muted; }
+    h4 { font-size: 14px; font-weight: bold; color: $btn-contract; margin: 0; }
+    span { font-size: 14px; text-transform: uppercase; color: $text-muted; }
   }
 }
 
@@ -508,12 +508,12 @@ $btn-contract: #7C6FA6;
     align-items: center; margin-bottom: 0.5rem;
   }
 
-  .solicitud-fechas { font-size: 12px; font-weight: bold; color: $text-dark; }
-  .solicitud-tipo { font-size: 12px; color: $text-muted; margin-bottom: 0.5rem; }
+  .solicitud-fechas { font-size: 14px; font-weight: bold; color: $text-dark; }
+  .solicitud-tipo { font-size: 14px; color: $text-muted; margin-bottom: 0.5rem; }
 
   .solicitud-badge {
     padding: 0.25rem 0.75rem; border-radius: 20px;
-    font-size: 10px; font-weight: bold; text-transform: uppercase;
+    font-size: 14px; font-weight: bold; text-transform: uppercase;
 
     &.badge-aprobada { color: $btn-save; background: rgba($btn-save, 0.1); }
     &.badge-pendiente { color: #b5654a; background: rgba(#b5654a, 0.1); }
@@ -523,7 +523,7 @@ $btn-contract: #7C6FA6;
   .solicitud-respuesta {
     margin-top: 0.5rem; padding-top: 0.5rem;
     border-top: 1px dashed $shadow-dark;
-    font-size: 12px; color: $text-dark;
+    font-size: 14px; color: $text-dark;
   }
 }
 
@@ -531,10 +531,10 @@ $btn-contract: #7C6FA6;
 .volver-wrapper { margin-bottom: 1rem; }
 
 .quick-action-card h3 {
-  font-size: 13px; font-weight: bold; text-transform: uppercase; color: $text-dark;
+  font-size: 14px; font-weight: bold; text-transform: uppercase; color: $text-dark;
 }
 
-.empty-docs-msg { font-size: 12px; color: $text-muted; text-align: center; padding: 1rem 0; }
+.empty-docs-msg { font-size: 14px; color: $text-muted; text-align: center; padding: 1rem 0; }
 
 /* --- 17. ANIMACIONES --- */
 .fade-in { animation: fadeIn 0.4s ease-in-out; }
@@ -545,6 +545,6 @@ $btn-contract: #7C6FA6;
 }
 
 h4.section-title {
-  font-size: 13px; text-align: center; text-transform: uppercase;
+  font-size: 14px; text-align: center; text-transform: uppercase;
   font-weight: bold; color: $text-dark; margin: 1rem 0 0.5rem;
 }

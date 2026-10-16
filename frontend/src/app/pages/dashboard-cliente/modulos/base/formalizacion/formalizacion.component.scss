@@ -4,8 +4,8 @@
 $bg-color: #f5f5dc;
 $shadow-light: #ffffff;
 $shadow-dark: #d1d1bc;
-$text-dark: #333333;
-$text-muted: #666666;
+$text-dark: #1a1a1a;
+$text-muted: #2d3748;
 $btn-add: #45a1ae;
 $btn-volver: #de3737;
 $btn-save: #066810;
@@ -37,7 +37,7 @@ $btn-gen-6: #A38B6D;
 /* Subtitulo: 13px, izquierda, mayusculas, sin negrita */
 /* Subtitulo: 13px, izquierda, mayusculas, sin negrita */
 .subtitulo, h2.subtitulo, h3.subtitulo {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: left;
@@ -47,7 +47,7 @@ $btn-gen-6: #A38B6D;
 
 /* Descripciones y Notas: 10px */
 .module-header p, .descripcion, .descripcion-general, .subtitle, .header-section p, .nota, .text-muted-small, .badge-small, .noti-time, .reunion-detail {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: center;
@@ -57,13 +57,13 @@ $btn-gen-6: #A38B6D;
 
 /* Texto general: 12px */
 .form-label, p, td, th, li, label, .text-general {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
 }
 
 /* Notas y descripciones: 10px */
 .nota, .descripcion, .text-muted-small, .badge-small, .noti-time, .reunion-detail {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: normal;
 }
 
@@ -94,7 +94,7 @@ $btn-gen-6: #A38B6D;
   background: $bg-color;
   box-shadow: inset 6px 6px 10px $shadow-dark, inset -6px -6px 10px $shadow-light;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   color: $text-dark;
   outline: none;
   transition: all 0.2s ease;
@@ -109,7 +109,7 @@ $btn-gen-6: #A38B6D;
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   
   cursor: pointer;
@@ -173,8 +173,8 @@ $bg-color: #f5f5dc;
 $shadow-light: #ffffff;
 $shadow-dark: #d1d1bc;
 
-$text-dark: #333333;
-$text-muted: #666666;
+$text-dark: #1a1a1a;
+$text-muted: #2d3748;
 
 $btn-add: #45a1ae;
 $btn-volver: #de3737;
@@ -203,7 +203,7 @@ $btn-gen-3: #C9A227;
 
 /* Subtítulo: 13px, izquierda, mayúsculas, sin negrita */
 .subtitulo {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: left;
@@ -212,7 +212,7 @@ $btn-gen-3: #C9A227;
 }
 
 .descripcion-general {
-  font-size: 10px;
+  font-size: 14px;
   text-align: center;
   color: $text-muted;
   margin-bottom: 1.5rem;
@@ -256,7 +256,7 @@ $btn-gen-3: #C9A227;
   padding: 0.6rem 0.8rem;
   border-radius: 9999px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold !important;
   text-transform: uppercase;
   cursor: pointer;
@@ -299,15 +299,15 @@ $btn-gen-3: #C9A227;
   box-shadow: inset 4px 4px 8px rgba(0,0,0,0.1), inset -4px -4px 8px rgba(255,255,255,0.5);
 }
 
-.btn-general-1 { background-color: $btn-gen-1; border: 2px solid #4a6850; color: #ffffff; padding: 0.5rem 1.5rem; font-size: 12px;
+.btn-general-1 { background-color: $btn-gen-1; border: 2px solid #4a6850; color: #ffffff; padding: 0.5rem 1.5rem; font-size: 14px;
   font-weight: normal; }
-.btn-general-2 { background-color: $btn-gen-2; border: 2px solid #574b7a; color: #ffffff; padding: 0.5rem 1.5rem; font-size: 12px;
+.btn-general-2 { background-color: $btn-gen-2; border: 2px solid #574b7a; color: #ffffff; padding: 0.5rem 1.5rem; font-size: 14px;
   font-weight: normal; }
 
 .btn-action {
   width: 100px;
   padding: 0.4rem 0 !important;
-  font-size: 12px;
+  font-size: 14px;
   display: inline-flex !important;
   justify-content: center !important;
   align-items: center !important;
@@ -326,7 +326,7 @@ $btn-gen-3: #C9A227;
   width: 100%;
   border-collapse: collapse;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   text-align: left;
   color: $text-dark;
 }
@@ -339,7 +339,7 @@ $btn-gen-3: #C9A227;
 .data-table th {
   font-weight: bold !important;
   text-transform: uppercase;
-  font-size: 12px;
+  font-size: 14px;
   border-bottom: 2px solid rgba(0,0,0,0.05);
 }
 
@@ -355,7 +355,7 @@ $btn-gen-3: #C9A227;
 .badge {
   padding: 0.4rem 1rem;
   border-radius: 9999px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold;
   text-transform: uppercase;
   background: $bg-color;
@@ -378,7 +378,7 @@ $btn-gen-3: #C9A227;
 }
 
 .modal-header h3 {
-  font-size: 13px;
+  font-size: 14px;
   text-align: left;
   text-transform: uppercase;
   font-weight: normal;
@@ -392,7 +392,7 @@ $btn-gen-3: #C9A227;
 .btn-cerrar {
   background: none;
   border: none;
-  font-size: 12px;
+  font-size: 14px;
   cursor: pointer;
   color: $text-muted;
 }
@@ -421,7 +421,7 @@ $btn-gen-3: #C9A227;
 }
 
 .form-group label {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: #4a4a4a;
 }
@@ -432,7 +432,7 @@ $btn-gen-3: #C9A227;
   border-radius: 8px;
   padding: 0.8rem 1rem;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   color: $text-dark;
   box-shadow: inset 3px 3px 6px $shadow-dark, inset -3px -3px 6px $shadow-light;
   outline: none;
@@ -455,7 +455,7 @@ $btn-gen-3: #C9A227;
 }
 
 .form-group label {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: #4a4a4a;
 }
@@ -466,7 +466,7 @@ $btn-gen-3: #C9A227;
   border-radius: 8px;
   padding: 0.8rem 1rem;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   color: $text-dark;
   box-shadow: inset 3px 3px 6px $shadow-dark, inset -3px -3px 6px $shadow-light;
   outline: none;
@@ -493,12 +493,12 @@ $btn-gen-3: #C9A227;
 
 .banner-text {
   margin: 0;
-  font-size: 12px;
+  font-size: 14px;
   color: $text-dark;
 }
 
 .form-group label {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: #4a4a4a;
 }
@@ -509,7 +509,7 @@ $btn-gen-3: #C9A227;
   border-radius: 8px;
   padding: 0.8rem 1rem;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   color: $text-dark;
   box-shadow: inset 3px 3px 6px $shadow-dark, inset -3px -3px 6px $shadow-light;
   outline: none;
@@ -536,7 +536,7 @@ $btn-gen-3: #C9A227;
 
 .banner-text {
   margin: 0;
-  font-size: 12px;
+  font-size: 14px;
   color: $text-dark;
 }
 

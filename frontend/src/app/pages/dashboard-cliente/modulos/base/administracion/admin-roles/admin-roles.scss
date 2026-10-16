@@ -4,8 +4,8 @@
 $bg-color: #f5f5dc;
 $shadow-light: #ffffff;
 $shadow-dark: #d1d1bc;
-$text-dark: #333333;
-$text-muted: #666666;
+$text-dark: #1a1a1a;
+$text-muted: #2d3748;
 $btn-add: #45a1ae;
 $btn-volver: #de3737;
 $btn-save: #066810;
@@ -38,7 +38,7 @@ $btn-gen-6: #A38B6D;
 
 /* Subtitulo: 13px, izquierda, mayusculas, sin negrita */
 .subtitulo, h2.subtitulo, h3.subtitulo {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: left;
@@ -48,7 +48,7 @@ $btn-gen-6: #A38B6D;
 
 /* Descripciones y Notas: 10px, centradas, mayusculas */
 .module-header p, .descripcion, .descripcion-general, .subtitle, .header-section p, .nota, .text-muted-small, .badge-small {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: center;
@@ -61,7 +61,7 @@ $btn-gen-6: #A38B6D;
 
 /* Texto general: 12px */
 .form-label, p, td, th, li, label, .text-general {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
 }
 
@@ -92,7 +92,7 @@ $btn-gen-6: #A38B6D;
   background: $bg-color;
   box-shadow: inset 6px 6px 10px $shadow-dark, inset -6px -6px 10px $shadow-light;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   color: $text-dark;
   outline: none;
   transition: all 0.2s ease;
@@ -107,7 +107,7 @@ $btn-gen-6: #A38B6D;
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   
   cursor: pointer;
@@ -153,7 +153,7 @@ $btn-gen-6: #A38B6D;
   padding: 0.6rem 1rem;
   border-radius: 9999px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold !important;
   text-transform: uppercase;
   cursor: pointer;
@@ -173,7 +173,7 @@ $btn-gen-6: #A38B6D;
   padding: 0.6rem 1rem;
   border-radius: 9999px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold !important;
   text-transform: uppercase;
   cursor: pointer;
@@ -249,7 +249,7 @@ $btn-gen-6: #A38B6D;
   th, td {
     padding: 1rem;
     text-align: left;
-    font-size: 12px;
+    font-size: 14px;
   font-weight: normal;
   }
   
@@ -258,7 +258,7 @@ $btn-gen-6: #A38B6D;
     font-weight: 600;
     color: #333;
     text-transform: uppercase;
-    font-size: 12px;
+    font-size: 14px;
   font-weight: normal;
     letter-spacing: 0.5px;
   }
@@ -283,7 +283,7 @@ $btn-gen-6: #A38B6D;
     background: rgba(69, 161, 174, 0.1);
     color: #45a1ae;
     font-weight: 600;
-    font-size: 12px;
+    font-size: 14px;
   font-weight: normal;
   }
 
@@ -297,7 +297,7 @@ $btn-gen-6: #A38B6D;
 .badge {
   padding: 0.3rem 0.8rem;
   border-radius: 50px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
   font-weight: bold;
   text-transform: uppercase;
@@ -333,10 +333,10 @@ $btn-gen-6: #A38B6D;
 .btn-close {
   background: transparent;
   border: none;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
   cursor: pointer;
-  color: #666;
+  color: #2d3748;
   
   &:hover {
     color: #de3737;
@@ -356,7 +356,7 @@ $btn-gen-6: #A38B6D;
   gap: 0.5rem;
   
   label {
-    font-size: 12px;
+    font-size: 14px;
   font-weight: normal;
     font-weight: 600;
     color: #4a4a4a;
@@ -375,7 +375,7 @@ $btn-gen-6: #A38B6D;
   border-radius: 8px;
   padding: 0.8rem 1rem;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
   color: #333;
   box-shadow: inset 3px 3px 6px #d0d0bb, inset -3px -3px 6px #ffffff;
@@ -389,7 +389,7 @@ $btn-gen-6: #A38B6D;
 
 .info-box {
   padding: 1rem;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
   color: #555;
   margin-top: 0.5rem;
@@ -406,7 +406,7 @@ $btn-gen-6: #A38B6D;
   border: 2px solid #2e7a85;
   padding: 0.8rem 1.5rem;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
   font-weight: bold;
   cursor: pointer;
@@ -424,7 +424,7 @@ $btn-gen-6: #A38B6D;
   border: 2px solid #044b0c;
   padding: 0.8rem 2rem;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
   font-weight: 600;
   cursor: pointer;
@@ -493,10 +493,10 @@ $btn-gen-6: #A38B6D;
   gap: 1rem;
   
   p {
-    font-size: 12px;
+    font-size: 14px;
   font-weight: normal;
     font-weight: 500;
-    color: #666;
+    color: #2d3748;
   }
 }
 
@@ -526,7 +526,7 @@ $btn-gen-6: #A38B6D;
 .empty-state {
   text-align: center;
   padding: 3rem !important;
-  color: #777;
+  color: #2d3748;
   font-style: italic;
 }
 
@@ -555,9 +555,9 @@ $btn-gen-6: #A38B6D;
 }
 
 .permisos-hint {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
-  color: #777;
+  color: #2d3748;
   margin-bottom: 1rem;
 }
 
@@ -594,10 +594,10 @@ $btn-gen-6: #A38B6D;
 }
 
 .area-paquete {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
-  color: #999;
+  color: #2d3748;
 }
 
 

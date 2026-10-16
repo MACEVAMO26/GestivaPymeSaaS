@@ -4,8 +4,8 @@
 $bg-color: #f5f5dc;
 $shadow-light: #ffffff;
 $shadow-dark: #d1d1bc;
-$text-dark: #333333;
-$text-muted: #666666;
+$text-dark: #1a1a1a;
+$text-muted: #2d3748;
 $btn-add: #45a1ae;
 $btn-volver: #de3737;
 $btn-save: #066810;
@@ -38,7 +38,7 @@ $btn-gen-6: #A38B6D;
 
 /* Subtitulo: 13px, izquierda, mayusculas, sin negrita */
 .subtitulo, h2.subtitulo, h3.subtitulo {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: left;
@@ -48,7 +48,7 @@ $btn-gen-6: #A38B6D;
 
 /* Descripciones y Notas: 10px, centradas, mayusculas */
 .module-header p, .descripcion, .descripcion-general, .subtitle, .header-section p, .nota, .text-muted-small, .badge-small {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: center;
@@ -61,7 +61,7 @@ $btn-gen-6: #A38B6D;
 
 /* Texto general: 12px */
 .form-label, p, td, th, li, label, .text-general {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
 }
 
@@ -92,7 +92,7 @@ $btn-gen-6: #A38B6D;
   background: $bg-color;
   box-shadow: inset 6px 6px 10px $shadow-dark, inset -6px -6px 10px $shadow-light;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   color: $text-dark;
   outline: none;
   transition: all 0.2s ease;
@@ -107,7 +107,7 @@ $btn-gen-6: #A38B6D;
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   
   cursor: pointer;
@@ -153,7 +153,7 @@ $btn-gen-6: #A38B6D;
   padding: 0.6rem 1rem;
   border-radius: 9999px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold !important;
   text-transform: uppercase;
   cursor: pointer;
@@ -173,7 +173,7 @@ $btn-gen-6: #A38B6D;
   padding: 0.6rem 1rem;
   border-radius: 9999px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold !important;
   text-transform: uppercase;
   cursor: pointer;
@@ -272,7 +272,7 @@ $btn-primary: #45a1ae;
 
 /* Mes abreviado: 10px */
 .reunion-date .month {
-  font-size: 10px;
+  font-size: 14px;
   text-transform: uppercase;
 }
 
@@ -284,7 +284,7 @@ $btn-primary: #45a1ae;
 /* Título reunión: 13px, mayúsculas, izquierda */
 .reunion-motive {
   font-family: 'Montserrat', sans-serif;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: left;
@@ -295,8 +295,8 @@ $btn-primary: #45a1ae;
 /* Detalle/descripción: 10px */
 .reunion-detail {
   font-family: 'Montserrat', sans-serif;
-  font-size: 10px;
-  color: #666666;
+  font-size: 14px;
+  color: #2d3748;
   margin: 0;
 }
 

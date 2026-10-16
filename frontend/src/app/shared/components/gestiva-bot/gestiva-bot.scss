@@ -54,7 +54,7 @@
   max-width: 270px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 15px rgba(16, 185, 129, 0.1);
   position: relative;
-  font-size: 0.85rem;
+  font-size: 14px;
   line-height: 1.45;
   cursor: pointer;
   transition: all 0.25s ease;
@@ -89,7 +89,7 @@
     align-items: center;
     gap: 0.4rem;
     font-weight: 700;
-    font-size: 0.75rem;
+    font-size: 14px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
@@ -103,7 +103,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 0.72rem;
+    font-size: 14px;
     font-weight: 600;
     padding-top: 0.4rem;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -149,7 +149,7 @@
         font-weight: 600;
       }
       span {
-        font-size: 0.75rem;
+        font-size: 14px;
         color: #10b981; /* Green status */
       }
     }
@@ -199,7 +199,7 @@
         padding: 0.6rem 1rem;
         border-radius: 20px;
         text-align: left;
-        font-size: 0.85rem;
+        font-size: 14px;
         cursor: pointer;
         transition: all 0.2s;
         
@@ -299,7 +299,7 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 
   .chat-tareas-title {
-    font-size: 0.7rem;
+    font-size: 14px;
     font-weight: 700;
     letter-spacing: 0.05em;
     color: #45a1ae;
@@ -318,7 +318,7 @@
       padding: 0.5rem 0.85rem;
       border-radius: 20px;
       text-align: left;
-      font-size: 0.8rem;
+      font-size: 14px;
       cursor: pointer;
       transition: all 0.2s;
 
@@ -332,11 +332,11 @@
   .btn-replay-tutorial {
     margin-top: 0.6rem;
     background: transparent;
-    color: #aaa;
+    color: #cbd5e1;
     border: none;
     text-decoration: underline;
     cursor: pointer;
-    font-size: 0.75rem;
+    font-size: 14px;
 
     &:hover {
       color: #fff;

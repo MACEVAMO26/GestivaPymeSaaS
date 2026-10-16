@@ -4,8 +4,8 @@
 $bg-color: #f5f5dc;
 $shadow-light: #ffffff;
 $shadow-dark: #d1d1bc;
-$text-dark: #333333;
-$text-muted: #666666;
+$text-dark: #1a1a1a;
+$text-muted: #2d3748;
 $btn-add: #45a1ae;
 $btn-volver: #de3737;
 $btn-save: #066810;
@@ -42,7 +42,7 @@ h1.titulo-principal,
 .subtitulo,
 h2.subtitulo,
 h3.subtitulo {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: left;
@@ -59,7 +59,7 @@ h3.subtitulo {
 .nota,
 .text-muted-small,
 .badge-small {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: center;
@@ -78,7 +78,7 @@ th,
 li,
 label,
 .text-general {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
 }
 
@@ -117,7 +117,7 @@ label,
     inset 6px 6px 10px $shadow-dark,
     inset -6px -6px 10px $shadow-light;
   font-family: "Montserrat", sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   color: $text-dark;
   outline: none;
   transition: all 0.2s ease;
@@ -134,7 +134,7 @@ label,
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
   font-family: "Montserrat", sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   
   cursor: pointer;
@@ -233,7 +233,7 @@ label,
   padding: 0.6rem 1rem;
   border-radius: 9999px;
   font-family: "Montserrat", sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold !important;
   text-transform: uppercase;
   cursor: pointer;
@@ -255,7 +255,7 @@ label,
   padding: 0.6rem 1rem;
   border-radius: 9999px;
   font-family: "Montserrat", sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold !important;
   text-transform: uppercase;
   cursor: pointer;
@@ -312,12 +312,12 @@ h1 {
 
 /* Subtítulo: 13px, izquierda, mayúsculas, sin negrita */
 .subtitulo {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: left;
   margin-bottom: 1rem;
-  color: #666666;
+  color: #2d3748;
 }
 
 /* Texto general: 12px */
@@ -325,16 +325,16 @@ h1 {
 label,
 td,
 th {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
   color: #333333;
 }
 
 /* Descripción/nota: 10px */
 .descripcion-general {
-  font-size: 10px;
+  font-size: 14px;
   text-align: center;
-  color: #666666;
+  color: #2d3748;
 }
 
 /* --- TABLA ÁREAS Y MÓDULOS --- */
@@ -349,7 +349,7 @@ th {
   border-spacing: 0;
 
   th {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: bold;
     text-transform: uppercase;
     padding: 0.75rem 1rem;
@@ -359,7 +359,7 @@ th {
   }
 
   td {
-    font-size: 12px;
+    font-size: 14px;
     padding: 0.75rem 1rem;
     color: #333333;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
@@ -371,7 +371,7 @@ th {
   display: inline-block;
   padding: 2px 8px;
   border-radius: 9999px;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: bold;
   background: #45a1ae;
   color: #ffffff;
@@ -400,7 +400,7 @@ th {
 
   .btn-xs {
     padding: 0.4rem 0.85rem;
-    font-size: 11px;
+    font-size: 14px;
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
