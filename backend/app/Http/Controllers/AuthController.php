@@ -42,7 +42,10 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required',
         ]);
-        $user = User::with(['empresa', 'cargo', 'rol', 'empleado.area', 'empleado.cargo'])->where('email', $request->email)->first();
+        $emailLimpio = strtolower(trim($request->email));
+        $user = User::with(['empresa', 'cargo', 'rol', 'empleado.area', 'empleado.cargo'])
+                    ->whereRaw('LOWER(email) = ?', [$emailLimpio])
+                    ->first();
         if (!$user || !Hash::check($request->password, $user->password_hash)) {
             throw ValidationException::withMessages([
                 'email' => ['Las credenciales proporcionadas son incorrectas.'],

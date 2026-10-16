@@ -142,6 +142,7 @@ export class LoginComponent implements OnInit {
     this.isLoading = true;
     const payload = {
       ...this.credentials,
+      email: (this.credentials.email || '').trim().toLowerCase(),
       force_logout: forceLogout
     };
 
