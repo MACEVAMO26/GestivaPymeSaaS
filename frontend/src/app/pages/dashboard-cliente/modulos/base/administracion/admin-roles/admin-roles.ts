@@ -1,3 +1,4 @@
+import { VolverDirective } from '../../../../../../shared/directives/volver.directive';
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -20,7 +21,7 @@ interface AccionesPermiso {
 @Component({
   selector: 'app-admin-roles',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, VolverDirective],
   templateUrl: './admin-roles.html',
   styleUrl: './admin-roles.scss'
 })

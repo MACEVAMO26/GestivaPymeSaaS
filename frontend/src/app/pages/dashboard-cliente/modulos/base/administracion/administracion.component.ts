@@ -1,3 +1,4 @@
+import { VolverDirective } from '../../../../../shared/directives/volver.directive';
 import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -11,7 +12,7 @@ import { timeout } from 'rxjs';
 @Component({
   selector: 'app-administracion',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingSpinnerComponent],
+  imports: [CommonModule, FormsModule, LoadingSpinnerComponent, VolverDirective],
   templateUrl: './administracion.component.html',
   styleUrl: './administracion.component.scss'
 })

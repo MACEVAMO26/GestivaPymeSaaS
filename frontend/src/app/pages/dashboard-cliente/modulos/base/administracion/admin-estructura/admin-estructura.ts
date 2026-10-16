@@ -1,3 +1,4 @@
+import { VolverDirective } from '../../../../../../shared/directives/volver.directive';
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LoadingSpinnerComponent } from '../../../../../../shared/components/loading-spinner/loading-spinner';
@@ -11,7 +12,7 @@ import { ToastService } from '../../../../../../services/toast.service';
 @Component({
   selector: 'app-admin-estructura',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingSpinnerComponent],
+  imports: [CommonModule, FormsModule, LoadingSpinnerComponent, VolverDirective],
   templateUrl: './admin-estructura.html',
   styleUrl: './admin-estructura.scss'
 })

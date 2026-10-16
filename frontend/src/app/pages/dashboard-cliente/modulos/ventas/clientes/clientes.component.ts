@@ -1,3 +1,4 @@
+import { VolverDirective } from '../../../../../shared/directives/volver.directive';
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,7 +11,7 @@ import { SolicitudInactivacionComponent } from '../../../../../shared/components
 @Component({
   selector: 'app-clientes',
   standalone: true,
-  imports: [CommonModule, FormsModule, CrmGestionDeClientesComponent, SolicitudInactivacionComponent],
+  imports: [CommonModule, FormsModule, CrmGestionDeClientesComponent, SolicitudInactivacionComponent, VolverDirective],
   templateUrl: './clientes.component.html',
   styleUrl: './clientes.component.scss'
 })

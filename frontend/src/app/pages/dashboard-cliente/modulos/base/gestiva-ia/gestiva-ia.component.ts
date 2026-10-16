@@ -1,3 +1,4 @@
+import { VolverDirective } from '../../../../../shared/directives/volver.directive';
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -16,7 +17,7 @@ interface Directriz {
 @Component({
   selector: 'app-gestiva-ia',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingSpinnerComponent],
+  imports: [CommonModule, FormsModule, LoadingSpinnerComponent, VolverDirective],
   templateUrl: './gestiva-ia.component.html',
   styleUrl: './gestiva-ia.component.scss'
 })

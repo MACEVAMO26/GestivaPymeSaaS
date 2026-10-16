@@ -1,3 +1,4 @@
+import { VolverDirective } from '../../../../../shared/directives/volver.directive';
 import { SolicitudInactivacionComponent } from '../../../../../shared/components/solicitud-inactivacion/solicitud-inactivacion.component';
 import { Component, OnInit, inject, ChangeDetectorRef, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -10,7 +11,7 @@ import { timeout } from 'rxjs';
 @Component({
   selector: 'app-gestion-de-operarios',
   standalone: true,
-  imports: [CommonModule, FormsModule, SolicitudInactivacionComponent],
+  imports: [CommonModule, FormsModule, SolicitudInactivacionComponent, VolverDirective],
   templateUrl: './gestion-de-operarios.component.html',
   styleUrl: './gestion-de-operarios.component.scss'
 })

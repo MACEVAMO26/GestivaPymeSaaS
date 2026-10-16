@@ -1,3 +1,4 @@
+import { VolverDirective } from '../../../../../shared/directives/volver.directive';
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,7 +10,7 @@ import { timeout } from 'rxjs';
 @Component({
   selector: 'app-caja',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, VolverDirective],
   templateUrl: './caja.component.html',
   styleUrl: './caja.component.scss'
 })

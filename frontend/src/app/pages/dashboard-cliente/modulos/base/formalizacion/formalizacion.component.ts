@@ -1,3 +1,4 @@
+import { VolverDirective } from '../../../../../shared/directives/volver.directive';
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,7 +11,7 @@ import { AdminEstructura } from '../administracion/admin-estructura/admin-estruc
 @Component({
   selector: 'app-formalizacion',
   standalone: true,
-  imports: [CommonModule, FormsModule, AdminEstructura],
+  imports: [CommonModule, FormsModule, AdminEstructura, VolverDirective],
   templateUrl: './formalizacion.component.html',
   styleUrl: './formalizacion.component.scss'
 })

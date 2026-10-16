@@ -1,3 +1,4 @@
+import { VolverDirective } from '../../../../../shared/directives/volver.directive';
 import { Component, OnInit, inject, ChangeDetectorRef, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,7 +10,7 @@ import { timeout } from 'rxjs';
 @Component({
   selector: 'app-crm-gestion-de-clientes',
   standalone: true,
-  imports: [CommonModule, FormsModule, SolicitudInactivacionComponent],
+  imports: [CommonModule, FormsModule, SolicitudInactivacionComponent, VolverDirective],
   templateUrl: './crm-gestion-de-clientes.component.html',
   styleUrl: './crm-gestion-de-clientes.component.scss'
 })

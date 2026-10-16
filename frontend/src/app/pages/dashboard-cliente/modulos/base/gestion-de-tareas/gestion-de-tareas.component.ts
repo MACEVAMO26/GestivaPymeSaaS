@@ -1,3 +1,4 @@
+import { VolverDirective } from '../../../../../shared/directives/volver.directive';
 import { Component, OnInit, inject , ChangeDetectorRef} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LoadingSpinnerComponent } from '../../../../../shared/components/loading-spinner/loading-spinner';
@@ -11,7 +12,7 @@ import { timeout } from 'rxjs';
 @Component({
   selector: 'app-gestion-de-tareas',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingSpinnerComponent],
+  imports: [CommonModule, FormsModule, LoadingSpinnerComponent, VolverDirective],
   templateUrl: './gestion-de-tareas.component.html',
   styleUrl: './gestion-de-tareas.component.scss'
 })

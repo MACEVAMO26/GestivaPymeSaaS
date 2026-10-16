@@ -1,3 +1,4 @@
+import { VolverDirective } from '../../../../../shared/directives/volver.directive';
 import { Component, OnInit, inject, ChangeDetectorRef, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -8,7 +9,7 @@ import { timeout } from 'rxjs';
 @Component({
   selector: 'app-reportes-de-servicios',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, VolverDirective],
   templateUrl: './reportes-de-servicios.component.html',
   styleUrl: './reportes-de-servicios.component.scss'
 })

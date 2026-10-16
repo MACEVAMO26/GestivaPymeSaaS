@@ -1,3 +1,4 @@
+import { VolverDirective } from '../../../../../shared/directives/volver.directive';
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,7 +16,7 @@ import { timeout } from 'rxjs';
 @Component({
   selector: 'app-catalogo-de-servicios',
   standalone: true,
-  imports: [CommonModule, FormsModule, SolicitudInactivacionComponent, GestionDeOperariosComponent, ReportesDeServiciosComponent],
+  imports: [CommonModule, FormsModule, SolicitudInactivacionComponent, GestionDeOperariosComponent, ReportesDeServiciosComponent, VolverDirective],
   templateUrl: './catalogo-de-servicios.component.html',
   styleUrl: './catalogo-de-servicios.component.scss'
 })

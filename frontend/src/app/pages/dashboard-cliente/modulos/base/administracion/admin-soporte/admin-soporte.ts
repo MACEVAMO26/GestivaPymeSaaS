@@ -1,3 +1,4 @@
+import { VolverDirective } from '../../../../../../shared/directives/volver.directive';
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,7 +10,7 @@ import { LoadingSpinnerComponent } from '../../../../../../shared/components/loa
 @Component({
   selector: 'app-admin-soporte',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingSpinnerComponent],
+  imports: [CommonModule, FormsModule, LoadingSpinnerComponent, VolverDirective],
   templateUrl: './admin-soporte.html',
   styleUrl: './admin-soporte.scss'
 })

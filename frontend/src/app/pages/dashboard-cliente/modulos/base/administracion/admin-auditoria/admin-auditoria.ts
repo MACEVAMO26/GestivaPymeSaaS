@@ -1,3 +1,4 @@
+import { VolverDirective } from '../../../../../../shared/directives/volver.directive';
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { timeout } from 'rxjs';
@@ -7,7 +8,7 @@ import { ToastService } from '../../../../../../services/toast.service';
 @Component({
   selector: 'app-admin-auditoria',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, VolverDirective],
   templateUrl: './admin-auditoria.html',
   styleUrl: './admin-auditoria.scss'
 })
