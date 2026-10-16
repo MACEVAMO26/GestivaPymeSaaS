@@ -261,6 +261,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/usuarios/tutorial-visto', [\App\Http\Controllers\UserController::class, 'marcarTutorialVisto']);
     Route::get('/ia/sugerencias', [\App\Http\Controllers\IaController::class, 'getSugerencias']);
+    Route::get('/ia/informe-word/{modulo}', [\App\Http\Controllers\IaController::class, 'generarInformeWord']);
+    Route::get('/ia/estadisticas-modulo/{modulo}', [\App\Http\Controllers\IaController::class, 'getEstadisticasModulo']);
     Route::apiResource('ia/directrices', \App\Http\Controllers\IaSugerenciaPersonalizadaController::class);
 
     // --- LOGS DE AUDITORIA ---

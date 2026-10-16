@@ -188,12 +188,13 @@ class IaService
             ];
         }
 
-        // Modelos candidatos en orden de calidad y disponibilidad (gemini-3.8-flash es el más estable y rápido)
+        // Modelos oficiales de Google Generative AI en orden de compatibilidad y velocidad
         $modelosCandidatos = array_unique(array_filter([
             $modelo,
-            'gemini-3.8-flash',
-            'gemini-3.5-flash',
-            'gemma-4-26b-a4b-it'
+            'gemini-2.5-flash',
+            'gemini-2.0-flash',
+            'gemini-1.5-flash',
+            'gemini-1.5-pro'
         ]));
 
         $ultimoError = '';

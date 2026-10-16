@@ -1,45 +1,74 @@
 <div class="gestiva-bot-container">
   
-  <!-- Burbuja interactiva de orientación contextual -->
-  <div class="bot-bubble slide-in" *ngIf="showBubble && !showChat" (click)="abrirChatDesdeBurbuja()" title="Clic para interactuar con Gestiva IA">
-    <button class="close-bubble" (click)="cerrarBurbuja($event)" title="Ocultar sugerencia">&times;</button>
-    <div class="bubble-header flex items-center gap-1.5 mb-1 text-emerald-400 font-semibold text-xs">
-      <i class="fas fa-lightbulb"></i>
-      <span>Sugerencia Gestiva IA</span>
+  <!-- Burbuja inteligente y proactiva de orientación contextual -->
+  <div class="bot-bubble slide-in" *ngIf="showBubble && !showChat">
+    <button type="button" class="close-bubble" (click)="cerrarBurbuja($event)" title="Ocultar sugerencia">&times;</button>
+    
+    <div class="bubble-header flex items-center gap-1.5 mb-1.5 text-emerald-400 font-semibold text-xs">
+      <i class="fas fa-wand-magic-sparkles"></i>
+      <span>{{ bubbleTitle }}</span>
     </div>
-    <p class="bubble-text text-xs text-slate-200 mb-2 leading-relaxed">{{ bubbleMessage }}</p>
-    <div class="bubble-footer flex items-center justify-between text-[11px] text-emerald-300 font-medium pt-1 border-t border-slate-700/60">
-      <span><i class="fas fa-comment-dots mr-1"></i> Abrir Asistente</span>
-      <span>&rarr;</span>
+
+    <!-- Directriz destacada de gerencia para este rol -->
+    <div *ngIf="directrizDestacada" class="bubble-directriz-badge mb-2">
+      <i class="fas fa-bullhorn text-amber-400 mr-1"></i>
+      <span class="text-[11px] text-amber-200 font-medium">Recordatorio: {{ directrizDestacada }}</span>
+    </div>
+
+    <!-- Pregunta / Sugerencia proactiva de la IA -->
+    <p class="bubble-text text-xs text-slate-100 mb-2.5 leading-relaxed">{{ bubbleMessage }}</p>
+
+    <!-- Botón de acción inmediata: Generar Word -->
+    <div class="bubble-actions flex flex-col gap-1.5">
+      <button type="button" class="btn-bubble-word" (click)="descargarInformeWord($event)" [disabled]="isGeneratingDoc">
+        <i class="fas" [ngClass]="isGeneratingDoc ? 'fa-spinner fa-spin' : 'fa-file-word'"></i>
+        <span>{{ isGeneratingDoc ? 'Generando Word...' : '📄 Sí, generar informe en Word' }}</span>
+      </button>
+
+      <button type="button" class="btn-bubble-chat" (click)="abrirChatDesdeBurbuja()">
+        <i class="fas fa-comment-dots mr-1"></i> Abrir Asistente IA &rarr;
+      </button>
     </div>
   </div>
 
-  <!-- Panel de Chat -->
+  <!-- Panel de Chat Gestiva AI -->
   <div class="bot-chat-panel slide-up" *ngIf="showChat">
     <div class="chat-header">
       <div class="bot-info">
         <img src="assets/images/GestivaIA/IA_Gestiva.png" alt="Gestiva" class="chat-avatar">
         <div>
           <h4>Gestiva IA</h4>
-          <span>Asistente Inteligente</span>
+          <span>Asistente Inteligente • {{ currentModuleNombre }}</span>
         </div>
       </div>
       <div class="header-actions" style="display: flex; align-items: center; gap: 10px;">
-        <label class="toggle-mode" style="font-size: 14px; color: #cbd5e1; display: flex; align-items: center; cursor: pointer;">
+        <label class="toggle-mode" style="font-size: 13px; color: #cbd5e1; display: flex; align-items: center; cursor: pointer;">
           <input type="checkbox" [(ngModel)]="isAdvancedMode" style="margin-right: 4px;">
           Modo Avanzado
         </label>
-        <button class="close-chat" (click)="closeChat()">&times;</button>
+        <button type="button" class="close-chat" (click)="closeChat()">&times;</button>
       </div>
+    </div>
 
-    <!-- Banner y Acciones Rápidas de Directrices Activas para el rol del usuario -->
-    <div class="chat-directrices-banner" *ngIf="directricesActivas.length > 0" style="margin: 10px 14px 4px; padding: 10px 12px; background: rgba(16, 185, 129, 0.16); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 8px;">
-      <div style="font-size: 11px; font-weight: 700; color: #10b981; text-transform: uppercase; display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
-        <i class="fas fa-bullhorn"></i> Directrices Activas de Gerencia para tu Rol:
+    <!-- Barra de Generación Rápida de Word -->
+    <div class="chat-word-banner" style="margin: 8px 12px 2px; padding: 6px 10px; background: rgba(5, 150, 105, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
+      <span style="font-size: 12px; color: #e2e8f0; font-weight: 500;">
+        <i class="fas fa-file-word text-blue-400 mr-1.5"></i> Informe de {{ currentModuleNombre }}
+      </span>
+      <button type="button" class="btn-chat-word" (click)="descargarInformeWord()" [disabled]="isGeneratingDoc" style="background: #059669; color: #fff; border: none; border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+        <i class="fas" [ngClass]="isGeneratingDoc ? 'fa-spinner fa-spin' : 'fa-download'"></i>
+        <span>{{ isGeneratingDoc ? 'Descargando...' : 'Descargar Word' }}</span>
+      </button>
+    </div>
+
+    <!-- Banner de Directrices Activas para el rol -->
+    <div class="chat-directrices-banner" *ngIf="directricesActivas.length > 0" style="margin: 8px 12px 4px; padding: 8px 10px; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px;">
+      <div style="font-size: 11px; font-weight: 700; color: #10b981; text-transform: uppercase; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+        <i class="fas fa-bullhorn"></i> Directrices Activas de Gerencia:
       </div>
-      <div *ngFor="let dir of directricesActivas" style="font-size: 13px; color: #f1f5f9; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px; padding: 4px 0; border-top: 1px dashed rgba(255,255,255,0.1);">
+      <div *ngFor="let dir of directricesActivas" style="font-size: 12px; color: #f1f5f9; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; padding: 3px 0; border-top: 1px dashed rgba(255,255,255,0.08);">
         <span style="line-height: 1.3;"><strong style="color: #6ee7b7;">•</strong> {{ dir }}</span>
-        <button type="button" (click)="sendSuggestion('¿Cómo puedo cumplir eficientemente con la directriz asignada a mi rol: \'' + dir + '\'? Dame pasos concretos.')" style="background: #059669; color: #ffffff; border: 1px solid #10b981; border-radius: 6px; padding: 4px 8px; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s;">
+        <button type="button" (click)="sendSuggestion('¿Cómo puedo cumplir eficientemente con la directriz asignada a mi rol: \'' + dir + '\'? Dame pasos concretos.')" style="background: #059669; color: #ffffff; border: 1px solid #10b981; border-radius: 6px; padding: 3px 6px; font-size: 10px; font-weight: 600; cursor: pointer; white-space: nowrap;">
           ¿Cómo cumplirla?
         </button>
       </div>
@@ -47,63 +76,41 @@
 
     <!-- Tareas permitidas + tutorial -->
     <div class="chat-tareas">
-      <div class="chat-tareas-title">TAREAS PERMITIDAS</div>
+      <div class="chat-tareas-title">ACCIONES RÁPIDAS DE IA</div>
       <div class="chat-tareas-grid">
-        <button class="suggestion-btn" (click)="sendSuggestion('Genera un resumen ejecutivo de mis ventas, clientes y tareas del mes. Incluye secciones claras y puntos clave.')">Generar resúmenes y reportes</button>
-        <button class="suggestion-btn" (click)="sendSuggestion('Ayúdame a redactar un correo profesional. Indícame el tema (venta, cobro, cliente o colaborador).')">Redactar correos y respuestas</button>
-        <button class="suggestion-btn" (click)="sendSuggestion('Analiza mis datos de ventas y clientes y recomiéndame qué métricas revisar para mejorar resultados.')">Analizar datos de ventas/clientes</button>
-        <button class="suggestion-btn" (click)="sendSuggestion('Diseña un plan de seguimientos automáticos y alertas para mis clientes y tareas.')">Automatizar seguimientos y alertas</button>
+        <button type="button" class="suggestion-btn" (click)="descargarInformeWord()">📄 Descargar informe en Word</button>
+        <button type="button" class="suggestion-btn" (click)="sendSuggestion('Genera un resumen ejecutivo de mis tareas y pendientes del mes.')">Resumen de tareas y metas</button>
+        <button type="button" class="suggestion-btn" (click)="sendSuggestion('Ayúdame a redactar un correo profesional para un cliente o colaborador.')">Redactar correo profesional</button>
+        <button type="button" class="suggestion-btn" (click)="sendSuggestion('Analiza los datos y recomiéndame acciones para optimizar resultados en ' + currentModuleNombre)">Recomendaciones operativas</button>
       </div>
-      <button class="btn-replay-tutorial" (click)="verTutorial()">
+      <button type="button" class="btn-replay-tutorial" (click)="verTutorial()">
         <i class="fas fa-compass mr-1.5"></i> Ver Guía Interactiva del Sistema
       </button>
     </div>
     
-    <div class="chat-body" style="overflow-y: auto; max-height: 300px;">
-      
+    <div class="chat-body" style="overflow-y: auto; max-height: 280px;">
       <!-- Historial de Conversación -->
-      <div *ngFor="let msg of chatHistory" [ngClass]="msg.role === 'user' ? 'user-message' : 'bot-message'" style="margin-bottom: 10px; padding: 8px; border-radius: 8px; background: rgba(255,255,255,0.05);">
-        <strong *ngIf="msg.role === 'user'" style="color: #45a1ae;">Tú:</strong>
-        <strong *ngIf="msg.role === 'assistant'" style="color: #10b981;">Gestiva AI:</strong>
-        <p style="margin: 0; font-size: 14px; color: #ddd;">{{ msg.content }}</p>
+      <div *ngFor="let msg of chatHistory" [ngClass]="msg.role === 'user' ? 'user-message' : 'bot-message'" style="margin-bottom: 8px; padding: 8px 10px; border-radius: 8px; background: rgba(255,255,255,0.05);">
+        <strong *ngIf="msg.role === 'user'" style="color: #45a1ae; font-size: 12px;">Tú:</strong>
+        <strong *ngIf="msg.role === 'assistant'" style="color: #10b981; font-size: 12px;">Gestiva AI:</strong>
+        <p style="margin: 3px 0 0; font-size: 13px; color: #e2e8f0; line-height: 1.45; white-space: pre-line;">{{ msg.content }}</p>
       </div>
 
-      <!-- Preguntas precargadas según el módulo (solo se muestran si no hay chat avanzado) -->
-      <div class="chat-options" *ngIf="chatHistory.length <= 1">
-        <div *ngIf="currentModule === 'empleados'">
-          <button class="suggestion-btn" (click)="sendSuggestion('¿Cómo agrego un nuevo empleado?')">¿Cómo agrego un nuevo empleado?</button>
-          <button class="suggestion-btn" (click)="sendSuggestion('¿Cómo veo los documentos de un empleado?')">¿Cómo veo los documentos de un empleado?</button>
-        </div>
-        <div *ngIf="currentModule === 'inventario'">
-          <button class="suggestion-btn" (click)="sendSuggestion('¿Cómo creo un producto?')">¿Cómo creo un producto?</button>
-          <button class="suggestion-btn" (click)="sendSuggestion('¿Cómo actualizo el stock?')">¿Cómo actualizo el stock?</button>
-        </div>
-        <div *ngIf="currentModule === 'clientes'">
-          <button class="suggestion-btn" (click)="sendSuggestion('¿Cómo registro un cliente?')">¿Cómo registro un cliente?</button>
-        </div>
-        <div *ngIf="currentModule === 'ventas'">
-          <button class="suggestion-btn" (click)="sendSuggestion('¿Cómo genero una factura?')">¿Cómo genero una factura?</button>
-        </div>
-        <div *ngIf="currentModule === 'general'">
-          <button class="suggestion-btn" (click)="sendSuggestion('¿Qué puedo hacer en GestivaPyme?')">¿Qué puedo hacer en GestivaPyme?</button>
-        </div>
-      </div>
-
-      <div *ngIf="isLoading" style="text-align: center; color: #cbd5e1; font-size: 14px; font-style: italic;">
-        Gestiva AI está escribiendo...
+      <div *ngIf="isLoading" style="text-align: center; color: #cbd5e1; font-size: 13px; font-style: italic; padding: 6px;">
+        <i class="fas fa-spinner fa-spin mr-1 text-emerald-400"></i> Gestiva AI está procesando...
       </div>
     </div>
 
     <div class="chat-input-area">
-      <input type="text" placeholder="Escribe tu pregunta..." [(ngModel)]="userMessage" (keyup.enter)="sendMessage()">
-      <button class="send-btn" (click)="sendMessage()" [disabled]="isLoading || !userMessage"><i class="fas fa-paper-plane"></i></button>
+      <input type="text" placeholder="Escribe tu mensaje o pide un Word..." [(ngModel)]="userMessage" (keyup.enter)="sendMessage()">
+      <button type="button" class="send-btn" (click)="sendMessage()" [disabled]="isLoading || !userMessage"><i class="fas fa-paper-plane"></i></button>
     </div>
   </div>
 
-  <!-- Avatar Flotante -->
-  <div class="bot-avatar-wrapper" (click)="toggleChat()">
+  <!-- Avatar Flotante con indicador interactivo -->
+  <div class="bot-avatar-wrapper" (click)="toggleChat()" title="Clic para interactuar con Gestiva IA">
     <img src="assets/images/GestivaIA/IA_Gestiva.png" alt="Gestiva" class="bot-avatar bounce">
-    <span class="notification-dot" *ngIf="showBubble"></span>
+    <span class="notification-dot" *ngIf="showBubble" title="Sugerencia activa"></span>
   </div>
 
 </div>
