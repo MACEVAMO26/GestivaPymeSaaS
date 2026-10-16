@@ -47,6 +47,11 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
   hasChecked = false;
 
   ngOnInit() {
+    const user = this.authService.getUser();
+    if (user?.ia_modo === 'avanzado') {
+      this.isAdvancedMode = true;
+    }
+
     // 1. Obtener status de la BD al iniciar
     this.http.get('/api/tutorial-status').subscribe({
       next: (res: any) => {
@@ -181,7 +186,8 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
       error: (err) => {
         this.isLoading = false;
         console.error('Error IA:', err);
-        this.chatHistory.push({ role: 'assistant', content: 'Error de conexión con el servicio de Inteligencia Artificial.' });
+        const errorMsg = err.error?.message || 'Error de conexión con el servicio de Inteligencia Artificial.';
+        this.chatHistory.push({ role: 'assistant', content: errorMsg });
       }
     });
   }

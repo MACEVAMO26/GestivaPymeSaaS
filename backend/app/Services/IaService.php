@@ -169,23 +169,36 @@ class IaService
             ];
         }
 
-        $modeloUsado = $modelo ?: 'gemini-3.5-flash-lite';
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$modeloUsado}:generateContent?key=" . $apiKey;
-        
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json',
-        ])->post($url, [
-            'contents' => $contents,
-        ]);
+        // Modelos candidatos en orden de calidad y disponibilidad (gemini-3.8-flash es el más estable y rápido)
+        $modelosCandidatos = array_unique(array_filter([
+            $modelo,
+            'gemini-3.8-flash',
+            'gemini-3.5-flash',
+            'gemma-4-26b-a4b-it'
+        ]));
 
-        if ($response->successful()) {
-            return [
-                'text' => $response->json('candidates.0.content.parts.0.text'),
-                'tokens_entrada' => $response->json('usageMetadata.promptTokenCount') ?: 0,
-                'tokens_salida' => $response->json('usageMetadata.candidatesTokenCount') ?: 0
-            ];
+        $ultimoError = '';
+
+        foreach ($modelosCandidatos as $modeloUsado) {
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/{$modeloUsado}:generateContent?key=" . $apiKey;
+            
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+            ])->timeout(25)->post($url, [
+                'contents' => $contents,
+            ]);
+
+            if ($response->successful()) {
+                return [
+                    'text' => $response->json('candidates.0.content.parts.0.text'),
+                    'tokens_entrada' => $response->json('usageMetadata.promptTokenCount') ?: 0,
+                    'tokens_salida' => $response->json('usageMetadata.candidatesTokenCount') ?: 0
+                ];
+            }
+
+            $ultimoError = $response->body();
         }
 
-        throw new \Exception('Error al contactar con Gemini: ' . $response->body());
+        throw new \Exception('Error al contactar con Gemini: ' . $ultimoError);
     }
 }
