@@ -64,12 +64,31 @@ class IaService
             $modelo = null;
         }
 
+        // Obtener directrices activas de la empresa para que la IA las conozca y recuerde su cumplimiento
+        $directricesTexto = "";
+        if ($empresaId) {
+            $directricesActivas = \App\Models\IaSugerenciaPersonalizada::where('empresa_id', $empresaId)
+                ->where('activo', true)
+                ->get();
+            if ($directricesActivas->count() > 0) {
+                $directricesTexto = "DIRECTRICES CORPORATIVAS VIGENTES ESTABLECIDAS POR LA GERENCIA:\n";
+                foreach ($directricesActivas as $dir) {
+                    $directricesTexto .= "- Para {$dir->audiencia}: \"{$dir->mensaje}\"\n";
+                }
+                $directricesTexto .= "\nInstrucción obligatoria de la Gerencia: Siempre que interactúes con el usuario, respondas dudas o propongas tareas, debes RECORDARLE y AVISARLE proactivamente sobre el cumplimiento de estas directrices de su rol.";
+            }
+        }
+
         // Historial de chat si es modo avanzado
         $messages = [];
         if ($modo === 'avanzado') {
+            $systemContent = 'Eres Gestiva AI, el asistente virtual corporativo experto en ventas, contabilidad, gestión de tareas y servicios de la empresa. Responde de manera profesional, concisa, proactiva y amable.';
+            if ($directricesTexto) {
+                $systemContent .= "\n\n" . $directricesTexto;
+            }
             $messages[] = [
                 'role' => 'system',
-                'content' => 'Eres Gestiva AI, un asistente virtual experto en ventas, contabilidad y gestión de servicios. Responde de manera profesional, concisa y amable.'
+                'content' => $systemContent
             ];
 
             $historial = IaChatHistory::where('empresa_id', $empresaId)

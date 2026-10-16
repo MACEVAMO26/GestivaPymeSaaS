@@ -59,25 +59,31 @@ class IaController extends Controller
         }
 
         // --- FETCH CUSTOM SUGGESTIONS (Directrices IA del Gerente) ---
-        // Audiencia defaults: 'Todos', 'Gerencia', 'Ventas', 'RRHH', etc.
-        // Mapeamos el rol actual a unas categorías genéricas para simplificar
+        // Audiencia: 'Todos', 'Gerencia', 'Ventas', 'RRHH', 'Operativos'
         $audiencias = ['Todos'];
-        if (in_array($rol, ['Gerente General', 'Jefe de Área'])) {
+        $rolNombre = strtolower($rol);
+        $cargoNombre = strtolower($user->empleado->cargo->nombre ?? ($user->cargo->nombre ?? ''));
+        $areaNombre = strtolower($user->empleado->area->nombre ?? '');
+
+        if (str_contains($rolNombre, 'gerente') || str_contains($rolNombre, 'administrador') || str_contains($rolNombre, 'jefe') || str_contains($rolNombre, 'coordinador')) {
             $audiencias[] = 'Gerencia';
-        } else {
+        }
+
+        if (str_contains($rolNombre, 'operativo') || str_contains($cargoNombre, 'operativo') || str_contains($rolNombre, 'auxiliar') || !str_contains($rolNombre, 'gerente')) {
             $audiencias[] = 'Operativos';
         }
-        
-        if ($area === 'ventas' || stripos($rol, 'Venta') !== false) {
+
+        if (str_contains($rolNombre, 'venta') || str_contains($cargoNombre, 'venta') || str_contains($areaNombre, 'comercial') || str_contains($areaNombre, 'venta') || $area === 'ventas') {
             $audiencias[] = 'Ventas';
         }
-        if (stripos($rol, 'Recursos Humanos') !== false) {
+
+        if (str_contains($rolNombre, 'rrhh') || str_contains($rolNombre, 'humana') || str_contains($cargoNombre, 'rrhh') || str_contains($cargoNombre, 'humana') || str_contains($areaNombre, 'rrhh') || str_contains($areaNombre, 'humana') || $area === 'empleados') {
             $audiencias[] = 'RRHH';
         }
 
         $directrices = \App\Models\IaSugerenciaPersonalizada::where('empresa_id', $user->empresa_id)
             ->where('activo', true)
-            ->whereIn('audiencia', $audiencias)
+            ->whereIn('audiencia', array_unique($audiencias))
             ->pluck('mensaje')
             ->toArray();
 
@@ -99,6 +105,7 @@ class IaController extends Controller
 
         return response()->json([
             'sugerencias' => $sugerencias,
+            'directrices' => $directrices,
             'area' => $area,
             'rol' => $rol
         ]);

@@ -14,7 +14,18 @@
 
     <!-- LISTADO DE DIRECTRICES -->
     <div *ngIf="!showForm" class="neumorphic-panel fade-in">
-      <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 15px;">
+        <div style="display: flex; gap: 10px; flex: 1; max-width: 500px;">
+          <input type="text" [(ngModel)]="filtroTexto" placeholder="🔍 Buscar directriz..." class="input-neumorphic" style="flex: 1; padding: 8px 12px; font-size: 14px;">
+          <select [(ngModel)]="filtroAudiencia" class="input-neumorphic" style="padding: 8px 12px; font-size: 14px;">
+            <option value="">Todas las Audiencias</option>
+            <option value="Todos">Toda la Empresa</option>
+            <option value="Gerencia">Solo Gerencia</option>
+            <option value="RRHH">Recursos Humanos</option>
+            <option value="Ventas">Área de Ventas</option>
+            <option value="Operativos">Operativos</option>
+          </select>
+        </div>
         <button class="btn-add btn-pill" (click)="abrirFormulario()">+ Nueva Directriz</button>
       </div>
 
@@ -54,16 +65,16 @@
                   </button>
                 </td>
               </tr>
-              <tr *ngIf="directrices.length === 0">
+              <tr *ngIf="directricesFiltradas.length === 0">
                 <td colspan="5" class="text-center" style="padding: 20px;">No hay directrices configuradas. ¡Crea la primera!</td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        @if (directrices.length > pageSize) {
+        @if (directricesFiltradas.length > pageSize) {
           <div class="neu-pagination-bar">
-            <span class="pagination-info">Página {{ pageDirectrices }} de {{ totalPagesDirectrices }} ({{ directrices.length }} directrices)</span>
+            <span class="pagination-info">Página {{ pageDirectrices }} de {{ totalPagesDirectrices }} ({{ directricesFiltradas.length }} directrices)</span>
             <div class="pagination-controls">
               <button class="pagination-btn" [disabled]="pageDirectrices === 1" (click)="pageDirectrices = pageDirectrices - 1">
                 <i class="fas fa-chevron-left"></i> Anterior

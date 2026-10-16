@@ -43,6 +43,7 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
     inventario: 0
   };
 
+  directricesActivas: string[] = [];
   currentModule = '';
   hasChecked = false;
 
@@ -52,7 +53,10 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
       this.isAdvancedMode = true;
     }
 
-    // 1. Obtener status de la BD al iniciar
+    // 1. Cargar directrices activas de la empresa para este rol y avisar al usuario
+    this.cargarDirectrices();
+
+    // 2. Obtener status de la BD al iniciar
     this.http.get('/api/tutorial-status').subscribe({
       next: (res: any) => {
         this.tutorialCounts = res;
@@ -62,13 +66,33 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
       error: (err) => console.error('Error fetching tutorial status', err)
     });
 
-    // 2. Escuchar cambios de ruta
+    // 3. Escuchar cambios de ruta
     this.routerSub = this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
       if (this.hasChecked) {
         this.evaluateRoute(event.urlAfterRedirects);
       }
+    });
+  }
+
+  cargarDirectrices() {
+    this.http.get<any>('/api/ia/sugerencias').subscribe({
+      next: (res) => {
+        if (res.directrices && res.directrices.length > 0) {
+          this.directricesActivas = res.directrices;
+          const primeraDirectriz = res.directrices[0];
+          
+          // Desplegar la burbuja proactiva avisando al rol sobre su directriz
+          this.triggerBubble(`📢 Recordatorio de Gerencia: ${primeraDirectriz}`);
+
+          if (this.chatHistory.length <= 1) {
+            const listado = this.directricesActivas.map(d => `• ${d}`).join('\n');
+            this.chatHistory[0].content = `¡Hola! Soy Gestiva AI. Tu gerencia ha establecido las siguientes directrices activas para tu rol:\n\n${listado}\n\n¿En qué puedo ayudarte hoy para avanzar con tus tareas?`;
+          }
+        }
+      },
+      error: (err) => console.error('Error al cargar directrices para el bot', err)
     });
   }
 
