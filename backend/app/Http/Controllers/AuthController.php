@@ -78,10 +78,9 @@ class AuthController extends Controller
         $tieneSesionActiva = $user->tokens()->where('name', $tokenName)->exists();
 
         if ($tieneSesionActiva && !$forzarCierre) {
-            $lugar = $isLocalhost ? 'en otra pestaña o navegador de este equipo' : 'en otro dispositivo o navegador';
             return response()->json([
                 'session_conflict' => true,
-                'message' => "Ya existe una sesión activa para este usuario {$lugar}. Por seguridad y control de concurrencia, no se permiten sesiones simultáneas."
+                'message' => 'Has iniciado sesión en otro dispositivo, por favor cierra esa sesión e intenta nuevamente.'
             ], 409);
         }
 

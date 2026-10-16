@@ -192,7 +192,7 @@ export class LoginComponent implements OnInit {
 
         // 1. Conflicto por Sesión Simultánea abierta en otro dispositivo
         if (err.status === 409 || errorData?.session_conflict) {
-          this.sessionConflictMessage = errorData?.message || 'Ya existe una sesión activa para este usuario en otro dispositivo o navegador. Por seguridad, no se permiten sesiones simultáneas.';
+          this.sessionConflictMessage = errorData?.message || 'Has iniciado sesión en otro dispositivo, por favor cierra esa sesión e intenta nuevamente.';
           this.showSessionConflictModal = true;
           this.cdr.detectChanges();
           return;
