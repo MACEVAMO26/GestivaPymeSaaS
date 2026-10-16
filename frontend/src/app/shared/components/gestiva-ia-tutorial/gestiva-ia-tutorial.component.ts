@@ -31,11 +31,8 @@ export class GestivaIaTutorialComponent implements OnInit, OnDestroy, OnChanges 
     this.user = this.authService.getUser();
     this.generarPasos();
     
-    // Solo mostrar automáticamente la primera vez si no ha sido visto y no ha sido omitido en esta sesión
-    const yaVistoSesion = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('tutorial_visto_sesion') : null;
-    if (this.user && this.user.tutorial_ia_visto === 0 && !yaVistoSesion) {
-      this.mostrar = true;
-    }
+    // La guía se muestra de forma controlada cuando el usuario la solicita voluntariamente
+    this.mostrar = false;
 
     this.sub = this.iaStateService.showTutorial$.subscribe(() => {
       this.generarPasos();

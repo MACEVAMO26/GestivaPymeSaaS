@@ -6,6 +6,7 @@ import { AuthService } from '../../services/auth.service';
 import { AccessibilityService } from '../../services/accessibility/accessibility.service';
 import { ModulosService, MODULOS_BASE_UI, RUTA_MODULO, ICONO_MODULO } from '../../services/modulos.service';
 import { ChangeDetectorRef } from '@angular/core';
+import { IaStateService } from '../../services/ia-state/ia-state.service';
 import { GestivaIaTutorialComponent } from '../../shared/components/gestiva-ia-tutorial/gestiva-ia-tutorial.component';
 import { GestivaBotComponent } from '../../shared/components/gestiva-bot/gestiva-bot';
 
@@ -28,9 +29,14 @@ export class DashboardClienteComponent implements OnInit {
   public accessibilityService = inject(AccessibilityService);
   private authService = inject(AuthService);
   private modulosService = inject(ModulosService);
+  private iaStateService = inject(IaStateService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
+
+  abrirTutorial() {
+    this.iaStateService.triggerTutorial();
+  }
 
   // --- VARIABLES DE ESTADO ---
   user: any = null;

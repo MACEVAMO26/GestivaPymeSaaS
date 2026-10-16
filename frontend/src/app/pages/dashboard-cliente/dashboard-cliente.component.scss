@@ -96,6 +96,44 @@ $primary-color: #45a1ae;
       }
     }
 
+    /* Botón Guía / Tutorial - Accesible y Neumórfico */
+    .tutorial-btn {
+      background-color: #DBDB9B !important;
+      border: 1px solid #eca06e !important;
+      height: 28px !important;
+      min-height: 28px !important;
+      padding: 0 12px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 6px !important;
+      border-radius: 9999px !important;
+      cursor: pointer !important;
+      transition: all 0.25s ease !important;
+      box-shadow: 2px 2px 5px #d1d1bc, -2px -2px 5px #ffffff !important;
+      color: #1a1a1a !important;
+      font-family: 'Montserrat', sans-serif !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+
+      i {
+        font-size: 14px;
+        color: #1a1a1a;
+      }
+
+      &:hover {
+        background-color: #45a1ae !important;
+        border-color: #388a96 !important;
+        box-shadow: inset 2px 2px 4px rgba(0,0,0,0.2) !important;
+        color: #ffffff !important;
+        i { color: #ffffff !important; }
+      }
+
+      &:active {
+        transform: translateY(1px);
+      }
+    }
+
     /* Perfil Neumórfico */
     .user-profile {
       display: flex;

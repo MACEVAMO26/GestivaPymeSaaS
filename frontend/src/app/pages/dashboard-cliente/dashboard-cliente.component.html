@@ -31,6 +31,12 @@
         </svg>
       </button>
 
+      <!-- Botón Guía / Tutorial de la Plataforma -->
+      <button class="tutorial-btn" (click)="abrirTutorial()" title="Guía y Tutorial de la Plataforma" aria-label="Abrir Guía y Tutorial">
+        <i class="fas fa-question-circle"></i>
+        <span>Guía</span>
+      </button>
+
       <!-- Perfil y Logout -->
       <div class="user-profile">
         @if (user?.avatar_url) {

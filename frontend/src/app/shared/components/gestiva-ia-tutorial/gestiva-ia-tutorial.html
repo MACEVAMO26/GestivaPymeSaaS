@@ -1,4 +1,4 @@
-<div class="ia-tutorial-overlay" *ngIf="mostrar" (click)="cerrarTutorial()">
+<div class="ia-tutorial-overlay" *ngIf="mostrar">
   <div class="ia-tutorial-modal" (click)="$event.stopPropagation()">
     <!-- Botón Cerrar Guía -->
     <button class="btn-skip" (click)="cerrarTutorial()" title="Cerrar Guía">&times; Cerrar</button>
