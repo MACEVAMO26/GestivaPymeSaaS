@@ -573,12 +573,12 @@
         <div class="form-row-divider mb-3">
           <div class="form-group">
             <label class="form-label">Fecha Inicio *</label>
-            <input type="date" class="input-neumorphic" [(ngModel)]="novedadForm.fecha_inicio" name="fecha_inicio" required>
+            <input type="date" class="input-neumorphic" [(ngModel)]="novedadForm.fecha_inicio" (change)="onNovedadFechaInicioChange()" name="fecha_inicio" [min]="fechaMinimaHoy" required>
           </div>
 
           <div class="form-group">
             <label class="form-label">Fecha Fin (si aplica)</label>
-            <input type="date" class="input-neumorphic" [(ngModel)]="novedadForm.fecha_fin" name="fecha_fin" [min]="novedadForm.fecha_inicio">
+            <input type="date" class="input-neumorphic" [(ngModel)]="novedadForm.fecha_fin" name="fecha_fin" [min]="novedadForm.fecha_inicio || fechaMinimaHoy">
           </div>
         </div>
 

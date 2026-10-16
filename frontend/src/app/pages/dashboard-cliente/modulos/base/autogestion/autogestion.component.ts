@@ -60,6 +60,20 @@ export class AutogestionComponent implements OnInit {
     return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
   }
 
+  get fechaMinimaFin(): string {
+    if (!this.nuevaVacacion.fecha_inicio) return this.fechaMinimaHoy;
+    const d = new Date(this.nuevaVacacion.fecha_inicio + 'T00:00:00');
+    d.setDate(d.getDate() + 1);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  }
+
+  onFechaInicioChange() {
+    if (this.nuevaVacacion.fecha_fin && this.nuevaVacacion.fecha_fin <= this.nuevaVacacion.fecha_inicio) {
+      this.nuevaVacacion.fecha_fin = '';
+    }
+  }
+
   // Documentos
   misDocumentos: any[] = [];
   archivoSeleccionado: File | null = null;

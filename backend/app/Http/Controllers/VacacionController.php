@@ -29,9 +29,10 @@ class VacacionController extends Controller
     // Registra una nueva solicitud de vacaciones
     public function store(Request $request)
     {
+        $hoy = now('America/Bogota')->format('Y-m-d');
         $validatedData = $request->validate([
             'usuario_id' => 'required|integer|exists:usuarios,id',
-            'fecha_inicio' => 'required|date|after_or_equal:today',
+            'fecha_inicio' => "required|date|after_or_equal:{$hoy}",
             'fecha_fin' => 'required|date|after:fecha_inicio',
             'tipo' => 'required|in:Disfrute Legal,Colectivas,Anticipadas',
             'observaciones' => 'nullable|string',
@@ -60,8 +61,9 @@ class VacacionController extends Controller
             return response()->json(['message' => 'No puedes modificar una solicitud que ya fue respondida.'], 403);
         }
 
+        $hoy = now('America/Bogota')->format('Y-m-d');
         $validatedData = $request->validate([
-            'fecha_inicio' => 'required|date|after_or_equal:today',
+            'fecha_inicio' => "required|date|after_or_equal:{$hoy}",
             'fecha_fin' => 'required|date|after:fecha_inicio',
             'tipo' => 'required|in:Disfrute Legal,Colectivas,Anticipadas',
             'observaciones' => 'nullable|string',

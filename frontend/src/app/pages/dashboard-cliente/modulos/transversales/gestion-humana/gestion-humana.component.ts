@@ -624,6 +624,18 @@ export class GestionHumanaComponent implements OnInit {
     this.isNovedadModalOpen = false;
   }
 
+  get fechaMinimaHoy(): string {
+    const now = new Date();
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  }
+
+  onNovedadFechaInicioChange() {
+    if (this.novedadForm.fecha_fin && this.novedadForm.fecha_fin < this.novedadForm.fecha_inicio) {
+      this.novedadForm.fecha_fin = '';
+    }
+  }
+
   guardarNovedad() {
     if (!this.novedadForm.empleado_id || !this.novedadForm.tipo_novedad) {
       this.toast.warning('Seleccione el empleado y el tipo de novedad');
@@ -631,6 +643,21 @@ export class GestionHumanaComponent implements OnInit {
     }
     if (!this.novedadForm.motivo.trim()) {
       this.toast.warning('Describa el motivo o razón válida de la ausencia');
+      return;
+    }
+
+    if (this.novedadForm.tipo_novedad === 'en vacaciones') {
+      const hoyStr = this.fechaMinimaHoy;
+      if (this.novedadForm.fecha_inicio && this.novedadForm.fecha_inicio < hoyStr) {
+        this.toast.warning('La fecha de inicio de vacaciones no puede ser anterior a la fecha actual');
+        return;
+      }
+      if (this.novedadForm.fecha_fin && this.novedadForm.fecha_fin <= this.novedadForm.fecha_inicio) {
+        this.toast.warning('La fecha de fin de vacaciones debe ser posterior a la fecha de inicio');
+        return;
+      }
+    } else if (this.novedadForm.fecha_fin && this.novedadForm.fecha_fin < this.novedadForm.fecha_inicio) {
+      this.toast.warning('La fecha de fin no puede ser anterior a la fecha de inicio');
       return;
     }
 
