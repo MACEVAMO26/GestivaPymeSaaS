@@ -68,7 +68,7 @@
       <div class="hero-image-area">
         <div class="hero-glow"></div>
         <div class="hero-image-box">
-          <img src="assets/illustrations/landingpage.jpg" alt="fotografia de equipo" class="hero-main-image">
+          <img src="assets/illustrations/landingpage.jpg" alt="fotografia de equipo" class="hero-main-image" loading="eager" fetchpriority="high" width="1000" height="600">
         </div>
       </div>
     </div>
@@ -432,7 +432,7 @@
   </div>
 
   <button class="chatbot-trigger" [class.active-bot]="isChatbotOpen" (click)="toggleChatbot()">
-    <img src="assets/images/Bot/gestiva-bot.png" alt="Gestiva Botón">
+    <img src="assets/images/Bot/gestiva-bot.png" alt="Gestiva Botón" loading="lazy" width="60" height="60">
     <span class="chatbot-notification"></span>
   </button>
   
