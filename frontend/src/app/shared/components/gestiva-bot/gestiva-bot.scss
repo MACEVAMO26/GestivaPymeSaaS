@@ -1,43 +1,52 @@
-.gestiva-bot-container {
+:host {
+  display: block;
   position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  z-index: 9999;
+  bottom: 24px;
+  right: 24px;
+  z-index: 99999;
+}
+
+.gestiva-bot-container {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 1rem;
+  gap: 12px;
+  position: relative;
 }
 
 /* Avatar Flotante */
 .bot-avatar-wrapper {
   position: relative;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
 
   &:hover {
-    transform: scale(1.05);
+    transform: scale(1.08);
   }
 
   .bot-avatar {
-    width: 60px;
-    height: 60px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    background: #111827; /* Dark background */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 12px rgba(16, 185, 129, 0.4);
+    border: 3px solid #10b981;
+    background: #0f172a;
     object-fit: cover;
+    display: block;
   }
 
   .notification-dot {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 2px;
+    right: 2px;
     width: 14px;
     height: 14px;
     background-color: #ef4444; /* Red dot */
     border-radius: 50%;
-    border: 2px solid #111827;
+    border: 2px solid #ffffff;
     animation: pulse 2s infinite;
   }
 }

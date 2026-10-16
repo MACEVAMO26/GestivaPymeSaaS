@@ -82,7 +82,6 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
             this.chatHistory[0].content = `¡Hola! Soy Gestiva AI. Tu gerencia ha establecido las siguientes directrices activas para tu rol:\n\n${listado}\n\n¿En qué puedo orientarte hoy o deseas que genere un informe en Word?`;
           }
         }
-        this.cdr.detectChanges();
       },
       error: (err) => console.error('Error al cargar directrices para el bot', err)
     });
@@ -99,7 +98,6 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
 
     // El globito siempre se muestra de manera visible y proactiva
     this.showBubble = true;
-    this.cdr.detectChanges();
   }
 
   private getModuleConfig(url: string) {
