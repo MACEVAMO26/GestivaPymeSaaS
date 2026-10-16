@@ -68,7 +68,7 @@
               </tr>
             </thead>
             <tbody>
-              @for(prod of productosFiltrados; track prod.id) {
+              @for(prod of paginatedProductos; track prod.id) {
                 <tr>
                   <td><strong>{{codigoProducto(prod)}}</strong></td>
                   <td>{{prod.nombre}}</td>
@@ -105,6 +105,36 @@
             </tbody>
           </table>
         </div>
+
+        <!-- Paginación Catálogo (8 por página) -->
+        @if (totalPagesCatalogo > 1) {
+          <div class="neu-pagination-bar">
+            <div class="pagination-info">
+              Mostrando <strong>{{ (pageCatalogo - 1) * pageSize + 1 }}</strong> a
+              <strong>{{ Math.min(pageCatalogo * pageSize, productosFiltrados.length) }}</strong> de
+              <strong>{{ productosFiltrados.length }}</strong> productos
+            </div>
+            <div class="pagination-controls">
+              <button
+                type="button"
+                class="pagination-btn"
+                (click)="pageCatalogo = pageCatalogo - 1"
+                [disabled]="pageCatalogo === 1"
+              >
+                <i class="fas fa-chevron-left"></i> Anterior
+              </button>
+              <span class="pagination-badge">Pág. {{ pageCatalogo }} / {{ totalPagesCatalogo }}</span>
+              <button
+                type="button"
+                class="pagination-btn"
+                (click)="pageCatalogo = pageCatalogo + 1"
+                [disabled]="pageCatalogo >= totalPagesCatalogo"
+              >
+                Siguiente <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        }
       </div>
     }
 
@@ -160,7 +190,7 @@
               </tr>
             </thead>
             <tbody>
-              @for(m of movimientos; track m.id) {
+              @for(m of paginatedMovimientos; track m.id) {
                 <tr>
                   <td>{{fechaMovimiento(m)}}</td>
                   <td>
@@ -182,6 +212,36 @@
             </tbody>
           </table>
         </div>
+
+        <!-- Paginación Movimientos (8 por página) -->
+        @if (totalPagesMovimientos > 1) {
+          <div class="neu-pagination-bar">
+            <div class="pagination-info">
+              Mostrando <strong>{{ (pageMovimientos - 1) * pageSize + 1 }}</strong> a
+              <strong>{{ Math.min(pageMovimientos * pageSize, movimientos.length) }}</strong> de
+              <strong>{{ movimientos.length }}</strong> movimientos
+            </div>
+            <div class="pagination-controls">
+              <button
+                type="button"
+                class="pagination-btn"
+                (click)="pageMovimientos = pageMovimientos - 1"
+                [disabled]="pageMovimientos === 1"
+              >
+                <i class="fas fa-chevron-left"></i> Anterior
+              </button>
+              <span class="pagination-badge">Pág. {{ pageMovimientos }} / {{ totalPagesMovimientos }}</span>
+              <button
+                type="button"
+                class="pagination-btn"
+                (click)="pageMovimientos = pageMovimientos + 1"
+                [disabled]="pageMovimientos >= totalPagesMovimientos"
+              >
+                Siguiente <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        }
       </div>
     }
 
@@ -283,7 +343,7 @@
               </tr>
             </thead>
             <tbody>
-              @for(fila of kardexFilas; track $index) {
+              @for(fila of paginatedKardex; track $index) {
                 <tr>
                   <td>{{fila.fecha}}</td>
                   <td>{{fila.concepto}}</td>
@@ -302,6 +362,36 @@
             </tbody>
           </table>
         </div>
+
+        <!-- Paginación Kardex (8 por página) -->
+        @if (totalPagesKardex > 1) {
+          <div class="neu-pagination-bar">
+            <div class="pagination-info">
+              Mostrando <strong>{{ (pageKardex - 1) * pageSize + 1 }}</strong> a
+              <strong>{{ Math.min(pageKardex * pageSize, kardexFilas.length) }}</strong> de
+              <strong>{{ kardexFilas.length }}</strong> registros de kardex
+            </div>
+            <div class="pagination-controls">
+              <button
+                type="button"
+                class="pagination-btn"
+                (click)="pageKardex = pageKardex - 1"
+                [disabled]="pageKardex === 1"
+              >
+                <i class="fas fa-chevron-left"></i> Anterior
+              </button>
+              <span class="pagination-badge">Pág. {{ pageKardex }} / {{ totalPagesKardex }}</span>
+              <button
+                type="button"
+                class="pagination-btn"
+                (click)="pageKardex = pageKardex + 1"
+                [disabled]="pageKardex >= totalPagesKardex"
+              >
+                Siguiente <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        }
       </div>
     }
 
@@ -328,7 +418,7 @@
               </tr>
             </thead>
             <tbody>
-              @for(cat of categorias; track cat.id) {
+              @for(cat of paginatedCategorias; track cat.id) {
                 <tr>
                   <td><strong>{{cat.nombre}}</strong></td>
                   <td>{{cat.descripcion || '-'}}</td>
@@ -357,6 +447,36 @@
             </tbody>
           </table>
         </div>
+
+        <!-- Paginación Categorías (8 por página) -->
+        @if (totalPagesCategorias > 1) {
+          <div class="neu-pagination-bar">
+            <div class="pagination-info">
+              Mostrando <strong>{{ (pageCategorias - 1) * pageSize + 1 }}</strong> a
+              <strong>{{ Math.min(pageCategorias * pageSize, categorias.length) }}</strong> de
+              <strong>{{ categorias.length }}</strong> categorías
+            </div>
+            <div class="pagination-controls">
+              <button
+                type="button"
+                class="pagination-btn"
+                (click)="pageCategorias = pageCategorias - 1"
+                [disabled]="pageCategorias === 1"
+              >
+                <i class="fas fa-chevron-left"></i> Anterior
+              </button>
+              <span class="pagination-badge">Pág. {{ pageCategorias }} / {{ totalPagesCategorias }}</span>
+              <button
+                type="button"
+                class="pagination-btn"
+                (click)="pageCategorias = pageCategorias + 1"
+                [disabled]="pageCategorias >= totalPagesCategorias"
+              >
+                Siguiente <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        }
       </div>
     }
   </div>

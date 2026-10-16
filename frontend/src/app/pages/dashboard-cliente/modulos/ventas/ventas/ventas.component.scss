@@ -397,14 +397,27 @@ $btn-gen-6: #A38B6D;
   background: $bg-color;
   border: none;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  max-width: 36px;
+  max-height: 36px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
   cursor: pointer;
   box-shadow: 2px 2px 4px $shadow-dark, -2px -2px 4px $shadow-light;
   transition: all 0.2s ease;
+
+  i {
+    font-size: 18px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
 
   &:hover {
     box-shadow: inset 2px 2px 4px $shadow-dark, inset -2px -2px 4px $shadow-light;

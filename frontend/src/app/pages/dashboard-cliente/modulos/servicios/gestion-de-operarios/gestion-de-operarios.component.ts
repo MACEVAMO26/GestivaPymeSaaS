@@ -1,4 +1,4 @@
-﻿import { SolicitudInactivacionComponent } from '../../../../../shared/components/solicitud-inactivacion/solicitud-inactivacion.component';
+import { SolicitudInactivacionComponent } from '../../../../../shared/components/solicitud-inactivacion/solicitud-inactivacion.component';
 import { Component, OnInit, inject, ChangeDetectorRef, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -23,6 +23,17 @@ export class GestionDeOperariosComponent implements OnInit {
   tickets: ServicioTicket[] = [];
   cargando = false;
   guardando = false;
+
+  pageSize = 8;
+  pageTickets = 1;
+
+  get paginatedTickets(): ServicioTicket[] {
+    const start = (this.pageTickets - 1) * this.pageSize;
+    return this.tickets.slice(start, start + this.pageSize);
+  }
+  get totalPagesTickets(): number {
+    return Math.ceil(this.tickets.length / this.pageSize) || 1;
+  }
 
   nuevoTicket: ServicioTicket = {
     cliente_nombre: '',

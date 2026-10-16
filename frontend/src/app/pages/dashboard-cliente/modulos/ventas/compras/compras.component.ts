@@ -52,6 +52,28 @@ export class ComprasComponent implements OnInit {
   precioActualCompra: number = 0;
   carritoCompras: any[] = [];
 
+  // Paginación (8 entradas por página)
+  pageSize: number = 8;
+  pageOrdenes: number = 1;
+  pageRecepcion: number = 1;
+  Math = Math;
+
+  get paginatedOrdenes(): any[] {
+    const start = (this.pageOrdenes - 1) * this.pageSize;
+    return this.ordenesFiltradas.slice(start, start + this.pageSize);
+  }
+  get totalPagesOrdenes(): number {
+    return Math.ceil(this.ordenesFiltradas.length / this.pageSize) || 1;
+  }
+
+  get paginatedRecepciones(): any[] {
+    const start = (this.pageRecepcion - 1) * this.pageSize;
+    return this.recepciones.slice(start, start + this.pageSize);
+  }
+  get totalPagesRecepciones(): number {
+    return Math.ceil(this.recepciones.length / this.pageSize) || 1;
+  }
+
   ngOnInit() {
     this.cargarDatos();
   }
@@ -119,6 +141,7 @@ export class ComprasComponent implements OnInit {
   filtrarOrdenes() {
     if (!this.searchTerm) {
       this.ordenesFiltradas = [...this.ordenes];
+      this.pageOrdenes = 1;
       return;
     }
     const term = this.searchTerm.toLowerCase();
@@ -126,6 +149,7 @@ export class ComprasComponent implements OnInit {
       this.numeroOrden(o).toLowerCase().includes(term) ||
       this.nombreProveedor(o).toLowerCase().includes(term)
     );
+    this.pageOrdenes = 1;
   }
 
   // --- LOGICA MODAL ORDEN ---

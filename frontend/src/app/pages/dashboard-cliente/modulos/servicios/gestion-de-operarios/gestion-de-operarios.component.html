@@ -1,4 +1,4 @@
-﻿<div [ngClass]="isEmbedded ? '' : 'module-container fade-in'">
+<div [ngClass]="isEmbedded ? '' : 'module-container fade-in'">
   @if(!isEmbedded) {
   <div class="module-header text-center mb-4 relative">
     <h1>Gestión de Operativos y Tickets</h1>
@@ -82,7 +82,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let t of tickets">
+                <tr *ngFor="let t of paginatedTickets">
                   <td>{{ t.consecutivo }}</td>
                   <td><strong>{{ t.cliente_nombre }}</strong></td>
                   <td>{{ t.servicio_requerido }}</td>
@@ -101,6 +101,21 @@
                 </tr>
               </tbody>
             </table>
+
+            @if (tickets.length > pageSize) {
+              <div class="neu-pagination-bar">
+                <span class="pagination-info">Página {{ pageTickets }} de {{ totalPagesTickets }} ({{ tickets.length }} tickets)</span>
+                <div class="pagination-controls">
+                  <button class="pagination-btn" [disabled]="pageTickets === 1" (click)="pageTickets = pageTickets - 1">
+                    <i class="fas fa-chevron-left"></i> Anterior
+                  </button>
+                  <span class="pagination-badge">{{ pageTickets }}</span>
+                  <button class="pagination-btn" [disabled]="pageTickets >= totalPagesTickets" (click)="pageTickets = pageTickets + 1">
+                    Siguiente <i class="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+            }
           </div>
         }
       </div>

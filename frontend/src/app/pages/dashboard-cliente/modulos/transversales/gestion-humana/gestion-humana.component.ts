@@ -32,6 +32,95 @@ export class GestionHumanaComponent implements OnInit {
   empleadosInactivos: any[] = [];
   empleadosAusentes: any[] = [];
 
+  pageSize: number = 8;
+  pagePendientes: number = 1;
+  pageActivos: number = 1;
+  pageInactivos: number = 1;
+  pageAusentes: number = 1;
+  pageContratos: number = 1;
+
+  searchTerm: string = '';
+
+  onSearchTermChange() {
+    this.pageActivos = 1;
+    this.pageInactivos = 1;
+    this.pageAusentes = 1;
+    this.pagePendientes = 1;
+  }
+
+  limpiarBusqueda() {
+    this.searchTerm = '';
+    this.onSearchTermChange();
+  }
+
+  private matchEmpleado(e: any, term: string): boolean {
+    const nombre = `${e.usuario?.nombres || e.usuario?.primer_nombre || ''} ${e.usuario?.apellidos || e.usuario?.primer_apellido || ''} ${e.nombre_completo || ''}`.toLowerCase();
+    const doc = (e.usuario?.documento || e.documento || '').toLowerCase();
+    const email = (e.usuario?.email || e.email || '').toLowerCase();
+    const cargo = (e.cargo?.nombre || e.puesto || '').toLowerCase();
+    const area = (e.area?.nombre || e.cargo?.area?.nombre || '').toLowerCase();
+    const codigo = (e.codigo_empleado || '').toLowerCase();
+    return nombre.includes(term) || doc.includes(term) || email.includes(term) || cargo.includes(term) || area.includes(term) || codigo.includes(term);
+  }
+
+  get empleadosActivosFiltrados(): any[] {
+    if (!this.searchTerm.trim()) return this.empleadosActivos;
+    const term = this.searchTerm.trim().toLowerCase();
+    return this.empleadosActivos.filter(e => this.matchEmpleado(e, term));
+  }
+
+  get empleadosInactivosFiltrados(): any[] {
+    if (!this.searchTerm.trim()) return this.empleadosInactivos;
+    const term = this.searchTerm.trim().toLowerCase();
+    return this.empleadosInactivos.filter(e => this.matchEmpleado(e, term));
+  }
+
+  get empleadosAusentesFiltrados(): any[] {
+    if (!this.searchTerm.trim()) return this.empleadosAusentes;
+    const term = this.searchTerm.trim().toLowerCase();
+    return this.empleadosAusentes.filter(e => this.matchEmpleado(e, term));
+  }
+
+  get paginatedPendientes(): any[] {
+    const start = (this.pagePendientes - 1) * this.pageSize;
+    return this.vacacionesPendientes.slice(start, start + this.pageSize);
+  }
+  get totalPagesPendientes(): number {
+    return Math.ceil(this.vacacionesPendientes.length / this.pageSize) || 1;
+  }
+
+  get paginatedActivos(): any[] {
+    const start = (this.pageActivos - 1) * this.pageSize;
+    return this.empleadosActivosFiltrados.slice(start, start + this.pageSize);
+  }
+  get totalPagesActivos(): number {
+    return Math.ceil(this.empleadosActivosFiltrados.length / this.pageSize) || 1;
+  }
+
+  get paginatedInactivos(): any[] {
+    const start = (this.pageInactivos - 1) * this.pageSize;
+    return this.empleadosInactivosFiltrados.slice(start, start + this.pageSize);
+  }
+  get totalPagesInactivos(): number {
+    return Math.ceil(this.empleadosInactivosFiltrados.length / this.pageSize) || 1;
+  }
+
+  get paginatedAusentes(): any[] {
+    const start = (this.pageAusentes - 1) * this.pageSize;
+    return this.empleadosAusentesFiltrados.slice(start, start + this.pageSize);
+  }
+  get totalPagesAusentes(): number {
+    return Math.ceil(this.empleadosAusentesFiltrados.length / this.pageSize) || 1;
+  }
+
+  get paginatedContratos(): any[] {
+    const start = (this.pageContratos - 1) * this.pageSize;
+    return this.todosEmpleados.slice(start, start + this.pageSize);
+  }
+  get totalPagesContratos(): number {
+    return Math.ceil(this.todosEmpleados.length / this.pageSize) || 1;
+  }
+
   // UI States
   isSubmitting: boolean = false;
   isUploading: boolean = false;
@@ -82,6 +171,10 @@ export class GestionHumanaComponent implements OnInit {
   }
 
   cargarEmpleados() {
+    this.pageActivos = 1;
+    this.pageInactivos = 1;
+    this.pageAusentes = 1;
+    this.pageContratos = 1;
     this.empleadoService.getEmpleados().pipe(timeout(15000)).subscribe({
       next: (res) => {
         this.empleadosActivos = res.filter((e: any) => e.estado === 'activo');
@@ -102,6 +195,7 @@ export class GestionHumanaComponent implements OnInit {
   }
 
   cargarVacaciones() {
+    this.pagePendientes = 1;
     this.vacacionService.getVacaciones().pipe(timeout(15000)).subscribe({
       next: (res) => {
         this.vacacionesPendientes = res.filter(v => v.estado === 'pendiente');

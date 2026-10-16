@@ -51,6 +51,46 @@ export class InventarioComponent implements OnInit {
   formCategoria: any = { nombre: '', descripcion: '', tipo: 'ventas' };
   guardandoCategoria = false;
 
+  // --- SISTEMA DE PAGINACIÓN (8 POR PÁGINA) ---
+  pageSize: number = 8;
+  pageCatalogo: number = 1;
+  pageMovimientos: number = 1;
+  pageCategorias: number = 1;
+  pageKardex: number = 1;
+  Math = Math;
+
+  get paginatedProductos(): any[] {
+    const start = (this.pageCatalogo - 1) * this.pageSize;
+    return this.productosFiltrados.slice(start, start + this.pageSize);
+  }
+  get totalPagesCatalogo(): number {
+    return Math.ceil(this.productosFiltrados.length / this.pageSize) || 1;
+  }
+
+  get paginatedMovimientos(): any[] {
+    const start = (this.pageMovimientos - 1) * this.pageSize;
+    return this.movimientos.slice(start, start + this.pageSize);
+  }
+  get totalPagesMovimientos(): number {
+    return Math.ceil(this.movimientos.length / this.pageSize) || 1;
+  }
+
+  get paginatedCategorias(): any[] {
+    const start = (this.pageCategorias - 1) * this.pageSize;
+    return this.categorias.slice(start, start + this.pageSize);
+  }
+  get totalPagesCategorias(): number {
+    return Math.ceil(this.categorias.length / this.pageSize) || 1;
+  }
+
+  get paginatedKardex(): any[] {
+    const start = (this.pageKardex - 1) * this.pageSize;
+    return this.kardexFilas.slice(start, start + this.pageSize);
+  }
+  get totalPagesKardex(): number {
+    return Math.ceil(this.kardexFilas.length / this.pageSize) || 1;
+  }
+
   ngOnInit() {
     this.cargarDatos();
   }
@@ -186,6 +226,7 @@ export class InventarioComponent implements OnInit {
   filtrarProductos() {
     if (!this.searchTerm) {
       this.productosFiltrados = [...this.productosOriginales];
+      this.pageCatalogo = 1;
       return;
     }
     const term = this.searchTerm.toLowerCase();
@@ -193,6 +234,7 @@ export class InventarioComponent implements OnInit {
       (p.nombre || '').toLowerCase().includes(term) ||
       (p.descripcion || '').toLowerCase().includes(term)
     );
+    this.pageCatalogo = 1;
   }
 
   // Helpers de vista: resolver categoría y stock del producto real

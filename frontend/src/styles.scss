@@ -38,3 +38,249 @@
   background-color: #a57025 !important; 
   box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5) !important;
 }
+
+/* ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   SIMETRÍA GLOBAL EN COLUMNA "ACCIONES" (RECOMENDACIÓN SENA - INSTRUCTOR DIEGO MARÍN CANO)
+   Garantiza que todos los botones e íconos de la columna "Acciones" tengan exactamente el mismo tamaño (36px x 36px con íconos de 18px-20px)
+   en todos los módulos de SaaS Admin y Dashboard Cliente, eliminando botones de texto.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+.acciones-fila,
+.acciones-tabla-centro,
+.acciones-iconos,
+.acciones-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-icon,
+.btn-icon-action,
+.btn-action-circle,
+.btn-action-icon {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  max-width: 36px;
+  max-height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  background: #f5f5dc;
+  box-shadow: 2px 2px 5px #d1d1bc, -2px -2px 5px #ffffff;
+
+  i {
+    font-size: 18px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
+  }
+
+  &:hover {
+    box-shadow: inset 2px 2px 4px #d1d1bc, inset -2px -2px 4px #ffffff;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0) scale(0.95);
+  }
+}
+
+/* ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   SIMETRÍA DE BOTONES GENERALES Y PESTAÑAS (RECOMENDACIÓN SENA)
+   Todos los módulos manejan el mismo tamaño, tipo de letra (Montserrat 13px) y efectos.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+.btn-neumorphic,
+.tab-neu-active,
+.tab-neu-inactive {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  min-height: 40px;
+  transition: all 0.25s ease;
+}
+
+.btn-neumorphic:hover {
+  transform: translateY(-1px);
+}
+
+/* ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   SISTEMA DE PAGINACIÓN UNIFICADO DASHBOARD CLIENTE (8 ENTRADAS POR PÁGINA)
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+.neu-pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding: 0.85rem 1.25rem;
+  background: #f5f5dc;
+  border-radius: 16px;
+  box-shadow: inset 2px 2px 5px #d1d1bc, inset -2px -2px 5px #ffffff;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  color: #555545;
+
+  .pagination-info {
+    font-weight: 500;
+    strong {
+      color: #1a1a15;
+      font-weight: 700;
+    }
+  }
+
+  .pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .pagination-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.9rem;
+    background: #f5f5dc;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 3px 3px 6px #d1d1bc, -3px -3px 6px #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #333325;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background: #ededce;
+      transform: translateY(-1px);
+      box-shadow: 2px 2px 4px #d1d1bc, -2px -2px 4px #ffffff;
+    }
+
+    &:active:not(:disabled) {
+      box-shadow: inset 2px 2px 4px #d1d1bc, inset -2px -2px 4px #ffffff;
+      transform: translateY(0);
+    }
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      box-shadow: none;
+      background: #e8e8d0;
+    }
+  }
+
+  .pagination-badge {
+    padding: 0.35rem 0.75rem;
+    background: #e2e2be;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #2b2b1e;
+    box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   BARRA DE DESPLAZAMIENTO ESTILIZADA (SCROLLBAR) - SAAS ADMIN & APLICATIVO
+   Reemplaza la barra nativa clara de Windows (con flechas) por una barra moderna y estilizada integrada con la paleta de colores.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+/* SaaS Admin: Paleta Slate/Dark (#0f172a / #334155 / #10b981) */
+.saas-layout,
+.saas-layout *,
+.saas-admin-container,
+.saas-admin-container * {
+  scrollbar-width: thin;
+  scrollbar-color: #334155 #0f172a;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #0f172a;
+    border-radius: 9999px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 9999px;
+    border: 2px solid #0f172a;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background: #10b981;
+    }
+
+    &:active {
+      background: #059669;
+    }
+  }
+
+  &::-webkit-scrollbar-corner {
+    background: #0f172a;
+  }
+
+  &::-webkit-scrollbar-button {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+}
+
+/* Dashboard Cliente: Paleta Neumórfica Beige/Teal (#d1d1bc / #f5f5dc / #45a1ae) */
+.neumorphic-panel,
+.tab-content,
+.table-container,
+.table-responsive {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d1bc #f5f5dc;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f5f5dc;
+    border-radius: 9999px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #d1d1bc;
+    border-radius: 9999px;
+    border: 2px solid #f5f5dc;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background: #45a1ae;
+    }
+  }
+
+  &::-webkit-scrollbar-corner {
+    background: #f5f5dc;
+  }
+
+  &::-webkit-scrollbar-button {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+}

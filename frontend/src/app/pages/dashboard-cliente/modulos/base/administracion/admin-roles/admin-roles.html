@@ -1,181 +1,198 @@
 <!-- HTML GESTIÓN DE ROLES -->
 <div class="fade-in">
-  <!-- Botón Volver Inyectado -->
-  <div class="volver-wrapper">
-    <button class="btn-volver btn-pill" onclick="window.history.back()">
-      <i class="fas fa-arrow-left"></i> VOLVER
-    </button>
-  </div>
-
-  <div class="module-header text-center mb-4 relative">
-    <h1>ROLES Y ACCESOS</h1>
-    <p>Define los permisos de acceso al sistema para los roles globales.</p>
-  </div>
-
-  <div class="panel-body">
-    @if (isLoading) {
-    <div class="loading-overlay neumorphic-panel">
-      <div class="spinner"></div>
-      <p>Cargando roles...</p>
+  <div [hidden]="isModalOpen || isPermisosOpen" class="main-view-wrapper">
+    <!-- Botón Volver Inyectado -->
+    <div class="volver-wrapper">
+      <button class="btn-volver btn-pill" onclick="window.history.back()">
+        <i class="fas fa-arrow-left"></i> VOLVER
+      </button>
     </div>
-    } @else {
-    <div class="neu-table-container">
-      <table class="neu-table">
-        <thead>
-          <tr>
-            <th>Nombre del Rol</th>
-            <th>Descripción</th>
-            <th>Tipo</th>
-            <th>Estado</th>
-            <th>Acciones Permitidas</th>
-          </tr>
-        </thead>
-        <tbody>
-          @if (roles.length === 0) {
-          <tr>
-            <td colspan="5" class="empty-state">No hay roles registrados.</td>
-          </tr>
-          } @for (rol of roles; track rol.id) {
-          <tr>
-            <td>
-              <div class="user-info">
-                <span class="user-name">{{ rol.nombre }}</span>
-              </div>
-            </td>
-            <td>{{ rol.descripcion || 'Sin descripción' }}</td>
-            <td>
-              @if (rol.es_base) {
-              <span class="role-badge">Sistema</span>
-              } @else {
-              <span class="role-badge role-badge-personalizado"
-                >Personalizado</span
-              >
-              }
-            </td>
-            <td>
-              @if (rol.activo) {
-              <span class="badge badge-active">Activo</span>
-              } @else {
-              <span class="badge badge-inactive">Inactivo</span>
-              }
-            </td>
-            <td>
-              <div class="acciones-tabla">
-                <!-- Mostrar botón de permisos si es Gerente o Auditor, sino el de expandir áreas -->
-                @if (rol.nombre.toLowerCase() === 'gerente general' ||
-                rol.nombre.toLowerCase() === 'auditor') {
-                <button
-                  class="btn-icon"
-                  title="Permisos bloqueados por el sistema"
-                  disabled
-                >
-                  🔒
-                </button>
+
+    <div class="module-header text-center mb-4 relative">
+      <h1>ROLES Y ACCESOS</h1>
+      <p>Define los permisos de acceso al sistema para los roles globales.</p>
+    </div>
+
+    <div class="panel-body">
+      @if (isLoading) {
+      <div class="loading-overlay neumorphic-panel">
+        <div class="spinner"></div>
+        <p>Cargando roles...</p>
+      </div>
+      } @else {
+      <div class="neu-table-container">
+        <table class="neu-table">
+          <thead>
+            <tr>
+              <th>Nombre del Rol</th>
+              <th>Descripción</th>
+              <th>Tipo</th>
+              <th>Estado</th>
+              <th>Acciones Permitidas</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (roles.length === 0) {
+            <tr>
+              <td colspan="5" class="empty-state">No hay roles registrados.</td>
+            </tr>
+            } @for (rol of paginatedRoles; track rol.id) {
+            <tr>
+              <td>
+                <div class="user-info">
+                  <span class="user-name">{{ rol.nombre }}</span>
+                </div>
+              </td>
+              <td>{{ rol.descripcion || 'Sin descripción' }}</td>
+              <td>
+                @if (rol.es_base) {
+                <span class="role-badge">Sistema</span>
                 } @else {
-                <button
-                  class="btn-icon"
-                  (click)="abrirPermisos(rol)"
-                  title="Editar Permisos"
+                <span class="role-badge role-badge-personalizado"
+                  >Personalizado</span
                 >
-                  ⚙️
-                </button>
                 }
-                <button
-                  class="btn-icon"
-                  (click)="cambiarEstado(rol)"
-                  title="Activar/Desactivar"
-                  [disabled]="rol.es_base"
-                >
-                  @if (rol.es_base) { 🔒 } @else { @if (rol.activo) { 🚫 } @else
-                  { ✅ } }
-                </button>
-              </div>
-            </td>
-          </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-    }
-  </div>
-</div>
-
-@if (isModalOpen) {
-<div class="inline-form-container mt-4">
-  <div class="modal-card neumorphic-panel">
-    <div class="panel-header mb-4">
-      <h1>Crear Nuevo Rol</h1>
-      <button class="btn-close" (click)="cerrarModal()" [disabled]="isSaving">
-        ×
-      </button>
-    </div>
-    <div class="panel-body">
-      <form>
-        <div class="form-grid">
-          <div class="form-group full-width">
-            <label>Nombre del Rol <span class="text-danger">*</span></label>
-            <input
-              type="text"
-              class="input-neumorphic"
-              name="nombre"
-              [(ngModel)]="nuevoRol.nombre"
-              required
-            />
-          </div>
-
-          <div class="form-group full-width">
-            <label>Descripción</label>
-            <textarea
-              class="input-neumorphic"
-              name="descripcion"
-              [(ngModel)]="nuevoRol.descripcion"
-              rows="3"
-            ></textarea>
-          </div>
-
-          <div class="form-group full-width info-box neumorphic-panel">
-            <p>
-              <strong>Nota:</strong> Los roles personalizados te permiten
-              definir permisos específicos más adelante. Los roles base del
-              sistema no pueden ser desactivados ni modificados.
-            </p>
-          </div>
-        </div>
-        <div class="form-actions">
-          <button
-            type="button"
-            class="btn-save btn-pill"
-            (click)="guardarRol()"
-            [disabled]="isSaving"
-          >
-            @if (isSaving) {
-            <span class="spinner-small"></span> Guardando... } @else { Crear Rol
+              </td>
+              <td>
+                @if (rol.activo) {
+                <span class="badge badge-active">Activo</span>
+                } @else {
+                <span class="badge badge-inactive">Inactivo</span>
+                }
+              </td>
+              <td>
+                <div class="acciones-tabla">
+                  <!-- Mostrar botón de permisos si es Gerente o Auditor, sino el de expandir áreas -->
+                  @if (rol.nombre.toLowerCase() === 'gerente general' ||
+                  rol.nombre.toLowerCase() === 'auditor') {
+                  <button
+                    class="btn-icon"
+                    title="Permisos bloqueados por el sistema"
+                    disabled
+                  >
+                    🔒
+                  </button>
+                  } @else {
+                  <button
+                    class="btn-icon"
+                    (click)="abrirPermisos(rol)"
+                    title="Editar Permisos"
+                  >
+                    ⚙️
+                  </button>
+                  }
+                  <button
+                    class="btn-icon"
+                    (click)="cambiarEstado(rol)"
+                    title="Activar/Desactivar"
+                    [disabled]="rol.es_base"
+                  >
+                    @if (rol.es_base) { 🔒 } @else { @if (rol.activo) { 🚫 } @else
+                    { ✅ } }
+                  </button>
+                </div>
+              </td>
+            </tr>
             }
-          </button>
-        </div>
-      </form>
+          </tbody>
+        </table>
+
+        @if (roles.length > pageSize) {
+          <div class="neu-pagination-bar">
+            <span class="pagination-info">Página {{ pageRoles }} de {{ totalPagesRoles }} ({{ roles.length }} roles)</span>
+            <div class="pagination-controls">
+              <button class="pagination-btn" [disabled]="pageRoles === 1" (click)="pageRoles = pageRoles - 1">
+                <i class="fas fa-chevron-left"></i> Anterior
+              </button>
+              <span class="pagination-badge">{{ pageRoles }}</span>
+              <button class="pagination-btn" [disabled]="pageRoles >= totalPagesRoles" (click)="pageRoles = pageRoles + 1">
+                Siguiente <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+      }
     </div>
   </div>
-</div>
-}
 
-<!-- MODAL EDITOR DE PERMISOS -->
-@if (isPermisosOpen) {
-<div class="inline-form-container mt-4">
-  <div class="modal-card neumorphic-panel permisos-modal">
-    <div class="panel-header mb-4">
-      <h1>
-        Permisos del rol: {{ rolPermisos?.nombre }}
-      </h1>
-      <button
-        class="btn-close"
-        (click)="cerrarPermisos()"
-        [disabled]="isPermisosSaving"
-      >
-        ×
-      </button>
+  @if (isModalOpen) {
+  <div class="view-switch-panel fade-in">
+    <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+      <div class="panel-header mb-4" style="display: flex; justify-content: space-between; align-items: center;">
+        <h1>Crear Nuevo Rol</h1>
+        <button class="btn-volver btn-pill" (click)="cerrarModal()" [disabled]="isSaving">
+          <i class="fas fa-arrow-left"></i> Volver
+        </button>
+      </div>
+      <div class="panel-body">
+        <form>
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label>Nombre del Rol <span class="text-danger">*</span></label>
+              <input
+                type="text"
+                class="input-neumorphic"
+                name="nombre"
+                [(ngModel)]="nuevoRol.nombre"
+                required
+              />
+            </div>
+
+            <div class="form-group full-width">
+              <label>Descripción</label>
+              <textarea
+                class="input-neumorphic"
+                name="descripcion"
+                [(ngModel)]="nuevoRol.descripcion"
+                rows="3"
+              ></textarea>
+            </div>
+
+            <div class="form-group full-width info-box neumorphic-panel">
+              <p>
+                <strong>Nota:</strong> Los roles personalizados te permiten
+                definir permisos específicos más adelante. Los roles base del
+                sistema no pueden ser desactivados ni modificados.
+              </p>
+            </div>
+          </div>
+          <div class="form-actions" style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: flex-end;">
+            <button type="button" class="btn-volver btn-pill" (click)="cerrarModal()" [disabled]="isSaving">Cancelar</button>
+            <button
+              type="button"
+              class="btn-save btn-pill"
+              (click)="guardarRol()"
+              [disabled]="isSaving"
+            >
+              @if (isSaving) {
+              <span class="spinner-small"></span> Guardando... } @else { Crear Rol
+              }
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-    <div class="panel-body">
+  </div>
+  }
+
+  <!-- MODAL EDITOR DE PERMISOS -->
+  @if (isPermisosOpen) {
+  <div class="view-switch-panel fade-in">
+    <div class="neu-card" style="max-width: 900px; margin: 0 auto;">
+      <div class="panel-header mb-4" style="display: flex; justify-content: space-between; align-items: center;">
+        <h1>
+          Permisos del rol: {{ rolPermisos?.nombre }}
+        </h1>
+        <button
+          class="btn-volver btn-pill"
+          (click)="cerrarPermisos()"
+          [disabled]="isPermisosSaving"
+        >
+          <i class="fas fa-arrow-left"></i> Volver
+        </button>
+      </div>
+      <div class="panel-body">
       <p class="descripcion-general">
         Marque qué acciones puede realizar este rol sobre cada módulo.
       </p>

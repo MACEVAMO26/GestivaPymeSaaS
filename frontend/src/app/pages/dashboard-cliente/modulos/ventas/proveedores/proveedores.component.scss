@@ -334,14 +334,27 @@ $btn-gen-6: #A38B6D;
   background: $bg-color;
   border: none;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  max-width: 36px;
+  max-height: 36px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
   cursor: pointer;
   box-shadow: 2px 2px 4px $shadow-dark, -2px -2px 4px $shadow-light;
   transition: all 0.2s ease;
+
+  i {
+    font-size: 18px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
 
   &:hover {
     box-shadow: inset 2px 2px 4px $shadow-dark, inset -2px -2px 4px $shadow-light;
@@ -507,17 +520,25 @@ $btn-gen-6: #A38B6D;
 
 /* BOTONES CIRCULARES DE ACCIÓN (PEQUEÑOS Y REDONDOS) */
 .btn-action-circle {
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  max-width: 36px;
+  max-height: 36px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   border: none;
-  font-size: 11px;
   transition: all 0.2s ease;
   box-shadow: 2px 2px 5px $shadow-dark, -2px -2px 5px $shadow-light;
+
+  i {
+    font-size: 18px;
+    line-height: 1;
+  }
 
   &:hover {
     transform: translateY(-1px) scale(1.08);

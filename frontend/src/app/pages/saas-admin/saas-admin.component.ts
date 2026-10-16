@@ -100,6 +100,7 @@ export class SaasAdminComponent implements OnInit {
     plan_suscripcion: 'Emprendedor',
     tipo_empresa: 'Ventas',
     tipo_identificacion: 'NIT',
+    fecha_inscripcion: new Date().toLocaleDateString('en-CA'),
     color_primario: '#6366f1',
     color_secundario: '#1e293b',
     color_fondo: '#4c808a',
@@ -143,6 +144,90 @@ export class SaasAdminComponent implements OnInit {
 
   filtroEmpresaSolicitud: string = '';
   filtroFechaSolicitud: string = '';
+
+  // --- SISTEMA DE PAGINACIÓN UNIFICADO (8 ENTRADAS POR PÁGINA) ---
+  pageSize: number = 8;
+  pageEmpresas: number = 1;
+  pageSuscripciones: number = 1;
+  pageLeads: number = 1;
+  pageTickets: number = 1;
+  pageSolicitudes: number = 1;
+  Math = Math;
+
+  busquedaEmpresas: string = '';
+
+  get empresasFiltradas(): any[] {
+    if (!this.busquedaEmpresas || !this.busquedaEmpresas.trim()) {
+      return this.empresas;
+    }
+    const term = this.busquedaEmpresas.trim().toLowerCase();
+    return this.empresas.filter(e => {
+      const razonSocial = (e.razon_social || '').toLowerCase();
+      const nit = (e.nit || '').toLowerCase();
+      const dominio = (e.dominio || '').toLowerCase();
+      const email = (e.email || '').toLowerCase();
+      const plan = (e.plan_suscripcion || '').toLowerCase();
+      const tipoEmpresa = (e.tipo_empresa || '').toLowerCase();
+      const estadoPago = (e.estado_pago || '').toLowerCase();
+      return razonSocial.includes(term) ||
+             nit.includes(term) ||
+             dominio.includes(term) ||
+             email.includes(term) ||
+             plan.includes(term) ||
+             tipoEmpresa.includes(term) ||
+             estadoPago.includes(term);
+    });
+  }
+
+  onBusquedaEmpresasChange() {
+    this.pageEmpresas = 1;
+  }
+
+  limpiarBusquedaEmpresas() {
+    this.busquedaEmpresas = '';
+    this.pageEmpresas = 1;
+  }
+
+  get paginatedEmpresas(): any[] {
+    const filtradas = this.empresasFiltradas;
+    const start = (this.pageEmpresas - 1) * this.pageSize;
+    return filtradas.slice(start, start + this.pageSize);
+  }
+  get totalPagesEmpresas(): number {
+    return Math.ceil(this.empresasFiltradas.length / this.pageSize) || 1;
+  }
+
+  get paginatedSuscripciones(): any[] {
+    const start = (this.pageSuscripciones - 1) * this.pageSize;
+    return this.suscripcionesList.slice(start, start + this.pageSize);
+  }
+  get totalPagesSuscripciones(): number {
+    return Math.ceil(this.suscripcionesList.length / this.pageSize) || 1;
+  }
+
+  get paginatedLeads(): any[] {
+    const start = (this.pageLeads - 1) * this.pageSize;
+    return this.leads.slice(start, start + this.pageSize);
+  }
+  get totalPagesLeads(): number {
+    return Math.ceil(this.leads.length / this.pageSize) || 1;
+  }
+
+  get paginatedTickets(): any[] {
+    const start = (this.pageTickets - 1) * this.pageSize;
+    return this.ticketsSoporte.slice(start, start + this.pageSize);
+  }
+  get totalPagesTickets(): number {
+    return Math.ceil(this.ticketsSoporte.length / this.pageSize) || 1;
+  }
+
+  get paginatedSolicitudes(): any[] {
+    const start = (this.pageSolicitudes - 1) * this.pageSize;
+    return this.solicitudesFiltradas.slice(start, start + this.pageSize);
+  }
+  get totalPagesSolicitudes(): number {
+    return Math.ceil(this.solicitudesFiltradas.length / this.pageSize) || 1;
+  }
 
   get solicitudesFiltradas() {
     return this.solicitudes.filter(s => {
@@ -1291,6 +1376,14 @@ export class SaasAdminComponent implements OnInit {
     });
   }
 
+  getFechaActualSistema(): string {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   abrirModalCrearEmpresa() {
     this.isEditMode = false;
     this.editingId = null;
@@ -1300,7 +1393,7 @@ export class SaasAdminComponent implements OnInit {
       dominio: '',
       nit: '', 
       plan_suscripcion: 'Emprendedor', 
-      fecha_inscripcion: '', 
+      fecha_inscripcion: this.getFechaActualSistema(), 
       periodo: 'Mensual', 
       descuento: 'N/A',
       nombre_gerente: '',
@@ -1366,7 +1459,7 @@ export class SaasAdminComponent implements OnInit {
       plan_suscripcion: 'Emprendedor', 
       tipo_empresa: 'Ventas',
       tipo_identificacion: 'NIT',
-      fecha_inscripcion: '', 
+      fecha_inscripcion: this.getFechaActualSistema(), 
       periodo: 'Mensual', 
       descuento: 'N/A',
       color_primario: '#6366f1',
@@ -1641,7 +1734,7 @@ export class SaasAdminComponent implements OnInit {
     this.isEditMode = false;
     this.editingId = null;
     this.listaDescuentosEmpresa = [];
-    this.nuevaEmpresa = { razon_social: '', dominio: '', nit: '', email: '', plan_suscripcion: 'Emprendedor', fecha_inscripcion: '', periodo: 'Mensual', descuento: 'N/A', nombre_gerente: '', apellido_gerente: '', documento_gerente: '' };
+    this.nuevaEmpresa = { razon_social: '', dominio: '', nit: '', email: '', plan_suscripcion: 'Emprendedor', fecha_inscripcion: this.getFechaActualSistema(), periodo: 'Mensual', descuento: 'N/A', nombre_gerente: '', apellido_gerente: '', documento_gerente: '' };
   }
 
 
@@ -1657,7 +1750,11 @@ export class SaasAdminComponent implements OnInit {
       : 'N/A';
 
     let payload = { ...this.nuevaEmpresa };
-    if (payload.fecha_inscripcion === '') payload.fecha_inscripcion = null;
+    if (!this.isEditMode) {
+      payload.fecha_inscripcion = this.getFechaActualSistema();
+    } else if (payload.fecha_inscripcion === '') {
+      payload.fecha_inscripcion = null;
+    }
     
     if (this.isEditMode && this.editingId) {
       this.empresaService.updateEmpresa(this.editingId, payload).subscribe({

@@ -58,6 +58,51 @@ export class CajaComponent implements OnInit {
   modalAuditoria = false;
   movimientoAuditoria: any = null;
 
+  pageSize = 8;
+  pageMovimientos = 1;
+  pageAuditoria = 1;
+
+  searchTermMovimientos: string = '';
+
+  onSearchTermMovimientosChange() {
+    this.pageMovimientos = 1;
+  }
+
+  limpiarBusquedaMovimientos() {
+    this.searchTermMovimientos = '';
+    this.pageMovimientos = 1;
+  }
+
+  get movimientosFiltrados(): any[] {
+    if (!this.searchTermMovimientos.trim()) return this.movimientos;
+    const term = this.searchTermMovimientos.trim().toLowerCase();
+    return this.movimientos.filter(m => {
+      const concepto = (m.concepto || '').toLowerCase();
+      const tipo = (m.tipo || '').toLowerCase();
+      const medio = (m.medio_pago || '').toLowerCase();
+      const monto = String(m.monto || '');
+      return concepto.includes(term) || tipo.includes(term) || medio.includes(term) || monto.includes(term);
+    });
+  }
+
+  get paginatedMovimientos(): any[] {
+    const start = (this.pageMovimientos - 1) * this.pageSize;
+    return this.movimientosFiltrados.slice(start, start + this.pageSize);
+  }
+
+  get totalPagesMovimientos(): number {
+    return Math.ceil(this.movimientosFiltrados.length / this.pageSize) || 1;
+  }
+
+  get paginatedAuditoria(): any[] {
+    const start = (this.pageAuditoria - 1) * this.pageSize;
+    return this.movimientosPendientes.slice(start, start + this.pageSize);
+  }
+
+  get totalPagesAuditoria(): number {
+    return Math.ceil(this.movimientosPendientes.length / this.pageSize) || 1;
+  }
+
   // Datos mock de auditoría pendiente
   movimientosPendientes: any[] = [
     {
@@ -171,6 +216,7 @@ export class CajaComponent implements OnInit {
   }
 
   cargarMovimientos(cajaId: number) {
+    this.pageMovimientos = 1;
     this.cajaService.getMovimientos(cajaId).pipe(timeout(15000)).subscribe({
       next: (res) => {
         this.movimientos = res;

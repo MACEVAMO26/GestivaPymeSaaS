@@ -41,7 +41,7 @@
               No hay registros de auditoría recientes.
             </td>
           </tr>
-          } @for (log of logs; track log.id) {
+          } @for (log of paginatedLogs; track log.id) {
           <tr>
             <td style="white-space: nowrap">
               {{ (log.fecha_hora || log.created_at) | date:'short' }}
@@ -69,6 +69,21 @@
         </tbody>
       </table>
     </div>
+
+    @if (logs.length > pageSize) {
+      <div class="neu-pagination-bar">
+        <span class="pagination-info">Página {{ page }} de {{ totalPages }} ({{ logs.length }} registros)</span>
+        <div class="pagination-controls">
+          <button class="pagination-btn" [disabled]="page === 1" (click)="page = page - 1">
+            <i class="fas fa-chevron-left"></i> Anterior
+          </button>
+          <span class="pagination-badge">{{ page }}</span>
+          <button class="pagination-btn" [disabled]="page >= totalPages" (click)="page = page + 1">
+            Siguiente <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    }
     }
   </div>
 </div>

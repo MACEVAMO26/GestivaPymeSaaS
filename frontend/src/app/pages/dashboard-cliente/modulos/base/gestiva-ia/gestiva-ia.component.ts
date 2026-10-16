@@ -31,6 +31,17 @@ export class GestivaIaComponent implements OnInit {
 
   showForm = false;
   modoEdicion = false;
+
+  pageSize = 8;
+  pageDirectrices = 1;
+
+  get paginatedDirectrices(): Directriz[] {
+    const start = (this.pageDirectrices - 1) * this.pageSize;
+    return this.directrices.slice(start, start + this.pageSize);
+  }
+  get totalPagesDirectrices(): number {
+    return Math.ceil(this.directrices.length / this.pageSize) || 1;
+  }
   
   form: Partial<Directriz> = {
     mensaje: '',

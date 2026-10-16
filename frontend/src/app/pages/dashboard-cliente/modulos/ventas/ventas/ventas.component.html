@@ -178,7 +178,7 @@
               </tr>
             </thead>
             <tbody>
-              @for(venta of ventasFiltradas; track venta.id) {
+              @for(venta of paginatedVentas; track venta.id) {
                 <tr>
                   <td><strong>{{numeroFactura(venta)}}</strong></td>
                   <td>{{venta.cliente?.nombres}} {{venta.cliente?.apellidos}}</td>
@@ -212,7 +212,7 @@
               }
               @if(ventasFiltradas.length === 0) {
                 <tr>
-                  <td colspan="6" style="padding: 0;">
+                  <td colspan="7" style="padding: 0;">
                     <div class="empty-state">
                       No hay ventas registradas.
                     </div>
@@ -222,6 +222,36 @@
             </tbody>
           </table>
         </div>
+
+        <!-- Paginación de Ventas (8 por página) -->
+        @if (totalPagesVentas > 1) {
+          <div class="neu-pagination-bar">
+            <div class="pagination-info">
+              Mostrando <strong>{{ (pageVentas - 1) * pageSize + 1 }}</strong> a
+              <strong>{{ Math.min(pageVentas * pageSize, ventasFiltradas.length) }}</strong> de
+              <strong>{{ ventasFiltradas.length }}</strong> ventas
+            </div>
+            <div class="pagination-controls">
+              <button
+                type="button"
+                class="pagination-btn"
+                (click)="pageVentas = pageVentas - 1"
+                [disabled]="pageVentas === 1"
+              >
+                <i class="fas fa-chevron-left"></i> Anterior
+              </button>
+              <span class="pagination-badge">Pág. {{ pageVentas }} / {{ totalPagesVentas }}</span>
+              <button
+                type="button"
+                class="pagination-btn"
+                (click)="pageVentas = pageVentas + 1"
+                [disabled]="pageVentas >= totalPagesVentas"
+              >
+                Siguiente <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        }
       </div>
     }
   </div>

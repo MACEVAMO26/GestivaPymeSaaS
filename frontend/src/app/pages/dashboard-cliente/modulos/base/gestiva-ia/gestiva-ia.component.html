@@ -36,7 +36,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let dir of directrices">
+              <tr *ngFor="let dir of paginatedDirectrices">
                 <td>{{ dir.id }}</td>
                 <td>{{ dir.mensaje }}</td>
                 <td>{{ dir.audiencia }}</td>
@@ -60,6 +60,21 @@
             </tbody>
           </table>
         </div>
+
+        @if (directrices.length > pageSize) {
+          <div class="neu-pagination-bar">
+            <span class="pagination-info">Página {{ pageDirectrices }} de {{ totalPagesDirectrices }} ({{ directrices.length }} directrices)</span>
+            <div class="pagination-controls">
+              <button class="pagination-btn" [disabled]="pageDirectrices === 1" (click)="pageDirectrices = pageDirectrices - 1">
+                <i class="fas fa-chevron-left"></i> Anterior
+              </button>
+              <span class="pagination-badge">{{ pageDirectrices }}</span>
+              <button class="pagination-btn" [disabled]="pageDirectrices >= totalPagesDirectrices" (click)="pageDirectrices = pageDirectrices + 1">
+                Siguiente <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        }
     </div>
 
     <!-- FORMULARIO DE CREACIÓN/EDICIÓN -->
@@ -96,7 +111,8 @@
 
           </div>
 
-          <div class="form-actions">
+          <div class="form-actions" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+            <button type="button" class="btn-volver btn-pill" (click)="showForm = false">Cancelar</button>
             <button type="submit" class="btn-save btn-pill" [disabled]="guardando">
               <span *ngIf="guardando" class="spinner-small"></span> 
               {{ guardando ? 'Guardando...' : (modoEdicion ? 'Actualizar Directriz' : '+ Guardar Directriz') }}

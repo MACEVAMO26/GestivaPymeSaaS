@@ -50,7 +50,7 @@
               </tr>
             </thead>
             <tbody>
-              @for(cli of resultados; track cli.id) {
+              @for(cli of paginatedResultados; track cli.id) {
                 <tr [class.fila-seleccionada]="clienteSeleccionado?.id === cli.id" (click)="seleccionarCliente(cli)" style="cursor: pointer;">
                   <td>
                     <strong>{{nombreCliente(cli)}}</strong>
@@ -88,6 +88,21 @@
             </tbody>
           </table>
         </div>
+
+        @if (resultados.length > pageSize) {
+          <div class="neu-pagination-bar">
+            <span class="pagination-info">Página {{ pageResultados }} de {{ totalPagesResultados }} ({{ resultados.length }} clientes)</span>
+            <div class="pagination-controls">
+              <button class="pagination-btn" [disabled]="pageResultados === 1" (click)="pageResultados = pageResultados - 1">
+                <i class="fas fa-chevron-left"></i> Anterior
+              </button>
+              <span class="pagination-badge">{{ pageResultados }}</span>
+              <button class="pagination-btn" [disabled]="pageResultados >= totalPagesResultados" (click)="pageResultados = pageResultados + 1">
+                Siguiente <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        }
       }
     </div>
 

@@ -1,4 +1,5 @@
 <div class="module-container fade-in">
+  <div [hidden]="modalAuditoria && movimientoAuditoria" class="main-view-wrapper">
 
   <div class="module-header text-center mb-4 relative">
     <h1 class="titulo-principal">CAJA REGISTRADORA Y AUDITORÍA DE PAGOS</h1>
@@ -157,6 +158,31 @@
           <!-- HISTORIAL DE MOVIMIENTOS DEL DÍA -->
           <div class="neumorphic-panel mb-4">
             <h2 class="subtitulo">Movimientos Registrados Hoy</h2>
+
+            <!-- BARRA DE BÚSQUEDA DE MOVIMIENTOS -->
+            <div class="search-filter-bar mb-4" *ngIf="movimientos.length > 0" style="display: flex; gap: 1rem; align-items: center; max-width: 500px; margin: 0 0 1rem 0;">
+              <div style="position: relative; width: 100%;">
+                <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #666; font-size: 13px;"></i>
+                <input
+                  type="text"
+                  class="input-neumorphic"
+                  style="padding-left: 36px; padding-right: 36px;"
+                  placeholder="Buscar movimiento por concepto, tipo, monto o medio..."
+                  [(ngModel)]="searchTermMovimientos"
+                  (ngModelChange)="onSearchTermMovimientosChange()"
+                />
+                <button
+                  *ngIf="searchTermMovimientos"
+                  type="button"
+                  (click)="limpiarBusquedaMovimientos()"
+                  style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #888; cursor: pointer; font-size: 14px;"
+                  title="Limpiar búsqueda"
+                >
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+
             <div class="table-responsive">
               <table class="data-table premium-table">
                 <thead>
@@ -170,26 +196,56 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let m of movimientos">
-                    <td>{{ m.created_at | date:'short' }}</td>
-                    <td [ngClass]="m.tipo === 'egreso' ? 'text-egreso' : 'text-ingreso'">
-                      <strong>{{ m.tipo | uppercase }}</strong>
-                    </td>
-                    <td><span class="badge badge-primary">{{ m.medio_pago || 'Efectivo' }}</span></td>
-                    <td>{{ m.concepto }}</td>
-                    <td><strong>$ {{ m.monto | number:'1.0-0' }}</strong></td>
-                    <td>
-                      <span class="badge" [ngClass]="m.medio_pago === 'Efectivo' ? 'badge-success' : 'badge-warning'">
-                        {{ m.medio_pago === 'Efectivo' ? 'Aprobado (Efectivo)' : 'Pendiente Auditar' }}
-                      </span>
-                    </td>
-                  </tr>
-                  <tr *ngIf="movimientos.length === 0">
-                    <td colspan="6" class="text-center">No hay movimientos en esta jornada.</td>
-                  </tr>
+                  @for (m of paginatedMovimientos; track m.id) {
+                    <tr>
+                      <td>{{ m.created_at | date:'short' }}</td>
+                      <td [ngClass]="m.tipo === 'egreso' ? 'text-egreso' : 'text-ingreso'">
+                        <strong>{{ m.tipo | uppercase }}</strong>
+                      </td>
+                      <td><span class="badge badge-primary">{{ m.medio_pago || 'Efectivo' }}</span></td>
+                      <td>{{ m.concepto }}</td>
+                      <td><strong>$ {{ m.monto | number:'1.0-0' }}</strong></td>
+                      <td>
+                        <span class="badge" [ngClass]="m.medio_pago === 'Efectivo' ? 'badge-success' : 'badge-warning'">
+                          {{ m.medio_pago === 'Efectivo' ? 'Aprobado (Efectivo)' : 'Pendiente Auditar' }}
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                  @if (movimientos.length === 0) {
+                    <tr>
+                      <td colspan="6" class="text-center">No hay movimientos en esta jornada.</td>
+                    </tr>
+                  }
+                  @if (movimientos.length > 0 && movimientosFiltrados.length === 0) {
+                    <tr>
+                      <td colspan="6" class="text-center" style="padding: 2rem;">
+                        No se encontraron movimientos con "{{ searchTermMovimientos }}".
+                        <br>
+                        <button class="btn-pill mt-2" (click)="limpiarBusquedaMovimientos()" style="background: #45a1ae; color: white; padding: 4px 12px; font-size: 11px; border: none; border-radius: 9999px; cursor: pointer;">
+                          Limpiar búsqueda
+                        </button>
+                      </td>
+                    </tr>
+                  }
                 </tbody>
               </table>
             </div>
+
+            @if (totalPagesMovimientos > 1) {
+              <div class="neu-pagination-bar">
+                <span class="pagination-info">Página {{ pageMovimientos }} de {{ totalPagesMovimientos }} ({{ movimientosFiltrados.length }} movimientos)</span>
+                <div class="pagination-controls">
+                  <button class="pagination-btn" [disabled]="pageMovimientos === 1" (click)="pageMovimientos = pageMovimientos - 1">
+                    <i class="fas fa-chevron-left"></i> Anterior
+                  </button>
+                  <span class="pagination-badge">{{ pageMovimientos }}</span>
+                  <button class="pagination-btn" [disabled]="pageMovimientos >= totalPagesMovimientos" (click)="pageMovimientos = pageMovimientos + 1">
+                    Siguiente <i class="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+            }
           </div>
 
           <!-- CIERRE DE CAJA DIARIO -->
@@ -239,37 +295,56 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let m of movimientosPendientes">
-                  <td>{{ m.fecha_hora }}</td>
-                  <td><strong>{{ m.cliente }}</strong></td>
-                  <td>{{ m.concepto }}</td>
-                  <td><span class="badge badge-secondary">{{ m.medio_pago }}</span></td>
-                  <td><strong class="text-azul">$ {{ m.monto | number:'1.0-0' }}</strong></td>
-                  <td>
-                    <button class="btn-general-3 btn-pill btn-xs" (click)="verComprobante(m)">
-                      <i class="fas fa-eye"></i> Ver Soporte
-                    </button>
-                  </td>
-                  <td class="text-center">
-                    <div class="flex gap-2 justify-center">
-                      <button class="btn-save btn-pill btn-xs" (click)="aprobarTransaccion(m)">
-                        <i class="fas fa-check"></i> Aprobar
+                @for (m of paginatedAuditoria; track m.id) {
+                  <tr>
+                    <td>{{ m.fecha_hora }}</td>
+                    <td><strong>{{ m.cliente }}</strong></td>
+                    <td>{{ m.concepto }}</td>
+                    <td><span class="badge badge-secondary">{{ m.medio_pago }}</span></td>
+                    <td><strong class="text-azul">$ {{ m.monto | number:'1.0-0' }}</strong></td>
+                    <td class="text-center">
+                      <button class="btn-action-circle" (click)="verComprobante(m)" title="Ver Comprobante de Soporte">
+                        <i class="fas fa-eye text-info"></i>
                       </button>
-                      <button class="btn-volver btn-pill btn-xs" (click)="rechazarTransaccion(m)">
-                        <i class="fas fa-times"></i> Rechazar
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr *ngIf="movimientosPendientes.length === 0">
-                  <td colspan="7" class="text-center py-6">
-                    <i class="fas fa-check-circle text-emerald-500 fa-2x mb-2" style="display: block; opacity: 0.5;"></i>
-                    <span class="text-muted">No hay comprobantes pendientes de auditoría.</span>
-                  </td>
-                </tr>
+                    </td>
+                    <td class="text-center">
+                      <div class="acciones-fila" style="justify-content: center;">
+                        <button class="btn-action-circle" (click)="aprobarTransaccion(m)" title="Aprobar Transacción">
+                          <i class="fas fa-check text-success"></i>
+                        </button>
+                        <button class="btn-action-circle" (click)="rechazarTransaccion(m)" title="Rechazar Transacción">
+                          <i class="fas fa-times text-danger"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+                @if (movimientosPendientes.length === 0) {
+                  <tr>
+                    <td colspan="7" class="text-center py-6">
+                      <i class="fas fa-check-circle text-emerald-500 fa-2x mb-2" style="display: block; opacity: 0.5;"></i>
+                      <span class="text-muted">No hay comprobantes pendientes de auditoría.</span>
+                    </td>
+                  </tr>
+                }
               </tbody>
             </table>
           </div>
+
+          @if (movimientosPendientes.length > pageSize) {
+            <div class="neu-pagination-bar">
+              <span class="pagination-info">Página {{ pageAuditoria }} de {{ totalPagesAuditoria }} ({{ movimientosPendientes.length }} pendientes)</span>
+              <div class="pagination-controls">
+                <button class="pagination-btn" [disabled]="pageAuditoria === 1" (click)="pageAuditoria = pageAuditoria - 1">
+                  <i class="fas fa-chevron-left"></i> Anterior
+                </button>
+                <span class="pagination-badge">{{ pageAuditoria }}</span>
+                <button class="pagination-btn" [disabled]="pageAuditoria >= totalPagesAuditoria" (click)="pageAuditoria = pageAuditoria + 1">
+                  Siguiente <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          }
         </div>
       </div>
     }
@@ -318,38 +393,44 @@
       </div>
     }
 
+    </div>
   </div>
-</div>
 
-<!-- VISOR MODAL COMPROBANTE DE AUDITORÍA -->
-@if (modalAuditoria && movimientoAuditoria) {
-  <div class="modal-backdrop fade-in" (click)="cerrarAuditoriaModal()">
-    <div class="modal-box neumorphic-panel" (click)="$event.stopPropagation()" style="max-width: 500px;">
-      <div class="modal-header">
-        <h3 style="margin: 0;">AUDITAR COMPROBANTE DE PAGO</h3>
-        <button class="btn-icon" (click)="cerrarAuditoriaModal()">&times;</button>
-      </div>
-      <div class="modal-body text-center">
-        <p class="descripcion-general mb-2">Transacción #{{ movimientoAuditoria.id }} - {{ movimientoAuditoria.cliente }}</p>
-        <div class="mb-3">
-          <strong class="text-azul" style="font-size: 16px;">$ {{ movimientoAuditoria.monto | number:'1.0-0' }}</strong>
-          <div class="text-muted text-xs">{{ movimientoAuditoria.medio_pago }} - {{ movimientoAuditoria.concepto }}</div>
+  <!-- VISOR COMPROBANTE DE AUDITORÍA (SUB-PÁGINA DEDICADA) -->
+  @if (modalAuditoria && movimientoAuditoria) {
+    <div class="view-switch-panel fade-in">
+      <div class="neu-card" style="max-width: 650px; margin: 0 auto;">
+        <div class="panel-header mb-4">
+          <h1>AUDITAR COMPROBANTE DE PAGO</h1>
+          <button class="btn-close" (click)="cerrarAuditoriaModal()">&times;</button>
         </div>
+        <div class="panel-body text-center">
+          <p class="descripcion-general mb-2">Transacción #{{ movimientoAuditoria.id }} - {{ movimientoAuditoria.cliente }}</p>
+          <div class="mb-3">
+            <strong class="text-azul" style="font-size: 16px;">$ {{ movimientoAuditoria.monto | number:'1.0-0' }}</strong>
+            <div class="text-muted text-xs">{{ movimientoAuditoria.medio_pago }} - {{ movimientoAuditoria.concepto }}</div>
+          </div>
 
-        <div class="comprobante-preview-box p-3 neumorphic-panel-inner mb-4">
-          <p class="text-xs font-semibold mb-2">Comprobante de Pago Subido:</p>
-          <img [src]="movimientoAuditoria.comprobante_url" alt="Sporte de Pago" style="max-width: 100%; max-height: 250px; border-radius: 8px; object-fit: contain;">
+          <div class="comprobante-preview-box p-3 neumorphic-panel-inner mb-4">
+            <p class="text-xs font-semibold mb-2">Comprobante de Pago Subido:</p>
+            <img [src]="movimientoAuditoria.comprobante_url" alt="Soporte de Pago" style="max-width: 100%; max-height: 250px; border-radius: 8px; object-fit: contain;">
+          </div>
+
+          <div class="flex justify-center gap-3">
+            <button class="btn-save btn-pill" (click)="aprobarTransaccion(movimientoAuditoria)">
+              <i class="fas fa-check"></i> Aprobar Verídico
+            </button>
+            <button class="btn-volver btn-pill" (click)="rechazarTransaccion(movimientoAuditoria)">
+              <i class="fas fa-times"></i> Rechazar y Cancelar Venta
+            </button>
+          </div>
         </div>
-
-        <div class="flex justify-center gap-3">
-          <button class="btn-save btn-pill" (click)="aprobarTransaccion(movimientoAuditoria)">
-            <i class="fas fa-check"></i> Aprobar Verídico
-          </button>
-          <button class="btn-volver btn-pill" (click)="rechazarTransaccion(movimientoAuditoria)">
-            <i class="fas fa-times"></i> Rechazar y Cancelar Venta
+        <div class="modal-footer mt-4">
+          <button class="btn-volver btn-pill" (click)="cerrarAuditoriaModal()">
+            <i class="fas fa-arrow-left"></i> Volver a la Lista
           </button>
         </div>
       </div>
     </div>
-  </div>
-}
+  }
+</div>

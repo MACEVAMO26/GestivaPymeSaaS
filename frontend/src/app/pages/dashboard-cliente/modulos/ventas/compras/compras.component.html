@@ -65,7 +65,7 @@
                     </td>
                   </tr>
                 } @else {
-                  @for(orden of ordenesFiltradas; track orden.id) {
+                  @for(orden of paginatedOrdenes; track orden.id) {
                     <tr>
                       <td><strong>{{numeroOrden(orden)}}</strong></td>
                       <td>
@@ -101,6 +101,36 @@
               </tbody>
             </table>
           </div>
+
+          <!-- Paginación Órdenes de Compra (8 por página) -->
+          @if (totalPagesOrdenes > 1) {
+            <div class="neu-pagination-bar">
+              <div class="pagination-info">
+                Mostrando <strong>{{ (pageOrdenes - 1) * pageSize + 1 }}</strong> a
+                <strong>{{ Math.min(pageOrdenes * pageSize, ordenesFiltradas.length) }}</strong> de
+                <strong>{{ ordenesFiltradas.length }}</strong> órdenes
+              </div>
+              <div class="pagination-controls">
+                <button
+                  type="button"
+                  class="pagination-btn"
+                  (click)="pageOrdenes = pageOrdenes - 1"
+                  [disabled]="pageOrdenes === 1"
+                >
+                  <i class="fas fa-chevron-left"></i> Anterior
+                </button>
+                <span class="pagination-badge">Pág. {{ pageOrdenes }} / {{ totalPagesOrdenes }}</span>
+                <button
+                  type="button"
+                  class="pagination-btn"
+                  (click)="pageOrdenes = pageOrdenes + 1"
+                  [disabled]="pageOrdenes >= totalPagesOrdenes"
+                >
+                  Siguiente <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          }
         </div>
       }
 
@@ -152,7 +182,7 @@
                     </td>
                   </tr>
                 } @else {
-                  @for(r of recepciones; track r.id) {
+                  @for(r of paginatedRecepciones; track r.id) {
                     <tr>
                       <td>{{ (r.fecha_hora || r.fecha_recepcion || r.created_at) | date:'mediumDate' }}</td>
                       <td><strong>{{ numeroOrden(r.orden_compra || { id: r.orden_compra_id }) }}</strong></td>
@@ -169,6 +199,36 @@
               </tbody>
             </table>
           </div>
+
+          <!-- Paginación Recepciones (8 por página) -->
+          @if (totalPagesRecepciones > 1) {
+            <div class="neu-pagination-bar">
+              <div class="pagination-info">
+                Mostrando <strong>{{ (pageRecepcion - 1) * pageSize + 1 }}</strong> a
+                <strong>{{ Math.min(pageRecepcion * pageSize, recepciones.length) }}</strong> de
+                <strong>{{ recepciones.length }}</strong> recepciones
+              </div>
+              <div class="pagination-controls">
+                <button
+                  type="button"
+                  class="pagination-btn"
+                  (click)="pageRecepcion = pageRecepcion - 1"
+                  [disabled]="pageRecepcion === 1"
+                >
+                  <i class="fas fa-chevron-left"></i> Anterior
+                </button>
+                <span class="pagination-badge">Pág. {{ pageRecepcion }} / {{ totalPagesRecepciones }}</span>
+                <button
+                  type="button"
+                  class="pagination-btn"
+                  (click)="pageRecepcion = pageRecepcion + 1"
+                  [disabled]="pageRecepcion >= totalPagesRecepciones"
+                >
+                  Siguiente <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          }
         </div>
       }
     </div>

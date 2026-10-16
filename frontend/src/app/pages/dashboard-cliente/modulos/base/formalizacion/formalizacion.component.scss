@@ -549,26 +549,31 @@ $btn-gen-3: #C9A227;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 26px;
-  border-radius: 20px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 3px 3px 6px $shadow-dark, -3px -3px 6px $shadow-light;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  max-width: 36px;
+  max-height: 36px;
+  border-radius: 50%;
+  border: none;
+  box-shadow: 2px 2px 4px $shadow-dark, -2px -2px 4px $shadow-light;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 13px;
 
   i {
+    font-size: 18px;
+    line-height: 1;
     color: #ffffff;
   }
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 4px 4px 8px $shadow-dark, -4px -4px 8px $shadow-light;
+    box-shadow: inset 2px 2px 4px $shadow-dark, inset -2px -2px 4px $shadow-light;
   }
 
   &:active {
-    box-shadow: inset 2px 2px 4px $shadow-dark, inset -2px -2px 4px $shadow-light;
+    transform: translateY(0) scale(0.95);
   }
 }
 

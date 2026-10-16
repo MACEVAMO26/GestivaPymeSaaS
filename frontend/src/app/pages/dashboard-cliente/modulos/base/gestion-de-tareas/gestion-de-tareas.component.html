@@ -126,7 +126,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let t of tareasActuales">
+                <tr *ngFor="let t of paginatedTareasActuales">
                   <td>{{ t.id }}</td>
                   <td>
                     {{ t.titulo }}
@@ -134,10 +134,10 @@
                   </td>
                   <td>
                     <span *ngIf="esCooperativa(t)" class="badge badge-cooperativa">
-                      ðŸ‘¥ Cooperativa ({{ nombreArea(t) }})
+                      👥 Cooperativa ({{ nombreArea(t) }})
                     </span>
                     <span *ngIf="!esCooperativa(t)" class="badge badge-individual">
-                      ðŸ‘¤ Individual
+                      👤 Individual
                     </span>
                   </td>
                   <td>{{ nombreUsuario(t.asignador) }}</td>
@@ -165,6 +165,21 @@
                 </tr>
               </tbody>
             </table>
+
+            @if (tareasActuales.length > pageSize) {
+              <div class="neu-pagination-bar">
+                <span class="pagination-info">Página {{ pageActuales }} de {{ totalPagesActuales }} ({{ tareasActuales.length }} tareas)</span>
+                <div class="pagination-controls">
+                  <button class="pagination-btn" [disabled]="pageActuales === 1" (click)="pageActuales = pageActuales - 1">
+                    <i class="fas fa-chevron-left"></i> Anterior
+                  </button>
+                  <span class="pagination-badge">{{ pageActuales }}</span>
+                  <button class="pagination-btn" [disabled]="pageActuales >= totalPagesActuales" (click)="pageActuales = pageActuales + 1">
+                    Siguiente <i class="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+            }
           </div>
         }
       </div>
@@ -194,15 +209,15 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let t of tareasEntregadas">
+                <tr *ngFor="let t of paginatedTareasEntregadas">
                   <td>{{ t.id }}</td>
                   <td>{{ t.titulo }}</td>
                   <td>
                     <span *ngIf="esCooperativa(t)" class="badge badge-cooperativa">
-                      ðŸ‘¥ Cooperativa ({{ nombreArea(t) }})
+                      👥 Cooperativa ({{ nombreArea(t) }})
                     </span>
                     <span *ngIf="!esCooperativa(t)" class="badge badge-individual">
-                      ðŸ‘¤ Individual
+                      👤 Individual
                     </span>
                   </td>
                   <td>{{ nombreUsuario(t.asignador) }}</td>
@@ -216,6 +231,21 @@
                 </tr>
               </tbody>
             </table>
+
+            @if (tareasEntregadas.length > pageSize) {
+              <div class="neu-pagination-bar">
+                <span class="pagination-info">Página {{ pageEntregadas }} de {{ totalPagesEntregadas }} ({{ tareasEntregadas.length }} tareas)</span>
+                <div class="pagination-controls">
+                  <button class="pagination-btn" [disabled]="pageEntregadas === 1" (click)="pageEntregadas = pageEntregadas - 1">
+                    <i class="fas fa-chevron-left"></i> Anterior
+                  </button>
+                  <span class="pagination-badge">{{ pageEntregadas }}</span>
+                  <button class="pagination-btn" [disabled]="pageEntregadas >= totalPagesEntregadas" (click)="pageEntregadas = pageEntregadas + 1">
+                    Siguiente <i class="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+            }
           </div>
         }
       </div>

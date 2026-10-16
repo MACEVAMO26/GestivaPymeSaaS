@@ -291,9 +291,8 @@ class EmpresaController extends Controller
         DB::beginTransaction();
         try {
 
-            if (empty($validatedData['fecha_inscripcion'])) {
-                $validatedData['fecha_inscripcion'] = date('Y-m-d');
-            }
+            // La fecha de creación/inscripción se toma obligatoriamente de la fecha actual del sistema
+            $validatedData['fecha_inscripcion'] = date('Y-m-d');
             // El formulario ya no define el tipo de negocio: los paquetes se gestionan en Suscripciones.
             // Se deja un valor por defecto para que la inicialización de módulos base siga funcionando.
             $validatedData['tipo_empresa'] = $validatedData['tipo_empresa'] ?? 'Ventas y Servicios';

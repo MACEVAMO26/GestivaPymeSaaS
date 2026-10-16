@@ -1,5 +1,5 @@
 <div class="gestion-humana-container fade-in">
-  <div [hidden]="(isContratoModalOpen && empleadoContrato)" class="main-view-wrapper">
+  <div [hidden]="(isContratoModalOpen && empleadoContrato) || isNovedadModalOpen" class="main-view-wrapper">
 
   <!-- ENCABEZADO -->
   <div class="module-header text-center mb-4 relative">
@@ -41,6 +41,30 @@
       </button>
     </div>
 
+    <!-- BARRA DE BÚSQUEDA GLOBAL DE EMPLEADOS -->
+    <div class="search-filter-bar mb-4" *ngIf="currentTab === 'activos' || currentTab === 'inactivos' || currentTab === 'ausentes'" style="display: flex; gap: 1rem; align-items: center; max-width: 520px; margin: 0 auto 1.5rem auto;">
+      <div style="position: relative; width: 100%;">
+        <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #666; font-size: 13px;"></i>
+        <input
+          type="text"
+          class="input-neumorphic"
+          style="padding-left: 36px; padding-right: 36px;"
+          placeholder="Buscar empleado por nombre, documento, cargo o área..."
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchTermChange()"
+        />
+        <button
+          *ngIf="searchTerm"
+          type="button"
+          (click)="limpiarBusqueda()"
+          style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #888; cursor: pointer; font-size: 14px;"
+          title="Limpiar búsqueda"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
   <!-- TAB SOLICITUDES -->
   <div class="neumorphic-panel fade-in" *ngIf="currentTab === 'pendientes'">
     <h2 class="subtitulo">SOLICITUDES DE VACACIONES PENDIENTES</h2>
@@ -56,21 +80,44 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let vac of vacacionesPendientes">
-            <td>{{ vac.usuario?.nombres }} {{ vac.usuario?.apellidos }}</td>
-            <td>{{ vac.fecha_inicio | date:'shortDate' }} al {{ vac.fecha_fin | date:'shortDate' }}</td>
-            <td>{{ vac.tipo }}</td>
-            <td>{{ vac.observaciones || 'Ninguna' }}</td>
-            <td class="text-center">
-              <button class="btn-general-1 btn-pill btn-action" (click)="abrirModalVacaciones(vac)">Revisar</button>
-            </td>
-          </tr>
-          <tr *ngIf="vacacionesPendientes.length === 0">
-            <td colspan="5" class="text-center" style="padding: 2rem;">No hay solicitudes de vacaciones pendientes.</td>
-          </tr>
+          @for (vac of paginatedPendientes; track vac.id) {
+            <tr>
+              <td>{{ vac.usuario?.nombres }} {{ vac.usuario?.apellidos }}</td>
+              <td>{{ vac.fecha_inicio | date:'shortDate' }} al {{ vac.fecha_fin | date:'shortDate' }}</td>
+              <td>{{ vac.tipo }}</td>
+              <td>{{ vac.observaciones || 'Ninguna' }}</td>
+              <td class="text-center">
+                <div class="acciones-fila" style="justify-content: center;">
+                  <button class="btn-action-circle" (click)="abrirModalVacaciones(vac)" title="Revisar Solicitud de Vacaciones" aria-label="Revisar Solicitud">
+                    <i class="fas fa-clipboard-check"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+          @if (vacacionesPendientes.length === 0) {
+            <tr>
+              <td colspan="5" class="text-center" style="padding: 2rem;">No hay solicitudes de vacaciones pendientes.</td>
+            </tr>
+          }
         </tbody>
       </table>
     </div>
+
+    @if (vacacionesPendientes.length > pageSize) {
+      <div class="neu-pagination-bar">
+        <span class="pagination-info">Página {{ pagePendientes }} de {{ totalPagesPendientes }} ({{ vacacionesPendientes.length }} solicitudes)</span>
+        <div class="pagination-controls">
+          <button class="pagination-btn" [disabled]="pagePendientes === 1" (click)="pagePendientes = pagePendientes - 1">
+            <i class="fas fa-chevron-left"></i> Anterior
+          </button>
+          <span class="pagination-badge">{{ pagePendientes }}</span>
+          <button class="pagination-btn" [disabled]="pagePendientes >= totalPagesPendientes" (click)="pagePendientes = pagePendientes + 1">
+            Siguiente <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    }
   </div>
 
   <!-- TAB ACTIVOS -->
@@ -90,7 +137,7 @@
           </tr>
         </thead>
         <tbody>
-          <ng-container *ngFor="let emp of empleadosActivos">
+          <ng-container *ngFor="let emp of paginatedActivos">
             <tr>
               <td>{{ emp.codigo_empleado || 'N/A' }}</td>
               <td>{{ emp.usuario?.documento }}</td>
@@ -102,11 +149,13 @@
                 <span class="badge badge-baja" *ngIf="emp.baja_solicitada">BAJA EN PROCESO</span>
               </td>
               <td class="text-center">
-                <div class="acciones-tabla-centro">
-                  <button class="btn-general-1 btn-pill btn-action" (click)="verDetalles(emp)">
-                    {{ empleadoExpandido?.id === emp.id ? 'Ocultar' : 'Detalles' }}
+                <div class="acciones-fila" style="justify-content: center;">
+                  <button class="btn-action-circle" (click)="verDetalles(emp)" [title]="empleadoExpandido?.id === emp.id ? 'Ocultar Expediente' : 'Ver Expediente Digital'" aria-label="Expediente Digital">
+                    <i class="fas" [ngClass]="empleadoExpandido?.id === emp.id ? 'fa-eye-slash' : 'fa-id-card'"></i>
                   </button>
-                  <button class="btn-general-5 btn-pill btn-action" (click)="abrirModalBaja(emp)" *ngIf="!emp.baja_solicitada">Baja</button>
+                  <button class="btn-action-circle text-danger" (click)="abrirModalBaja(emp)" *ngIf="!emp.baja_solicitada" title="Tramitar Baja de Empleado" aria-label="Tramitar Baja">
+                    <i class="fas fa-user-minus"></i>
+                  </button>
                 </div>
               </td>
             </tr>
@@ -164,9 +213,33 @@
           <tr *ngIf="empleadosActivos.length === 0">
             <td colspan="7" class="text-center" style="padding: 2rem;">No hay empleados activos en el sistema.</td>
           </tr>
+          <tr *ngIf="empleadosActivos.length > 0 && empleadosActivosFiltrados.length === 0">
+            <td colspan="7" class="text-center" style="padding: 2rem;">
+              No se encontraron empleados activos con "{{ searchTerm }}".
+              <br>
+              <button class="btn-pill mt-2" (click)="limpiarBusqueda()" style="background: #45a1ae; color: white; padding: 4px 12px; font-size: 11px; border: none; border-radius: 9999px; cursor: pointer;">
+                Limpiar búsqueda
+              </button>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
+
+    @if (totalPagesActivos > 1) {
+      <div class="neu-pagination-bar">
+        <span class="pagination-info">Página {{ pageActivos }} de {{ totalPagesActivos }} ({{ empleadosActivosFiltrados.length }} empleados activos)</span>
+        <div class="pagination-controls">
+          <button class="pagination-btn" [disabled]="pageActivos === 1" (click)="pageActivos = pageActivos - 1">
+            <i class="fas fa-chevron-left"></i> Anterior
+          </button>
+          <span class="pagination-badge">{{ pageActivos }}</span>
+          <button class="pagination-btn" [disabled]="pageActivos >= totalPagesActivos" (click)="pageActivos = pageActivos + 1">
+            Siguiente <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    }
   </div>
 
   <!-- TAB INACTIVOS -->
@@ -185,20 +258,50 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let emp of empleadosInactivos">
-            <td>{{ emp.codigo_empleado || 'N/A' }}</td>
-            <td>{{ emp.usuario?.documento }}</td>
-            <td>{{ emp.usuario?.nombres }} {{ emp.usuario?.apellidos }}</td>
-            <td>{{ emp.area?.nombre || 'Sin Asignar' }}</td>
-            <td>{{ emp.cargo?.nombre || 'Sin Asignar' }}</td>
-            <td><span class="badge badge-baja">INACTIVO</span></td>
-          </tr>
-          <tr *ngIf="empleadosInactivos.length === 0">
-            <td colspan="6" class="text-center" style="padding: 2rem;">No hay empleados inactivos.</td>
-          </tr>
+          @for (emp of paginatedInactivos; track emp.id) {
+            <tr>
+              <td>{{ emp.codigo_empleado || 'N/A' }}</td>
+              <td>{{ emp.usuario?.documento }}</td>
+              <td>{{ emp.usuario?.nombres }} {{ emp.usuario?.apellidos }}</td>
+              <td>{{ emp.area?.nombre || 'Sin Asignar' }}</td>
+              <td>{{ emp.cargo?.nombre || 'Sin Asignar' }}</td>
+              <td><span class="badge badge-baja">INACTIVO</span></td>
+            </tr>
+          }
+          @if (empleadosInactivos.length === 0) {
+            <tr>
+              <td colspan="6" class="text-center" style="padding: 2rem;">No hay empleados inactivos.</td>
+            </tr>
+          }
+          @if (empleadosInactivos.length > 0 && empleadosInactivosFiltrados.length === 0) {
+            <tr>
+              <td colspan="6" class="text-center" style="padding: 2rem;">
+                No se encontraron empleados inactivos con "{{ searchTerm }}".
+                <br>
+                <button class="btn-pill mt-2" (click)="limpiarBusqueda()" style="background: #45a1ae; color: white; padding: 4px 12px; font-size: 11px; border: none; border-radius: 9999px; cursor: pointer;">
+                  Limpiar búsqueda
+                </button>
+              </td>
+            </tr>
+          }
         </tbody>
       </table>
     </div>
+
+    @if (totalPagesInactivos > 1) {
+      <div class="neu-pagination-bar">
+        <span class="pagination-info">Página {{ pageInactivos }} de {{ totalPagesInactivos }} ({{ empleadosInactivosFiltrados.length }} empleados inactivos)</span>
+        <div class="pagination-controls">
+          <button class="pagination-btn" [disabled]="pageInactivos === 1" (click)="pageInactivos = pageInactivos - 1">
+            <i class="fas fa-chevron-left"></i> Anterior
+          </button>
+          <span class="pagination-badge">{{ pageInactivos }}</span>
+          <button class="pagination-btn" [disabled]="pageInactivos >= totalPagesInactivos" (click)="pageInactivos = pageInactivos + 1">
+            Siguiente <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    }
   </div>
 
   <!-- TAB AUSENTES -->
@@ -229,29 +332,61 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let emp of empleadosAusentes">
-            <td>{{ emp.codigo_empleado || 'N/A' }}</td>
-            <td>{{ emp.usuario?.documento }}</td>
-            <td><strong>{{ emp.usuario?.nombres }} {{ emp.usuario?.apellidos }}</strong></td>
-            <td>{{ emp.area?.nombre || 'Sin Área' }} <br><small class="text-muted-small">{{ emp.cargo?.nombre || 'Sin Cargo' }}</small></td>
-            <td>
-              <span class="badge" [ngClass]="obtenerClaseAusencia(emp)">
-                <i [class]="obtenerIconoAusencia(emp)"></i> {{ emp.estado }}
-              </span>
-            </td>
-            <td>{{ obtenerMotivoAusencia(emp) }}</td>
-            <td class="text-center">
-              <button class="btn-general-1 btn-pill btn-action" (click)="reincorporarEmpleado(emp)" title="Reincorporar a estado Activo">
-                <i class="fas fa-user-check"></i> Reincorporar
-              </button>
-            </td>
-          </tr>
-          <tr *ngIf="empleadosAusentes.length === 0">
-            <td colspan="7" class="text-center" style="padding: 2rem;">No hay empleados ausentes en este momento.</td>
-          </tr>
+          @for (emp of paginatedAusentes; track emp.id) {
+            <tr>
+              <td>{{ emp.codigo_empleado || 'N/A' }}</td>
+              <td>{{ emp.usuario?.documento }}</td>
+              <td><strong>{{ emp.usuario?.nombres }} {{ emp.usuario?.apellidos }}</strong></td>
+              <td>{{ emp.area?.nombre || 'Sin Área' }} <br><small class="text-muted-small">{{ emp.cargo?.nombre || 'Sin Cargo' }}</small></td>
+              <td>
+                <span class="badge" [ngClass]="obtenerClaseAusencia(emp)">
+                  <i [class]="obtenerIconoAusencia(emp)"></i> {{ emp.estado }}
+                </span>
+              </td>
+              <td>{{ obtenerMotivoAusencia(emp) }}</td>
+              <td class="text-center">
+                <div class="acciones-fila" style="justify-content: center;">
+                  <button class="btn-action-circle text-success" (click)="reincorporarEmpleado(emp)" title="Reincorporar a estado Activo" aria-label="Reincorporar a estado Activo">
+                    <i class="fas fa-user-check"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+          @if (empleadosAusentes.length === 0) {
+            <tr>
+              <td colspan="7" class="text-center" style="padding: 2rem;">No hay empleados ausentes en este momento.</td>
+            </tr>
+          }
+          @if (empleadosAusentes.length > 0 && empleadosAusentesFiltrados.length === 0) {
+            <tr>
+              <td colspan="7" class="text-center" style="padding: 2rem;">
+                No se encontraron empleados ausentes con "{{ searchTerm }}".
+                <br>
+                <button class="btn-pill mt-2" (click)="limpiarBusqueda()" style="background: #45a1ae; color: white; padding: 4px 12px; font-size: 11px; border: none; border-radius: 9999px; cursor: pointer;">
+                  Limpiar búsqueda
+                </button>
+              </td>
+            </tr>
+          }
         </tbody>
       </table>
     </div>
+
+    @if (totalPagesAusentes > 1) {
+      <div class="neu-pagination-bar">
+        <span class="pagination-info">Página {{ pageAusentes }} de {{ totalPagesAusentes }} ({{ empleadosAusentesFiltrados.length }} ausentes)</span>
+        <div class="pagination-controls">
+          <button class="pagination-btn" [disabled]="pageAusentes === 1" (click)="pageAusentes = pageAusentes - 1">
+            <i class="fas fa-chevron-left"></i> Anterior
+          </button>
+          <span class="pagination-badge">{{ pageAusentes }}</span>
+          <button class="pagination-btn" [disabled]="pageAusentes >= totalPagesAusentes" (click)="pageAusentes = pageAusentes + 1">
+            Siguiente <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    }
   </div>
 
   <!-- TAB CONTRATOS -->
@@ -280,28 +415,51 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let emp of todosEmpleados">
-            <td>{{ emp.usuario?.documento || 'N/A' }}</td>
-            <td>{{ nombreCompletoUsuario(emp.usuario) }}</td>
-            <td>{{ emp.area?.nombre || 'Sin Asignar' }}</td>
-            <td>{{ emp.cargo?.nombre || 'Sin Asignar' }}</td>
-            <td>{{ emp.tipo_contrato || '—' }}</td>
-            <td>{{ emp.fecha_contratacion | date:'shortDate' }}</td>
-            <td>{{ emp.fecha_fin_contrato ? (emp.fecha_fin_contrato | date:'shortDate') : '—' }}</td>
-            <td><span class="badge" [ngClass]="claseContrato(emp)">{{ etiquetaContrato(emp) }}</span></td>
-            <td class="text-center">
-              <div class="acciones-tabla-centro">
-                <button class="btn-general-1 btn-pill btn-action" (click)="abrirModalContrato(emp)">Editar</button>
-                <button class="btn-general-2 btn-pill btn-action" (click)="descargarCertificado(emp)">Certificado</button>
-              </div>
-            </td>
-          </tr>
-          <tr *ngIf="todosEmpleados.length === 0">
-            <td colspan="9" class="text-center" style="padding: 2rem;">No hay empleados registrados.</td>
-          </tr>
+          @for (emp of paginatedContratos; track emp.id) {
+            <tr>
+              <td>{{ emp.usuario?.documento || 'N/A' }}</td>
+              <td>{{ nombreCompletoUsuario(emp.usuario) }}</td>
+              <td>{{ emp.area?.nombre || 'Sin Asignar' }}</td>
+              <td>{{ emp.cargo?.nombre || 'Sin Asignar' }}</td>
+              <td>{{ emp.tipo_contrato || '—' }}</td>
+              <td>{{ emp.fecha_contratacion | date:'shortDate' }}</td>
+              <td>{{ emp.fecha_fin_contrato ? (emp.fecha_fin_contrato | date:'shortDate') : '—' }}</td>
+              <td><span class="badge" [ngClass]="claseContrato(emp)">{{ etiquetaContrato(emp) }}</span></td>
+              <td class="text-center">
+                <div class="acciones-fila" style="justify-content: center;">
+                  <button class="btn-action-circle" (click)="abrirModalContrato(emp)" title="Editar Contrato" aria-label="Editar Contrato">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn-action-circle text-info" (click)="descargarCertificado(emp)" title="Descargar Certificado Laboral" aria-label="Descargar Certificado Laboral">
+                    <i class="fas fa-file-pdf"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+          @if (todosEmpleados.length === 0) {
+            <tr>
+              <td colspan="9" class="text-center" style="padding: 2rem;">No hay empleados registrados.</td>
+            </tr>
+          }
         </tbody>
       </table>
     </div>
+
+    @if (todosEmpleados.length > pageSize) {
+      <div class="neu-pagination-bar">
+        <span class="pagination-info">Página {{ pageContratos }} de {{ totalPagesContratos }} ({{ todosEmpleados.length }} contratos)</span>
+        <div class="pagination-controls">
+          <button class="pagination-btn" [disabled]="pageContratos === 1" (click)="pageContratos = pageContratos - 1">
+            <i class="fas fa-chevron-left"></i> Anterior
+          </button>
+          <span class="pagination-badge">{{ pageContratos }}</span>
+          <button class="pagination-btn" [disabled]="pageContratos >= totalPagesContratos" (click)="pageContratos = pageContratos + 1">
+            Siguiente <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    }
   </div>
 
   <!-- TAB CONFIGURACION -->
@@ -358,7 +516,7 @@
         <div class="form-row-divider">
           <div class="form-group">
             <label class="form-label">Fecha Fin (si aplica)</label>
-            <input type="date" class="input-neumorphic" name="fecha_fin_contrato" [(ngModel)]="contratoForm.fecha_fin_contrato">
+            <input type="date" class="input-neumorphic" name="fecha_fin_contrato" [(ngModel)]="contratoForm.fecha_fin_contrato" [min]="contratoForm.fecha_contratacion">
           </div>
           <div class="form-group">
             <label class="form-label">Salario Básico</label>
@@ -376,12 +534,13 @@
   </div>
   }
 
-  <!-- MODAL REGISTRAR NOVEDAD / AUSENCIA -->
-  <div class="modal-backdrop" *ngIf="isNovedadModalOpen" (click)="cerrarModalNovedad()">
-    <div class="modal-card neumorphic-panel" (click)="$event.stopPropagation()" style="max-width: 650px; max-height: 90vh; overflow-y: auto;">
-      <div class="modal-header flex-between mb-3" style="display: flex; justify-content: space-between; align-items: center;">
-        <h2 class="subtitulo" style="margin: 0;">Registrar Novedad / Ausencia Laboral</h2>
-        <button type="button" class="btn-icon text-muted" (click)="cerrarModalNovedad()">✕</button>
+  <!-- SUB-PÁGINA DEDICADA REGISTRAR NOVEDAD / AUSENCIA -->
+  @if (isNovedadModalOpen) {
+  <div class="view-switch-panel fade-in">
+    <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+      <div class="panel-header mb-4">
+        <h1>REGISTRAR NOVEDAD / AUSENCIA LABORAL</h1>
+        <button class="btn-close" (click)="cerrarModalNovedad()">&times;</button>
       </div>
 
       <p class="descripcion-general mb-3" style="text-align: left;">
@@ -419,7 +578,7 @@
 
           <div class="form-group">
             <label class="form-label">Fecha Fin (si aplica)</label>
-            <input type="date" class="input-neumorphic" [(ngModel)]="novedadForm.fecha_fin" name="fecha_fin">
+            <input type="date" class="input-neumorphic" [(ngModel)]="novedadForm.fecha_fin" name="fecha_fin" [min]="novedadForm.fecha_inicio">
           </div>
         </div>
 
@@ -428,8 +587,8 @@
           <textarea class="input-neumorphic" rows="3" [(ngModel)]="novedadForm.motivo" name="motivo" placeholder="Ej. Incapacidad médica expedida por EPS Sura por 5 días / Licencia de maternidad legal..." required></textarea>
         </div>
 
-        <div class="modal-footer flex-between mt-4" style="display: flex; justify-content: space-between; align-items: center;">
-          <button type="button" class="btn-volver btn-pill" (click)="cerrarModalNovedad()">Cancelar</button>
+        <div class="modal-footer mt-4">
+          <button type="button" class="btn-volver btn-pill" (click)="cerrarModalNovedad()">Volver</button>
           <button type="submit" class="btn-save btn-pill" [disabled]="isSubmitting">
             <i class="fas fa-save"></i> {{ isSubmitting ? 'Guardando...' : 'Guardar Novedad' }}
           </button>
@@ -437,4 +596,5 @@
       </form>
     </div>
   </div>
+  }
 </div>

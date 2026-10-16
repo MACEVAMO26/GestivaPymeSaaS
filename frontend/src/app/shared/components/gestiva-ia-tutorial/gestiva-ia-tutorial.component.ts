@@ -29,19 +29,23 @@ export class GestivaIaTutorialComponent implements OnInit, OnDestroy, OnChanges 
 
   ngOnInit() {
     this.user = this.authService.getUser();
+    this.generarPasos();
     
-    if (this.user && this.user.tutorial_ia_visto === 0) {
+    // Solo mostrar automáticamente la primera vez si no ha sido visto y no ha sido omitido en esta sesión
+    const yaVistoSesion = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('tutorial_visto_sesion') : null;
+    if (this.user && this.user.tutorial_ia_visto === 0 && !yaVistoSesion) {
       this.mostrar = true;
     }
 
     this.sub = this.iaStateService.showTutorial$.subscribe(() => {
+      this.generarPasos();
       this.pasoActual = 0;
       this.mostrar = true;
     });
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['modulos'] && this.modulos) {
+    if (changes['modulos']) {
       this.generarPasos();
     }
   }
@@ -52,47 +56,65 @@ export class GestivaIaTutorialComponent implements OnInit, OnDestroy, OnChanges 
     }
   }
 
-  private generarPasos() {
+  generarPasos() {
     this.pasos = [];
     this.pasos.push({
-      title: '¡Hola! Soy Gestiva',
-      description: 'Tu inteligencia artificial personal. Estoy aquí para ayudarte a configurar y sacar el máximo provecho de tu nueva plataforma. Vamos a repasar brevemente los módulos que tienes activos.'
+      title: '¡Hola! Te damos la bienvenida a GestivaPyme',
+      description: 'Soy Gestiva AI, tu asistente inteligente empresarial. Esta plataforma reúne en un solo lugar la administración, las ventas, los inventarios, los servicios y la gestión de talento de tu empresa.'
     });
 
     const descripciones: {[key: string]: string} = {
-      'd_ini': 'Aquí tendrás una vista resumida de lo que pasa en tu negocio al instante.',
-      'd_adm': 'El corazón de tu empresa. Aquí configuras datos base, sucursales y usuarios.',
-      'd_tar': 'Asigna actividades a tu equipo, establece fechas y no pierdas rastro de nada.',
-      'd_gia': 'Aquí como gerente puedes enseñarme reglas y sugerencias para transmitirlas a tu equipo.',
-      'rrhh': 'Control total sobre tus empleados, sus accesos, nóminas, vacaciones y ausencias.',
-      'v_prov': 'Registra a tus proveedores para tener su contacto siempre a mano.',
-      'v_rep': 'Lleva registro de las compras y abastecimiento para mantener el inventario al día.',
-      'v_inv': 'Controla tus productos, stock disponible, costos y márgenes de ganancia.',
-      'v_pos': 'Factura rápidamente, genera cotizaciones y cierra ventas como todo un profesional.',
-      'v_cxc': 'Gestiona la relación comercial, cartera de clientes y cuentas por cobrar.',
-      's_age': 'Lleva el calendario de servicios agendados para no cruzar citas.',
-      's_crm': 'Sigue cada oportunidad de servicio y mantén felices a tus clientes.',
-      's_cat': 'Define qué servicios ofreces, sus duraciones y costos base.',
-      's_ope': 'Asigna técnicos u Operativos a cada servicio y mide su rendimiento.',
-      's_rep': 'Reportes detallados de la prestación de servicios para tomar mejores decisiones.',
-      'finanzas': 'Tu panel de control económico: cuentas, ingresos, egresos y proyecciones.',
-      'd_aut': 'Para que cada empleado pueda ver su propio rendimiento y reportes personales.',
-      'addons': 'Nuevas herramientas extra que puedes añadir a tu plataforma.'
+      'd_ini': 'Panel Resumen: Visión global y métricas clave de tu operación al instante.',
+      'd_adm': 'Administración y Usuarios: Configuración institucional de la empresa y gestión de accesos.',
+      'd_tar': 'Gestión de Tareas: Asigna actividades a tu equipo, establece prioridades y haz seguimiento oportuno.',
+      'd_gia': 'Gestiva IA Estratégica: Entrena reglas de negocio y parámetros de atención para tu equipo.',
+      'rrhh': 'Gestión Humana: Expedientes de empleados, contratos, vacaciones y novedades laborales.',
+      'v_prov': 'Proveedores: Directorio comercial y cuentas por pagar organizadas.',
+      'v_rep': 'Compras: Gestión de abastecimiento, órdenes de compra y control de pedidos.',
+      'v_inv': 'Inventario: Catálogo de productos, control de existencias, ajustes y movimientos de almacén.',
+      'v_pos': 'Ventas y POS: Facturación ágil, punto de venta y cierre de caja en tiempo real.',
+      'v_cxc': 'Clientes y Cartera: Gestión de compradores, seguimiento comercial y cuentas por cobrar.',
+      's_age': 'Agenda y Citas: Programación de servicios técnicos y visitas a clientes.',
+      's_crm': 'CRM de Servicios: Seguimiento a oportunidades, solicitudes de servicio y atención.',
+      's_cat': 'Catálogo de Servicios: Definición de prestaciones, duraciones estimadas y tarifas.',
+      's_ope': 'Operarios y Técnicos: Asignación de servicios de campo y métricas de rendimiento.',
+      's_rep': 'Reportes de Servicios: Informes detallados de ejecución y calidad del servicio.',
+      'finanzas': 'Finanzas y Caja: Flujo de caja, arqueos diarios, balances y proyecciones.',
+      'd_aut': 'Portal de Autogestión: Espacio personal para que cada colaborador revise sus novedades y solicitudes.',
+      'addons': 'Módulos y Conectores: Herramientas adicionales para expandir tu suscripción.'
     };
 
-    this.modulos.forEach(modulo => {
-      if (descripciones[modulo.id]) {
-        this.pasos.push({
-          title: modulo.nombre,
-          description: descripciones[modulo.id]
-        });
-      }
-    });
+    if (this.modulos && this.modulos.length > 0) {
+      this.modulos.forEach(modulo => {
+        if (descripciones[modulo.id]) {
+          this.pasos.push({
+            title: modulo.nombre,
+            description: descripciones[modulo.id]
+          });
+        }
+      });
+    } else {
+      // Pasos base garantizados si la lista de módulos aún está cargando
+      this.pasos.push({
+        title: 'Menú Lateral Adaptativo',
+        description: 'En el panel izquierdo encontrarás todos los módulos contratados por tu empresa, desde ventas y facturación hasta inventario y recursos humanos.'
+      });
+      this.pasos.push({
+        title: 'Asistente Gestiva AI',
+        description: 'En la esquina inferior derecha encontrarás siempre mi botón flotante para resolver dudas, generar reportes o sugerir mejoras para tu operación.'
+      });
+    }
 
     this.pasos.push({
       title: '¡Todo listo para empezar!',
-      description: 'A medida que uses la plataforma, estaré analizando métricas en segundo plano. Me verás ocasionalmente por aquí dándote sugerencias.'
+      description: 'Puedes volver a abrir esta guía interactiva en cualquier momento desde el asistente Gestiva AI en la esquina inferior derecha. ¡Muchos éxitos en tu gestión!'
     });
+  }
+
+  anterior() {
+    if (this.pasoActual > 0) {
+      this.pasoActual--;
+    }
   }
 
   siguiente() {
@@ -103,10 +125,26 @@ export class GestivaIaTutorialComponent implements OnInit, OnDestroy, OnChanges 
     }
   }
 
+  irAPaso(index: number) {
+    if (index >= 0 && index < this.pasos.length) {
+      this.pasoActual = index;
+    }
+  }
+
+  cerrarTutorial() {
+    this.mostrar = false;
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem('tutorial_visto_sesion', 'true');
+    }
+  }
+
   finalizarTutorial() {
+    this.mostrar = false;
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem('tutorial_visto_sesion', 'true');
+    }
     this.http.post('/api/usuarios/tutorial-visto', {}).subscribe({
       next: () => {
-        this.mostrar = false;
         if (this.user) {
           this.user.tutorial_ia_visto = 1;
           this.authService.setUser(this.user);
@@ -114,7 +152,6 @@ export class GestivaIaTutorialComponent implements OnInit, OnDestroy, OnChanges 
       },
       error: (err) => {
         console.error('Error al guardar estado del tutorial', err);
-        this.mostrar = false;
       }
     });
   }

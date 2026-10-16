@@ -24,6 +24,34 @@ export class AgendaYCalendarioComponent implements OnInit {
   cargando = false;
   guardando = false;
 
+  busqueda: string = '';
+  pageSize = 8;
+  pageEventos = 1;
+
+  get fechaMinimaActual(): string {
+    const now = new Date();
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  }
+
+  get eventosFiltrados(): EventoCalendario[] {
+    if (!this.busqueda.trim()) return this.eventos;
+    const term = this.busqueda.toLowerCase();
+    return this.eventos.filter(e =>
+      (e.titulo && e.titulo.toLowerCase().includes(term)) ||
+      (e.descripcion && e.descripcion.toLowerCase().includes(term)) ||
+      (e.fecha_inicio && e.fecha_inicio.toLowerCase().includes(term))
+    );
+  }
+
+  get paginatedEventos(): EventoCalendario[] {
+    const start = (this.pageEventos - 1) * this.pageSize;
+    return this.eventosFiltrados.slice(start, start + this.pageSize);
+  }
+  get totalPagesEventos(): number {
+    return Math.ceil(this.eventosFiltrados.length / this.pageSize) || 1;
+  }
+
   nuevoEvento: EventoCalendario = {
     titulo: '',
     descripcion: '',
@@ -66,6 +94,18 @@ export class AgendaYCalendarioComponent implements OnInit {
       return this.toast.warning('Título, fecha de inicio y fin son obligatorios');
     }
 
+    const fechaInicio = new Date(this.nuevoEvento.fecha_inicio).getTime();
+    const fechaFin = new Date(this.nuevoEvento.fecha_fin).getTime();
+    const margenTolerancia = Date.now() - (2 * 60 * 1000); // 2 minutos de tolerancia por llenado
+
+    if (fechaInicio < margenTolerancia) {
+      return this.toast.warning('No es posible agendar eventos en fechas u horas pasadas');
+    }
+
+    if (fechaFin < fechaInicio) {
+      return this.toast.warning('La fecha y hora de fin debe ser posterior a la fecha de inicio');
+    }
+
     this.guardando = true;
     this.agendaService.crearEvento(this.nuevoEvento).pipe(timeout(10000)).subscribe({
       next: () => {
@@ -78,6 +118,8 @@ export class AgendaYCalendarioComponent implements OnInit {
       error: (err: any) => {
         if (err?.name === 'TimeoutError') {
           this.toast.error('Tiempo de espera agotado');
+        } else if (err?.error?.message) {
+          this.toast.error(err.error.message);
         } else {
           this.toast.error('Error al guardar el evento');
         }

@@ -41,6 +41,26 @@ export class FinanzasComponent implements OnInit {
   movimientos: CajaMovimiento[] = [];
   prefacturas: CotizacionPedido[] = [];
 
+  pageSize = 8;
+  pageMovimientos = 1;
+  pagePrefacturas = 1;
+
+  get paginatedMovimientos(): CajaMovimiento[] {
+    const start = (this.pageMovimientos - 1) * this.pageSize;
+    return this.movimientos.slice(start, start + this.pageSize);
+  }
+  get totalPagesMovimientos(): number {
+    return Math.ceil(this.movimientos.length / this.pageSize) || 1;
+  }
+
+  get paginatedPrefacturas(): CotizacionPedido[] {
+    const start = (this.pagePrefacturas - 1) * this.pageSize;
+    return this.prefacturas.slice(start, start + this.pageSize);
+  }
+  get totalPagesPrefacturas(): number {
+    return Math.ceil(this.prefacturas.length / this.pageSize) || 1;
+  }
+
   ngOnInit() {
     this.cargarCajas();
     this.cargarPrefacturas();
@@ -69,6 +89,7 @@ export class FinanzasComponent implements OnInit {
   }
 
   cargarMovimientos(cajaId: number) {
+    this.pageMovimientos = 1;
     this.cajaService.getMovimientos(cajaId).pipe(timeout(15000)).subscribe({
       next: (res) => {
         this.movimientos = res;
@@ -88,6 +109,7 @@ export class FinanzasComponent implements OnInit {
   }
 
   cargarPrefacturas() {
+    this.pagePrefacturas = 1;
     this.prefacturacionService.getCotizaciones().pipe(timeout(15000)).subscribe({
       next: (res) => {
         this.prefacturas = res;

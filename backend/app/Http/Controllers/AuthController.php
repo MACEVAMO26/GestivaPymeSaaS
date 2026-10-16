@@ -61,20 +61,20 @@ class AuthController extends Controller
         // Limpieza de tokens expirados o abandonados con más de 12 horas sin actividad
         $user->tokens()->where('created_at', '<', now()->subHours(12))->delete();
 
-        // Control de Sesiones Simultáneas: verificar si ya existe otra sesión activa
+        // Control Estricto de Sesiones Simultáneas (Requerimiento SENA)
+        // Se valida tanto en local como en producción para impedir sesiones concurrentes con el mismo usuario
         $tieneSesionActiva = $user->tokens()->exists();
         $forzarCierre = $request->boolean('force_logout');
 
         if ($tieneSesionActiva && !$forzarCierre) {
             return response()->json([
                 'session_conflict' => true,
-                'message' => 'Ya existe una sesión activa para este usuario en otro dispositivo o navegador. Por seguridad, no se permiten sesiones simultáneas.'
+                'message' => 'Ya existe una sesión activa para este usuario en otro dispositivo o pestaña del navegador. Por seguridad y control de concurrencia, no se permiten sesiones simultáneas.'
             ], 409);
         }
 
-        // Cierra cualquier sesión previa abierta por este usuario en otros navegadores o dispositivos
+        // Cierra de forma inmediata cualquier sesión previa del usuario
         $user->tokens()->delete();
-
         $token = $user->createToken('auth_token')->plainTextToken;
 
         // Cargar módulos activos para evitar llamadas extras en el frontend
@@ -159,7 +159,9 @@ class AuthController extends Controller
     // Revoca el token de acceso actual cerrando la sesión del usuario
     public function cerrarSesion(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        if ($request->user()) {
+            $request->user()->tokens()->delete();
+        }
         return response()->json([
             'message' => 'Has cerrado sesión correctamente.'
         ]);

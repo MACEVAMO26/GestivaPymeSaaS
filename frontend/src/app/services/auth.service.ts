@@ -10,11 +10,31 @@ export class AuthService {
 
   // 1. URL base de nuestra API en Laravel
   private apiUrl = '/api';
+  private heartbeatInterval: any = null;
+  private authChannel: BroadcastChannel | null = null;
 
   constructor(
     private http: HttpClient,
     private router: Router
-  ) { }
+  ) {
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      try {
+        this.authChannel = new BroadcastChannel('gestiva_auth_sync');
+        this.authChannel.onmessage = (event) => {
+          if (event.data?.type === 'NEW_LOGIN' && this.getToken()) {
+            this.clearSessionStorage();
+            this.router.navigate(['/login'], { queryParams: { motivo: 'sesion_remota' }, replaceUrl: true });
+          }
+        };
+      } catch (e) {
+        console.warn('BroadcastChannel not supported', e);
+      }
+    }
+
+    if (this.getToken()) {
+      this.startHeartbeat();
+    }
+  }
 
   // 2. Método para el inicio de sesión
   login(credentials: {email: string, password: string, force_logout?: boolean}): Observable<any> {
@@ -32,6 +52,10 @@ export class AuthService {
           if (response.modulos_activos) {
             this.saveModulosActivos(response.modulos_activos);
           }
+          if (this.authChannel) {
+            this.authChannel.postMessage({ type: 'NEW_LOGIN', userId: response.user?.id });
+          }
+          this.startHeartbeat();
         }
       })
     );
@@ -52,8 +76,35 @@ export class AuthService {
     return this.http.get<any>(`${this.apiUrl}/session-check`);
   }
 
+  startHeartbeat(): void {
+    this.stopHeartbeat();
+    // Ejecutar chequeo cada 20 segundos para detectar si otra sesión cerró la actual
+    this.heartbeatInterval = setInterval(() => {
+      if (!this.getToken()) {
+        this.stopHeartbeat();
+        return;
+      }
+      this.checkSession().subscribe({
+        next: () => {},
+        error: (err) => {
+          if (err?.status === 401) {
+            this.stopHeartbeat();
+          }
+        }
+      });
+    }, 20000);
+  }
+
+  stopHeartbeat(): void {
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+      this.heartbeatInterval = null;
+    }
+  }
+
   // 3. Método para cerrar sesión de forma inmediata
   logout(redirectToLogin: boolean = true): void {
+    this.stopHeartbeat();
     const token = this.getToken();
 
     // Limpiamos el almacenamiento local de inmediato para no bloquear la interfaz
@@ -77,6 +128,7 @@ export class AuthService {
 
   // Limpia todos los datos de sesión almacenados en el navegador
   clearSessionStorage(): void {
+    this.stopHeartbeat();
     try {
       sessionStorage.removeItem('auth_token');
       sessionStorage.removeItem('current_user');

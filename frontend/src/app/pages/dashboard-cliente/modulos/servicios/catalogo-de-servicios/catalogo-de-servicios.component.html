@@ -141,7 +141,7 @@
                 </tr>
               </thead>
               <tbody>
-                @for(tk of getTicketsFiltrados(); track tk.id) {
+                @for(tk of paginatedTickets; track tk.id) {
                   <tr>
                     <td><strong>{{tk.consecutivo}}</strong></td>
                     <td>
@@ -206,6 +206,21 @@
               </tbody>
             </table>
           </div>
+
+          @if (getTicketsFiltrados().length > pageSize) {
+            <div class="neu-pagination-bar">
+              <span class="pagination-info">Página {{ pageTickets }} de {{ totalPagesTickets }} ({{ getTicketsFiltrados().length }} tickets)</span>
+              <div class="pagination-controls">
+                <button class="pagination-btn" [disabled]="pageTickets === 1" (click)="pageTickets = pageTickets - 1">
+                  <i class="fas fa-chevron-left"></i> Anterior
+                </button>
+                <span class="pagination-badge">{{ pageTickets }}</span>
+                <button class="pagination-btn" [disabled]="pageTickets >= totalPagesTickets" (click)="pageTickets = pageTickets + 1">
+                  Siguiente <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          }
         </div>
       </div>
     }
@@ -230,52 +245,70 @@
               </tr>
             </thead>
             <tbody>
-              @for(tk of tickets; track tk.id) {
-                @if(tk.estado !== 'Finalizado' && tk.estado !== 'Cancelado') {
-                  <tr>
-                    <td><strong>{{tk.consecutivo}}</strong></td>
-                    <td>
-                      <strong>{{tk.cliente_nombre}}</strong>
-                      <br><span class="text-muted text-xs">📍 {{tk.direccion}}</span>
-                      @if(tk.equipo_recibido) {
-                        <br><span class="text-azul text-xs"><i class="fas fa-laptop"></i> {{tk.equipo_recibido}}</span>
+              @for(tk of paginatedAgendaTickets; track tk.id) {
+                <tr>
+                  <td><strong>{{tk.consecutivo}}</strong></td>
+                  <td>
+                    <strong>{{tk.cliente_nombre}}</strong>
+                    <br><span class="text-muted text-xs">📍 {{tk.direccion}}</span>
+                    @if(tk.equipo_recibido) {
+                      <br><span class="text-azul text-xs"><i class="fas fa-laptop"></i> {{tk.equipo_recibido}}</span>
+                    }
+                  </td>
+                  <td>{{tk.fecha_solicitada}} <br><span class="text-xs text-muted">{{tk.hora_sugerida}}</span></td>
+                  <td class="text-azul" style="font-weight: bold;">
+                    {{nombreTecnico(tk.tecnico_id)}}
+                  </td>
+                  <td>
+                    <span class="badge" [ngClass]="getBadgeEstado(tk.estado)">
+                      <i [class]="getIconoEstado(tk.estado)"></i> {{tk.estado}}
+                    </span>
+                  </td>
+                  <td style="text-align: center;">
+                    <div class="btn-group-acciones" style="display: flex; gap: 0.35rem; justify-content: center;">
+                      <button class="btn-action-circle btn-circle-user" (click)="abrirAsignacion(tk)" [disabled]="!puedeAsignarOperarios()" title="Asignar Operario Técnico">
+                        <i class="fas fa-user-edit"></i>
+                      </button>
+                      @if(tk.tecnico_id && tk.estado === 'Asignado') {
+                        <button class="btn-action-circle btn-circle-truck" (click)="cambiarEstadoDirecto(tk, 'En Camino')" title="Marcar Técnico en Camino">
+                          <i class="fas fa-truck"></i>
+                        </button>
                       }
-                    </td>
-                    <td>{{tk.fecha_solicitada}} <br><span class="text-xs text-muted">{{tk.hora_sugerida}}</span></td>
-                    <td class="text-azul" style="font-weight: bold;">
-                      {{nombreTecnico(tk.tecnico_id)}}
-                    </td>
-                    <td>
-                      <span class="badge" [ngClass]="getBadgeEstado(tk.estado)">
-                        <i [class]="getIconoEstado(tk.estado)"></i> {{tk.estado}}
-                      </span>
-                    </td>
-                    <td style="text-align: center;">
-                      <div class="btn-group-acciones" style="display: flex; gap: 0.35rem; justify-content: center;">
-                        <button class="btn-action-circle btn-circle-user" (click)="abrirAsignacion(tk)" [disabled]="!puedeAsignarOperarios()" title="Asignar Operario Técnico">
-                          <i class="fas fa-user-edit"></i>
+                      @if(tk.estado === 'En Camino') {
+                        <button class="btn-action-circle btn-circle-map" (click)="cambiarEstadoDirecto(tk, 'En Sitio')" title="Marcar Llegada a Sitio">
+                          <i class="fas fa-map-marker-alt"></i>
                         </button>
-                        @if(tk.tecnico_id && tk.estado === 'Asignado') {
-                          <button class="btn-action-circle btn-circle-truck" (click)="cambiarEstadoDirecto(tk, 'En Camino')" title="Marcar Técnico en Camino">
-                            <i class="fas fa-truck"></i>
-                          </button>
-                        }
-                        @if(tk.estado === 'En Camino') {
-                          <button class="btn-action-circle btn-circle-map" (click)="cambiarEstadoDirecto(tk, 'En Sitio')" title="Marcar Llegada a Sitio">
-                            <i class="fas fa-map-marker-alt"></i>
-                          </button>
-                        }
-                        <button class="btn-action-circle btn-circle-tools" (click)="abrirEjecucion(tk)" title="Cerrar Servicio / Mini Inventario">
-                          <i class="fas fa-tools"></i>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                }
+                      }
+                      <button class="btn-action-circle btn-circle-tools" (click)="abrirEjecucion(tk)" title="Cerrar Servicio / Mini Inventario">
+                        <i class="fas fa-tools"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+              @if(agendaTickets.length === 0) {
+                <tr>
+                  <td colspan="6" class="tabla-vacia">No hay tickets activos para despacho en este momento.</td>
+                </tr>
               }
             </tbody>
           </table>
         </div>
+
+        @if (agendaTickets.length > pageSize) {
+          <div class="neu-pagination-bar">
+            <span class="pagination-info">Página {{ pageAgenda }} de {{ totalPagesAgenda }} ({{ agendaTickets.length }} tickets)</span>
+            <div class="pagination-controls">
+              <button class="pagination-btn" [disabled]="pageAgenda === 1" (click)="pageAgenda = pageAgenda - 1">
+                <i class="fas fa-chevron-left"></i> Anterior
+              </button>
+              <span class="pagination-badge">{{ pageAgenda }}</span>
+              <button class="pagination-btn" [disabled]="pageAgenda >= totalPagesAgenda" (click)="pageAgenda = pageAgenda + 1">
+                Siguiente <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        }
       </div>
     }
 
@@ -458,6 +491,30 @@
       <div class="neumorphic-panel fade-in">
         <p class="text-muted" style="margin-bottom: 1.5rem;">Definición de servicios base para la empresa. Estos alimentan las cotizaciones y facturas.</p>
         
+        <!-- BARRA DE BÚSQUEDA DE SERVICIOS -->
+        <div class="search-filter-bar mb-4" *ngIf="catalogo.length > 0" style="display: flex; gap: 1rem; align-items: center; max-width: 500px; margin: 0 auto 1.5rem auto;">
+          <div style="position: relative; width: 100%;">
+            <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #666; font-size: 13px;"></i>
+            <input
+              type="text"
+              class="input-neumorphic"
+              style="padding-left: 36px; padding-right: 36px;"
+              placeholder="Buscar servicio por nombre, descripción o código..."
+              [(ngModel)]="searchTermCatalogo"
+              (ngModelChange)="onSearchTermCatalogoChange()"
+            />
+            <button
+              *ngIf="searchTermCatalogo"
+              type="button"
+              (click)="limpiarBusquedaCatalogo()"
+              style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #888; cursor: pointer; font-size: 14px;"
+              title="Limpiar búsqueda"
+            >
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+
         <div class="table-responsive">
           <table class="premium-table data-table">
             <thead>
@@ -470,7 +527,7 @@
               </tr>
             </thead>
             <tbody>
-              @for(cat of catalogo; track cat.id) {
+              @for(cat of paginatedCatalogo; track cat.id) {
                 <tr>
                   <td><strong>{{codigoServicio(cat.id)}}</strong></td>
                   <td>{{cat.nombre}}</td>
@@ -482,9 +539,40 @@
                   </td>
                 </tr>
               }
+              @if(catalogo.length === 0) {
+                <tr>
+                  <td colspan="5" class="tabla-vacia">No hay servicios registrados en el catálogo.</td>
+                </tr>
+              }
+              @if(catalogo.length > 0 && catalogoFiltrado.length === 0) {
+                <tr>
+                  <td colspan="5" class="tabla-vacia" style="padding: 2rem;">
+                    No se encontraron servicios con "{{ searchTermCatalogo }}".
+                    <br>
+                    <button class="btn-pill mt-2" (click)="limpiarBusquedaCatalogo()" style="background: #45a1ae; color: white; padding: 4px 12px; font-size: 11px; border: none; border-radius: 9999px; cursor: pointer;">
+                      Limpiar búsqueda
+                    </button>
+                  </td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>
+
+        @if (totalPagesCatalogo > 1) {
+          <div class="neu-pagination-bar">
+            <span class="pagination-info">Página {{ pageCatalogo }} de {{ totalPagesCatalogo }} ({{ catalogoFiltrado.length }} servicios)</span>
+            <div class="pagination-controls">
+              <button class="pagination-btn" [disabled]="pageCatalogo === 1" (click)="pageCatalogo = pageCatalogo - 1">
+                <i class="fas fa-chevron-left"></i> Anterior
+              </button>
+              <span class="pagination-badge">{{ pageCatalogo }}</span>
+              <button class="pagination-btn" [disabled]="pageCatalogo >= totalPagesCatalogo" (click)="pageCatalogo = pageCatalogo + 1">
+                Siguiente <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        }
       </div>
     }
 

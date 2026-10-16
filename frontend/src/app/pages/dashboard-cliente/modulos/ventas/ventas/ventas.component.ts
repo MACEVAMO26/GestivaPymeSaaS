@@ -52,6 +52,20 @@ export class VentasComponent implements OnInit {
   showModalAnular: boolean = false;
   ventaSeleccionada: any = null;
 
+  // Paginación 8 items por página
+  pageSize: number = 8;
+  pageVentas: number = 1;
+  Math = Math;
+
+  get paginatedVentas(): any[] {
+    const start = (this.pageVentas - 1) * this.pageSize;
+    return this.ventasFiltradas.slice(start, start + this.pageSize);
+  }
+
+  get totalPagesVentas(): number {
+    return Math.ceil(this.ventasFiltradas.length / this.pageSize) || 1;
+  }
+
   ngOnInit() {
     this.cargarDatosBase();
     this.cargarVentas();
@@ -109,6 +123,7 @@ export class VentasComponent implements OnInit {
       v.cliente?.nombres?.toLowerCase().includes(term) ||
       v.cliente?.apellidos?.toLowerCase().includes(term)
     );
+    this.pageVentas = 1;
   }
 
   numeroFactura(venta: any): string {

@@ -18,6 +18,29 @@
     </div>
   </div>
 
+  <!-- BARRA DE BÚSQUEDA EN TIEMPO REAL -->
+  <div class="search-filter-bar mb-4" *ngIf="!isLoading && usuarios.length > 0" style="display: flex; gap: 1rem; align-items: center; max-width: 520px; margin: 0 auto 1.5rem auto;">
+    <div style="position: relative; width: 100%;">
+      <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #666; font-size: 13px;"></i>
+      <input
+        type="text"
+        class="input-neumorphic"
+        style="padding-left: 36px; padding-right: 36px;"
+        placeholder="Buscar usuario por nombre, documento, email o rol..."
+        [(ngModel)]="searchTerm"
+      />
+      <button
+        *ngIf="searchTerm"
+        type="button"
+        (click)="limpiarBusqueda()"
+        style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #888; cursor: pointer; font-size: 14px;"
+        title="Limpiar búsqueda"
+      >
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+
   <!-- HTML TABLA USUARIOS AGRUPADA POR ROL -->
   <div class="fade-in">
 
@@ -34,6 +57,14 @@
     <!-- Sin usuarios -->
     <div *ngIf="!isLoading && !errorMessage && usuarios.length === 0" class="empty-state">
       No hay usuarios registrados aún.
+    </div>
+
+    <!-- Búsqueda sin resultados -->
+    <div *ngIf="!isLoading && !errorMessage && usuarios.length > 0 && usuariosFiltrados.length === 0" class="empty-state text-center py-6">
+      <p style="font-weight: 600; color: #333; margin-bottom: 0.5rem;">No se encontraron usuarios con "{{ searchTerm }}"</p>
+      <button class="btn-pill" (click)="limpiarBusqueda()" style="background: #45a1ae; color: white; padding: 6px 16px; font-size: 12px; border: none; border-radius: 9999px; cursor: pointer;">
+        Limpiar búsqueda
+      </button>
     </div>
 
     <!-- Bloques por Rol -->

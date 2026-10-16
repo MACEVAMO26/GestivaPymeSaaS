@@ -33,6 +33,26 @@ export class FormalizacionComponent implements OnInit {
   sedes: any[] = [];
   pendientes: any[] = [];
   formalizados: any[] = [];
+
+  pageSize: number = 8;
+  pagePendientes: number = 1;
+  pageFormalizados: number = 1;
+
+  get paginatedPendientes(): any[] {
+    const start = (this.pagePendientes - 1) * this.pageSize;
+    return this.pendientes.slice(start, start + this.pageSize);
+  }
+  get totalPagesPendientes(): number {
+    return Math.ceil(this.pendientes.length / this.pageSize) || 1;
+  }
+
+  get paginatedFormalizados(): any[] {
+    const start = (this.pageFormalizados - 1) * this.pageSize;
+    return this.formalizados.slice(start, start + this.pageSize);
+  }
+  get totalPagesFormalizados(): number {
+    return Math.ceil(this.formalizados.length / this.pageSize) || 1;
+  }
   
 
   isFormalizarModalOpen = false;
@@ -118,6 +138,7 @@ export class FormalizacionComponent implements OnInit {
   }
 
   cargarPendientes() {
+    this.pagePendientes = 1;
     this.empleadoService.getPendientes().pipe(timeout(15000)).subscribe({
       next: (res) => { this.pendientes = res; this.cdr.detectChanges(); },
       error: (err) => { 
@@ -129,6 +150,7 @@ export class FormalizacionComponent implements OnInit {
   }
 
   cargarFormalizados() {
+    this.pageFormalizados = 1;
     this.empleadoService.getEmpleados().pipe(timeout(15000)).subscribe({
       next: (res) => { this.formalizados = res; this.cdr.detectChanges(); },
       error: (err) => { 

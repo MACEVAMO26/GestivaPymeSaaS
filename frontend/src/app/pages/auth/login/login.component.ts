@@ -181,18 +181,28 @@ export class LoginComponent implements OnInit {
         this.isLoading = false;
         console.error("LOGIN ERROR", err);
 
+        let errorData = err.error;
+        if (typeof errorData === 'string') {
+          try {
+            errorData = JSON.parse(errorData);
+          } catch {
+            // No es un string JSON válido
+          }
+        }
+
         // 1. Conflicto por Sesión Simultánea abierta en otro dispositivo
-        if (err.status === 409 && err.error?.session_conflict) {
-          this.sessionConflictMessage = err.error.message || 'Ya existe una sesión activa para este usuario en otro dispositivo. Por seguridad, no se permiten sesiones simultáneas.';
+        if (err.status === 409 || errorData?.session_conflict) {
+          this.sessionConflictMessage = errorData?.message || 'Ya existe una sesión activa para este usuario en otro dispositivo o navegador. Por seguridad, no se permiten sesiones simultáneas.';
           this.showSessionConflictModal = true;
           this.cdr.detectChanges();
           return;
         }
 
-        if (err.error && err.error.errors) {
-          const errors = err.error.errors;
+        if (errorData && errorData.errors) {
+          const errors = errorData.errors;
           if (errors.system_suspended) {
             this.suspendedMessage = errors.system_suspended[0];
+            this.cdr.detectChanges();
             return;
           }
           if (errors.email) {
@@ -200,6 +210,12 @@ export class LoginComponent implements OnInit {
             return;
           }
         }
+
+        if (errorData?.message) {
+          alert(errorData.message);
+          return;
+        }
+
         alert('Credenciales incorrectas o error en el servidor. Revisa la consola.');
       }
     });

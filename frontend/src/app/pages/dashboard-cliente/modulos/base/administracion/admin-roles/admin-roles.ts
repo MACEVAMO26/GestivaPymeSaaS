@@ -42,6 +42,18 @@ export class AdminRoles implements OnInit {
     descripcion: ''
   };
 
+  pageSize = 8;
+  pageRoles = 1;
+
+  get paginatedRoles(): any[] {
+    const start = (this.pageRoles - 1) * this.pageSize;
+    return this.roles.slice(start, start + this.pageSize);
+  }
+
+  get totalPagesRoles(): number {
+    return Math.ceil(this.roles.length / this.pageSize) || 1;
+  }
+
   // --- EDITOR DE PERMISOS ---
   isPermisosOpen = false;
   isPermisosSaving = false;

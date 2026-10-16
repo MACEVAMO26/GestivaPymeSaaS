@@ -1,9 +1,17 @@
 <div class="gestiva-bot-container">
   
-  <!-- Burbuja de mensaje inicial (Tutorial) -->
-  <div class="bot-bubble slide-in" *ngIf="showBubble && !showChat">
-    <button class="close-bubble" (click)="showBubble = false">&times;</button>
-    <p>{{ bubbleMessage }}</p>
+  <!-- Burbuja interactiva de orientación contextual -->
+  <div class="bot-bubble slide-in" *ngIf="showBubble && !showChat" (click)="abrirChatDesdeBurbuja()" title="Clic para interactuar con Gestiva IA">
+    <button class="close-bubble" (click)="cerrarBurbuja($event)" title="Ocultar sugerencia">&times;</button>
+    <div class="bubble-header flex items-center gap-1.5 mb-1 text-emerald-400 font-semibold text-xs">
+      <i class="fas fa-lightbulb"></i>
+      <span>Sugerencia Gestiva IA</span>
+    </div>
+    <p class="bubble-text text-xs text-slate-200 mb-2 leading-relaxed">{{ bubbleMessage }}</p>
+    <div class="bubble-footer flex items-center justify-between text-[11px] text-emerald-300 font-medium pt-1 border-t border-slate-700/60">
+      <span><i class="fas fa-comment-dots mr-1"></i> Abrir Asistente</span>
+      <span>&rarr;</span>
+    </div>
   </div>
 
   <!-- Panel de Chat -->
@@ -35,7 +43,7 @@
         <button class="suggestion-btn" (click)="sendSuggestion('Diseña un plan de seguimientos automáticos y alertas para mis clientes y tareas.')">Automatizar seguimientos y alertas</button>
       </div>
       <button class="btn-replay-tutorial" (click)="verTutorial()">
-        <i class="fas fa-redo"></i> ¿Deseas ver el tutorial de nuevo?
+        <i class="fas fa-compass mr-1.5"></i> Ver Guía Interactiva del Sistema
       </button>
     </div>
     

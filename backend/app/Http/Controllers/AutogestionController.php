@@ -168,8 +168,11 @@ class AutogestionController extends Controller
             'estado' => 'required|in:aprobado,rechazado,pendiente',
             'notas_rechazo' => 'nullable|string',
             'fecha_contratacion' => 'nullable|date',
-            'finalizacion_contrato' => 'nullable|date',
-            'renovacion_contrato' => 'nullable|date',
+            'finalizacion_contrato' => 'nullable|date|after_or_equal:fecha_contratacion',
+            'renovacion_contrato' => 'nullable|date|after_or_equal:fecha_contratacion',
+        ], [
+            'finalizacion_contrato.after_or_equal' => 'La fecha de finalización debe ser igual o posterior a la de contratación.',
+            'renovacion_contrato.after_or_equal' => 'La fecha de renovación debe ser igual o posterior a la de contratación.',
         ]);
 
         $existe = DB::table('afiliaciones')->where('user_id', $id)->first();

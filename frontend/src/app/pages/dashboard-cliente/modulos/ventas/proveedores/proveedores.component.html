@@ -69,7 +69,7 @@
                     </td>
                   </tr>
                 } @else {
-                  @for (proveedor of proveedoresFiltrados; track proveedor.id) {
+                  @for (proveedor of paginatedDirectorio; track proveedor.id) {
                     <tr>
                       <td>
                         <strong>{{proveedor.razon_social}}</strong><br>
@@ -110,6 +110,21 @@
               </tbody>
             </table>
           </div>
+
+          @if (proveedoresFiltrados.length > pageSize) {
+            <div class="neu-pagination-bar">
+              <span class="pagination-info">Página {{ pageDirectorio }} de {{ totalPagesDirectorio }} ({{ proveedoresFiltrados.length }} proveedores)</span>
+              <div class="pagination-controls">
+                <button class="pagination-btn" [disabled]="pageDirectorio === 1" (click)="pageDirectorio = pageDirectorio - 1">
+                  <i class="fas fa-chevron-left"></i> Anterior
+                </button>
+                <span class="pagination-badge">{{ pageDirectorio }}</span>
+                <button class="pagination-btn" [disabled]="pageDirectorio >= totalPagesDirectorio" (click)="pageDirectorio = pageDirectorio + 1">
+                  Siguiente <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          }
         </div>
       }
 
@@ -150,7 +165,7 @@
                     </td>
                   </tr>
                 } @else {
-                  @for(cuenta of cuentasPorPagar; track cuenta.id) {
+                  @for(cuenta of paginatedCuentas; track cuenta.id) {
                     <tr>
                       <td><strong>{{nombreProveedorCuenta(cuenta)}}</strong></td>
                       <td><span class="badge badge-secundario">{{cuenta.factura_numero}}</span></td>
@@ -176,6 +191,21 @@
               </tbody>
             </table>
           </div>
+
+          @if (cuentasPorPagar.length > pageSize) {
+            <div class="neu-pagination-bar">
+              <span class="pagination-info">Página {{ pageCuentas }} de {{ totalPagesCuentas }} ({{ cuentasPorPagar.length }} facturas)</span>
+              <div class="pagination-controls">
+                <button class="pagination-btn" [disabled]="pageCuentas === 1" (click)="pageCuentas = pageCuentas - 1">
+                  <i class="fas fa-chevron-left"></i> Anterior
+                </button>
+                <span class="pagination-badge">{{ pageCuentas }}</span>
+                <button class="pagination-btn" [disabled]="pageCuentas >= totalPagesCuentas" (click)="pageCuentas = pageCuentas + 1">
+                  Siguiente <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          }
         </div>
       }
 
@@ -206,7 +236,7 @@
                     </td>
                   </tr>
                 } @else {
-                  @for(eval of contratos; track eval.id) {
+                  @for(eval of paginatedEvaluaciones; track eval.id) {
                     <tr>
                       <td><strong>{{eval.proveedor}}</strong></td>
                       <td><span class="badge badge-aprobada">{{eval.vigencia}}</span></td>
@@ -229,6 +259,21 @@
               </tbody>
             </table>
           </div>
+
+          @if (contratos.length > pageSize) {
+            <div class="neu-pagination-bar">
+              <span class="pagination-info">Página {{ pageEvaluaciones }} de {{ totalPagesEvaluaciones }} ({{ contratos.length }} evaluaciones)</span>
+              <div class="pagination-controls">
+                <button class="pagination-btn" [disabled]="pageEvaluaciones === 1" (click)="pageEvaluaciones = pageEvaluaciones - 1">
+                  <i class="fas fa-chevron-left"></i> Anterior
+                </button>
+                <span class="pagination-badge">{{ pageEvaluaciones }}</span>
+                <button class="pagination-btn" [disabled]="pageEvaluaciones >= totalPagesEvaluaciones" (click)="pageEvaluaciones = pageEvaluaciones + 1">
+                  Siguiente <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          }
         </div>
       }
     </div>

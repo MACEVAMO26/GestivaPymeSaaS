@@ -112,7 +112,7 @@
                       </tr>
                     </thead>
                     <tbody>
-                      @for(mov of movimientos; track $index) {
+                      @for(mov of paginatedMovimientos; track $index) {
                         <tr>
                           <td>{{fechaMovimiento(mov)}}</td>
                           <td>
@@ -131,6 +131,21 @@
                     </tbody>
                   </table>
                 </div>
+
+                @if (movimientos.length > pageSize) {
+                  <div class="neu-pagination-bar">
+                    <span class="pagination-info">Página {{ pageMovimientos }} de {{ totalPagesMovimientos }} ({{ movimientos.length }} movimientos)</span>
+                    <div class="pagination-controls">
+                      <button class="pagination-btn" [disabled]="pageMovimientos === 1" (click)="pageMovimientos = pageMovimientos - 1">
+                        <i class="fas fa-chevron-left"></i> Anterior
+                      </button>
+                      <span class="pagination-badge">{{ pageMovimientos }}</span>
+                      <button class="pagination-btn" [disabled]="pageMovimientos >= totalPagesMovimientos" (click)="pageMovimientos = pageMovimientos + 1">
+                        Siguiente <i class="fas fa-chevron-right"></i>
+                      </button>
+                    </div>
+                  </div>
+                }
               </div>
 
             </div>
@@ -158,7 +173,7 @@
               </tr>
             </thead>
             <tbody>
-              @for(pref of prefacturas; track pref.id) {
+              @for(pref of paginatedPrefacturas; track pref.id) {
                 <tr>
                   <td><strong>{{consecutivoPref(pref)}}</strong></td>
                   <td>{{nombreClientePref(pref)}}</td>
@@ -183,6 +198,21 @@
             </tbody>
           </table>
         </div>
+
+        @if (prefacturas.length > pageSize) {
+          <div class="neu-pagination-bar">
+            <span class="pagination-info">Página {{ pagePrefacturas }} de {{ totalPagesPrefacturas }} ({{ prefacturas.length }} prefacturas)</span>
+            <div class="pagination-controls">
+              <button class="pagination-btn" [disabled]="pagePrefacturas === 1" (click)="pagePrefacturas = pagePrefacturas - 1">
+                <i class="fas fa-chevron-left"></i> Anterior
+              </button>
+              <span class="pagination-badge">{{ pagePrefacturas }}</span>
+              <button class="pagination-btn" [disabled]="pagePrefacturas >= totalPagesPrefacturas" (click)="pagePrefacturas = pagePrefacturas + 1">
+                Siguiente <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        }
       </div>
     }
   </div>

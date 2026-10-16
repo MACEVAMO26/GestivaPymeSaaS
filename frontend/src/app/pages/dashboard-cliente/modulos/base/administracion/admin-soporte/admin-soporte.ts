@@ -22,6 +22,18 @@ export class AdminSoporteComponent implements OnInit {
   isLoading = true;
   isSaving = false;
 
+  pageSize = 8;
+  pageTickets = 1;
+
+  get paginatedTickets(): any[] {
+    const start = (this.pageTickets - 1) * this.pageSize;
+    return this.tickets.slice(start, start + this.pageSize);
+  }
+
+  get totalPagesTickets(): number {
+    return Math.ceil(this.tickets.length / this.pageSize) || 1;
+  }
+
   nuevoTicket = {
     asunto: '',
     mensaje: ''
@@ -42,6 +54,7 @@ export class AdminSoporteComponent implements OnInit {
   }
 
   cargarTickets() {
+    this.pageTickets = 1;
     this.isLoading = true;
     
     // Obtenemos tanto los tickets de soporte como las solicitudes administrativas

@@ -274,10 +274,31 @@ export class AdminUsuarios implements OnInit {
       || 'Pendiente RRHH';
   }
 
+  searchTerm: string = '';
+
+  get usuariosFiltrados(): any[] {
+    if (!this.searchTerm || !this.searchTerm.trim()) {
+      return this.usuarios;
+    }
+    const term = this.searchTerm.trim().toLowerCase();
+    return this.usuarios.filter(u => {
+      const nombreCompleto = `${u.primer_nombre || ''} ${u.segundo_nombre || ''} ${u.primer_apellido || ''} ${u.segundo_apellido || ''}`.toLowerCase();
+      const doc = (u.documento || '').toLowerCase();
+      const email = (u.email || '').toLowerCase();
+      const area = (u.empleado?.cargo?.area?.nombre || u.area?.nombre || '').toLowerCase();
+      const rol = this.obtenerNombreRol(u).toLowerCase();
+      return nombreCompleto.includes(term) || doc.includes(term) || email.includes(term) || area.includes(term) || rol.includes(term);
+    });
+  }
+
+  limpiarBusqueda() {
+    this.searchTerm = '';
+  }
+
   // Devuelve la lista de nombres de rol únicos presentes en los usuarios,
   // ordenados según la jerarquía definida en ORDEN_ROLES
   get rolesPresentes(): string[] {
-    const roles = new Set<string>(this.usuarios.map(u => this.obtenerNombreRol(u)));
+    const roles = new Set<string>(this.usuariosFiltrados.map(u => this.obtenerNombreRol(u)));
     const ordenados = this.ORDEN_ROLES.filter(r => roles.has(r));
     // Agrega roles que no están en ORDEN_ROLES al final
     roles.forEach(r => { if (!this.ORDEN_ROLES.includes(r)) ordenados.push(r); });
@@ -286,6 +307,6 @@ export class AdminUsuarios implements OnInit {
 
   // Filtra los usuarios que pertenecen a un Rol dado
   getUsuariosPorRol(nombreRol: string): any[] {
-    return this.usuarios.filter(u => this.obtenerNombreRol(u) === nombreRol);
+    return this.usuariosFiltrados.filter(u => this.obtenerNombreRol(u) === nombreRol);
   }
 }

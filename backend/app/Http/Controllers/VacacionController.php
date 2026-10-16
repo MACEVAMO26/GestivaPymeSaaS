@@ -35,6 +35,9 @@ class VacacionController extends Controller
             'fecha_fin' => 'required|date|after:fecha_inicio',
             'tipo' => 'required|in:Disfrute Legal,Colectivas,Anticipadas',
             'observaciones' => 'nullable|string',
+        ], [
+            'fecha_inicio.after_or_equal' => 'La fecha de inicio de vacaciones no puede ser anterior a hoy.',
+            'fecha_fin.after' => 'La fecha de fin debe ser posterior a la fecha de inicio.',
         ]);
         $validatedData['estado'] = 'pendiente';
 
@@ -62,6 +65,9 @@ class VacacionController extends Controller
             'fecha_fin' => 'required|date|after:fecha_inicio',
             'tipo' => 'required|in:Disfrute Legal,Colectivas,Anticipadas',
             'observaciones' => 'nullable|string',
+        ], [
+            'fecha_inicio.after_or_equal' => 'La fecha de inicio de vacaciones no puede ser anterior a hoy.',
+            'fecha_fin.after' => 'La fecha de fin debe ser posterior a la fecha de inicio.',
         ]);
 
         $vacacion->update($validatedData);

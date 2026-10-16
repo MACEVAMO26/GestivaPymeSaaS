@@ -32,9 +32,21 @@ class CalendarioEventoController extends Controller
         $validated = $request->validate([
             'titulo' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
-            'fecha_inicio' => 'required|date',
+            'fecha_inicio' => [
+                'required',
+                'date',
+                function ($attribute, $value, $fail) {
+                    if (strtotime($value) < (time() - 300)) {
+                        $fail('No se pueden programar eventos en fechas u horas pasadas.');
+                    }
+                },
+            ],
             'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
             'color_etiqueta' => 'nullable|string|max:20',
+        ], [
+            'fecha_inicio.required' => 'La fecha de inicio es obligatoria.',
+            'fecha_fin.required' => 'La fecha de fin es obligatoria.',
+            'fecha_fin.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
         ]);
 
         $evento = CalendarioEvento::create([
@@ -61,9 +73,19 @@ class CalendarioEventoController extends Controller
         $validated = $request->validate([
             'titulo' => 'sometimes|string|max:255',
             'descripcion' => 'nullable|string',
-            'fecha_inicio' => 'sometimes|date',
-            'fecha_fin' => 'sometimes|date',
+            'fecha_inicio' => [
+                'sometimes',
+                'date',
+                function ($attribute, $value, $fail) {
+                    if (strtotime($value) < (time() - 300)) {
+                        $fail('No se pueden programar eventos en fechas u horas pasadas.');
+                    }
+                },
+            ],
+            'fecha_fin' => 'sometimes|date|after_or_equal:fecha_inicio',
             'color_etiqueta' => 'nullable|string|max:20',
+        ], [
+            'fecha_fin.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
         ]);
 
         $evento->update($validated);

@@ -2,7 +2,7 @@
 $primary-color: #6366f1;
 $primary-hover: #4f46e5;
 $bg-color: #4c808a;
-$sidebar-bg: #1e293b;
+$sidebar-bg: #8cc8d4;
 $text-dark: #f8fafc;
 $text-muted: #94a3b8;
 $glass-bg: rgba(30, 41, 59, 0.7);
@@ -97,18 +97,10 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   reglas de seguridad de los módulos Intocables.
 */
 
-/* --- 3. LAYOUT PRINCIPAL --- */
-.saas-layout {
-  display: flex;
-  height: 100vh;
-  width: 100vw;
-  background-color: $bg-color;
-  overflow: hidden;
-}
-
-$sidebar-bg: #8cc8d4;
 $sidebar-text: #0f172a;
 $sidebar-text-muted: #0f172a;
+
+/* --- 3. LAYOUT PRINCIPAL --- */
 .saas-layout {
   display: flex;
   flex-direction: column;
@@ -130,27 +122,60 @@ $sidebar-text-muted: #0f172a;
 .global-header {
   min-height: 58px;
   background-color: #1e293b;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: none;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: stretch;
   padding: 0;
   z-index: 50;
-  box-shadow: $shadow-sm;
+
   .header-left {
     width: 185px;
+    min-width: 185px;
+    max-width: 185px;
+    flex: 0 0 185px;
     min-height: 58px;
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: $sidebar-bg;
-    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    border-right: none;
+    border-bottom: none;
+    box-shadow: 10px 0 20px rgba(0, 0, 0, 0.08);
     padding: 0.25rem 0.4rem;
+    box-sizing: border-box;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), flex-basis 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &.collapsed {
+      width: 68px;
+      min-width: 68px;
+      max-width: 68px;
+      flex: 0 0 68px;
+      padding: 0.25rem 0.2rem;
+
+      .brand-logo {
+        height: 18px;
+      }
+      .badge {
+        font-size: 8px;
+        padding: 0.1rem 0.3rem;
+        letter-spacing: 0;
+      }
+    }
 
     @media (max-width: 768px) {
-      width: auto;
-      min-width: 135px;
-      padding: 0.25rem 0.65rem;
+      width: 185px;
+      min-width: 185px;
+      max-width: 185px;
+      flex: 0 0 185px;
+
+      &.collapsed {
+        width: 60px;
+        min-width: 60px;
+        max-width: 60px;
+        flex: 0 0 60px;
+        padding: 0.25rem 0.2rem;
+      }
     }
   }
 
@@ -163,6 +188,7 @@ $sidebar-text-muted: #0f172a;
     .brand-logo {
       height: 22px;
       width: auto;
+      transition: height 0.3s ease;
     }
 
     .badge {
@@ -176,15 +202,19 @@ $sidebar-text-muted: #0f172a;
       text-transform: uppercase;
       line-height: 1.1;
       letter-spacing: 0.5px;
+      transition: all 0.3s ease;
     }
   }
 
   .header-right {
     flex: 1;
+    min-height: 58px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: $shadow-sm;
     @media (min-width: 768px) {
       padding: 0 2.5rem;
     }
@@ -274,17 +304,20 @@ $sidebar-text-muted: #0f172a;
 /* --- 6. BARRA LATERAL --- */
 .sidebar-saas {
   width: 185px;
+  min-width: 185px;
+  max-width: 185px;
+  flex: 0 0 185px;
   background-color: $sidebar-bg;
   border-right: none;
+  border-top: none;
   display: flex;
   flex-direction: column;
   padding: 0.85rem 0.35rem;
-  box-shadow:
-    10px 0 20px rgba(0, 0, 0, 0.08),
-    -1px 0 5px rgba(255, 255, 255, 0.5);
+  box-shadow: 10px 0 20px rgba(0, 0, 0, 0.08);
   z-index: 30;
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), flex-basis 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  box-sizing: border-box;
 
   @media (max-width: 768px) {
     position: absolute;
@@ -292,12 +325,18 @@ $sidebar-text-muted: #0f172a;
     bottom: 0;
     left: 0;
     width: 185px;
+    min-width: 185px;
+    max-width: 185px;
+    flex: 0 0 185px;
     z-index: 40;
     box-shadow: 12px 0 28px rgba(0, 0, 0, 0.45);
 
     &.collapsed {
       position: relative;
       width: 60px;
+      min-width: 60px;
+      max-width: 60px;
+      flex: 0 0 60px;
       padding: 0.85rem 0.25rem;
       box-shadow: none;
     }
@@ -305,9 +344,15 @@ $sidebar-text-muted: #0f172a;
 
   &.collapsed {
     width: 68px;
+    min-width: 68px;
+    max-width: 68px;
+    flex: 0 0 68px;
     padding: 0.85rem 0.3rem;
     @media (max-width: 768px) {
       width: 60px;
+      min-width: 60px;
+      max-width: 60px;
+      flex: 0 0 60px;
       padding: 0.85rem 0.25rem;
     }
     .nav-menu .nav-item {
@@ -690,52 +735,9 @@ $sidebar-text-muted: #0f172a;
       }
 
       .actions {
-        text-align: right;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.4rem;
-        justify-content: flex-end;
-        align-items: center;
-        button {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.25rem;
-          border: 1px solid transparent;
-          cursor: pointer;
-          font-size: 14px;
-          font-weight: 600;
-          transition:
-            transform 0.1s ease,
-            box-shadow 0.1s ease;
-          &:active {
-            transform: scale(0.95);
-          }
-        }
-        .btn-editar {
-          background: #4f46e5;
-          color: #ffffff;
-          border: none;
-        }
-        .btn-cobrar {
-          background: #2563eb;
-          color: #ffffff;
-          border: none;
-        }
-        .btn-inactivar {
-          background: #b45309;
-          color: #ffffff;
-          border: none;
-        }
-        .btn-inactivar-total {
-          background: #b91c1c;
-          color: #ffffff;
-          border: none;
-        }
-        .btn-activar {
-          background: #047857;
-          color: #ffffff;
-          border: none;
-        }
+        text-align: center;
+        vertical-align: middle;
+        white-space: nowrap;
       }
     }
 
@@ -1879,12 +1881,14 @@ $sidebar-text-muted: #0f172a;
 }
 
 /* --- SISTEMA UNIFICADO DE BOTONES DE ACCIÓN (COLUMNA "ACCIONES") --- */
-/* Guarda simetría exacta en todos los módulos (34px x 34px, iconos 18px, tooltips) */
+/* Guarda simetría exacta en todos los módulos (36px x 36px, iconos 20px x 20px, tooltips) */
 .saas-action-btn {
-  width: 2.125rem;
-  height: 2.125rem;
-  min-width: 2.125rem;
-  min-height: 2.125rem;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  max-width: 36px;
+  max-height: 36px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
@@ -1901,8 +1905,13 @@ $sidebar-text-muted: #0f172a;
 
   .saas-action-icon,
   svg {
-    width: 1.125rem;
-    height: 1.125rem;
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    min-height: 18px;
+    max-width: 18px;
+    max-height: 18px;
+    display: block;
     flex-shrink: 0;
     transition: transform 0.2s ease;
   }
@@ -2185,5 +2194,119 @@ $sidebar-text-muted: #0f172a;
     border-color: #10b981;
   }
 }
+
+/* --- BARRA DE PAGINACIÓN UNIFICADA (8 ENTRADAS POR PÁGINA) --- */
+.saas-pagination-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  font-size: 14px;
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+  }
+
+  .pagination-info {
+    color: #94a3b8;
+    font-weight: 500;
+    strong {
+      color: #ffffff;
+      font-weight: 600;
+    }
+  }
+
+  .pagination-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .pagination-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #f1f5f9;
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background: rgba(51, 65, 85, 0.9);
+      border-color: rgba(96, 165, 250, 0.5);
+      color: #ffffff;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+
+  .pagination-badge {
+    padding: 0.4rem 0.85rem;
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #38bdf8;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+  }
+}
+
+/* --- SCROLLBAR ESTILIZADO SAAS ADMIN (REEMPLAZA SCROLLBAR CLARO DE WINDOWS) --- */
+:host,
+.saas-layout,
+div[class*="overflow-"] {
+  scrollbar-width: thin;
+  scrollbar-color: #334155 #0f172a;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 9999px;
+  border: 2px solid #0f172a;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: #10b981;
+  }
+
+  &:active {
+    background: #059669;
+  }
+}
+
+::-webkit-scrollbar-corner {
+  background: #0f172a;
+}
+
+::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
 
 

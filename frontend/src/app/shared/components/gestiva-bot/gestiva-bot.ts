@@ -67,35 +67,40 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
     });
   }
 
+  private bubbleTimer: any = null;
+
   ngOnDestroy() {
     if (this.routerSub) {
       this.routerSub.unsubscribe();
+    }
+    if (this.bubbleTimer) {
+      clearTimeout(this.bubbleTimer);
     }
   }
 
   evaluateRoute(url: string) {
     this.showBubble = false;
-    this.showChat = false;
+    // Mantiene el chat abierto si el usuario ya lo abrió expresamente, para no cerrarlo de forma confusa
 
-    if (url.includes('/empleados')) {
+    if (url.includes('/empleados') || url.includes('/gestion-humana')) {
       this.currentModule = 'empleados';
       if (this.tutorialCounts.empleados < 2) {
-        this.triggerBubble('¡Hola! Estás en el módulo de Empleados. ¡Haz clic en "Agregar Empleado"!');
+        this.triggerBubble('Estás en Gestión Humana. ¿Deseas ayuda para crear contratos o tramitar novedades?');
       }
     } else if (url.includes('/inventario')) {
       this.currentModule = 'inventario';
       if (this.tutorialCounts.inventario < 2) {
-        this.triggerBubble('¡Hola! Bienvenido al Inventario. ¡Comienza creando nuevos ítems!');
+        this.triggerBubble('Estás en Inventario. Puedo orientarte sobre cómo ajustar existencias o catalogar productos.');
       }
     } else if (url.includes('/clientes')) {
       this.currentModule = 'clientes';
       if (this.tutorialCounts.clientes < 2) {
-        this.triggerBubble('¡Hola! En la sección de Clientes puedes registrar a tus compradores. ¡Intenta agregar uno nuevo!');
+        this.triggerBubble('Estás en Clientes. ¿Necesitas registrar un comprador o ver su ficha comercial 360°?');
       }
     } else if (url.includes('/ventas')) {
       this.currentModule = 'ventas';
       if (this.tutorialCounts.ventas < 2) {
-        this.triggerBubble('¡Hola! El módulo de Ventas te permite registrar cotizaciones. ¡Crea tu primera venta!');
+        this.triggerBubble('Estás en Ventas. Puedo ayudarte con cotizaciones, facturas o el arqueo de caja.');
       }
     } else {
       this.currentModule = 'general';
@@ -103,19 +108,41 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
   }
 
   triggerBubble(msg: string) {
+    if (this.bubbleTimer) {
+      clearTimeout(this.bubbleTimer);
+    }
     setTimeout(() => {
       this.bubbleMessage = msg;
       this.showBubble = true;
-      setTimeout(() => {
+      this.bubbleTimer = setTimeout(() => {
         this.showBubble = false;
       }, 15000);
-    }, 1000);
+    }, 1200);
+  }
+
+  abrirChatDesdeBurbuja() {
+    if (this.bubbleTimer) {
+      clearTimeout(this.bubbleTimer);
+    }
+    this.showBubble = false;
+    this.showChat = true;
+  }
+
+  cerrarBurbuja(event: Event) {
+    event.stopPropagation();
+    if (this.bubbleTimer) {
+      clearTimeout(this.bubbleTimer);
+    }
+    this.showBubble = false;
   }
 
   toggleChat() {
     this.showChat = !this.showChat;
     if (this.showChat) {
       this.showBubble = false;
+      if (this.bubbleTimer) {
+        clearTimeout(this.bubbleTimer);
+      }
     }
   }
 
@@ -160,6 +187,7 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
   }
 
   verTutorial() {
+    this.showChat = false; // Cierra el mini-chat para permitir ver el tutorial completo en pantalla
     this.iaStateService.triggerTutorial();
   }
 }

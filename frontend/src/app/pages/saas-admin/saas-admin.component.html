@@ -1,7 +1,7 @@
 <div class="saas-layout" [attr.data-daltonism]="accessibilityService.currentMode()">
   <!-- GLOBAL HEADER -->
   <header class="global-header">
-    <div class="header-left">
+    <div class="header-left" [class.collapsed]="isSidebarCollapsed">
       <div class="logo-container flex flex-col items-center justify-center pt-2">
         <img src="assets/images/Logos/GESTIVAPYME(7).png" alt="GestivaPyme" class="brand-logo" />
         <span class="badge mt-0.5">ADMINISTRADOR</span>
@@ -381,117 +381,258 @@
       }
 
       @if (currentView === 'soporte') {
-        <!-- BANDEJA DE SOPORTE TÉCNICO -->
-        <div class="glass-panel mt-2rem">
-          <div class="mb-8 flex justify-between items-center">
-            <div>
-              <h2 class="text-[16px] font-bold text-white tracking-wide uppercase mb-2">
-                Módulo de Soporte Técnico
-              </h2>
-              <p class="text-slate-200 font-medium">
-                Gestión de tickets de soporte de empresas cliente
-              </p>
+        @if (!isModalTicketOpen) {
+          <!-- BANDEJA DE SOPORTE TÉCNICO (VISTA LISTADO CON PAGINACIÓN DE 8) -->
+          <div class="glass-panel mt-2rem">
+            <div class="mb-8 flex justify-between items-center">
+              <div>
+                <h2 class="text-[16px] font-bold text-white tracking-wide uppercase mb-2">
+                  Módulo de Soporte Técnico
+                </h2>
+                <p class="text-slate-200 font-medium">
+                  Gestión de tickets de soporte de empresas cliente
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div
-            class="bg-gray-800/50 rounded-xl overflow-hidden border border-slate-500/50 mt-6 shadow-xl relative backdrop-blur-sm"
-          >
-            <div class="overflow-x-auto">
-              <table class="saas-table w-full text-left border-collapse">
-                <thead>
-                  <tr
-                    class="bg-gray-900/50 text-gray-300 text-sm tracking-wider uppercase border-b border-slate-500"
-                  >
-                    <th class="px-2 py-4 font-semibold">ID</th>
-                    <th class="px-2 py-4 font-semibold">Empresa</th>
-                    <th class="px-2 py-4 font-semibold">Asunto</th>
-                    <th class="px-2 py-4 font-semibold">Prioridad</th>
-                    <th class="px-2 py-4 font-semibold">Estado</th>
-                    <th class="px-2 py-4 font-semibold">Fecha</th>
-                    <th class="px-2 py-4 font-semibold text-center">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-800/50">
-                  @for (ticket of ticketsSoporte; track ticket.id) {
-                    <tr class="hover:bg-gray-700/30 transition-colors duration-200">
-                      <td class="px-2 py-4 text-slate-200 text-sm">#{{ ticket.id }}</td>
-                      <td class="px-2 py-4 font-medium text-white">
-                        {{ ticket.empresa?.razon_social || 'Desconocida' }}
-                      </td>
-                      <td class="px-2 py-4 text-gray-300">{{ ticket.asunto }}</td>
-                      <td class="px-2 py-4">
-                        <span
-                          class="px-3 py-1 rounded-full text-sm font-semibold
-                          {{
-                            ticket.prioridad === 'Alta'
-                              ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-                              : ticket.prioridad === 'Media'
-                                ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
-                                : 'bg-green-500/20 text-green-400 border border-green-500/30'
-                          }}"
-                        >
-                          {{ ticket.prioridad }}
-                        </span>
-                      </td>
-                      <td class="px-2 py-4">
-                        <span
-                          class="px-3 py-1 rounded-full text-sm font-semibold
-                          {{
-                            ticket.estado === 'Abierto'
-                              ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
-                              : ticket.estado === 'En progreso'
-                                ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                                : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                          }}"
-                        >
-                          {{ ticket.estado }}
-                        </span>
-                      </td>
-                      <td class="px-2 py-4 text-slate-200 text-sm">
-                        {{ ticket.created_at | date: 'dd/MM/yyyy HH:mm' }}
-                      </td>
-                      <td class="px-2 py-4 text-center">
-                        <div class="flex items-center justify-center">
-                          <button
-                            (click)="abrirTicket(ticket)"
-                            class="saas-action-btn saas-action-btn--indigo"
-                            title="Atender ticket #{{ ticket.id }}"
-                            aria-label="Atender ticket"
+            <div
+              class="bg-gray-800/50 rounded-xl overflow-hidden border border-slate-500/50 mt-6 shadow-xl relative backdrop-blur-sm"
+            >
+              <div class="overflow-x-auto">
+                <table class="saas-table w-full text-left border-collapse">
+                  <thead>
+                    <tr
+                      class="bg-gray-900/50 text-gray-300 text-sm tracking-wider uppercase border-b border-slate-500"
+                    >
+                      <th class="px-2 py-4 font-semibold">ID</th>
+                      <th class="px-2 py-4 font-semibold">Empresa</th>
+                      <th class="px-2 py-4 font-semibold">Asunto</th>
+                      <th class="px-2 py-4 font-semibold">Prioridad</th>
+                      <th class="px-2 py-4 font-semibold">Estado</th>
+                      <th class="px-2 py-4 font-semibold">Fecha</th>
+                      <th class="px-2 py-4 font-semibold text-center">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-800/50">
+                    @for (ticket of paginatedTickets; track ticket.id) {
+                      <tr class="hover:bg-gray-700/30 transition-colors duration-200">
+                        <td class="px-2 py-4 text-slate-200 text-sm">#{{ ticket.id }}</td>
+                        <td class="px-2 py-4 font-medium text-white">
+                          {{ ticket.empresa?.razon_social || 'Desconocida' }}
+                        </td>
+                        <td class="px-2 py-4 text-gray-300">{{ ticket.asunto }}</td>
+                        <td class="px-2 py-4">
+                          <span
+                            class="px-3 py-1 rounded-full text-sm font-semibold
+                            {{
+                              ticket.prioridad === 'Alta'
+                                ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                : ticket.prioridad === 'Media'
+                                  ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                                  : 'bg-green-500/20 text-green-400 border border-green-500/30'
+                            }}"
                           >
-                            <svg class="saas-action-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a.75.75 0 0 1-.974-.94 5.95 5.95 0 0 0 .54-2.477A8.163 8.163 0 0 1 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  }
-                  @if (ticketsSoporte.length === 0) {
-                    <tr>
-                      <td colspan="7" class="p-8 text-center text-slate-200">
-                        <svg
-                          class="w-12 h-12 mx-auto mb-3 opacity-50"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="1.5"
-                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                          ></path>
-                        </svg>
-                        No hay tickets de soporte disponibles.
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
+                            {{ ticket.prioridad }}
+                          </span>
+                        </td>
+                        <td class="px-2 py-4">
+                          <span
+                            class="px-3 py-1 rounded-full text-sm font-semibold
+                            {{
+                              ticket.estado === 'Abierto'
+                                ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
+                                : ticket.estado === 'En progreso'
+                                  ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                                  : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                            }}"
+                          >
+                            {{ ticket.estado }}
+                          </span>
+                        </td>
+                        <td class="px-2 py-4 text-slate-200 text-sm">
+                          {{ ticket.created_at | date: 'dd/MM/yyyy HH:mm' }}
+                        </td>
+                        <td class="px-2 py-4 text-center align-middle whitespace-nowrap">
+                          <div class="flex items-center justify-center mx-auto">
+                            <button
+                              (click)="abrirTicket(ticket)"
+                              class="saas-action-btn saas-action-btn--indigo"
+                              title="Atender ticket #{{ ticket.id }}"
+                              aria-label="Atender ticket"
+                            >
+                              <svg class="saas-action-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v5.018Z" />
+                              </svg>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    }
+                    @if (ticketsSoporte.length === 0) {
+                      <tr>
+                        <td colspan="7" class="p-8 text-center text-slate-200">
+                          <svg
+                            class="w-12 h-12 mx-auto mb-3 opacity-50"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="1.5"
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                            ></path>
+                          </svg>
+                          No hay tickets de soporte disponibles.
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Paginación de Soporte (8 por página) -->
+              @if (totalPagesTickets > 1) {
+                <div class="saas-pagination-bar px-4 pb-4">
+                  <div class="pagination-info">
+                    Mostrando <strong>{{ (pageTickets - 1) * pageSize + 1 }}</strong> a
+                    <strong>{{ Math.min(pageTickets * pageSize, ticketsSoporte.length) }}</strong> de
+                    <strong>{{ ticketsSoporte.length }}</strong> tickets
+                  </div>
+                  <div class="pagination-controls">
+                    <button
+                      type="button"
+                      class="pagination-btn"
+                      (click)="pageTickets = pageTickets - 1"
+                      [disabled]="pageTickets === 1"
+                    >
+                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                      </svg>
+                      Anterior
+                    </button>
+                    <span class="pagination-badge">Pág. {{ pageTickets }} / {{ totalPagesTickets }}</span>
+                    <button
+                      type="button"
+                      class="pagination-btn"
+                      (click)="pageTickets = pageTickets + 1"
+                      [disabled]="pageTickets >= totalPagesTickets"
+                    >
+                      Siguiente
+                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              }
             </div>
           </div>
-        </div>
+        } @else {
+          <!-- VISTA COMPLETA: ATENCIÓN DE TICKET (PÁGINA DEDICADA SIN MODAL FLOTANTE) -->
+          @if (ticketSeleccionado) {
+            <div class="glass-panel mt-2rem fade-in">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6 border-b border-gray-800">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0 border border-indigo-500/30">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 class="text-xl font-bold text-white tracking-wide uppercase m-0">
+                      Atención de Ticket #{{ ticketSeleccionado.id }}: {{ ticketSeleccionado.asunto }}
+                    </h2>
+                    <p class="text-slate-300 text-sm mt-1 mb-0">
+                      Empresa: <strong class="text-white">{{ ticketSeleccionado.empresa?.razon_social }}</strong> | 
+                      Fecha: {{ ticketSeleccionado.created_at | date: 'dd/MM/yyyy HH:mm' }} | 
+                      Prioridad: <span class="font-bold text-yellow-400">{{ ticketSeleccionado.prioridad }}</span>
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  (click)="cerrarModalTicket()"
+                  class="saas-btn saas-btn--secondary flex items-center gap-2 self-start sm:self-auto"
+                >
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                  </svg>
+                  Volver a Tickets
+                </button>
+              </div>
+
+              <div class="max-w-4xl mx-auto space-y-6">
+                <div class="p-5 bg-gray-900/60 rounded-xl border border-gray-800">
+                  <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                    Descripción del Problema Reportado
+                  </h3>
+                  <p class="text-gray-200 text-base leading-relaxed whitespace-pre-line m-0">
+                    {{ ticketSeleccionado.mensaje }}
+                  </p>
+                </div>
+
+                <div class="form-group">
+                  <label class="block text-sm font-semibold text-gray-300 mb-2">
+                    Respuesta Oficial (se notificará al cliente):
+                  </label>
+                  <textarea
+                    [(ngModel)]="respuestaTicket"
+                    class="saas-input w-full min-h-[140px] text-base"
+                    placeholder="Escribe la respuesta, solución o indicaciones técnicas brindadas a la empresa..."
+                  ></textarea>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-800">
+                  <button
+                    type="button"
+                    (click)="cerrarModalTicket()"
+                    class="saas-btn saas-btn--secondary"
+                    [disabled]="isRespondiendoTicket"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    (click)="responderTicket()"
+                    class="saas-btn saas-btn--primary flex items-center gap-2"
+                    [disabled]="isRespondiendoTicket || !respuestaTicket.trim()"
+                  >
+                    @if (isRespondiendoTicket) {
+                      <svg
+                        class="animate-spin h-4 w-4 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          class="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          stroke-width="4"
+                        ></circle>
+                        <path
+                          class="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Enviando Solución...
+                    } @else {
+                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                      </svg>
+                      Resolver y Enviar Respuesta
+                    }
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        }
       }
 
       @if (currentView === 'seguridad') {
@@ -656,9 +797,12 @@
                   Si crees que tu cuenta ha sido comprometida o simplemente deseas renovar tu clave
                   por seguridad, puedes forzar un reseteo.
                   <br /><br />
-                  <span class="text-yellow-400 font-semibold"
-                    ><i class="fas fa-exclamation-triangle"></i> Atención:</span
-                  >
+                  <span class="text-yellow-400 font-semibold inline-flex items-center gap-1">
+                    <svg class="w-4 h-4 text-yellow-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                    </svg>
+                    Atención:
+                  </span>
                   Al presionar este botón, tu sesión se cerrará de inmediato y el sistema te
                   obligará a registrar una nueva contraseña la próxima vez que inicies sesión.
                 </p>
@@ -691,373 +835,1090 @@
       }
 
       @if (currentView === 'empresas') {
-        <!-- COMPANIES TABLE -->
-        <div class="glass-panel mt-2rem">
-          <div class="mb-8 flex flex-col items-center justify-center gap-2">
-            <h2 class="text-[16px] font-bold text-white tracking-wide text-center uppercase m-0">
-              Directorio de Empresas Cliente
-            </h2>
-            <p class="text-slate-200 text-center text-sm m-0">
-              Administra el portafolio global de empresas y sus estados en el sistema.
-            </p>
-            <button (click)="abrirModal()" class="btn-new mt-2">+ Nueva Empresa</button>
-          </div>
+        @if (!showModal) {
+          <!-- COMPANIES TABLE (VISTA LISTADO CON PAGINACIÓN DE 8) -->
+          <div class="glass-panel mt-2rem">
+            <div class="mb-8 flex flex-col items-center justify-center gap-2">
+              <h2 class="text-[16px] font-bold text-white tracking-wide text-center uppercase m-0">
+                Directorio de Empresas Cliente
+              </h2>
+              <p class="text-slate-200 text-center text-sm m-0">
+                Administra el portafolio global de empresas y sus estados en el sistema.
+              </p>
+              <button (click)="abrirModal()" class="btn-new mt-2">+ Nueva Empresa</button>
+            </div>
 
-          <div
-            class="bg-[#0f172a] rounded-2xl p-6 shadow-inner border border-gray-800 w-full overflow-x-auto"
-          >
-            @if (isLoadingEmpresas) {
-              <div class="flex flex-col items-center justify-center py-12">
-                <svg
-                  class="animate-spin h-10 w-10 text-emerald-500 mb-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  ></circle>
-                  <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                <span class="text-slate-200 font-semibold tracking-wide"
-                  >Cargando base de datos...</span
-                >
+            <!-- BARRA DE BÚSQUEDA EN TIEMPO REAL -->
+            <div class="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+              <div class="relative w-full sm:max-w-md">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  [(ngModel)]="busquedaEmpresas"
+                  (ngModelChange)="onBusquedaEmpresasChange()"
+                  placeholder="Buscar empresa por Razón Social, NIT o dominio..."
+                  class="w-full pl-10 pr-10 py-2.5 bg-slate-950/80 border border-slate-700/80 rounded-lg text-slate-100 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all shadow-inner"
+                />
+                @if (busquedaEmpresas) {
+                  <button
+                    type="button"
+                    (click)="limpiarBusquedaEmpresas()"
+                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white transition-colors"
+                    title="Limpiar búsqueda"
+                  >
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                }
               </div>
-            } @else if (empresas.length > 0) {
-              <table class="data-table text-sm">
-                <thead>
-                  <tr>
-                    <th class="px-2 py-4 font-semibold uppercase tracking-wider">ID</th>
-                    <th
-                      class="px-2 py-4 font-semibold uppercase tracking-wider text-center min-w-[90px] whitespace-normal"
-                    >
-                      Razón Social
-                    </th>
-                    <th
-                      class="px-2 py-4 font-semibold uppercase tracking-wider text-center min-w-[80px] whitespace-nowrap"
-                    >
-                      NIT
-                    </th>
-                    <th
-                      class="px-2 py-4 font-semibold uppercase tracking-wider text-center min-w-[100px] whitespace-normal"
-                    >
-                      Fecha Inscripción
-                    </th>
-                    <th
-                      class="px-2 py-4 font-semibold uppercase tracking-wider text-center max-w-[80px] whitespace-normal"
-                    >
-                      Tipo de Plan
-                    </th>
-                    <th
-                      class="px-2 py-4 font-semibold uppercase tracking-wider text-center min-w-[90px] whitespace-normal"
-                    >
-                      Meses Pagados
-                    </th>
-                    <th
-                      class="px-2 py-4 font-semibold uppercase tracking-wider text-center min-w-[100px] whitespace-normal"
-                    >
-                      Ganancia Histórica
-                    </th>
-                    <th
-                      class="px-2 py-4 font-semibold uppercase tracking-wider text-center min-w-[130px] whitespace-nowrap"
-                    >
-                      Estado
-                    </th>
-                    <th
-                      class="px-2 py-4 font-semibold uppercase tracking-wider text-center min-w-[160px] pl-6"
-                    >
-                      Acciones
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (empresa of empresas; track empresa.id) {
-                    <tr [class.highlight-row]="empresa.id === empresaDestacadaId">
-                      <td>{{ empresa.id }}</td>
-                      <td class="font-500">{{ empresa.razon_social }}</td>
-                      <td class="whitespace-nowrap">{{ empresa.nit }}</td>
-                      <td class="text-center">
-                        {{
-                          empresa.fecha_inscripcion
-                            ? (empresa.fecha_inscripcion | date: 'mediumDate')
-                            : 'No registrada'
-                        }}
-                      </td>
-                      <td class="text-center">
-                        <span class="badge-modulos">{{
-                          empresa.plan_suscripcion || 'Emprendedor'
-                        }}</span>
-                      </td>
-                      <td class="text-center font-bold text-emerald-400">
-                        {{ empresa.meses_activos }} meses
-                      </td>
-                      <td class="text-center font-bold text-emerald-400">
-                        {{ empresa.ganancia_total | currency: 'USD' : 'symbol' : '1.0-0' }}
-                      </td>
-                      <td class="text-center">
-                        @if (empresa.activo && empresa.estado_pago === 'al_dia') {
-                          <span
-                            class="px-3 py-1 rounded-full font-semibold uppercase bg-green-500/20 text-green-400 whitespace-nowrap"
-                            >Al Día</span
-                          >
-                        } @else if (empresa.activo && empresa.estado_pago === 'mora') {
-                          <span
-                            class="px-3 py-1 rounded-full font-semibold uppercase bg-yellow-500/20 text-yellow-400 whitespace-nowrap"
-                            >En Mora (Suspendida)</span
-                          >
-                        } @else {
-                          <span
-                            class="px-3 py-1 rounded-full font-semibold uppercase bg-red-500/20 text-red-400 whitespace-nowrap"
-                            >Inactiva Total</span
-                          >
-                        }
-                      </td>
-                      <td class="actions text-center">
-                        <div class="flex items-center gap-1.5 justify-center">
-                          <!-- Auditoria / Modo Dios -->
-                          <button
-                            (click)="auditarEmpresa(empresa)"
-                            class="saas-action-btn saas-action-btn--blue"
-                            title="Auditar Sistema (Modo Dios)"
-                            aria-label="Auditar Sistema"
-                          >
-                            <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="saas-action-icon">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                            </svg>
-                          </button>
 
-                          <!-- Ir a Suscripción (carga el precio según el plan) -->
-                          <button
-                            (click)="abrirSuscripcionDeEmpresa(empresa)"
-                            class="saas-action-btn saas-action-btn--emerald"
-                            title="Suscripción / Plan"
-                            aria-label="Suscripción y Plan"
-                          >
-                            <svg
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke-width="2"
-                              stroke="currentColor"
-                              class="saas-action-icon"
-                            >
-                              <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                              />
-                            </svg>
-                          </button>
+              <!-- Indicador de conteo -->
+              <div class="text-xs text-slate-400 whitespace-nowrap flex items-center gap-2">
+                @if (busquedaEmpresas) {
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    {{ empresasFiltradas.length }} encontrada(s) de {{ empresas.length }}
+                  </span>
+                } @else {
+                  <span>Total: <strong class="text-slate-200">{{ empresas.length }}</strong> empresas</span>
+                }
+              </div>
+            </div>
 
-                          <!-- Activar (Check) -->
-                          <button
-                            (click)="cambiarEstadoEmpresa(empresa, 'activar')"
-                            class="saas-action-btn saas-action-btn--emerald"
-                            title="Activar"
-                            aria-label="Activar Empresa"
-                          >
-                            <svg
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke-width="2"
-                              stroke="currentColor"
-                              class="saas-action-icon"
-                            >
-                              <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="m4.5 12.75 6 6 9-13.5"
-                              />
-                            </svg>
-                          </button>
-
-                          <!-- Inactivar (Block) -->
-                          <button
-                            (click)="cambiarEstadoEmpresa(empresa, 'mora')"
-                            class="saas-action-btn saas-action-btn--amber"
-                            title="Suspender (Mora)"
-                            aria-label="Suspender por Mora"
-                          >
-                            <svg
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke-width="2"
-                              stroke="currentColor"
-                              class="saas-action-icon"
-                            >
-                              <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636"
-                              />
-                            </svg>
-                          </button>
-
-                          <!-- Inactivar Total (Trash) -->
-                          <button
-                            (click)="cambiarEstadoEmpresa(empresa, 'inactivar')"
-                            class="saas-action-btn saas-action-btn--red"
-                            title="Inactivar Total"
-                            aria-label="Inactivar Total"
-                          >
-                            <svg
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke-width="2"
-                              stroke="currentColor"
-                              class="saas-action-icon"
-                            >
-                              <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                              />
-                            </svg>
-                          </button>
-
-                          <!-- Editar (Edit) -->
-                          <button
-                            (click)="editarEmpresa(empresa)"
-                            class="saas-action-btn saas-action-btn--fuchsia"
-                            title="Editar Datos"
-                            aria-label="Editar Empresa"
-                          >
-                            <svg
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke-width="2"
-                              stroke="currentColor"
-                              class="saas-action-icon"
-                            >
-                              <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
-                              />
-                            </svg>
-                          </button>
-
-                          <!-- Reenviar Credenciales -->
-                          <button
-                            (click)="reenviarCredenciales(empresa)"
-                            class="saas-action-btn saas-action-btn--blue"
-                            title="Reenviar credenciales por correo"
-                            aria-label="Reenviar credenciales"
-                          >
-                            <svg
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke-width="2"
-                              stroke="currentColor"
-                              class="saas-action-icon"
-                            >
-                              <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
-                              />
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
+            <div
+              class="bg-[#0f172a] rounded-2xl p-6 shadow-inner border border-gray-800 w-full overflow-x-auto"
+            >
+              @if (isLoadingEmpresas) {
+                <div class="flex flex-col items-center justify-center py-12">
+                  <svg
+                    class="animate-spin h-10 w-10 text-emerald-500 mb-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    ></circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  <span class="text-slate-200 font-semibold tracking-wide"
+                    >Cargando base de datos...</span
+                  >
+                </div>
+              } @else if (empresas.length > 0) {
+                @if (empresasFiltradas.length > 0) {
+                <table class="data-table text-sm">
+                  <thead>
+                    <tr>
+                      <th class="px-2 py-4 font-semibold uppercase tracking-wider">ID</th>
+                      <th
+                        class="px-2 py-4 font-semibold uppercase tracking-wider text-center min-w-[90px] whitespace-normal"
+                      >
+                        Razón Social
+                      </th>
+                      <th
+                        class="px-2 py-4 font-semibold uppercase tracking-wider text-center min-w-[80px] whitespace-nowrap"
+                      >
+                        NIT
+                      </th>
+                      <th
+                        class="px-2 py-4 font-semibold uppercase tracking-wider text-center min-w-[100px] whitespace-normal"
+                      >
+                        Fecha Inscripción
+                      </th>
+                      <th
+                        class="px-2 py-4 font-semibold uppercase tracking-wider text-center max-w-[80px] whitespace-normal"
+                      >
+                        Tipo de Plan
+                      </th>
+                      <th
+                        class="px-2 py-4 font-semibold uppercase tracking-wider text-center min-w-[90px] whitespace-normal"
+                      >
+                        Meses Pagados
+                      </th>
+                      <th
+                        class="px-2 py-4 font-semibold uppercase tracking-wider text-center min-w-[100px] whitespace-normal"
+                      >
+                        Ganancia Histórica
+                      </th>
+                      <th
+                        class="px-2 py-4 font-semibold uppercase tracking-wider text-center min-w-[130px] whitespace-nowrap"
+                      >
+                        Estado
+                      </th>
+                      <th
+                        class="px-2 py-4 font-semibold uppercase tracking-wider text-center min-w-[300px]"
+                      >
+                        Acciones
+                      </th>
                     </tr>
-                  }
-                </tbody>
-              </table>
-            } @else {
-              <div class="empty-state">No hay empresas registradas aún.</div>
-            }
+                  </thead>
+                  <tbody>
+                    @for (empresa of paginatedEmpresas; track empresa.id) {
+                      <tr [class.highlight-row]="empresa.id === empresaDestacadaId">
+                        <td>{{ empresa.id }}</td>
+                        <td class="font-500">{{ empresa.razon_social }}</td>
+                        <td class="whitespace-nowrap">{{ empresa.nit }}</td>
+                        <td class="text-center">
+                          {{
+                            empresa.fecha_inscripcion
+                              ? (empresa.fecha_inscripcion | date: 'mediumDate')
+                              : 'No registrada'
+                          }}
+                        </td>
+                        <td class="text-center">
+                          <span class="badge-modulos">{{
+                            empresa.plan_suscripcion || 'Emprendedor'
+                          }}</span>
+                        </td>
+                        <td class="text-center font-bold text-emerald-400">
+                          {{ empresa.meses_activos }} meses
+                        </td>
+                        <td class="text-center font-bold text-emerald-400">
+                          {{ empresa.ganancia_total | currency: 'USD' : 'symbol' : '1.0-0' }}
+                        </td>
+                        <td class="text-center">
+                          @if (empresa.activo && empresa.estado_pago === 'al_dia') {
+                            <span
+                              class="px-3 py-1 rounded-full font-semibold uppercase bg-green-500/20 text-green-400 whitespace-nowrap"
+                              >Al Día</span
+                            >
+                          } @else if (empresa.activo && empresa.estado_pago === 'mora') {
+                            <span
+                              class="px-3 py-1 rounded-full font-semibold uppercase bg-yellow-500/20 text-yellow-400 whitespace-nowrap"
+                              >En Mora (Suspendida)</span
+                            >
+                          } @else {
+                            <span
+                              class="px-3 py-1 rounded-full font-semibold uppercase bg-red-500/20 text-red-400 whitespace-nowrap"
+                              >Inactiva Total</span
+                            >
+                          }
+                        </td>
+                        <td class="actions text-center align-middle whitespace-nowrap">
+                          <div class="flex items-center justify-center gap-1.5 mx-auto">
+                            <!-- Auditoria / Modo Dios -->
+                            <button
+                              (click)="auditarEmpresa(empresa)"
+                              class="saas-action-btn saas-action-btn--blue"
+                              title="Auditar Sistema (Modo Dios)"
+                              aria-label="Auditar Sistema"
+                            >
+                              <svg class="saas-action-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                              </svg>
+                            </button>
+
+                            <!-- Ir a Suscripción (carga el precio según el plan) -->
+                            <button
+                              (click)="abrirSuscripcionDeEmpresa(empresa)"
+                              class="saas-action-btn saas-action-btn--emerald"
+                              title="Suscripción / Plan"
+                              aria-label="Suscripción y Plan"
+                            >
+                              <svg class="saas-action-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                              </svg>
+                            </button>
+
+                            <!-- Activar (Check Circle) -->
+                            <button
+                              (click)="cambiarEstadoEmpresa(empresa, 'activar')"
+                              class="saas-action-btn saas-action-btn--emerald"
+                              title="Activar"
+                              aria-label="Activar Empresa"
+                            >
+                              <svg class="saas-action-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                              </svg>
+                            </button>
+
+                            <!-- Inactivar (Block) -->
+                            <button
+                              (click)="cambiarEstadoEmpresa(empresa, 'mora')"
+                              class="saas-action-btn saas-action-btn--amber"
+                              title="Suspender (Mora)"
+                              aria-label="Suspender por Mora"
+                            >
+                              <svg class="saas-action-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+                              </svg>
+                            </button>
+
+                            <!-- Inactivar Total (Trash) -->
+                            <button
+                              (click)="cambiarEstadoEmpresa(empresa, 'inactivar')"
+                              class="saas-action-btn saas-action-btn--red"
+                              title="Inactivar Total"
+                              aria-label="Inactivar Total"
+                            >
+                              <svg class="saas-action-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                              </svg>
+                            </button>
+
+                            <!-- Editar (Edit) -->
+                            <button
+                              (click)="editarEmpresa(empresa)"
+                              class="saas-action-btn saas-action-btn--fuchsia"
+                              title="Editar Datos"
+                              aria-label="Editar Empresa"
+                            >
+                              <svg class="saas-action-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                              </svg>
+                            </button>
+
+                            <!-- Reenviar Credenciales -->
+                            <button
+                              (click)="reenviarCredenciales(empresa)"
+                              class="saas-action-btn saas-action-btn--blue"
+                              title="Reenviar credenciales por correo"
+                              aria-label="Reenviar credenciales"
+                            >
+                              <svg class="saas-action-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                              </svg>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+
+                <!-- Paginación de Empresas (8 por página) -->
+                @if (totalPagesEmpresas > 1) {
+                  <div class="saas-pagination-bar">
+                    <div class="pagination-info">
+                      Mostrando <strong>{{ (pageEmpresas - 1) * pageSize + 1 }}</strong> a
+                      <strong>{{ Math.min(pageEmpresas * pageSize, empresasFiltradas.length) }}</strong> de
+                      <strong>{{ empresasFiltradas.length }}</strong> empresas
+                    </div>
+                    <div class="pagination-controls">
+                      <button
+                        type="button"
+                        class="pagination-btn"
+                        (click)="pageEmpresas = pageEmpresas - 1"
+                        [disabled]="pageEmpresas === 1"
+                      >
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                        </svg>
+                        Anterior
+                      </button>
+                      <span class="pagination-badge">Pág. {{ pageEmpresas }} / {{ totalPagesEmpresas }}</span>
+                      <button
+                        type="button"
+                        class="pagination-btn"
+                        (click)="pageEmpresas = pageEmpresas + 1"
+                        [disabled]="pageEmpresas >= totalPagesEmpresas"
+                      >
+                        Siguiente
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                }
+              } @else {
+                <div class="empty-state py-12 text-center flex flex-col items-center justify-center">
+                  <svg class="w-12 h-12 text-slate-500 mb-3" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                  </svg>
+                  <p class="text-slate-200 font-semibold text-base mb-1">No se encontraron empresas con "{{ busquedaEmpresas }}"</p>
+                  <p class="text-slate-400 text-sm mb-4">Verifica la razón social, NIT o dominio ingresado.</p>
+                  <button type="button" (click)="limpiarBusquedaEmpresas()" class="text-sm bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 px-4 py-2 rounded-lg transition-colors font-medium">
+                    Limpiar filtro de búsqueda
+                  </button>
+                </div>
+              }
+              } @else {
+                <div class="empty-state">No hay empresas registradas aún.</div>
+              }
+            </div>
           </div>
-        </div>
+        } @else {
+          <!-- VISTA COMPLETA: CREAR / EDITAR EMPRESA (PÁGINA DEDICADA SIN MODAL FLOTANTE) -->
+          <div class="glass-panel mt-2rem fade-in">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6 border-b border-gray-800">
+              <div>
+                <h2 class="text-xl font-bold text-white tracking-wide uppercase m-0">
+                  {{ isEditMode ? 'Editar Empresa: ' + nuevaEmpresa.razon_social : 'Crear Nueva Empresa Cliente' }}
+                </h2>
+                <p class="text-slate-300 text-sm mt-1 mb-0">
+                  {{ isEditMode ? 'Actualiza los datos institucionales, de contacto y plan de la empresa.' : 'Registra una nueva empresa en el ecosistema SaaS con sus credenciales y suscripción.' }}
+                </p>
+              </div>
+              <button
+                type="button"
+                (click)="cerrarModal()"
+                class="saas-btn saas-btn--secondary flex items-center gap-2 self-start sm:self-auto"
+              >
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                </svg>
+                Volver al Directorio
+              </button>
+            </div>
+
+            <form (ngSubmit)="guardarEmpresa()" class="max-w-4xl mx-auto">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="saas-form-group">
+                  <label class="saas-label">Razón Social *</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="nuevaEmpresa.razon_social"
+                    name="razon_social"
+                    required
+                    class="saas-input"
+                  />
+                </div>
+                <div class="saas-form-group">
+                  <label class="saas-label">Correo del Cliente / Gerente (Real) *</label>
+                  <input
+                    type="email"
+                    [(ngModel)]="nuevaEmpresa.email"
+                    name="email"
+                    required
+                    class="saas-input"
+                    placeholder="ej: cliente@gmail.com"
+                  />
+                </div>
+              </div>
+
+              <div class="saas-form-group">
+                <label class="saas-label flex justify-between items-center">
+                  Ruta / Dominio Personalizado
+                  <button
+                    type="button"
+                    (click)="generarDominio()"
+                    class="text-sm text-emerald-400 hover:text-emerald-300 font-semibold underline bg-transparent border-none cursor-pointer p-0 m-0"
+                  >
+                    Autogenerar
+                  </button>
+                </label>
+                <div class="flex items-center">
+                  <span class="text-slate-200 text-sm mr-2 select-none">gestivapyme.com/</span>
+                  <input
+                    type="text"
+                    [(ngModel)]="nuevaEmpresa.dominio"
+                    name="dominio"
+                    class="saas-input flex-1"
+                    placeholder="ej: miempresa"
+                  />
+                </div>
+                <span class="text-sm text-slate-200 mt-1 block">
+                  Deja vacío para autogenerar. Dale clic varias veces a "Autogenerar" para ver más opciones.
+                </span>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="saas-form-group">
+                  <label class="saas-label">Tipo de Identificación *</label>
+                  <select
+                    [(ngModel)]="nuevaEmpresa.tipo_identificacion"
+                    name="tipo_identificacion"
+                    class="saas-select"
+                  >
+                    <option value="NIT">NIT</option>
+                    <option value="CC">Cédula de Ciudadanía (CC)</option>
+                    <option value="CE">Cédula de Extranjería (CE)</option>
+                  </select>
+                </div>
+                <div class="saas-form-group">
+                  <label class="saas-label">{{
+                    nuevaEmpresa.tipo_identificacion === 'NIT' ? 'NIT *' : 'Número de Identificación *'
+                  }}</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="nuevaEmpresa.nit"
+                    name="nit"
+                    required
+                    class="saas-input"
+                    [placeholder]="
+                      nuevaEmpresa.tipo_identificacion === 'NIT' ? 'Ej: 900123456-7' : 'Ej: 1234567890'
+                    "
+                  />
+                </div>
+              </div>
+
+              <div class="saas-form-group">
+                <label class="saas-label">Tipo de Empresa *</label>
+                <select
+                  [(ngModel)]="nuevaEmpresa.tipo_empresa"
+                  name="tipo_empresa"
+                  required
+                  class="saas-select"
+                >
+                  <option value="Ventas">Ventas</option>
+                  <option value="Servicios">Servicios</option>
+                  <option value="Mixto">Mixto (Ventas y Servicios)</option>
+                </select>
+              </div>
+
+              <!-- Campos del Gerente -->
+              <h3 class="text-emerald-400 font-bold mt-6 mb-3 border-b border-gray-800 pb-2">
+                Datos del Gerente General
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="saas-form-group">
+                  <label class="saas-label">Tipo de Documento *</label>
+                  <select
+                    [(ngModel)]="nuevaEmpresa.tipo_documento_gerente"
+                    name="tipo_documento_gerente"
+                    class="saas-select"
+                    required
+                  >
+                    <option value="CC">Cédula de Ciudadanía (CC)</option>
+                    <option value="CE">Cédula de Extranjería (CE)</option>
+                    <option value="Pasaporte">Pasaporte</option>
+                    <option value="PEP">Permiso Especial de Permanencia (PEP)</option>
+                    <option value="PPT">Permiso de Protección Temporal (PPT)</option>
+                  </select>
+                </div>
+                <div class="saas-form-group">
+                  <label class="saas-label">Número de Documento *</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="nuevaEmpresa.documento_gerente"
+                    name="documento_gerente"
+                    class="saas-input"
+                    placeholder="Ej: 1010101010"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="saas-form-group">
+                  <label class="saas-label">Primer Nombre</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="nuevaEmpresa.primer_nombre_gerente"
+                    name="primer_nombre_gerente"
+                    class="saas-input"
+                    placeholder="Ej: Juan"
+                  />
+                </div>
+                <div class="saas-form-group">
+                  <label class="saas-label">Segundo Nombre</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="nuevaEmpresa.segundo_nombre_gerente"
+                    name="segundo_nombre_gerente"
+                    class="saas-input"
+                    placeholder="Ej: Carlos"
+                  />
+                </div>
+                <div class="saas-form-group">
+                  <label class="saas-label">Primer Apellido</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="nuevaEmpresa.primer_apellido_gerente"
+                    name="primer_apellido_gerente"
+                    class="saas-input"
+                    placeholder="Ej: Pérez"
+                  />
+                </div>
+                <div class="saas-form-group">
+                  <label class="saas-label">Segundo Apellido</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="nuevaEmpresa.segundo_apellido_gerente"
+                    name="segundo_apellido_gerente"
+                    class="saas-input"
+                    placeholder="Ej: López"
+                  />
+                </div>
+              </div>
+
+              <!-- Suscripción y Descuentos -->
+              <h3 class="text-emerald-400 font-bold mt-6 mb-3 border-b border-gray-800 pb-2">
+                Plan y Contratación
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="saas-form-group">
+                  <label class="saas-label">Tipo de Plan *</label>
+                  <select
+                    [(ngModel)]="nuevaEmpresa.plan_suscripcion"
+                    name="plan_suscripcion"
+                    required
+                    class="saas-select"
+                  >
+                    <option value="Emprendedor">Emprendedor</option>
+                    <option value="Pyme">Pyme</option>
+                    <option value="Empresarial">Empresarial</option>
+                  </select>
+                </div>
+                <div class="saas-form-group">
+                  <label class="saas-label">Periodo Contratado *</label>
+                  <select [(ngModel)]="nuevaEmpresa.periodo" name="periodo" class="saas-select" required>
+                    <option value="Mensual">Mensual</option>
+                    <option value="Anual">Anual</option>
+                  </select>
+                </div>
+                <div class="saas-form-group">
+                  <label class="saas-label">Fecha de Creación / Inscripción</label>
+                  <div class="relative">
+                    <input
+                      type="date"
+                      [(ngModel)]="nuevaEmpresa.fecha_inscripcion"
+                      name="fecha_inscripcion"
+                      class="saas-input cursor-not-allowed bg-slate-900/80 border-slate-700 text-emerald-400 font-semibold"
+                      readonly
+                      title="Fecha asignada automáticamente por el sistema"
+                    />
+                  </div>
+                  <span class="text-xs text-emerald-400 mt-1 block">
+                    <i class="fas fa-check-circle mr-1"></i> Asignada automáticamente por el sistema (hoy).
+                  </span>
+                </div>
+              </div>
+
+              <div class="saas-form-group">
+                <div class="flex justify-between items-center mb-2">
+                  <label class="saas-label mb-0">Descuentos Especiales</label>
+                  <button
+                    type="button"
+                    (click)="agregarDescuentoEmpresaForm()"
+                    class="text-sm bg-yellow-900/50 hover:bg-yellow-800/50 text-yellow-300 border border-yellow-800 px-3 py-1 rounded-lg transition-colors"
+                  >
+                    + Añadir Descuento
+                  </button>
+                </div>
+
+                <div class="space-y-2">
+                  @for (desc of listaDescuentosEmpresa; track $index) {
+                    <div class="flex items-center gap-2">
+                      <select
+                        [(ngModel)]="listaDescuentosEmpresa[$index]"
+                        name="desc_{{ $index }}"
+                        class="saas-select flex-1"
+                      >
+                        <option value="N/A">N/A</option>
+                        <option value="Referido 10%">Referido 10%</option>
+                        <option value="Mes Gratis">Mes gratis (Solo Anual)</option>
+                      </select>
+                      <button
+                        type="button"
+                        (click)="eliminarDescuentoEmpresaForm($index)"
+                        class="text-red-400 hover:text-red-300 p-1"
+                      >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"
+                          ></path>
+                        </svg>
+                      </button>
+                    </div>
+                  }
+                  @if (listaDescuentosEmpresa.length === 0) {
+                    <p class="text-sm text-slate-200 italic">No hay descuentos aplicados.</p>
+                  }
+                </div>
+              </div>
+
+              <div class="flex items-center justify-end gap-3 mt-8 pt-4 border-t border-gray-800">
+                <button type="button" (click)="cerrarModal()" class="saas-btn saas-btn--secondary">
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  [disabled]="isSubmitting"
+                  class="saas-btn saas-btn--primary flex items-center justify-center gap-2"
+                >
+                  <span *ngIf="!isSubmitting">{{ isEditMode ? 'Actualizar Empresa' : 'Crear Empresa' }}</span>
+                  <span *ngIf="isSubmitting" class="flex items-center gap-2">
+                    <svg
+                      class="animate-spin h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        class="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="4"
+                      ></circle>
+                      <path
+                        class="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Guardando...
+                  </span>
+                </button>
+              </div>
+            </form>
+          </div>
+        }
       }
 
       @if (currentView === 'solicitudes') {
-        <!-- BANDEJA DE SOLICITUDES -->
-        <div class="glass-panel mt-2rem">
-          <div class="mb-8">
-            <h2 class="text-[16px] font-bold text-white mb-2 tracking-wide text-center uppercase">
-              Bandeja de Solicitudes
-            </h2>
-            <p class="text-slate-200 text-center text-sm">
-              Centro de atención para requerimientos, soporte técnico y comunicación con clientes.
-            </p>
-          </div>
-
-          <!-- Filtros -->
-          <div class="flex flex-col sm:flex-row gap-4 mb-6">
-            <div class="flex-1">
-              <input
-                type="text"
-                [(ngModel)]="filtroEmpresaSolicitud"
-                placeholder="Buscar por nombre de empresa..."
-                class="w-full bg-[#0f172a] border border-slate-500 text-white rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500 transition-colors"
-              />
+        @if (!isModalSolicitudOpen) {
+          <!-- BANDEJA DE SOLICITUDES (VISTA LISTADO CON PAGINACIÓN DE 8) -->
+          <div class="glass-panel mt-2rem">
+            <div class="mb-8">
+              <h2 class="text-[16px] font-bold text-white mb-2 tracking-wide text-center uppercase">
+                Bandeja de Solicitudes
+              </h2>
+              <p class="text-slate-200 text-center text-sm">
+                Centro de atención para requerimientos, soporte técnico y comunicación con clientes.
+              </p>
             </div>
-            <div class="w-full sm:w-48">
-              <input
-                type="date"
-                [(ngModel)]="filtroFechaSolicitud"
-                class="dark-date-input w-full bg-[#0f172a] border border-orange-500/40 text-white rounded-lg px-4 py-2 focus:outline-none focus:border-orange-500 transition-colors"
-                title="Filtrar por fecha"
-              />
+
+            <!-- Filtros -->
+            <div class="flex flex-col sm:flex-row gap-4 mb-6">
+              <div class="flex-1">
+                <input
+                  type="text"
+                  [(ngModel)]="filtroEmpresaSolicitud"
+                  placeholder="Buscar por nombre de empresa..."
+                  class="w-full bg-[#0f172a] border border-slate-500 text-white rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500 transition-colors"
+                />
+              </div>
+              <div class="w-full sm:w-48">
+                <input
+                  type="date"
+                  [(ngModel)]="filtroFechaSolicitud"
+                  class="dark-date-input w-full bg-[#0f172a] border border-orange-500/40 text-white rounded-lg px-4 py-2 focus:outline-none focus:border-orange-500 transition-colors"
+                  title="Filtrar por fecha"
+                />
+              </div>
+            </div>
+
+            <div
+              class="bg-[#0f172a] rounded-2xl p-6 shadow-inner border border-gray-800 w-full overflow-x-auto"
+            >
+              @if (solicitudesFiltradas.length > 0) {
+                <div class="request-list">
+                  @for (solicitud of paginatedSolicitudes; track solicitud.id) {
+                    <div class="request-item">
+                      <div class="req-info">
+                        <h4 class="font-inter">Empresa: {{ solicitud.empresa?.razon_social }}</h4>
+                        <p class="meta-info font-inter">
+                          Tipo:
+                          <span [class]="'type-' + solicitud.tipo">{{
+                            formatTipo(solicitud.tipo) | uppercase
+                          }}</span>
+                          | Fecha: {{ solicitud.created_at | date: 'short' }} | Estado:
+                          <span [class]="'status-' + solicitud.estado">{{
+                            solicitud.estado | uppercase
+                          }}</span>
+                        </p>
+                        @if (solicitud.notas_propietaria && solicitud.estado !== 'pendiente') {
+                          <div class="response-note font-inter">
+                            <strong>Tu Respuesta:</strong> "{{ solicitud.notas_propietaria }}"
+                          </div>
+                        }
+                      </div>
+                      <div class="flex flex-col gap-2">
+                        <button (click)="abrirSolicitud(solicitud)" class="saas-btn saas-btn--primary saas-btn--pill">
+                          Ver Detalles
+                        </button>
+                        @if (solicitud.estado === 'pendiente') {
+                          <button
+                            (click)="marcarComoResueltaRapido(solicitud)"
+                            class="saas-btn saas-btn--secondary saas-btn--pill"
+                          >
+                            Resuelta
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                <!-- Paginación de Solicitudes (8 por página) -->
+                @if (totalPagesSolicitudes > 1) {
+                  <div class="saas-pagination-bar">
+                    <div class="pagination-info">
+                      Mostrando <strong>{{ (pageSolicitudes - 1) * pageSize + 1 }}</strong> a
+                      <strong>{{ Math.min(pageSolicitudes * pageSize, solicitudesFiltradas.length) }}</strong> de
+                      <strong>{{ solicitudesFiltradas.length }}</strong> solicitudes
+                    </div>
+                    <div class="pagination-controls">
+                      <button
+                        type="button"
+                        class="pagination-btn"
+                        (click)="pageSolicitudes = pageSolicitudes - 1"
+                        [disabled]="pageSolicitudes === 1"
+                      >
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                        </svg>
+                        Anterior
+                      </button>
+                      <span class="pagination-badge">Pág. {{ pageSolicitudes }} / {{ totalPagesSolicitudes }}</span>
+                      <button
+                        type="button"
+                        class="pagination-btn"
+                        (click)="pageSolicitudes = pageSolicitudes + 1"
+                        [disabled]="pageSolicitudes >= totalPagesSolicitudes"
+                      >
+                        Siguiente
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                }
+              } @else {
+                <div class="empty-state">No tienes solicitudes en el historial.</div>
+              }
             </div>
           </div>
+        } @else {
+          <!-- VISTA COMPLETA: DETALLE DE SOLICITUD (PÁGINA DEDICADA SIN MODAL FLOTANTE) -->
+          @if (solicitudSeleccionada) {
+            <div class="glass-panel mt-2rem fade-in">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6 border-b border-gray-800">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0 border border-cyan-500/30">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 class="text-xl font-bold text-white tracking-wide uppercase m-0 flex items-center gap-3">
+                      Detalle de la Solicitud #{{ solicitudSeleccionada.id }}
+                      <span class="px-3 py-0.5 bg-cyan-500/20 text-cyan-400 text-xs rounded-full uppercase border border-cyan-500/30">
+                        {{ formatTipo(solicitudSeleccionada.tipo) | uppercase }}
+                      </span>
+                    </h2>
+                    <p class="text-slate-300 text-sm mt-1 mb-0">
+                      Empresa: <strong class="text-white">{{ solicitudSeleccionada.empresa?.razon_social }}</strong> | 
+                      Fecha: {{ solicitudSeleccionada.created_at | date: 'medium' }} | 
+                      Estado: <span class="font-bold uppercase text-emerald-400">{{ solicitudSeleccionada.estado }}</span>
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  (click)="cerrarModalSolicitud()"
+                  class="saas-btn saas-btn--secondary flex items-center gap-2 self-start sm:self-auto"
+                >
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                  </svg>
+                  Volver a Solicitudes
+                </button>
+              </div>
 
-          <div
-            class="bg-[#0f172a] rounded-2xl p-6 shadow-inner border border-gray-800 w-full overflow-x-auto"
-          >
-            @if (solicitudesFiltradas.length > 0) {
-              <div class="request-list">
-                @for (solicitud of solicitudesFiltradas; track solicitud.id) {
-                  <div class="request-item">
-                    <div class="req-info">
-                      <h4 class="font-inter">Empresa: {{ solicitud.empresa?.razon_social }}</h4>
-                      <p class="meta-info font-inter">
-                        Tipo:
-                        <span [class]="'type-' + solicitud.tipo">{{
-                          formatTipo(solicitud.tipo) | uppercase
-                        }}</span>
-                        | Fecha: {{ solicitud.created_at | date: 'short' }} | Estado:
-                        <span [class]="'status-' + solicitud.estado">{{
-                          solicitud.estado | uppercase
-                        }}</span>
-                      </p>
-                      @if (solicitud.notas_propietaria && solicitud.estado !== 'pendiente') {
-                        <div class="response-note font-inter">
-                          <strong>Tu Respuesta:</strong> "{{ solicitud.notas_propietaria }}"
+              <div class="max-w-4xl mx-auto space-y-6">
+                @if (solicitudSeleccionada.tipo === 'pago') {
+                  <div class="p-5 bg-gray-900/60 rounded-xl border border-gray-800">
+                    <strong class="text-white text-base block mb-2">Información del Pago:</strong>
+                    <p class="text-slate-300 text-sm mb-4">
+                      Banco Origen: <strong class="text-white">{{ solicitudSeleccionada.banco_origen || 'No especificado' }}</strong>
+                    </p>
+                    @if (solicitudSeleccionada.comprobante_path) {
+                      <strong class="text-white text-sm block mb-2">Comprobante Adjunto:</strong>
+                      <div class="bg-[#111827] border border-slate-700 rounded-xl p-4 text-center">
+                        <a
+                          [href]="getArchivoUrl(solicitudSeleccionada.comprobante_path)"
+                          target="_blank"
+                          class="text-blue-400 hover:text-blue-300 flex items-center justify-center gap-2 font-medium"
+                        >
+                          Ver Comprobante (Click para abrir)
+                          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+                          </svg>
+                        </a>
+                      </div>
+                    }
+                  </div>
+                }
+
+                @if (solicitudSeleccionada.tipo === 'cambio_datos') {
+                  <div class="p-5 bg-gray-900/60 rounded-xl border border-gray-800">
+                    <strong class="text-white text-base block mb-3">Datos a Modificar:</strong>
+                    @if (solicitudSeleccionada.datosPropuestos) {
+                      <ul class="space-y-3 text-sm">
+                        @if (solicitudSeleccionada.datosPropuestos.razon_social) {
+                          <li class="flex items-center gap-3">
+                            <input
+                              type="checkbox"
+                              [(ngModel)]="camposAprobados['razon_social']"
+                              class="rounded bg-gray-800 border-gray-600 text-cyan-500 focus:ring-cyan-500 cursor-pointer w-4 h-4"
+                            />
+                            <div>
+                              <span class="text-slate-400">Razón Social:</span>
+                              <span class="text-white font-medium ml-2">{{ solicitudSeleccionada.datosPropuestos.razon_social }}</span>
+                            </div>
+                          </li>
+                        }
+                        @if (solicitudSeleccionada.datosPropuestos.nit) {
+                          <li class="flex items-center gap-3">
+                            <input
+                              type="checkbox"
+                              [(ngModel)]="camposAprobados['nit']"
+                              class="rounded bg-gray-800 border-gray-600 text-cyan-500 focus:ring-cyan-500 cursor-pointer w-4 h-4"
+                            />
+                            <div>
+                              <span class="text-slate-400">NIT:</span>
+                              <span class="text-white font-medium ml-2">{{ solicitudSeleccionada.datosPropuestos.nit }}</span>
+                            </div>
+                          </li>
+                        }
+                        @if (solicitudSeleccionada.datosPropuestos.telefono) {
+                          <li class="flex items-center gap-3">
+                            <input
+                              type="checkbox"
+                              [(ngModel)]="camposAprobados['telefono']"
+                              class="rounded bg-gray-800 border-gray-600 text-cyan-500 focus:ring-cyan-500 cursor-pointer w-4 h-4"
+                            />
+                            <div>
+                              <span class="text-slate-400">Teléfono:</span>
+                              <span class="text-white font-medium ml-2">{{ solicitudSeleccionada.datosPropuestos.telefono }}</span>
+                            </div>
+                          </li>
+                        }
+                        @if (solicitudSeleccionada.datosPropuestos.direccion) {
+                          <li class="flex items-center gap-3">
+                            <input
+                              type="checkbox"
+                              [(ngModel)]="camposAprobados['direccion']"
+                              class="rounded bg-gray-800 border-gray-600 text-cyan-500 focus:ring-cyan-500 cursor-pointer w-4 h-4"
+                            />
+                            <div>
+                              <span class="text-slate-400">Dirección:</span>
+                              <span class="text-white font-medium ml-2">{{ solicitudSeleccionada.datosPropuestos.direccion }}</span>
+                            </div>
+                          </li>
+                        }
+                        @if (solicitudSeleccionada.datosPropuestos.color_primario) {
+                          <li class="flex items-center gap-3">
+                            <input
+                              type="checkbox"
+                              [(ngModel)]="camposAprobados['color_primario']"
+                              class="rounded bg-gray-800 border-gray-600 text-cyan-500 focus:ring-cyan-500 cursor-pointer w-4 h-4"
+                            />
+                            <div class="flex items-center gap-2">
+                              <span class="text-slate-400">Color Primario:</span>
+                              <span class="text-white font-medium">{{ solicitudSeleccionada.datosPropuestos.color_primario }}</span>
+                              <input
+                                type="color"
+                                [value]="solicitudSeleccionada.datosPropuestos.color_primario"
+                                disabled
+                                class="w-5 h-5 rounded border border-slate-500 bg-transparent p-0 cursor-default"
+                              />
+                            </div>
+                          </li>
+                        }
+                      </ul>
+
+                      @if (solicitudSeleccionada.datosPropuestos.temp_logo) {
+                        <div class="mt-4 pt-4 border-t border-slate-700 flex items-start gap-3">
+                          <input
+                            type="checkbox"
+                            [(ngModel)]="camposAprobados['temp_logo']"
+                            class="rounded bg-gray-800 border-gray-600 text-cyan-500 focus:ring-cyan-500 cursor-pointer w-4 h-4 mt-1"
+                          />
+                          <div>
+                            <strong class="text-white text-sm">Nuevo Logo Propuesto:</strong>
+                            <div class="mt-2 p-2 bg-gray-800 rounded inline-block">
+                              <img
+                                [src]="getArchivoUrl(solicitudSeleccionada.datosPropuestos.temp_logo)"
+                                class="max-h-24 object-contain"
+                                alt="Logo"
+                              />
+                            </div>
+                          </div>
                         </div>
                       }
+
+                      @if (solicitudSeleccionada.datosPropuestos.temp_doc) {
+                        <div class="mt-4 pt-4 border-t border-slate-700">
+                          <a
+                            [href]="getArchivoUrl(solicitudSeleccionada.datosPropuestos.temp_doc, true)"
+                            target="_blank"
+                            download
+                            class="text-cyan-400 hover:text-cyan-300 text-sm font-medium inline-flex items-center gap-2"
+                          >
+                            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                            </svg>
+                            Ver Documento / RUT Adjunto
+                          </a>
+                        </div>
+                      }
+                    } @else {
+                      <p class="text-slate-200 italic text-sm m-0">La solicitud no contiene datos estructurados.</p>
+                    }
+                  </div>
+                }
+
+                @if (solicitudSeleccionada.tipo === 'soporte') {
+                  <div class="p-5 bg-gray-900/60 rounded-xl border border-gray-800">
+                    <strong class="text-white text-base block mb-2">Mensaje del Cliente:</strong>
+                    <div class="bg-[#111827] border border-slate-700 rounded-xl p-4">
+                      <p class="text-gray-300 m-0 whitespace-pre-wrap">
+                        {{ solicitudSeleccionada.datosPropuestos?.mensaje || 'El usuario no adjuntó un mensaje.' }}
+                      </p>
                     </div>
-                    <div class="flex flex-col gap-2">
-                      <button (click)="abrirSolicitud(solicitud)" class="saas-btn saas-btn--primary saas-btn--pill">
-                        Ver Detalles
+                  </div>
+                }
+
+                @if (solicitudSeleccionada.tipo === 'migracion') {
+                  <div class="p-5 bg-gray-900/60 rounded-xl border border-gray-800">
+                    <strong class="text-white text-base block mb-2">Base de Datos Recibida (Onboarding):</strong>
+                    <p class="text-gray-300 text-sm mb-4">
+                      La empresa subió su información histórica (Excel) para migrarla a GestivaPyme.
+                      Descarga el archivo, corrígelo si es necesario y vuelve a subirlo para importar los
+                      datos a su cuenta. Al importar, los datos aparecerán en Clientes, Proveedores,
+                      Inventario, Servicios y Gestión Humana.
+                    </p>
+
+                    <div class="flex flex-wrap gap-3">
+                      <button
+                        (click)="aprobarEImportar()"
+                        [disabled]="importandoMigracion || solicitudSeleccionada?.estado === 'aprobado'"
+                        class="px-4 py-2 glass-btn-green text-white rounded-lg font-bold flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        @if (importandoMigracion) {
+                          <svg class="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg>
+                          Importando...
+                        } @else if (solicitudSeleccionada?.estado === 'aprobado') {
+                          <svg class="w-4 h-4 inline-block" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                          </svg>
+                          Ya Importado
+                        } @else {
+                          <svg class="w-4 h-4 inline-block" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                          </svg>
+                          Aprobar e Importar
+                        }
                       </button>
-                      @if (solicitud.estado === 'pendiente') {
+                      <button
+                        (click)="descargarArchivoMigracion()"
+                        class="px-4 py-2 glass-btn-blue text-white rounded-lg font-bold flex items-center gap-2 transition-colors"
+                      >
+                        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                        </svg>
+                        Descargar Archivo Subido
+                      </button>
+
+                      @if (solicitudSeleccionada.estado === 'pendiente') {
+                        <label class="px-4 py-2 glass-btn-cyan text-white rounded-lg font-bold flex items-center gap-2 cursor-pointer transition-colors">
+                          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                          </svg>
+                          {{ archivoMigracionCorregido ? archivoMigracionCorregido.name : 'Seleccionar Archivo Corregido' }}
+                          <input type="file" accept=".xlsx,.xls,.csv" class="hidden" (change)="onArchivoMigracionSeleccionado($event)" />
+                        </label>
                         <button
-                          (click)="marcarComoResueltaRapido(solicitud)"
-                          class="saas-btn saas-btn--secondary saas-btn--pill"
+                          (click)="importarMigracion()"
+                          [disabled]="!archivoMigracionCorregido || importandoMigracion"
+                          class="px-4 py-2 glass-btn-green text-white rounded-lg font-bold flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          Resuelta
+                          @if (importandoMigracion) {
+                            <svg class="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none">
+                              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Importando...
+                          } @else {
+                            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15" />
+                            </svg>
+                            Importar Base de Datos
+                          }
                         </button>
                       }
+                    </div>
+
+                    @if (solicitudSeleccionada.notas_propietaria) {
+                      <div class="mt-4 bg-emerald-500/10 border border-emerald-500/40 rounded p-3">
+                        <p class="text-emerald-300 text-sm font-medium m-0">
+                          {{ solicitudSeleccionada.notas_propietaria }}
+                        </p>
+                      </div>
+                    }
+                  </div>
+                }
+
+                @if (solicitudSeleccionada.estado === 'pendiente') {
+                  <div class="saas-form-group mb-6">
+                    <label class="saas-label font-semibold text-gray-300 mb-2 block">
+                      Mensaje / Notas para el Cliente (Obligatorio para rechazar)
+                    </label>
+                    <textarea
+                      [(ngModel)]="mensajeRespuesta"
+                      rows="3"
+                      placeholder="Ej: Comprobante ilegible, vuelve a subirlo..."
+                      class="saas-input w-full bg-[#111827] text-white border-slate-700 focus:border-cyan-500 resize-none"
+                    ></textarea>
+                  </div>
+
+                  <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-800">
+                    <button type="button" (click)="cerrarModalSolicitud()" class="saas-btn saas-btn--secondary">
+                      Cancelar
+                    </button>
+                    <button
+                      type="button"
+                      (click)="procesarSolicitud('rechazado')"
+                      class="saas-btn saas-btn--danger flex items-center gap-2"
+                      [disabled]="!mensajeRespuesta || mensajeRespuesta.trim() === ''"
+                    >
+                      Rechazar
+                      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      (click)="procesarSolicitud('aprobado')"
+                      class="saas-btn saas-btn--primary flex items-center gap-2"
+                    >
+                      Aprobar Solicitud
+                      <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                      </svg>
+                    </button>
+                  </div>
+                } @else {
+                  <div class="mt-6 pt-4 border-t border-gray-800 text-center">
+                    <span class="inline-block px-4 py-2 bg-gray-800 text-gray-300 rounded-full text-sm font-semibold mb-6">
+                      Esta solicitud ya fue {{ solicitudSeleccionada.estado | uppercase }}.
+                    </span>
+                    <div class="flex justify-center">
+                      <button type="button" (click)="cerrarModalSolicitud()" class="saas-btn saas-btn--secondary">
+                        Volver al Listado
+                      </button>
                     </div>
                   </div>
                 }
               </div>
-            } @else {
-              <div class="empty-state">No tienes solicitudes en el historial.</div>
-            }
-          </div>
-        </div>
+            </div>
+          }
+        }
       }
 
       <!-- VISTA: CONTROL DE IA -->
@@ -1307,7 +2168,7 @@
           </div>
 
           <div class="bg-[#0f172a] rounded-2xl p-6 shadow-inner border border-gray-800 w-full">
-            @if (!editandoSuscripcion) {
+            @if (!editandoSuscripcion && !modalTarifasGlobalesVisible) {
               <h3 class="panel-title mb-6">Métricas Financieras (MRR)</h3>
 
               <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
@@ -1429,14 +2290,14 @@
                           Estado
                         </th>
                         <th
-                          class="px-2 py-4 font-semibold uppercase tracking-wider text-center min-w-[110px] whitespace-nowrap"
+                          class="px-2 py-4 font-semibold uppercase tracking-wider text-center min-w-[150px] whitespace-nowrap"
                         >
                           Acciones
                         </th>
                       </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-700">
-                      @for (sus of suscripcionesList; track sus.id) {
+                      @for (sus of paginatedSuscripciones; track sus.id) {
                         <tr class="hover:bg-gray-800/50 transition-colors">
                           <td
                             class="px-2 py-4 text-center text-gray-300 font-medium whitespace-nowrap"
@@ -1520,32 +2381,17 @@
                               </span>
                             }
                           </td>
-                          <td class="px-2 py-4 text-center whitespace-nowrap">
-                            <div class="flex justify-center gap-1.5">
+                          <td class="px-2 py-4 text-center align-middle whitespace-nowrap">
+                            <div class="flex items-center justify-center gap-1.5 mx-auto">
                               <button
                                 (click)="abrirCarritoSuscripcion(sus)"
                                 class="saas-action-btn saas-action-btn--slate"
                                 title="Gestionar Tarifas"
                                 aria-label="Gestionar Tarifas"
                               >
-                                <svg
-                                  class="saas-action-icon"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                                  ></path>
-                                  <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                  ></path>
+                                <svg class="saas-action-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065Z" />
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                                 </svg>
                               </button>
                               <button
@@ -1554,18 +2400,8 @@
                                 title="Renovar Suscripción"
                                 aria-label="Renovar Suscripción"
                               >
-                                <svg
-                                  class="saas-action-icon"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                                  ></path>
+                                <svg class="saas-action-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
                                 </svg>
                               </button>
                               <button
@@ -1574,18 +2410,8 @@
                                 title="Suspender Suscripción"
                                 aria-label="Suspender Suscripción"
                               >
-                                <svg
-                                  class="saas-action-icon"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
-                                  ></path>
+                                <svg class="saas-action-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
                                 </svg>
                               </button>
                             </div>
@@ -1595,9 +2421,121 @@
                     </tbody>
                   </table>
                 </div>
+
+                <!-- Paginación de Suscripciones (8 por página) -->
+                @if (totalPagesSuscripciones > 1) {
+                  <div class="saas-pagination-bar">
+                    <div class="pagination-info">
+                      Mostrando <strong>{{ (pageSuscripciones - 1) * pageSize + 1 }}</strong> a
+                      <strong>{{ Math.min(pageSuscripciones * pageSize, suscripcionesList.length) }}</strong> de
+                      <strong>{{ suscripcionesList.length }}</strong> suscripciones
+                    </div>
+                    <div class="pagination-controls">
+                      <button
+                        type="button"
+                        class="pagination-btn"
+                        (click)="pageSuscripciones = pageSuscripciones - 1"
+                        [disabled]="pageSuscripciones === 1"
+                      >
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                        </svg>
+                        Anterior
+                      </button>
+                      <span class="pagination-badge">Pág. {{ pageSuscripciones }} / {{ totalPagesSuscripciones }}</span>
+                      <button
+                        type="button"
+                        class="pagination-btn"
+                        (click)="pageSuscripciones = pageSuscripciones + 1"
+                        [disabled]="pageSuscripciones >= totalPagesSuscripciones"
+                      >
+                        Siguiente
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                }
               } @else {
                 <div class="empty-state">No hay datos de suscripciones para mostrar.</div>
               }
+            } @else if (modalTarifasGlobalesVisible) {
+              <!-- VISTA COMPLETA: CATÁLOGO DE TARIFAS GLOBALES (SUBPÁGINA DEDICADA SIN MODAL FLOTANTE) -->
+              <div class="w-full text-white font-inter fade-in">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6 border-b border-gray-800">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30">
+                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h2 class="text-xl font-bold text-white tracking-wide uppercase m-0">
+                        Catálogo de Precios y Tarifas Globales
+                      </h2>
+                      <p class="text-slate-300 text-sm mt-1 mb-0">
+                        Establece los valores (COP) que el sistema cobrará. Los porcentajes se aplican como descuento.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    (click)="cerrarModalTarifasGlobales()"
+                    class="saas-btn saas-btn--secondary flex items-center gap-2 self-start sm:self-auto"
+                  >
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                    </svg>
+                    Volver a Suscripciones
+                  </button>
+                </div>
+
+                <div class="max-w-4xl mx-auto space-y-6">
+                  @for (grupo of gruposTarifas; track grupo.titulo) {
+                    <div class="bg-gray-900/60 rounded-xl p-5 border border-gray-800 shadow-inner">
+                      <h3 class="text-sm uppercase tracking-wider text-emerald-400 font-semibold mb-3 border-b border-gray-800 pb-2">
+                        {{ grupo.titulo }}
+                      </h3>
+                      <div class="space-y-2">
+                        @for (item of grupo.items; track item.id) {
+                          <div class="flex items-center justify-between gap-3 bg-gray-900 rounded-lg px-4 py-2 border border-gray-800">
+                            <label class="flex-1 text-sm text-gray-300">{{ item.nombre }}</label>
+                            <div class="relative w-44">
+                              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-semibold">
+                                {{ item.tipo === 'descuento' ? '%' : '$' }}
+                              </span>
+                              <input
+                                type="number"
+                                [(ngModel)]="item.valor"
+                                [disabled]="!item.activo"
+                                class="neu-dark-input w-full pl-8 pr-3 py-1.5 text-sm text-right text-white"
+                              />
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+
+                  <div class="flex justify-end gap-3 pt-6 border-t border-gray-800">
+                    <button
+                      type="button"
+                      (click)="cerrarModalTarifasGlobales()"
+                      class="saas-btn saas-btn--secondary"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="button"
+                      (click)="guardarTarifasCatalogo()"
+                      class="saas-btn saas-btn--primary"
+                    >
+                      Actualizar Tarifas
+                    </button>
+                  </div>
+                </div>
+              </div>
             } @else {
               <!-- CARRITO DE SUSCRIPCIONES INLINE -->
               <div class="w-full text-white font-inter">
@@ -2640,162 +3578,250 @@
                   (click)="cargarLeads()"
                   class="saas-btn saas-btn--secondary ml-auto"
                 >
-                  <i class="fas fa-sync-alt"></i> Actualizar lista
+                  <svg class="w-4 h-4 inline-block mr-1.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                  </svg>
+                  Actualizar lista
                 </button>
               }
             </div>
 
             @if (comercialTab === 'interesados') {
-              <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                  <thead>
-                    <tr
-                      class="border-b border-slate-500 text-white text-base uppercase tracking-wider"
-                    >
-                      <th class="py-3 px-2 font-bold uppercase tracking-wider text-center">
-                        Nombre
-                      </th>
-                      <th class="py-3 px-2 font-bold uppercase tracking-wider text-center">
-                        Teléfono
-                      </th>
-                      <th class="py-3 px-2 font-bold uppercase tracking-wider text-center">
-                        Correo
-                      </th>
-                      <th
-                        class="py-3 px-2 font-bold uppercase tracking-wider text-center min-w-[80px] whitespace-normal"
+              @if (!showNotasModal) {
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left border-collapse">
+                    <thead>
+                      <tr
+                        class="border-b border-slate-500 text-white text-base uppercase tracking-wider"
                       >
-                        Horario Ideal
-                      </th>
-                      <th class="py-3 px-2 font-bold uppercase tracking-wider text-center">
-                        Mensaje
-                      </th>
-                      <th class="py-3 px-2 font-bold uppercase tracking-wider text-center">
-                        Estado
-                      </th>
-                      <th class="py-3 px-2 font-bold uppercase tracking-wider text-center">
-                        Acciones
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody class="text-base text-[#cbd5e1]">
-                    @for (lead of leads; track lead.id) {
-                      <tr class="border-b border-gray-800 hover:bg-gray-800/50 transition-colors">
-                        <td class="py-3 px-2 font-medium">{{ lead.nombre }}</td>
-                        <td class="py-3 px-2 text-center">{{ lead.telefono }}</td>
-                        <td class="py-3 px-2 text-center">{{ lead.correo }}</td>
-                        <td class="py-3 px-2 text-center">
-                          {{ lead.horario_llamada || 'Cualquier hora' }}
-                        </td>
-                        <td class="py-3 px-2 max-w-xs truncate" title="{{ lead.mensaje }}">
-                          {{ lead.mensaje || '-' }}
-                        </td>
-                        <td class="py-3 px-2 text-center">
-                          <span
-                            class="px-3 py-1 rounded-full font-semibold uppercase"
-                            [ngClass]="{
-                              'bg-blue-500/20 text-blue-400': lead.estado === 'pendiente',
-                              'bg-green-500/20 text-green-400': lead.estado === 'contactado',
-                              'bg-yellow-500/20 text-yellow-400': lead.estado === 'archivado',
-                            }"
-                            >{{ lead.estado }}</span
-                          >
-                        </td>
-                        <td class="py-3 px-2">
-                          <div class="flex items-center justify-center gap-1.5">
-                            <button
-                              class="saas-action-btn saas-action-btn--emerald"
-                              title="Marcar Contactado"
-                              aria-label="Marcar como Contactado"
-                              (click)="cambiarEstadoLead(lead.id, 'contactado')"
+                        <th class="py-3 px-2 font-bold uppercase tracking-wider text-center">
+                          Nombre
+                        </th>
+                        <th class="py-3 px-2 font-bold uppercase tracking-wider text-center">
+                          Teléfono
+                        </th>
+                        <th class="py-3 px-2 font-bold uppercase tracking-wider text-center">
+                          Correo
+                        </th>
+                        <th
+                          class="py-3 px-2 font-bold uppercase tracking-wider text-center min-w-[80px] whitespace-normal"
+                        >
+                          Horario Ideal
+                        </th>
+                        <th class="py-3 px-2 font-bold uppercase tracking-wider text-center">
+                          Mensaje
+                        </th>
+                        <th class="py-3 px-2 font-bold uppercase tracking-wider text-center">
+                          Estado
+                        </th>
+                        <th class="py-3 px-2 font-bold uppercase tracking-wider text-center min-w-[180px]">
+                          Acciones
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="text-base text-[#cbd5e1]">
+                      @for (lead of paginatedLeads; track lead.id) {
+                        <tr class="border-b border-gray-800 hover:bg-gray-800/50 transition-colors">
+                          <td class="py-3 px-2 font-medium">{{ lead.nombre }}</td>
+                          <td class="py-3 px-2 text-center">{{ lead.telefono }}</td>
+                          <td class="py-3 px-2 text-center">{{ lead.correo }}</td>
+                          <td class="py-3 px-2 text-center">
+                            {{ lead.horario_llamada || 'Cualquier hora' }}
+                          </td>
+                          <td class="py-3 px-2 max-w-xs truncate" title="{{ lead.mensaje }}">
+                            {{ lead.mensaje || '-' }}
+                          </td>
+                          <td class="py-3 px-2 text-center">
+                            <span
+                              class="px-3 py-1 rounded-full font-semibold uppercase"
+                              [ngClass]="{
+                                'bg-blue-500/20 text-blue-400': lead.estado === 'pendiente',
+                                'bg-green-500/20 text-green-400': lead.estado === 'contactado',
+                                'bg-yellow-500/20 text-yellow-400': lead.estado === 'archivado',
+                              }"
+                              >{{ lead.estado }}</span
                             >
-                              <svg
-                                class="saas-action-icon"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
+                          </td>
+                          <td class="py-3 px-2 text-center align-middle whitespace-nowrap">
+                            <div class="flex items-center justify-center gap-1.5 mx-auto">
+                              <button
+                                class="saas-action-btn saas-action-btn--emerald"
+                                title="Marcar Contactado"
+                                aria-label="Marcar como Contactado"
+                                (click)="cambiarEstadoLead(lead.id, 'contactado')"
                               >
-                                <path
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M5 13l4 4L19 7"
-                                />
-                              </svg>
-                            </button>
-                            <button
-                              class="saas-action-btn saas-action-btn--amber"
-                              title="No Responde"
-                              aria-label="Marcar como No Responde"
-                              (click)="cambiarEstadoLead(lead.id, 'archivado')"
-                            >
-                              <svg
-                                class="saas-action-icon"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
+                                <svg class="saas-action-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                              </button>
+                              <button
+                                class="saas-action-btn saas-action-btn--amber"
+                                title="No Responde"
+                                aria-label="Marcar como No Responde"
+                                (click)="cambiarEstadoLead(lead.id, 'archivado')"
                               >
-                                <path
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
-                                />
-                              </svg>
-                            </button>
-                            <button
-                              class="saas-action-btn saas-action-btn--red"
-                              title="Eliminar"
-                              aria-label="Eliminar Lead"
-                              (click)="eliminarLead(lead.id)"
-                            >
-                              <svg
-                                class="saas-action-icon"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
+                                <svg class="saas-action-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+                                </svg>
+                              </button>
+                              <button
+                                class="saas-action-btn saas-action-btn--red"
+                                title="Eliminar"
+                                aria-label="Eliminar Lead"
+                                (click)="eliminarLead(lead.id)"
                               >
-                                <path
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                />
-                              </svg>
-                            </button>
-                            <button
-                              class="saas-action-btn saas-action-btn--fuchsia"
-                              title="Notas del Lead"
-                              aria-label="Notas del Lead"
-                              (click)="abrirModalNotas(lead)"
-                            >
-                              <svg
-                                class="saas-action-icon"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
+                                <svg class="saas-action-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                </svg>
+                              </button>
+                              <button
+                                class="saas-action-btn saas-action-btn--fuchsia"
+                                title="Notas del Lead"
+                                aria-label="Notas del Lead"
+                                (click)="abrirModalNotas(lead)"
                               >
-                                <path
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                                />
-                              </svg>
-                            </button>
+                                <svg class="saas-action-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                                </svg>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      }
+                      @if (leads.length === 0) {
+                        <tr>
+                          <td colspan="7" class="text-center text-slate-200 py-8">
+                            No hay interesados registrados aún.
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Paginación de Leads (8 por página) -->
+                @if (totalPagesLeads > 1) {
+                  <div class="saas-pagination-bar">
+                    <div class="pagination-info">
+                      Mostrando <strong>{{ (pageLeads - 1) * pageSize + 1 }}</strong> a
+                      <strong>{{ Math.min(pageLeads * pageSize, leads.length) }}</strong> de
+                      <strong>{{ leads.length }}</strong> interesados
+                    </div>
+                    <div class="pagination-controls">
+                      <button
+                        type="button"
+                        class="pagination-btn"
+                        (click)="pageLeads = pageLeads - 1"
+                        [disabled]="pageLeads === 1"
+                      >
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                        </svg>
+                        Anterior
+                      </button>
+                      <span class="pagination-badge">Pág. {{ pageLeads }} / {{ totalPagesLeads }}</span>
+                      <button
+                        type="button"
+                        class="pagination-btn"
+                        (click)="pageLeads = pageLeads + 1"
+                        [disabled]="pageLeads >= totalPagesLeads"
+                      >
+                        Siguiente
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                }
+              } @else {
+                <!-- VISTA COMPLETA: GESTIÓN DE NOTAS DEL LEAD (SUBPÁGINA DEDICADA SIN MODAL FLOTANTE) -->
+                <div class="glass-panel mt-6 font-inter fade-in">
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6 border-b border-gray-800">
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0 border border-cyan-500/30">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h2 class="text-xl font-bold text-white tracking-wide uppercase m-0 flex items-center gap-2">
+                          Bitácora de Notas: {{ leadSeleccionadoParaNotas?.nombre }}
+                        </h2>
+                        <p class="text-slate-300 text-sm mt-1 mb-0">
+                          Registra llamadas, observaciones y acuerdos. Las notas se eliminan automáticamente tras 90 días.
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      (click)="cerrarModalNotas()"
+                      class="saas-btn saas-btn--secondary flex items-center gap-2 self-start sm:self-auto"
+                    >
+                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                      </svg>
+                      Volver a Interesados
+                    </button>
+                  </div>
+
+                  <div class="max-w-3xl mx-auto space-y-6">
+                    <div class="bg-gray-900/60 p-5 rounded-xl border border-gray-800">
+                      <label class="block text-sm font-semibold text-slate-200 uppercase tracking-wide mb-2">
+                        Agregar Nueva Nota
+                      </label>
+                      <div class="flex flex-col sm:flex-row gap-3">
+                        <input
+                          type="text"
+                          [(ngModel)]="nuevaNotaTexto"
+                          (keyup.enter)="agregarNota()"
+                          placeholder="Ej: Llamada agendada para el viernes 10am..."
+                          class="saas-input flex-1 bg-[#111827] text-white border-slate-700 focus:border-cyan-500"
+                        />
+                        <button
+                          type="button"
+                          (click)="agregarNota()"
+                          class="saas-btn saas-btn--primary flex items-center justify-center gap-2 shrink-0"
+                        >
+                          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                          </svg>
+                          Guardar Nota
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="space-y-3">
+                      <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-2">
+                        Historial de Notas Registradas ({{ leadSeleccionadoParaNotas?.notas?.length || 0 }})
+                      </h3>
+                      @for (nota of leadSeleccionadoParaNotas?.notas; track nota.id) {
+                        <div class="bg-gray-900/40 p-4 rounded-xl border border-gray-800 relative group flex items-start justify-between gap-4">
+                          <div class="flex-1">
+                            <p class="text-gray-200 text-sm leading-relaxed mb-1">{{ nota.texto }}</p>
+                            <span class="text-xs text-slate-400 block">{{ nota.fecha | date: 'medium' }}</span>
                           </div>
-                        </td>
-                      </tr>
-                    }
-                    @if (leads.length === 0) {
-                      <tr>
-                        <td colspan="7" class="text-center text-slate-200 py-8">
-                          No hay interesados registrados aún.
-                        </td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
-              </div>
+                          <button
+                            type="button"
+                            (click)="eliminarNota(nota.id)"
+                            class="text-red-400 hover:text-red-300 p-1 rounded hover:bg-red-500/10 transition-colors"
+                            title="Eliminar nota"
+                          >
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                            </svg>
+                          </button>
+                        </div>
+                      }
+                      @if (!leadSeleccionadoParaNotas?.notas?.length) {
+                        <div class="text-center text-slate-400 text-sm py-8 bg-gray-900/30 rounded-xl border border-gray-800">
+                          No hay notas registradas para este interesado.
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
             }
 
             @if (comercialTab === 'correos') {
@@ -3098,788 +4124,10 @@
     </main>
   </div>
 
-  <!-- Modal Nueva Empresa -->
-  <div *ngIf="showModal" class="saas-modal-overlay">
-    <div class="saas-modal-content">
-      <h2 class="saas-modal-header">{{ isEditMode ? 'Editar Empresa' : 'Crear Nueva Empresa' }}</h2>
-      <form (ngSubmit)="guardarEmpresa()">
-        <div class="saas-form-group">
-          <label class="saas-label">Razón Social</label>
-          <input
-            type="text"
-            [(ngModel)]="nuevaEmpresa.razon_social"
-            name="razon_social"
-            required
-            class="saas-input"
-          />
-        </div>
-        <div class="saas-form-group">
-          <label class="saas-label">Correo del Cliente / Gerente (Real)</label>
-          <input
-            type="email"
-            [(ngModel)]="nuevaEmpresa.email"
-            name="email"
-            required
-            class="saas-input"
-            placeholder="ej: cliente@gmail.com"
-          />
-        </div>
-        <div class="saas-form-group">
-          <label class="saas-label flex justify-between items-center">
-            Ruta / Dominio Personalizado
-            <button
-              type="button"
-              (click)="generarDominio()"
-              class="text-sm text-emerald-400 hover:text-emerald-300 font-semibold underline bg-transparent border-none cursor-pointer p-0 m-0"
-            >
-              Autogenerar
-            </button>
-          </label>
-          <div class="flex items-center">
-            <span class="text-slate-200 text-sm mr-2 select-none">gestivapyme.com/</span>
-            <input
-              type="text"
-              [(ngModel)]="nuevaEmpresa.dominio"
-              name="dominio"
-              class="saas-input flex-1"
-              placeholder="ej: miempresa"
-            />
-          </div>
-          <span class="text-sm text-slate-200 mt-1 block"
-            >Deja vacío para autogenerar. Dale clic varias veces a "Autogenerar" para ver más
-            opciones.</span
-          >
-        </div>
-        <div class="saas-form-group">
-          <label class="saas-label">Tipo de Identificación</label>
-          <select
-            [(ngModel)]="nuevaEmpresa.tipo_identificacion"
-            name="tipo_identificacion"
-            class="saas-select"
-          >
-            <option value="NIT">NIT</option>
-            <option value="CC">Cédula de Ciudadanía (CC)</option>
-            <option value="CE">Cédula de Extranjería (CE)</option>
-          </select>
-        </div>
-        <div class="saas-form-group">
-          <label class="saas-label">{{
-            nuevaEmpresa.tipo_identificacion === 'NIT' ? 'NIT' : 'Número de Identificación'
-          }}</label>
-          <input
-            type="text"
-            [(ngModel)]="nuevaEmpresa.nit"
-            name="nit"
-            required
-            class="saas-input"
-            [placeholder]="
-              nuevaEmpresa.tipo_identificacion === 'NIT' ? 'Ej: 900123456-7' : 'Ej: 1234567890'
-            "
-          />
-        </div>
-        <div class="saas-form-group">
-          <label class="saas-label">Tipo de Empresa</label>
-          <select
-            [(ngModel)]="nuevaEmpresa.tipo_empresa"
-            name="tipo_empresa"
-            required
-            class="saas-select"
-          >
-            <option value="Ventas">Ventas</option>
-            <option value="Servicios">Servicios</option>
-            <option value="Mixto">Mixto (Ventas y Servicios)</option>
-          </select>
-        </div>
 
-        <!-- Campos del Gerente -->
-        <h3 class="text-emerald-400 font-bold mt-4 mb-2">Cargo: Gerente General</h3>
-        <div class="grid grid-cols-2 gap-4">
-          <div class="saas-form-group">
-            <label class="saas-label">Tipo de Documento</label>
-            <select
-              [(ngModel)]="nuevaEmpresa.tipo_documento_gerente"
-              name="tipo_documento_gerente"
-              class="saas-select"
-              required
-            >
-              <option value="CC">Cédula de Ciudadanía (CC)</option>
-              <option value="CE">Cédula de Extranjería (CE)</option>
-              <option value="Pasaporte">Pasaporte</option>
-              <option value="PEP">Permiso Especial de Permanencia (PEP)</option>
-              <option value="PPT">Permiso de Protección Temporal (PPT)</option>
-            </select>
-          </div>
-          <div class="saas-form-group">
-            <label class="saas-label">Número de Documento</label>
-            <input
-              type="text"
-              [(ngModel)]="nuevaEmpresa.documento_gerente"
-              name="documento_gerente"
-              class="saas-input"
-              placeholder="Ej: 1010101010"
-              required
-            />
-          </div>
-        </div>
 
-        <div class="grid grid-cols-2 gap-4">
-          <div class="saas-form-group">
-            <label class="saas-label">Primer Nombre</label>
-            <input
-              type="text"
-              [(ngModel)]="nuevaEmpresa.primer_nombre_gerente"
-              name="primer_nombre_gerente"
-              class="saas-input"
-              placeholder="Ej: Juan"
-            />
-          </div>
-          <div class="saas-form-group">
-            <label class="saas-label">Segundo Nombre</label>
-            <input
-              type="text"
-              [(ngModel)]="nuevaEmpresa.segundo_nombre_gerente"
-              name="segundo_nombre_gerente"
-              class="saas-input"
-              placeholder="Ej: Carlos"
-            />
-          </div>
-          <div class="saas-form-group">
-            <label class="saas-label">Primer Apellido</label>
-            <input
-              type="text"
-              [(ngModel)]="nuevaEmpresa.primer_apellido_gerente"
-              name="primer_apellido_gerente"
-              class="saas-input"
-              placeholder="Ej: Pérez"
-            />
-          </div>
-          <div class="saas-form-group">
-            <label class="saas-label">Segundo Apellido</label>
-            <input
-              type="text"
-              [(ngModel)]="nuevaEmpresa.segundo_apellido_gerente"
-              name="segundo_apellido_gerente"
-              class="saas-input"
-              placeholder="Ej: López"
-            />
-          </div>
-        </div>
 
-        <div class="saas-form-group">
-          <label class="saas-label">Periodo Contratado</label>
-          <select [(ngModel)]="nuevaEmpresa.periodo" name="periodo" class="saas-select" required>
-            <option value="Mensual">Mensual</option>
-            <option value="Anual">Anual</option>
-          </select>
-        </div>
-        <div class="saas-form-group">
-          <div class="flex justify-between items-center mb-2">
-            <label class="saas-label mb-0">Descuentos Especiales</label>
-            <button
-              type="button"
-              (click)="agregarDescuentoEmpresaForm()"
-              class="text-sm bg-yellow-900/50 hover:bg-yellow-800/50 text-yellow-300 border border-yellow-800 px-2 py-1 rounded transition-colors"
-            >
-              + Añadir
-            </button>
-          </div>
 
-          <div class="space-y-2">
-            @for (desc of listaDescuentosEmpresa; track $index) {
-              <div class="flex items-center gap-2">
-                <select
-                  [(ngModel)]="listaDescuentosEmpresa[$index]"
-                  name="desc_{{ $index }}"
-                  class="saas-select flex-1"
-                >
-                  <option value="N/A">N/A</option>
-                  <option value="Referido 10%">Referido 10%</option>
-                  <option value="Mes Gratis">Mes gratis (Solo Anual)</option>
-                </select>
-                <button
-                  type="button"
-                  (click)="eliminarDescuentoEmpresaForm($index)"
-                  class="text-red-400 hover:text-red-300"
-                >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M6 18L18 6M6 6l12 12"
-                    ></path>
-                  </svg>
-                </button>
-              </div>
-            }
-            @if (listaDescuentosEmpresa.length === 0) {
-              <p class="text-sm text-slate-200 italic">No hay descuentos aplicados.</p>
-            }
-          </div>
-        </div>
-        <div class="saas-form-group">
-          <label class="saas-label">Fecha Inscripción (Opcional)</label>
-          <input
-            type="date"
-            [(ngModel)]="nuevaEmpresa.fecha_inscripcion"
-            name="fecha_inscripcion"
-            class="saas-input"
-          />
-        </div>
-        <div class="saas-form-group">
-          <label class="saas-label">Tipo de Plan</label>
-          <select
-            [(ngModel)]="nuevaEmpresa.plan_suscripcion"
-            name="plan_suscripcion"
-            required
-            class="saas-select"
-          >
-            <option value="Emprendedor" class="saas-option">Emprendedor</option>
-            <option value="Pyme" class="saas-option">Pyme</option>
-            <option value="Empresarial" class="saas-option">Empresarial</option>
-          </select>
-        </div>
-
-        <div class="saas-modal-actions">
-          <button type="button" (click)="cerrarModal()" class="saas-btn-cancel">Cancelar</button>
-          <button
-            type="submit"
-            [disabled]="isSubmitting"
-            class="saas-btn-submit flex items-center justify-center"
-          >
-            <span *ngIf="!isSubmitting">{{ isEditMode ? 'Actualizar' : 'Crear' }}</span>
-            <span *ngIf="isSubmitting" class="flex items-center">
-              <svg
-                class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  class="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="4"
-                ></circle>
-                <path
-                  class="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-              Guardando...
-            </span>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODAL DE SOLICITUDES -->
-  @if (isModalTicketOpen && ticketSeleccionado) {
-    <div class="saas-modal-overlay">
-      <div class="saas-modal-content max-w-xl">
-        <div class="flex justify-between items-center mb-6 border-b border-slate-500/50 pb-4">
-          <h2 class="text-[16px] font-bold text-white flex items-center gap-2">
-            <svg
-              class="w-6 h-6 text-indigo-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-              />
-            </svg>
-            Atender Ticket #{{ ticketSeleccionado.id }}
-          </h2>
-          <button
-            (click)="cerrarModalTicket()"
-            class="text-slate-200 hover:text-white transition-colors"
-          >
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-
-        <div class="mb-4 p-4 bg-gray-800/50 rounded-lg border border-slate-500/50">
-          <p class="text-sm text-slate-200 mb-1">Empresa:</p>
-          <p class="text-white font-medium mb-3">{{ ticketSeleccionado.empresa?.razon_social }}</p>
-
-          <p class="text-sm text-slate-200 mb-1">Asunto:</p>
-          <p class="text-white font-medium mb-3">{{ ticketSeleccionado.asunto }}</p>
-
-          <p class="text-sm text-slate-200 mb-1">Descripción del problema:</p>
-          <p class="text-gray-300 bg-gray-900/50 p-3 rounded text-sm">
-            {{ ticketSeleccionado.mensaje }}
-          </p>
-        </div>
-
-        <div class="form-group mb-6">
-          <label class="block text-sm font-medium text-gray-300 mb-2"
-            >Respuesta (se enviará al cliente)</label
-          >
-          <textarea
-            [(ngModel)]="respuestaTicket"
-            class="saas-input w-full min-h-[120px]"
-            placeholder="Escribe la respuesta o solución brindada..."
-          ></textarea>
-        </div>
-
-        <div class="flex justify-end gap-3 pt-4 border-t border-slate-500/50">
-          <button
-            (click)="cerrarModalTicket()"
-            class="saas-btn saas-btn--secondary"
-            [disabled]="isRespondiendoTicket"
-          >
-            Cancelar
-          </button>
-          <button
-            (click)="responderTicket()"
-            class="saas-btn saas-btn--primary"
-            [disabled]="isRespondiendoTicket || !respuestaTicket.trim()"
-          >
-            @if (isRespondiendoTicket) {
-              <svg
-                class="animate-spin h-4 w-4 text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  class="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="4"
-                ></circle>
-                <path
-                  class="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-              Enviando...
-            } @else {
-              Resolver Ticket
-            }
-          </button>
-        </div>
-      </div>
-    </div>
-  }
-
-  @if (isModalSolicitudOpen && solicitudSeleccionada) {
-    <div class="saas-modal-overlay">
-      <div class="saas-modal-content max-w-2xl">
-        <h2 class="text-[16px] font-bold text-white mb-6 border-b border-slate-500 pb-2">
-          Detalle de la Solicitud
-          <span
-            class="ml-3 px-3 py-1 bg-cyan-500/20 text-cyan-400 text-sm rounded-full uppercase"
-            >{{ formatTipo(solicitudSeleccionada.tipo) | uppercase }}</span
-          >
-        </h2>
-
-        <div class="text-gray-300 space-y-2 mb-6">
-          <p>
-            <strong class="text-white">Empresa:</strong>
-            {{ solicitudSeleccionada.empresa?.razon_social }}
-          </p>
-          <p>
-            <strong class="text-white">Fecha:</strong>
-            {{ solicitudSeleccionada.created_at | date: 'medium' }}
-          </p>
-
-          @if (solicitudSeleccionada.tipo === 'pago') {
-            <div class="mb-4">
-              <strong class="text-white">Banco:</strong>
-              {{ solicitudSeleccionada.banco_origen || 'No especificado' }}<br /><br />
-              @if (solicitudSeleccionada.comprobante_path) {
-                <strong class="text-white">Comprobante Adjunto:</strong>
-                <div class="mt-2 bg-[#111827] border border-slate-500 rounded p-4 text-center">
-                  <a
-                    [href]="getArchivoUrl(solicitudSeleccionada.comprobante_path)"
-                    target="_blank"
-                    class="text-blue-400 hover:text-blue-300 flex items-center justify-center gap-2 font-medium"
-                  >
-                    Ver Comprobante (Click para abrir)
-                    <svg
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="w-5 h-5"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"
-                      />
-                    </svg>
-                  </a>
-                </div>
-              }
-            </div>
-          }
-
-          @if (solicitudSeleccionada.tipo === 'cambio_datos') {
-            <div class="mb-4">
-              <strong class="text-white">Datos a Modificar:</strong>
-              <div class="mt-2 bg-[#111827] border border-slate-500 rounded p-4">
-                @if (solicitudSeleccionada.datosPropuestos) {
-                  <ul class="space-y-2 text-sm">
-                    @if (solicitudSeleccionada.datosPropuestos.razon_social) {
-                      <li class="flex items-center gap-3">
-                        <input
-                          type="checkbox"
-                          [(ngModel)]="camposAprobados['razon_social']"
-                          class="rounded bg-gray-800 border-gray-600 text-cyan-500 focus:ring-cyan-500 cursor-pointer w-4 h-4"
-                        />
-                        <div>
-                          <span class="text-slate-200">Razón Social:</span>
-                          <span class="text-white font-medium">{{
-                            solicitudSeleccionada.datosPropuestos.razon_social
-                          }}</span>
-                        </div>
-                      </li>
-                    }
-                    @if (solicitudSeleccionada.datosPropuestos.nit) {
-                      <li class="flex items-center gap-3">
-                        <input
-                          type="checkbox"
-                          [(ngModel)]="camposAprobados['nit']"
-                          class="rounded bg-gray-800 border-gray-600 text-cyan-500 focus:ring-cyan-500 cursor-pointer w-4 h-4"
-                        />
-                        <div>
-                          <span class="text-slate-200">NIT:</span>
-                          <span class="text-white font-medium">{{
-                            solicitudSeleccionada.datosPropuestos.nit
-                          }}</span>
-                        </div>
-                      </li>
-                    }
-                    @if (solicitudSeleccionada.datosPropuestos.telefono) {
-                      <li class="flex items-center gap-3">
-                        <input
-                          type="checkbox"
-                          [(ngModel)]="camposAprobados['telefono']"
-                          class="rounded bg-gray-800 border-gray-600 text-cyan-500 focus:ring-cyan-500 cursor-pointer w-4 h-4"
-                        />
-                        <div>
-                          <span class="text-slate-200">Teléfono:</span>
-                          <span class="text-white font-medium">{{
-                            solicitudSeleccionada.datosPropuestos.telefono
-                          }}</span>
-                        </div>
-                      </li>
-                    }
-                    @if (solicitudSeleccionada.datosPropuestos.direccion) {
-                      <li class="flex items-center gap-3">
-                        <input
-                          type="checkbox"
-                          [(ngModel)]="camposAprobados['direccion']"
-                          class="rounded bg-gray-800 border-gray-600 text-cyan-500 focus:ring-cyan-500 cursor-pointer w-4 h-4"
-                        />
-                        <div>
-                          <span class="text-slate-200">Dirección:</span>
-                          <span class="text-white font-medium">{{
-                            solicitudSeleccionada.datosPropuestos.direccion
-                          }}</span>
-                        </div>
-                      </li>
-                    }
-                    @if (solicitudSeleccionada.datosPropuestos.color_primario) {
-                      <li class="flex items-center gap-3">
-                        <input
-                          type="checkbox"
-                          [(ngModel)]="camposAprobados['color_primario']"
-                          class="rounded bg-gray-800 border-gray-600 text-cyan-500 focus:ring-cyan-500 cursor-pointer w-4 h-4"
-                        />
-                        <div class="flex items-center gap-2">
-                          <span class="text-slate-200">Color Primario:</span>
-                          <span class="text-white font-medium">{{
-                            solicitudSeleccionada.datosPropuestos.color_primario
-                          }}</span>
-                          <input
-                            type="color"
-                            [value]="solicitudSeleccionada.datosPropuestos.color_primario"
-                            disabled
-                            class="w-5 h-5 rounded border border-slate-500 bg-transparent p-0 cursor-default"
-                          />
-                        </div>
-                      </li>
-                    }
-                  </ul>
-
-                  @if (solicitudSeleccionada.datosPropuestos.temp_logo) {
-                    <div class="mt-4 pt-4 border-t border-slate-500 flex items-start gap-3">
-                      <input
-                        type="checkbox"
-                        [(ngModel)]="camposAprobados['temp_logo']"
-                        class="rounded bg-gray-800 border-gray-600 text-cyan-500 focus:ring-cyan-500 cursor-pointer w-4 h-4 mt-1"
-                      />
-                      <div>
-                        <strong class="text-white text-sm">Nuevo Logo Propuesto:</strong>
-                        <div class="mt-2 p-2 bg-gray-800 rounded inline-block">
-                          <img
-                            [src]="getArchivoUrl(solicitudSeleccionada.datosPropuestos.temp_logo)"
-                            class="max-h-24 object-contain"
-                            alt="Logo"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  }
-
-                  @if (solicitudSeleccionada.datosPropuestos.temp_doc) {
-                    <div class="mt-4 pt-4 border-t border-slate-500">
-                      <a
-                        [href]="getArchivoUrl(solicitudSeleccionada.datosPropuestos.temp_doc, true)"
-                        target="_blank"
-                        download
-                        class="text-cyan-400 hover:text-cyan-300 text-sm font-medium inline-flex items-center gap-2"
-                      >
-                        <svg
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke-width="1.5"
-                          stroke="currentColor"
-                          class="w-5 h-5"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
-                          />
-                        </svg>
-                        Ver Documento / RUT Adjunto
-                      </a>
-                    </div>
-                  }
-                } @else {
-                  <p class="text-slate-200 italic text-sm">
-                    La solicitud no contiene datos estructurados.
-                  </p>
-                }
-              </div>
-            </div>
-          }
-
-          @if (solicitudSeleccionada.tipo === 'soporte') {
-            <div class="mb-4">
-              <strong class="text-white">Mensaje del Cliente:</strong>
-              <div class="mt-2 bg-[#111827] border border-slate-500 rounded p-4">
-                <p class="text-gray-300 m-0 whitespace-pre-wrap">
-                  {{
-                    solicitudSeleccionada.datosPropuestos?.mensaje ||
-                      'El usuario no adjuntó un mensaje.'
-                  }}
-                </p>
-              </div>
-            </div>
-          }
-
-          @if (solicitudSeleccionada.tipo === 'migracion') {
-            <div class="mb-4">
-              <strong class="text-white">Base de Datos Recibida (Onboarding):</strong>
-              <p class="text-gray-300 text-sm mt-1">
-                La empresa subió su información histórica (Excel) para migrarla a GestivaPyme.
-                Descarga el archivo, corrígelo si es necesario y vuelve a subirlo para importar los
-                datos a su cuenta. Al importar, los datos aparecerán en Clientes, Proveedores,
-                Inventario, Servicios y Gestión Humana.
-              </p>
-
-              <div class="mt-3 flex flex-wrap gap-3">
-                <button
-                  (click)="aprobarEImportar()"
-                  [disabled]="importandoMigracion || solicitudSeleccionada?.estado === 'aprobado'"
-                  class="px-4 py-2 glass-btn-green text-white rounded-lg font-bold flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  @if (importandoMigracion) {
-                    <svg class="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg>
-                    Importando...
-                  } @else if (solicitudSeleccionada?.estado === 'aprobado') {
-                    <i class="fas fa-check"></i> Ya Importado
-                  } @else {
-                    <i class="fas fa-check-circle"></i> Aprobar e Importar
-                  }
-                </button>
-                <button
-                  (click)="descargarArchivoMigracion()"
-                  class="px-4 py-2 glass-btn-blue text-white rounded-lg font-bold flex items-center gap-2 transition-colors"
-                >
-                  <svg
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="w-5 h-5"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
-                    />
-                  </svg>
-                  Descargar Archivo Subido
-                </button>
-
-                @if (solicitudSeleccionada.estado === 'pendiente') {
-                  <label
-                    class="px-4 py-2 glass-btn-cyan text-white rounded-lg font-bold flex items-center gap-2 cursor-pointer transition-colors"
-                  >
-                    <svg
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      class="w-5 h-5"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"
-                      />
-                    </svg>
-                    {{
-                      archivoMigracionCorregido
-                        ? archivoMigracionCorregido.name
-                        : 'Seleccionar Archivo Corregido'
-                    }}
-                    <input
-                      type="file"
-                      accept=".xlsx,.xls,.csv"
-                      class="hidden"
-                      (change)="onArchivoMigracionSeleccionado($event)"
-                    />
-                  </label>
-                  <button
-                    (click)="importarMigracion()"
-                    [disabled]="!archivoMigracionCorregido || importandoMigracion"
-                    class="px-4 py-2 glass-btn-green text-white rounded-lg font-bold flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    @if (importandoMigracion) {
-                      <svg class="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none">
-                        <circle
-                          class="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          stroke-width="4"
-                        ></circle>
-                        <path
-                          class="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                      Importando...
-                    } @else {
-                      <svg
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        class="w-5 h-5"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15"
-                        />
-                      </svg>
-                      Importar Base de Datos
-                    }
-                  </button>
-                }
-              </div>
-
-              @if (solicitudSeleccionada.notas_propietaria) {
-                <div class="mt-4 bg-emerald-500/10 border border-emerald-500/40 rounded p-3">
-                  <p class="text-emerald-300 text-sm font-medium m-0">
-                    {{ solicitudSeleccionada.notas_propietaria }}
-                  </p>
-                </div>
-              }
-            </div>
-          }
-        </div>
-
-        @if (solicitudSeleccionada.estado === 'pendiente') {
-          <div class="saas-form-group mb-6">
-            <label class="saas-label"
-              >Mensaje / Notas para el Cliente (Obligatorio para rechazar)</label
-            >
-            <textarea
-              [(ngModel)]="mensajeRespuesta"
-              rows="3"
-              placeholder="Ej: Comprobante ilegible, vuelve a subirlo..."
-              class="saas-input w-full bg-[#111827] text-white border-slate-500 focus:border-cyan-500 resize-none"
-            ></textarea>
-          </div>
-
-          <div class="flex items-center justify-end gap-4 mt-6 pt-4 border-t border-slate-500">
-            <button (click)="cerrarModalSolicitud()" class="saas-btn-cancel">Cancelar</button>
-            <button
-              (click)="procesarSolicitud('rechazado')"
-              class="saas-btn saas-btn--danger"
-              [disabled]="!mensajeRespuesta || mensajeRespuesta.trim() === ''"
-            >
-              Rechazar
-              <svg
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-5 h-5"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-              </svg>
-            </button>
-            <button
-              (click)="procesarSolicitud('aprobado')"
-              class="saas-btn saas-btn--primary"
-            >
-              Aprobar
-              <svg
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-5 h-5"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-              </svg>
-            </button>
-          </div>
-        } @else {
-          <div class="mt-6 pt-4 border-t border-slate-500 text-center">
-            <span
-              class="inline-block px-4 py-2 bg-gray-800 text-gray-300 rounded-full text-sm font-semibold mb-6"
-            >
-              Esta solicitud ya fue {{ solicitudSeleccionada.estado | uppercase }}.
-            </span>
-            <div class="flex justify-center">
-              <button (click)="cerrarModalSolicitud()" class="saas-btn-cancel">Cerrar</button>
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-  }
 
   <!-- Modal Éxito (Credenciales) -->
   <div *ngIf="showSuccessModal" class="saas-success-overlay">
@@ -3910,192 +4158,7 @@
       <button (click)="cerrarSuccessModal()" class="saas-success-btn">Ir al Dashboard</button>
     </div>
   </div>
-  <!-- Modal Agregar / Editar Conector -->
-  <div
-    *ngIf="showAddonModal"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-  >
-    <div class="soft-ui-panel-dark w-full max-w-md p-6 relative animate-fade-in-up">
-      <button
-        (click)="cerrarAddonModal()"
-        class="absolute top-4 right-4 text-slate-200 hover:text-white"
-      >
-        &times;
-      </button>
-      <h3 class="text-base font-bold text-white mb-2">
-        {{ editingAddonId ? 'Editar Conector / API' : 'Crear Nuevo Conector / API' }}
-      </h3>
-      <p class="text-slate-200 text-sm mb-6">
-        {{
-          editingAddonId
-            ? 'Actualiza el nombre de este conector en el catálogo.'
-            : 'Esta opción añadirá un nuevo conector al catálogo de tu cliente.'
-        }}
-      </p>
 
-      <div class="mb-6">
-        <label class="block text-gray-300 text-sm font-bold mb-2">Nombre del Conector</label>
-        <input
-          type="text"
-          [(ngModel)]="nombreNuevoAddon"
-          placeholder="Ej: CRM Hubspot, SAP Integración..."
-          class="form-input soft-ui-input w-full"
-        />
-      </div>
-
-      <div class="flex justify-end gap-3">
-        <button
-          (click)="cerrarAddonModal()"
-          class="px-4 py-2 rounded-xl text-gray-300 hover:bg-gray-800 transition-colors"
-        >
-          Cancelar
-        </button>
-        <button (click)="guardarNuevoAddon()" class="soft-ui-btn px-6">Crear Conector</button>
-      </div>
-    </div>
-  </div>
-  <!-- Modal Notas -->
-  <div
-    *ngIf="showNotasModal"
-    class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm"
-  >
-    <div class="neu-dark-panel w-full max-w-lg p-6 relative animate-fade-in-up">
-      <button
-        (click)="cerrarModalNotas()"
-        class="absolute top-4 right-4 text-slate-200 hover:text-white"
-      >
-        &times;
-      </button>
-      <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
-        <svg class="w-6 h-6 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-          />
-        </svg>
-        Notas: {{ leadSeleccionadoParaNotas?.nombre }}
-      </h3>
-      <p class="text-slate-200 text-sm mb-6">
-        Agrega apuntes sobre este interesado. Las notas se eliminan a los 3 meses.
-      </p>
-
-      <div class="mb-6 flex gap-2">
-        <input
-          type="text"
-          [(ngModel)]="nuevaNotaTexto"
-          (keyup.enter)="agregarNota()"
-          placeholder="Escribe una nueva nota..."
-          class="neu-dark-input flex-1"
-        />
-        <button (click)="agregarNota()" class="neu-dark-button text-cyan-400 hover:text-cyan-300">
-          Guardar
-        </button>
-      </div>
-
-      <div class="space-y-3 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
-        @for (nota of leadSeleccionadoParaNotas?.notas; track nota.id) {
-          <div class="bg-gray-800/50 p-3 rounded-lg border border-slate-500 relative group">
-            <p class="text-gray-300 text-sm pr-6">{{ nota.texto }}</p>
-            <span class="text-sm text-slate-200 mt-1 block">{{ nota.fecha | date: 'short' }}</span>
-            <button
-              (click)="eliminarNota(nota.id)"
-              class="absolute top-2 right-2 text-red-500/50 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-              <i class="fas fa-trash text-sm"></i>
-            </button>
-          </div>
-        }
-        @if (!leadSeleccionadoParaNotas?.notas?.length) {
-          <p class="text-center text-slate-200 text-sm py-4">No hay notas registradas.</p>
-        }
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL DE TARIFAS GLOBALES -->
-  @if (modalTarifasGlobalesVisible) {
-    <div
-      class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-    >
-      <div
-        class="bg-[#0f172a] rounded-2xl w-full max-w-3xl border border-gray-800 shadow-2xl overflow-hidden font-inter relative max-h-[92vh] flex flex-col"
-      >
-        <div
-          class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-indigo-500"
-        ></div>
-        <div class="p-6 overflow-y-auto">
-          <h2 class="text-[16px] font-bold text-white mb-2 flex items-center gap-2">
-            <svg
-              class="w-6 h-6 text-emerald-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              ></path>
-            </svg>
-            Catálogo de Precios Base
-          </h2>
-          <p class="text-slate-200 text-sm mb-6">
-            Establece los valores (COP) que el sistema cobrará. Los porcentajes se aplican como
-            descuento.
-          </p>
-
-          @for (grupo of gruposTarifas; track grupo.titulo) {
-            <div class="mb-5">
-              <h3
-                class="text-sm uppercase tracking-wider text-slate-200 font-semibold mb-3 border-b border-gray-800 pb-2"
-              >
-                {{ grupo.titulo }}
-              </h3>
-              <div class="space-y-2">
-                @for (item of grupo.items; track item.id) {
-                  <div
-                    class="flex items-center justify-between gap-3 bg-gray-900 rounded-lg px-4 py-2 border border-gray-800"
-                  >
-                    <label class="flex-1 text-sm text-gray-300">{{ item.nombre }}</label>
-                    <div class="relative w-44">
-                      <span
-                        class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-200 text-sm font-semibold"
-                        >{{ item.tipo === 'descuento' ? '%' : '$' }}</span
-                      >
-                      <input
-                        type="number"
-                        [(ngModel)]="item.valor"
-                        [disabled]="!item.activo"
-                        class="neu-dark-input w-full pl-8 pr-3 py-1.5 text-sm text-right"
-                      />
-                    </div>
-                  </div>
-                }
-              </div>
-            </div>
-          }
-        </div>
-
-        <div class="flex justify-end gap-3 pt-4 border-t border-gray-800 p-6 bg-[#0f172a]">
-          <button
-            (click)="cerrarModalTarifasGlobales()"
-            class="saas-btn saas-btn--secondary"
-          >
-            Cancelar
-          </button>
-          <button
-            (click)="guardarTarifasCatalogo()"
-            class="saas-btn saas-btn--primary"
-          >
-            Actualizar Tarifas
-          </button>
-        </div>
-      </div>
-    </div>
-  }
 
   <!-- MODAL DE CONFIRMACIÓN GLOBAL -->
   @if (confirmModalVisible) {

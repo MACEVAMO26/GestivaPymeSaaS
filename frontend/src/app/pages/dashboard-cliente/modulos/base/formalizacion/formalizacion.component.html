@@ -1,4 +1,5 @@
 <div class="formalizacion-container fade-in">
+  <div [hidden]="isFormalizarModalOpen || isEditarEmpleadoModalOpen" class="main-view-wrapper">
 
   <!-- ENCABEZADO -->
   <div class="module-header text-center mb-4">
@@ -19,11 +20,15 @@
     <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'estructura'" (click)="setTab('estructura')">
       <span class="icon">📊</span> Estructura
     </button>
-    
-    
   </div>
 
   <div class="tab-content neumorphic-panel-inner p-4">
+    <!-- Botón Volver -->
+    <div class="volver-wrapper">
+      <button class="btn-volver btn-pill" onclick="window.history.back()">
+        <i class="fas fa-arrow-left"></i> Volver
+      </button>
+    </div>
 
     <!-- TAB PENDIENTES -->
     <div class="neumorphic-panel fade-in" *ngIf="currentTab === 'pendientes'">
@@ -46,23 +51,44 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let p of pendientes">
-              <td>{{ p.documento }}</td>
-              <td>{{ nombreCompleto(p) }}</td>
-              <td>{{ p.email }}</td>
-              <td>{{ p.created_at | date:'shortDate' }}</td>
-              <td class="text-center">
-                <button type="button" class="btn-action-icon btn-action-edit" title="Formalizar Empleado" (click)="abrirModalFormalizar(p)">
-                  <i class="fas fa-user-check"></i>
-                </button>
-              </td>
-            </tr>
-            <tr *ngIf="pendientes.length === 0">
-              <td colspan="5" class="text-center" style="padding: 2rem;">No hay usuarios pendientes de formalización.</td>
-            </tr>
+            @for (p of paginatedPendientes; track p.id) {
+              <tr>
+                <td>{{ p.documento }}</td>
+                <td>{{ nombreCompleto(p) }}</td>
+                <td>{{ p.email }}</td>
+                <td>{{ p.created_at | date:'shortDate' }}</td>
+                <td class="text-center">
+                  <div class="acciones-fila" style="justify-content: center;">
+                    <button type="button" class="btn-action-circle" title="Formalizar Empleado" (click)="abrirModalFormalizar(p)">
+                      <i class="fas fa-user-check"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+            @if (pendientes.length === 0) {
+              <tr>
+                <td colspan="5" class="text-center" style="padding: 2rem;">No hay usuarios pendientes de formalización.</td>
+              </tr>
+            }
           </tbody>
         </table>
       </div>
+
+      @if (pendientes.length > pageSize) {
+        <div class="neu-pagination-bar">
+          <span class="pagination-info">Página {{ pagePendientes }} de {{ totalPagesPendientes }} ({{ pendientes.length }} pendientes)</span>
+          <div class="pagination-controls">
+            <button class="pagination-btn" [disabled]="pagePendientes === 1" (click)="pagePendientes = pagePendientes - 1">
+              <i class="fas fa-chevron-left"></i> Anterior
+            </button>
+            <span class="pagination-badge">{{ pagePendientes }}</span>
+            <button class="pagination-btn" [disabled]="pagePendientes >= totalPagesPendientes" (click)="pagePendientes = pagePendientes + 1">
+              Siguiente <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      }
     </div>
 
     <!-- TAB FORMALIZADOS -->
@@ -82,41 +108,63 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let e of formalizados">
-              <td>{{ e.usuario?.documento }}</td>
-              <td>{{ nombreCompleto(e.usuario) }}</td>
-              <td>{{ areaNombre(e) }}</td>
-              <td>{{ cargoNombre(e) }}</td>
-              <td>{{ e.tipo_contrato || '—' }}</td>
-              <td>{{ e.fecha_contratacion | date:'shortDate' }}</td>
-              <td class="text-center">
-                <button type="button" class="btn-action-icon btn-action-edit" title="Editar Permisos y Perfil" (click)="abrirModalEditarEmpleado(e)">
-                  <i class="fas fa-user-edit"></i>
-                </button>
-              </td>
-            </tr>
-            <tr *ngIf="formalizados.length === 0">
-              <td colspan="7" class="text-center" style="padding: 2rem;">Aún no hay personal formalizado.</td>
-            </tr>
+            @for (e of paginatedFormalizados; track e.id) {
+              <tr>
+                <td>{{ e.usuario?.documento }}</td>
+                <td>{{ nombreCompleto(e.usuario) }}</td>
+                <td>{{ areaNombre(e) }}</td>
+                <td>{{ cargoNombre(e) }}</td>
+                <td>{{ e.tipo_contrato || '—' }}</td>
+                <td>{{ e.fecha_contratacion | date:'shortDate' }}</td>
+                <td class="text-center">
+                  <div class="acciones-fila" style="justify-content: center;">
+                    <button type="button" class="btn-action-circle" title="Editar Permisos y Perfil" (click)="abrirModalEditarEmpleado(e)">
+                      <i class="fas fa-user-edit"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+            @if (formalizados.length === 0) {
+              <tr>
+                <td colspan="7" class="text-center" style="padding: 2rem;">Aún no hay personal formalizado.</td>
+              </tr>
+            }
           </tbody>
         </table>
       </div>
+
+      @if (formalizados.length > pageSize) {
+        <div class="neu-pagination-bar">
+          <span class="pagination-info">Página {{ pageFormalizados }} de {{ totalPagesFormalizados }} ({{ formalizados.length }} formalizados)</span>
+          <div class="pagination-controls">
+            <button class="pagination-btn" [disabled]="pageFormalizados === 1" (click)="pageFormalizados = pageFormalizados - 1">
+              <i class="fas fa-chevron-left"></i> Anterior
+            </button>
+            <span class="pagination-badge">{{ pageFormalizados }}</span>
+            <button class="pagination-btn" [disabled]="pageFormalizados >= totalPagesFormalizados" (click)="pageFormalizados = pageFormalizados + 1">
+              Siguiente <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      }
     </div>
 
-  
+    <!-- TAB ESTRUCTURA -->
+    <div class="neumorphic-panel fade-in" *ngIf="currentTab === 'estructura'">
+      <app-admin-estructura></app-admin-estructura>
+    </div>
 
-<!-- TAB ESTRUCTURA -->
-  <div class="neumorphic-panel fade-in" *ngIf="currentTab === 'estructura'">
-    <app-admin-estructura></app-admin-estructura>
+  </div>
   </div>
 
-  
-<!-- MODAL FORMALIZAR -->
-  <div class="inline-form-container mt-4" *ngIf="isFormalizarModalOpen" (click.self)="cerrarModalFormalizar()">
+  <!-- SUB-PÁGINA DEDICADA FORMALIZAR -->
+  @if (isFormalizarModalOpen) {
+  <div class="view-switch-panel fade-in">
     <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
       <div class="panel-header mb-4">
-        <h3>Formalizar: {{ nombreCompleto(usuarioAFormalizar) }}</h3>
-        <button class="btn-cerrar" (click)="cerrarModalFormalizar()">×</button>
+        <h1>FORMALIZAR: {{ nombreCompleto(usuarioAFormalizar) }}</h1>
+        <button class="btn-close" (click)="cerrarModalFormalizar()">&times;</button>
       </div>
       <div class="panel-body">
         <div class="form-row-divider mb-3">
@@ -211,20 +259,22 @@
         </div>
       </div>
       <div class="modal-footer mt-4">
-        <button class="btn-general-2 btn-pill" (click)="cerrarModalFormalizar()">Cancelar</button>
-        <button class="btn-general-1 btn-pill" (click)="submitFormalizar()" [disabled]="isSubmitting">
-          {{ isSubmitting ? 'Guardando...' : 'Formalizar' }}
+        <button class="btn-volver btn-pill" (click)="cerrarModalFormalizar()">Volver</button>
+        <button class="btn-save btn-pill" (click)="submitFormalizar()" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Guardando...' : 'Formalizar Empleado' }}
         </button>
       </div>
     </div>
   </div>
+  }
 
-  <!-- MODAL EDICIÓN EMPLEADO FORMALIZADO Y MÓDULOS -->
-  <div class="modal-backdrop" *ngIf="isEditarEmpleadoModalOpen" (click)="cerrarModalEditarEmpleado()">
-    <div class="modal-card neumorphic-panel" (click)="$event.stopPropagation()" style="max-width: 720px; max-height: 90vh; overflow-y: auto;">
-      <div class="modal-header flex-between mb-3">
-        <h2 class="subtitulo" style="margin: 0;">Editar Perfil, Seguridad Social y Permisos</h2>
-        <button type="button" class="btn-icon text-muted" (click)="cerrarModalEditarEmpleado()">✕</button>
+  <!-- SUB-PÁGINA DEDICADA EDICIÓN EMPLEADO FORMALIZADO Y MÓDULOS -->
+  @if (isEditarEmpleadoModalOpen) {
+  <div class="view-switch-panel fade-in">
+    <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+      <div class="panel-header mb-4">
+        <h1>EDITAR PERFIL, SEGURIDAD SOCIAL Y PERMISOS</h1>
+        <button class="btn-close" (click)="cerrarModalEditarEmpleado()">&times;</button>
       </div>
 
       <p class="descripcion-general mb-3">
@@ -343,8 +393,8 @@
           </div>
         </div>
 
-        <div class="modal-footer flex-between mt-4">
-          <button type="button" class="btn-volver btn-pill" (click)="cerrarModalEditarEmpleado()">Cancelar</button>
+        <div class="modal-footer mt-4">
+          <button type="button" class="btn-volver btn-pill" (click)="cerrarModalEditarEmpleado()">Volver</button>
           <button type="submit" class="btn-save btn-pill" [disabled]="isSubmitting">
             <i class="fas fa-save"></i> {{ isSubmitting ? 'Guardando...' : 'Guardar Cambios' }}
           </button>
@@ -352,7 +402,7 @@
       </form>
     </div>
   </div>
-
+  }
 </div>
 
 

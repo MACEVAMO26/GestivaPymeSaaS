@@ -48,6 +48,38 @@ export class ProveedoresComponent implements OnInit {
   totalDeuda: number = 0;
   contratos: any[] = [];
 
+  pageSize = 8;
+  pageDirectorio = 1;
+  pageCuentas = 1;
+  pageEvaluaciones = 1;
+
+  get paginatedDirectorio(): Proveedor[] {
+    const start = (this.pageDirectorio - 1) * this.pageSize;
+    return this.proveedoresFiltrados.slice(start, start + this.pageSize);
+  }
+
+  get totalPagesDirectorio(): number {
+    return Math.ceil(this.proveedoresFiltrados.length / this.pageSize) || 1;
+  }
+
+  get paginatedCuentas(): any[] {
+    const start = (this.pageCuentas - 1) * this.pageSize;
+    return this.cuentasPorPagar.slice(start, start + this.pageSize);
+  }
+
+  get totalPagesCuentas(): number {
+    return Math.ceil(this.cuentasPorPagar.length / this.pageSize) || 1;
+  }
+
+  get paginatedEvaluaciones(): any[] {
+    const start = (this.pageEvaluaciones - 1) * this.pageSize;
+    return this.contratos.slice(start, start + this.pageSize);
+  }
+
+  get totalPagesEvaluaciones(): number {
+    return Math.ceil(this.contratos.length / this.pageSize) || 1;
+  }
+
   ngOnInit() {
     this.cargarProveedores();
     this.cargarCuentasPorPagar();
@@ -105,6 +137,7 @@ export class ProveedoresComponent implements OnInit {
   }
 
   filtrarProveedores() {
+    this.pageDirectorio = 1;
     const term = this.searchTerm.toLowerCase();
     this.proveedoresFiltrados = this.proveedores.filter(p => 
       p.razon_social?.toLowerCase().includes(term) || 

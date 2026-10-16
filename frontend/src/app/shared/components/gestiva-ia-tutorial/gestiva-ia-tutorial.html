@@ -1,32 +1,63 @@
-<div class="ia-tutorial-overlay" *ngIf="mostrar">
-  <div class="ia-tutorial-modal">
-    <!-- Close button / Skip tutorial -->
-    <button class="btn-skip" (click)="finalizarTutorial()">Omitir Tutorial &times;</button>
+<div class="ia-tutorial-overlay" *ngIf="mostrar" (click)="cerrarTutorial()">
+  <div class="ia-tutorial-modal" (click)="$event.stopPropagation()">
+    <!-- Botón Cerrar Guía -->
+    <button class="btn-skip" (click)="cerrarTutorial()" title="Cerrar Guía">&times; Cerrar</button>
 
     <div class="ia-tutorial-content">
-      <!-- Mascot Image -->
+      <!-- Imagen de Mascota -->
       <div class="ia-mascot">
         <img src="assets/images/GestivaIA/IA_Gestiva.png" alt="Gestiva IA Mascot">
+        <span class="mascot-badge">Asistente Gestiva</span>
       </div>
 
-      <!-- Dialogue Bubble -->
+      <!-- Globo de Diálogo Explicativo -->
       <div class="ia-dialogue">
-        <h3 *ngIf="pasos.length > 0">{{ pasos[pasoActual].title }}</h3>
-        <p *ngIf="pasos.length > 0">{{ pasos[pasoActual].description }}</p>
+        <div class="step-header">
+          <span class="step-counter">Paso {{ pasoActual + 1 }} de {{ pasos.length }}</span>
+          <h3 *ngIf="pasos.length > 0">{{ pasos[pasoActual].title }}</h3>
+        </div>
+        <p *ngIf="pasos.length > 0" class="step-desc">{{ pasos[pasoActual].description }}</p>
 
-        <!-- Navigation -->
+        <!-- Navegación y Botones Funcionales -->
         <div class="actions">
+          <button
+            type="button"
+            class="btn-nav btn-anterior"
+            (click)="anterior()"
+            [disabled]="pasoActual === 0"
+          >
+            &larr; Anterior
+          </button>
+
           @if (pasoActual < pasos.length - 1) {
-            <button class="btn-add" (click)="siguiente()">Siguiente</button>
-            <button class="btn-omitir" style="margin-left: 10px; background: transparent; color: #666; border: none; text-decoration: underline; cursor: pointer; font-size: 12px;" (click)="finalizarTutorial()">Omitir</button>
+            <button type="button" class="btn-nav btn-siguiente" (click)="siguiente()">
+              Siguiente &rarr;
+            </button>
           } @else {
-            <button class="btn-add success" (click)="finalizarTutorial()">¡Empezar a trabajar!</button>
+            <button type="button" class="btn-nav btn-finalizar" (click)="finalizarTutorial()">
+              ¡Empezar a Trabajar! &check;
+            </button>
           }
+
+          <button
+            type="button"
+            class="btn-omitir-link"
+            (click)="finalizarTutorial()"
+          >
+            Omitir Guía
+          </button>
         </div>
         
-        <!-- Step Indicators -->
-        <div class="step-indicators" style="display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-top: 15px;">
-          <span *ngFor="let p of pasos; let i = index" [class.active]="pasoActual === i" style="width: 8px; height: 8px; border-radius: 50%; background: #ccc;" [style.background]="pasoActual === i ? '#45a1ae' : '#ccc'"></span>
+        <!-- Indicadores de Paso Clickeables -->
+        <div class="step-indicators">
+          <button
+            *ngFor="let p of pasos; let i = index"
+            type="button"
+            class="step-dot"
+            [class.active]="pasoActual === i"
+            (click)="irAPaso(i)"
+            [title]="'Ir al paso ' + (i + 1)"
+          ></button>
         </div>
       </div>
     </div>

@@ -30,6 +30,17 @@ export class CrmGestionDeClientesComponent implements OnInit {
   historial360: Historial360Response | null = null;
   subTab360: 'timeline' | 'ventas' | 'cotizaciones' | 'servicios' = 'timeline';
 
+  pageSize = 8;
+  pageResultados = 1;
+
+  get paginatedResultados(): Cliente[] {
+    const start = (this.pageResultados - 1) * this.pageSize;
+    return this.resultados.slice(start, start + this.pageSize);
+  }
+  get totalPagesResultados(): number {
+    return Math.ceil(this.resultados.length / this.pageSize) || 1;
+  }
+
   ngOnInit() {
     this.cargarClientes();
   }
@@ -68,6 +79,7 @@ export class CrmGestionDeClientesComponent implements OnInit {
 
   buscar() {
     this.buscando = true;
+    this.pageResultados = 1;
     const q = this.busqueda.trim().toLowerCase();
     if (!q) {
       this.resultados = this.clientes;

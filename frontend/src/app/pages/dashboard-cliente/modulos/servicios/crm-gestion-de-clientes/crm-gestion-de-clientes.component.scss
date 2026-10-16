@@ -211,17 +211,25 @@ th.col-accion, td.col-accion {
 
 /* Botones Redondos Pequeños de Acción (Sin Texto) */
 .btn-action-circle {
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  max-width: 36px;
+  max-height: 36px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   border: none;
-  font-size: 11px;
   transition: all 0.2s ease;
   box-shadow: 2px 2px 5px $shadow-dark, -2px -2px 5px $shadow-light;
+
+  i {
+    font-size: 18px;
+    line-height: 1;
+  }
 
   &:hover {
     transform: translateY(-1px) scale(1.08);

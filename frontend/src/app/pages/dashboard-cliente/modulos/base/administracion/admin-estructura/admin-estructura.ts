@@ -45,6 +45,26 @@ export class AdminEstructura implements OnInit {
   nuevaArea = { nombre: '', descripcion: '', modulos: [] as string[] };
   nuevoCargo = { nombre: '', descripcion: '', funciones: '', rol_id: '', area_id: '' };
 
+  pageSize = 8;
+  pageSedes = 1;
+  pageAreas = 1;
+
+  get paginatedSedes(): any[] {
+    const start = (this.pageSedes - 1) * this.pageSize;
+    return this.sedes.slice(start, start + this.pageSize);
+  }
+  get totalPagesSedes(): number {
+    return Math.ceil(this.sedes.length / this.pageSize) || 1;
+  }
+
+  get paginatedAreas(): any[] {
+    const start = (this.pageAreas - 1) * this.pageSize;
+    return this.areas.slice(start, start + this.pageSize);
+  }
+  get totalPagesAreas(): number {
+    return Math.ceil(this.areas.length / this.pageSize) || 1;
+  }
+
   ngOnInit() {
     this.cargarDatos();
   }

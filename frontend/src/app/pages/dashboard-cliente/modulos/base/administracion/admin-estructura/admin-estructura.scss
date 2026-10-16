@@ -408,16 +408,29 @@ th {
 }
 
 .btn-icon {
-  background: none;
+  background: #f5f5dc;
   border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  max-width: 36px;
+  max-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  font-size: 12px;
-  padding: 4px 6px;
-  border-radius: 6px;
+  box-shadow: 2px 2px 4px #d0d0bb, -2px -2px 4px #ffffff;
   transition: all 0.2s ease;
 
+  i {
+    font-size: 18px;
+    line-height: 1;
+  }
+
   &:hover {
-    opacity: 0.7;
+    box-shadow: inset 2px 2px 4px #d0d0bb, inset -2px -2px 4px #ffffff;
   }
 }
 

@@ -54,6 +54,12 @@ export class AutogestionComponent implements OnInit {
   isSubmittingVacacion = false;
   diasDisponibles = 15; // Por defecto o calculado desde el backend
 
+  get fechaMinimaHoy(): string {
+    const now = new Date();
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  }
+
   // Documentos
   misDocumentos: any[] = [];
   archivoSeleccionado: File | null = null;
@@ -293,7 +299,18 @@ export class AutogestionComponent implements OnInit {
 
   solicitarVacaciones() {
     if (!this.nuevaVacacion.fecha_inicio || !this.nuevaVacacion.fecha_fin) {
-      this.toast.warning('Complete las fechas');
+      this.toast.warning('Complete las fechas de inicio y fin');
+      return;
+    }
+
+    const hoyStr = this.fechaMinimaHoy;
+    if (this.nuevaVacacion.fecha_inicio < hoyStr) {
+      this.toast.warning('La fecha de inicio de vacaciones no puede ser anterior a la fecha de hoy');
+      return;
+    }
+
+    if (this.nuevaVacacion.fecha_fin <= this.nuevaVacacion.fecha_inicio) {
+      this.toast.warning('La fecha de fin debe ser posterior a la fecha de inicio');
       return;
     }
     
@@ -302,14 +319,17 @@ export class AutogestionComponent implements OnInit {
     
     this.tiempoService.solicitarVacaciones(payload).subscribe({
       next: () => {
-        this.toast.success('Solicitud enviada al administrador');
+        this.toast.success('Solicitud enviada al administrador con éxito');
         this.isSubmittingVacacion = false;
         this.nuevaVacacion = { fecha_inicio: '', fecha_fin: '', tipo: 'Disfrute Legal', observaciones: '' };
         this.cargarVacaciones();
+        this.cdr.detectChanges();
       },
-      error: () => {
-        this.toast.error('Error al enviar la solicitud');
+      error: (err: any) => {
+        const msg = err?.error?.message || err?.error?.error || 'Error al enviar la solicitud';
+        this.toast.error(msg);
         this.isSubmittingVacacion = false;
+        this.cdr.detectChanges();
       }
     });
   }

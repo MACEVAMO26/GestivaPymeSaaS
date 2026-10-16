@@ -36,6 +36,18 @@ export class ClientesComponent implements OnInit {
   isSaving = false;
   clienteActual: any = {};
 
+  pageSize = 8;
+  pageClientes = 1;
+
+  get paginatedClientes(): any[] {
+    const start = (this.pageClientes - 1) * this.pageSize;
+    return this.clientes.slice(start, start + this.pageSize);
+  }
+
+  get totalPagesClientes(): number {
+    return Math.ceil(this.clientes.length / this.pageSize) || 1;
+  }
+
   getNombreCliente(c: any): string {
     if (!c) return '--';
     if (c.nombre_razon_social && c.nombre_razon_social.trim()) {
@@ -98,6 +110,7 @@ export class ClientesComponent implements OnInit {
   }
 
   filtrarClientes() {
+    this.pageClientes = 1;
     let result = this.clientesOriginales;
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase();

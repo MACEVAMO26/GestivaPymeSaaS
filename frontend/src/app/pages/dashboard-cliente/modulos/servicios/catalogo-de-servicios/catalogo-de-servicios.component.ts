@@ -267,6 +267,61 @@ export class CatalogoDeServiciosComponent implements OnInit {
     this.ticketsPendientes = this.tickets.filter(t => t.estado === 'Pendiente' || t.estado === 'Recibido');
   }
 
+  pageSize = 8;
+  pageTickets = 1;
+  pageAgenda = 1;
+  pageCatalogo = 1;
+
+  get paginatedTickets(): ServicioTicket[] {
+    const list = this.getTicketsFiltrados();
+    const start = (this.pageTickets - 1) * this.pageSize;
+    return list.slice(start, start + this.pageSize);
+  }
+  get totalPagesTickets(): number {
+    return Math.ceil(this.getTicketsFiltrados().length / this.pageSize) || 1;
+  }
+
+  get agendaTickets(): ServicioTicket[] {
+    return this.tickets.filter(tk => tk.estado !== 'Finalizado' && tk.estado !== 'Cancelado');
+  }
+  get paginatedAgendaTickets(): ServicioTicket[] {
+    const start = (this.pageAgenda - 1) * this.pageSize;
+    return this.agendaTickets.slice(start, start + this.pageSize);
+  }
+  get totalPagesAgenda(): number {
+    return Math.ceil(this.agendaTickets.length / this.pageSize) || 1;
+  }
+
+  searchTermCatalogo: string = '';
+
+  onSearchTermCatalogoChange() {
+    this.pageCatalogo = 1;
+  }
+
+  limpiarBusquedaCatalogo() {
+    this.searchTermCatalogo = '';
+    this.pageCatalogo = 1;
+  }
+
+  get catalogoFiltrado(): Servicio[] {
+    if (!this.searchTermCatalogo.trim()) return this.catalogo;
+    const term = this.searchTermCatalogo.trim().toLowerCase();
+    return this.catalogo.filter(s => {
+      const nombre = (s.nombre || '').toLowerCase();
+      const desc = (s.descripcion || '').toLowerCase();
+      const cod = this.codigoServicio(s.id).toLowerCase();
+      return nombre.includes(term) || desc.includes(term) || cod.includes(term);
+    });
+  }
+
+  get paginatedCatalogo(): Servicio[] {
+    const start = (this.pageCatalogo - 1) * this.pageSize;
+    return this.catalogoFiltrado.slice(start, start + this.pageSize);
+  }
+  get totalPagesCatalogo(): number {
+    return Math.ceil(this.catalogoFiltrado.length / this.pageSize) || 1;
+  }
+
   getTicketsFiltrados(): ServicioTicket[] {
     if (this.filtroEstado === 'TODOS') return this.tickets;
     return this.tickets.filter(t => t.estado === this.filtroEstado);

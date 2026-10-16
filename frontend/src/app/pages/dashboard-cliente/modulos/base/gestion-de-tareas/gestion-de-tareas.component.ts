@@ -56,6 +56,26 @@ export class GestionDeTareasComponent implements OnInit {
     return this.tareas.filter(t => t.estado === 'terminada');
   }
 
+  pageSize = 8;
+  pageActuales = 1;
+  pageEntregadas = 1;
+
+  get paginatedTareasActuales(): Tarea[] {
+    const start = (this.pageActuales - 1) * this.pageSize;
+    return this.tareasActuales.slice(start, start + this.pageSize);
+  }
+  get totalPagesActuales(): number {
+    return Math.ceil(this.tareasActuales.length / this.pageSize) || 1;
+  }
+
+  get paginatedTareasEntregadas(): Tarea[] {
+    const start = (this.pageEntregadas - 1) * this.pageSize;
+    return this.tareasEntregadas.slice(start, start + this.pageSize);
+  }
+  get totalPagesEntregadas(): number {
+    return Math.ceil(this.tareasEntregadas.length / this.pageSize) || 1;
+  }
+
   // Formulario
   nuevaTarea: Tarea = {
     titulo: '',

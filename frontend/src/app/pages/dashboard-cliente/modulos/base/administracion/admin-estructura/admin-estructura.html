@@ -49,7 +49,7 @@
                 </tr>
               </thead>
               <tbody>
-                @for (sede of sedes; track sede.id) {
+                @for (sede of paginatedSedes; track sede.id) {
                   <tr>
                     <td><strong>{{ sede.nombre }}</strong></td>
                     <td>{{ sede.direccion || 'N/A' }}</td>
@@ -62,8 +62,8 @@
                       }
                     </td>
                     <td class="text-center">
-                      <div class="acciones-tabla-centro">
-                        <button class="btn-general-1 btn-pill btn-xs" (click)="abrirEdicionSede(sede)" title="Editar Sede">
+                      <div class="acciones-fila">
+                        <button class="btn-icon" (click)="abrirEdicionSede(sede)" title="Editar Sede" aria-label="Editar Sede">
                           <i class="fas fa-edit"></i>
                         </button>
                       </div>
@@ -75,6 +75,21 @@
                 }
               </tbody>
             </table>
+
+            @if (sedes.length > pageSize) {
+              <div class="neu-pagination-bar">
+                <span class="pagination-info">Página {{ pageSedes }} de {{ totalPagesSedes }} ({{ sedes.length }} sedes)</span>
+                <div class="pagination-controls">
+                  <button class="pagination-btn" [disabled]="pageSedes === 1" (click)="pageSedes = pageSedes - 1">
+                    <i class="fas fa-chevron-left"></i> Anterior
+                  </button>
+                  <span class="pagination-badge">{{ pageSedes }}</span>
+                  <button class="pagination-btn" [disabled]="pageSedes >= totalPagesSedes" (click)="pageSedes = pageSedes + 1">
+                    Siguiente <i class="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+            }
           </div>
         }
 
@@ -93,7 +108,7 @@
                 </tr>
               </thead>
               <tbody>
-                @for (area of areas; track area.id) {
+                @for (area of paginatedAreas; track area.id) {
                   <tr>
                     <td><strong>{{ area.nombre }}</strong></td>
                     <td class="text-muted">{{ area.descripcion || 'Sin descripción' }}</td>
@@ -117,11 +132,11 @@
                       }
                     </td>
                     <td class="text-center">
-                      <div class="acciones-tabla-centro">
-                        <button class="btn-general-1 btn-pill btn-xs" (click)="abrirEdicionArea(area)" title="Editar Área y Módulos">
+                      <div class="acciones-fila">
+                        <button class="btn-icon" (click)="abrirEdicionArea(area)" title="Editar Área y Módulos" aria-label="Editar Área y Módulos">
                           <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn-general-5 btn-pill btn-xs" (click)="cambiarEstadoArea(area)" [title]="area.activo ? 'Desactivar Área' : 'Activar Área'">
+                        <button class="btn-icon" [ngClass]="area.activo ? 'text-danger' : 'text-success'" (click)="cambiarEstadoArea(area)" [title]="area.activo ? 'Desactivar Área' : 'Activar Área'" aria-label="Cambiar Estado">
                           <i class="fas" [ngClass]="area.activo ? 'fa-ban' : 'fa-check'"></i>
                         </button>
                       </div>
@@ -133,6 +148,21 @@
                 }
               </tbody>
             </table>
+
+            @if (areas.length > pageSize) {
+              <div class="neu-pagination-bar">
+                <span class="pagination-info">Página {{ pageAreas }} de {{ totalPagesAreas }} ({{ areas.length }} áreas)</span>
+                <div class="pagination-controls">
+                  <button class="pagination-btn" [disabled]="pageAreas === 1" (click)="pageAreas = pageAreas - 1">
+                    <i class="fas fa-chevron-left"></i> Anterior
+                  </button>
+                  <span class="pagination-badge">{{ pageAreas }}</span>
+                  <button class="pagination-btn" [disabled]="pageAreas >= totalPagesAreas" (click)="pageAreas = pageAreas + 1">
+                    Siguiente <i class="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+            }
           </div>
         }
 
@@ -166,11 +196,11 @@
                             }
                           </td>
                           <td class="text-center">
-                            <div class="acciones-tabla-centro">
-                              <button class="btn-general-1 btn-pill btn-xs" (click)="abrirEdicionCargo(cargo)" [disabled]="cargo.nombre === 'Jefe de Recursos Humanos' || cargo.nombre === 'Gerente General'" title="Editar Cargo">
+                            <div class="acciones-fila">
+                              <button class="btn-icon" (click)="abrirEdicionCargo(cargo)" [disabled]="cargo.nombre === 'Jefe de Recursos Humanos' || cargo.nombre === 'Gerente General'" title="Editar Cargo" aria-label="Editar Cargo">
                                 <i class="fas fa-edit"></i>
                               </button>
-                              <button class="btn-general-5 btn-pill btn-xs" (click)="cambiarEstadoCargo(cargo)" [disabled]="cargo.nombre === 'Jefe de Recursos Humanos' || cargo.nombre === 'Gerente General'" [title]="cargo.activo ? 'Desactivar' : 'Activar'">
+                              <button class="btn-icon" [ngClass]="cargo.activo ? 'text-danger' : 'text-success'" (click)="cambiarEstadoCargo(cargo)" [disabled]="cargo.nombre === 'Jefe de Recursos Humanos' || cargo.nombre === 'Gerente General'" [title]="cargo.activo ? 'Desactivar' : 'Activar'" aria-label="Cambiar Estado">
                                 <i class="fas" [ngClass]="cargo.activo ? 'fa-ban' : 'fa-check'"></i>
                               </button>
                             </div>
