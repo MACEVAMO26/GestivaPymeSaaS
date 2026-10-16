@@ -61,21 +61,33 @@ class AuthController extends Controller
         // Limpieza de tokens expirados o abandonados con más de 12 horas sin actividad
         $user->tokens()->where('created_at', '<', now()->subHours(12))->delete();
 
-        // Control Estricto de Sesiones Simultáneas (Requerimiento SENA)
-        // Se valida tanto en local como en producción para impedir sesiones concurrentes con el mismo usuario
-        $tieneSesionActiva = $user->tokens()->exists();
+        // Control Inteligente de Sesiones Simultáneas
+        // Permite operar en desarrollo local (localhost) sin colisionar con producción (Vercel / móvil),
+        // pero validando y bloqueando estrictamente sesiones concurrentes dentro del mismo entorno.
+        $origin = $request->header('Origin', '');
+        $referer = $request->header('Referer', '');
+        $host = $request->getHost();
+        $isLocalhost = str_contains($origin, 'localhost') || str_contains($origin, '127.0.0.1') || 
+                       str_contains($referer, 'localhost') || str_contains($referer, '127.0.0.1') ||
+                       $host === '127.0.0.1' || $host === 'localhost';
+
+        $tokenName = $isLocalhost ? 'local_token' : 'auth_token';
         $forzarCierre = $request->boolean('force_logout');
 
+        // Validar si ya existe una sesión activa para este usuario en este entorno
+        $tieneSesionActiva = $user->tokens()->where('name', $tokenName)->exists();
+
         if ($tieneSesionActiva && !$forzarCierre) {
+            $lugar = $isLocalhost ? 'en otra pestaña o navegador de este equipo' : 'en otro dispositivo o navegador';
             return response()->json([
                 'session_conflict' => true,
-                'message' => 'Ya existe una sesión activa para este usuario en otro dispositivo o pestaña del navegador. Por seguridad y control de concurrencia, no se permiten sesiones simultáneas.'
+                'message' => "Ya existe una sesión activa para este usuario {$lugar}. Por seguridad y control de concurrencia, no se permiten sesiones simultáneas."
             ], 409);
         }
 
-        // Cierra de forma inmediata cualquier sesión previa del usuario
-        $user->tokens()->delete();
-        $token = $user->createToken('auth_token')->plainTextToken;
+        // Cierra de forma inmediata cualquier sesión previa de este entorno
+        $user->tokens()->where('name', $tokenName)->delete();
+        $token = $user->createToken($tokenName)->plainTextToken;
 
         // Cargar módulos activos para evitar llamadas extras en el frontend
         $modulosActivos = [];

@@ -216,6 +216,11 @@ export class LoginComponent implements OnInit {
           return;
         }
 
+        if (err.status === 0) {
+          alert('No fue posible contactar al servidor. Esto puede deberse a que el servidor se encuentra iniciando (cold start de Render) o a intermitencia en la red. Por favor reintenta en unos segundos.');
+          return;
+        }
+
         alert('Credenciales incorrectas o error en el servidor. Revisa la consola.');
       }
     });
