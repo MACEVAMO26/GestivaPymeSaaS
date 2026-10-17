@@ -74,8 +74,9 @@ export class ModulosService {
       const cached = sessionStorage.getItem('modulos_empresa_cache');
       if (cached) {
         const parsed = JSON.parse(cached);
-        // Si ya está en cache de sesión (vino en el login o petición anterior), responder al instante
-        return of({ modulos: parsed });
+        if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+          return of({ modulos: parsed });
+        }
       }
     } catch (e) {}
 
