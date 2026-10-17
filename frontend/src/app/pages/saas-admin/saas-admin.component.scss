@@ -89,12 +89,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
 /* 
   --- TÍTULOS DE LOS MÓDULOS ---
-  Si en el futuro deseas cacharrear y unificar los estilos de todos los títulos de los módulos 
-  (Directorio de Empresas, Bandeja de Suscripciones, Bandeja de Solicitudes, etc.),
-  puedes crear una clase aquí (ej. .saas-modulo-titulo) y luego reemplazar las clases de 
-  Tailwind por esta nueva clase en el HTML de cada módulo.
-  Por ahora, mantuvimos los estilos de Tailwind directamente en el HTML para respetar las 
-  reglas de seguridad de los módulos Intocables.
+ 
 */
 
 $sidebar-text: #0f172a;
@@ -194,14 +189,14 @@ $sidebar-text-muted: #0f172a;
     .badge {
       background: #facc15;
       color: #0f172a;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 800;
       padding: 0.15rem 0.6rem;
       border-radius: 40px;
       border: none;
       text-transform: uppercase;
       line-height: 1.1;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
       transition: all 0.3s ease;
     }
   }
