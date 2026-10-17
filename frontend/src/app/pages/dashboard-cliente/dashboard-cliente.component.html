@@ -82,7 +82,7 @@
     <!-- HTML CONTENIDO CENTRAL -->
     <main class="content-area">
       <div style="flex: 1;">
-        <router-outlet></router-outlet>
+        <router-outlet (activate)="botRef.evaluateRoute()"></router-outlet>
       </div>
       
       <!-- FOOTER DISCRETO -->
@@ -101,4 +101,4 @@
 <app-gestiva-ia-tutorial [modulos]="modulosSidebar"></app-gestiva-ia-tutorial>
 
 <!-- GESTIVA IA ASSISTANT (Flotante) -->
-<app-gestiva-bot></app-gestiva-bot>
+<app-gestiva-bot #botRef></app-gestiva-bot>

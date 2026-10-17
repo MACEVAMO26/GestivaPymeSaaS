@@ -86,7 +86,7 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
             this.chatHistory[0].content = `¡Hola! Soy Gestiva AI. Tu gerencia ha establecido las siguientes directrices activas para tu rol:\n\n${listado}\n\n¿En qué puedo orientarte hoy o deseas que genere un informe en Word?`;
           }
         }
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       },
       error: (err) => console.error('Error al cargar directrices para el bot', err)
     });
@@ -99,11 +99,10 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
     const cleanPath = fullUrl.split('?')[0].split('#')[0];
 
     // Extraer segmentos de la ruta: /:entorno/:modulo/...
-    // Importante: ignorar segments[0] (:entorno, ej. 'techventasysoluciones') para que la palabra 'ventas' en el nombre de la empresa no altere la detección del módulo
     const segments = cleanPath.split('/').filter(Boolean);
     const modulePath = segments.length > 1 ? segments.slice(1).join('/') : (segments[0] || '');
 
-    // REGLA FUNDAMENTAL: Ocultar el bot exclusivamente si está en /inicio o fuera de los módulos del dashboard cliente
+    // Ocultar el bot exclusivamente cuando el módulo activo es /inicio
     const isInicio = modulePath === '' ||
                      modulePath === 'inicio' ||
                      modulePath.startsWith('inicio/') ||
@@ -115,11 +114,11 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
     if (isInicio) {
       this.showBot = false;
       this.showBubble = false;
-      this.cdr.markForCheck();
+      this.cdr.detectChanges();
       return;
     }
 
-    // En CUALQUIER otro módulo del cliente, el bot debe aparecer en la esquina inferior derecha
+    // En cualquier otro módulo del cliente, mostrar siempre el bot y su globito en la esquina inferior derecha
     this.showBot = true;
     if (!this.showChat) {
       this.showBubble = true;
@@ -131,7 +130,7 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
     this.bubbleTitle = config.title;
     this.bubbleMessage = config.pregunta;
 
-    this.cdr.markForCheck();
+    this.cdr.detectChanges();
   }
 
   private getModuleConfig(url: string) {
@@ -269,22 +268,29 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
   abrirChatDesdeBurbuja() {
     this.showBubble = false;
     this.showChat = true;
+    this.cdr.detectChanges();
   }
 
   cerrarBurbuja(event: Event) {
     event.stopPropagation();
     this.showBubble = false;
+    this.cdr.detectChanges();
   }
 
   toggleChat() {
     this.showChat = !this.showChat;
     if (this.showChat) {
       this.showBubble = false;
+    } else {
+      this.showBubble = true;
     }
+    this.cdr.detectChanges();
   }
 
   closeChat() {
     this.showChat = false;
+    this.showBubble = true;
+    this.cdr.detectChanges();
   }
 
   descargarInformeWord(event?: Event) {
@@ -292,6 +298,7 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
       event.stopPropagation();
     }
     this.isGeneratingDoc = true;
+    this.cdr.detectChanges();
     const modulo = this.currentModuleKey || 'general';
 
     this.http.get(`/api/ia/informe-word/${modulo}`, { responseType: 'blob' }).subscribe({
