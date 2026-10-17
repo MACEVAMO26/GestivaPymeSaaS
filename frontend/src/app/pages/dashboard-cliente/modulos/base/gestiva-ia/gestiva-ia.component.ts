@@ -1,4 +1,3 @@
-import { VolverDirective } from '../../../../../shared/directives/volver.directive';
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -17,7 +16,7 @@ interface Directriz {
 @Component({
   selector: 'app-gestiva-ia',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoadingSpinnerComponent, VolverDirective],
+  imports: [CommonModule, FormsModule, LoadingSpinnerComponent],
   templateUrl: './gestiva-ia.component.html',
   styleUrl: './gestiva-ia.component.scss'
 })
@@ -32,31 +31,6 @@ export class GestivaIaComponent implements OnInit {
 
   showForm = false;
   modoEdicion = false;
-
-  pageSize = 8;
-  pageDirectrices = 1;
-  filtroTexto = '';
-  filtroAudiencia = '';
-
-  get directricesFiltradas(): Directriz[] {
-    return this.directrices.filter(d => {
-      const cumpleTexto = !this.filtroTexto.trim() || 
-        d.mensaje.toLowerCase().includes(this.filtroTexto.toLowerCase()) ||
-        d.id.toString().includes(this.filtroTexto);
-      const cumpleAudiencia = !this.filtroAudiencia || d.audiencia === this.filtroAudiencia;
-      return cumpleTexto && cumpleAudiencia;
-    });
-  }
-
-  get paginatedDirectrices(): Directriz[] {
-    const list = this.directricesFiltradas;
-    const start = (this.pageDirectrices - 1) * this.pageSize;
-    return list.slice(start, start + this.pageSize);
-  }
-
-  get totalPagesDirectrices(): number {
-    return Math.ceil(this.directricesFiltradas.length / this.pageSize) || 1;
-  }
   
   form: Partial<Directriz> = {
     mensaje: '',

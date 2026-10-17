@@ -7,27 +7,14 @@
   <div class="tab-content neumorphic-panel-inner p-4">
     
     <div class="volver-wrapper">
-      <button class="btn-volver btn-pill" appVolver>
+      <button class="btn-volver btn-pill" onclick="window.history.back()">
         <i class="fas fa-arrow-left"></i> Volver
       </button>
     </div>
 
     <!-- LISTADO DE DIRECTRICES -->
     <div *ngIf="!showForm" class="neumorphic-panel fade-in">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 15px;">
-        <div style="display: flex; gap: 10px; flex: 1; max-width: 500px;">
-          <input type="text" [(ngModel)]="filtroTexto" placeholder="🔍 Buscar directriz..." class="input-neumorphic" style="flex: 1; padding: 8px 12px; font-size: 14px;">
-          <select [(ngModel)]="filtroAudiencia" class="input-neumorphic" style="padding: 8px 12px; font-size: 14px;">
-            <option value="">Todas las Audiencias</option>
-            <option value="Todos">Toda la Empresa</option>
-            <option value="Gerencia">Solo Gerencia</option>
-            <option value="RRHH">Recursos Humanos</option>
-            <option value="Ventas">Área de Ventas</option>
-            <option value="Servicios">Área de Servicios</option>
-            <option value="Inventario">Área de Inventario</option>
-            <option value="Operativos">Operativos</option>
-          </select>
-        </div>
+      <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
         <button class="btn-add btn-pill" (click)="abrirFormulario()">+ Nueva Directriz</button>
       </div>
 
@@ -49,7 +36,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let dir of paginatedDirectrices">
+              <tr *ngFor="let dir of directrices">
                 <td>{{ dir.id }}</td>
                 <td>{{ dir.mensaje }}</td>
                 <td>{{ dir.audiencia }}</td>
@@ -67,27 +54,12 @@
                   </button>
                 </td>
               </tr>
-              <tr *ngIf="directricesFiltradas.length === 0">
+              <tr *ngIf="directrices.length === 0">
                 <td colspan="5" class="text-center" style="padding: 20px;">No hay directrices configuradas. ¡Crea la primera!</td>
               </tr>
             </tbody>
           </table>
         </div>
-
-        @if (directricesFiltradas.length > pageSize) {
-          <div class="neu-pagination-bar">
-            <span class="pagination-info">Página {{ pageDirectrices }} de {{ totalPagesDirectrices }} ({{ directricesFiltradas.length }} directrices)</span>
-            <div class="pagination-controls">
-              <button class="pagination-btn" [disabled]="pageDirectrices === 1" (click)="pageDirectrices = pageDirectrices - 1">
-                <i class="fas fa-chevron-left"></i> Anterior
-              </button>
-              <span class="pagination-badge">{{ pageDirectrices }}</span>
-              <button class="pagination-btn" [disabled]="pageDirectrices >= totalPagesDirectrices" (click)="pageDirectrices = pageDirectrices + 1">
-                Siguiente <i class="fas fa-chevron-right"></i>
-              </button>
-            </div>
-          </div>
-        }
     </div>
 
     <!-- FORMULARIO DE CREACIÓN/EDICIÓN -->
@@ -110,8 +82,6 @@
                 <option value="Gerencia">Solo Jefes y Gerencia</option>
                 <option value="RRHH">Recursos Humanos</option>
                 <option value="Ventas">Área de Ventas</option>
-                <option value="Servicios">Área de Servicios</option>
-                <option value="Inventario">Área de Inventario</option>
                 <option value="Operativos">Empleados Operativos (Generales)</option>
               </select>
             </div>
@@ -126,8 +96,7 @@
 
           </div>
 
-          <div class="form-actions" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
-            <button type="button" class="btn-volver btn-pill" (click)="showForm = false">Cancelar</button>
+          <div class="form-actions">
             <button type="submit" class="btn-save btn-pill" [disabled]="guardando">
               <span *ngIf="guardando" class="spinner-small"></span> 
               {{ guardando ? 'Guardando...' : (modoEdicion ? 'Actualizar Directriz' : '+ Guardar Directriz') }}
