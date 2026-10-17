@@ -81,6 +81,16 @@ class IaController extends Controller
             $audiencias[] = 'RRHH';
         }
 
+        if (str_contains($rolNombre, 'servicio') || str_contains($cargoNombre, 'servicio') || str_contains($areaNombre, 'servicio') || str_contains($areaNombre, 'operacion') || $area === 'servicios') {
+            $audiencias[] = 'Servicios';
+            $audiencias[] = 'Operativos';
+        }
+
+        if (str_contains($rolNombre, 'inventario') || str_contains($cargoNombre, 'inventario') || str_contains($areaNombre, 'inventario') || str_contains($areaNombre, 'almacen') || str_contains($areaNombre, 'bodega') || $area === 'inventario') {
+            $audiencias[] = 'Inventario';
+            $audiencias[] = 'Operativos';
+        }
+
         $directrices = \App\Models\IaSugerenciaPersonalizada::where('empresa_id', $user->empresa_id)
             ->where('activo', true)
             ->whereIn('audiencia', array_unique($audiencias))

@@ -22,7 +22,10 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private routerSub!: Subscription;
 
-  // Estados visuales del Globito Proactivo
+  // Control de visibilidad del Bot Flotante (Se oculta exclusivamente en /inicio)
+  showBot = false;
+
+  // Estados visuales del Globito Proactivo y Chat
   showBubble = true;
   showChat = false;
   bubbleTitle = 'Gestiva IA';
@@ -39,19 +42,20 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
   isAdvancedMode = false;
   isLoading = false;
   chatHistory: { role: string; content: string }[] = [
-    { role: 'assistant', content: '¡Hola! Soy Gestiva AI, tu asistente proactivo. Puedo ayudarte con tareas, guías y generar informes ejecutivos en Word con las estadísticas de tu empresa.' }
+    { role: 'assistant', content: '¡Hola! Soy Gestiva AI, tu asistente proactivo. Puedo orientarte en tus actividades, interpretar directrices de la gerencia y generar informes ejecutivos en Word con las estadísticas de tu empresa.' }
   ];
 
   directricesActivas: string[] = [];
 
   ngOnInit() {
     const user = this.authService.getUser();
-    if (user?.ia_modo === 'avanzado') {
+    if (user?.ia_modo === 'avanzado' || user?.empresa?.ia_modo === 'avanzado' || user?.empresa?.plan === 'avanzado' || user?.plan_ia === 'avanzado') {
       this.isAdvancedMode = true;
     }
 
     // 1. Evaluar inmediatamente la ruta actual para desplegar la sugerencia contextual
-    this.evaluateRoute(this.router.url);
+    const currentUrl = this.router.url || (typeof window !== 'undefined' ? window.location.pathname : '');
+    this.evaluateRoute(currentUrl);
 
     // 2. Cargar directrices activas de la empresa para el rol del usuario
     this.cargarDirectrices();
@@ -60,7 +64,7 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
     this.routerSub = this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
-      this.evaluateRoute(event.urlAfterRedirects || this.router.url);
+      this.evaluateRoute(event.urlAfterRedirects || event.url || this.router.url);
     });
   }
 
@@ -82,73 +86,172 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
             this.chatHistory[0].content = `¡Hola! Soy Gestiva AI. Tu gerencia ha establecido las siguientes directrices activas para tu rol:\n\n${listado}\n\n¿En qué puedo orientarte hoy o deseas que genere un informe en Word?`;
           }
         }
+        this.cdr.markForCheck();
       },
       error: (err) => console.error('Error al cargar directrices para el bot', err)
     });
   }
 
   evaluateRoute(url: string) {
-    const cleanUrl = (url || '').toLowerCase();
-    const config = this.getModuleConfig(cleanUrl);
+    const fullUrl = (url || this.router.url || (typeof window !== 'undefined' ? window.location.pathname : '')).toLowerCase();
+    const cleanPath = fullUrl.split('?')[0].split('#')[0];
 
+    // REGLA FUNDAMENTAL: Ocultar el bot exclusivamente si está en /inicio, /login, fuera del dashboard cliente o no autenticado
+    const isInicio = cleanPath.endsWith('/inicio') || 
+                     cleanPath.endsWith('/inicio/') || 
+                     cleanPath === '/' || 
+                     cleanPath === '' || 
+                     cleanPath.includes('/login') || 
+                     cleanPath.includes('/saas-admin');
+
+    if (isInicio || !this.authService.getToken()) {
+      this.showBot = false;
+      this.showBubble = false;
+      this.cdr.markForCheck();
+      return;
+    }
+
+    // En CUALQUIER otro módulo del cliente, el bot debe aparecer en la esquina derecha
+    this.showBot = true;
+    this.showBubble = true;
+
+    const config = this.getModuleConfig(cleanPath);
     this.currentModuleKey = config.key;
     this.currentModuleNombre = config.nombre;
     this.bubbleTitle = config.title;
     this.bubbleMessage = config.pregunta;
 
-    // El globito siempre se muestra de manera visible y proactiva
-    this.showBubble = true;
+    this.cdr.markForCheck();
   }
 
   private getModuleConfig(url: string) {
-    if (url.includes('ventas') || url.includes('prefacturacion')) {
+    const user = this.authService.getUser();
+    const rolNombre = (user?.rol?.nombre || '').toLowerCase();
+    const cargoNombre = (user?.empleado?.cargo?.nombre || user?.cargo?.nombre || user?.puesto || '').toLowerCase();
+    const esGerente = rolNombre.includes('gerente') || rolNombre.includes('auditor');
+    const esOperativoVentas = cargoNombre.includes('venta') || rolNombre.includes('venta');
+    const esOperativoServicios = cargoNombre.includes('servicio') || rolNombre.includes('servicio');
+    const esOperativoInventario = cargoNombre.includes('inventario') || cargoNombre.includes('almacen') || rolNombre.includes('inventario');
+    const esRRHH = cargoNombre.includes('humana') || cargoNombre.includes('rrhh') || rolNombre.includes('humana');
+    const primerNombre = (user?.nombres || 'Usuario').split(' ')[0];
+
+    if (url.includes('proveedores')) {
+      let pregunta = `Hola ${primerNombre}. Estás en Proveedores. ¿Deseas auditar órdenes de compra, cuentas por pagar y generar el informe en Word?`;
+      if (esGerente) {
+        pregunta = `Hola Gerente ${primerNombre}. En Gestión de Proveedores supervisas acreedores y contratos. ¿Deseas generar el informe ejecutivo en Word?`;
+      } else if (esOperativoInventario) {
+        pregunta = `Hola ${primerNombre}. Verifica facturas por pagar y recepción de mercancía. ¿Deseas compilar el balance de proveedores en Word?`;
+      }
+      return {
+        key: 'proveedores',
+        nombre: 'Gestión de Proveedores',
+        title: 'Gestiva IA • Proveedores',
+        pregunta
+      };
+    } else if (url.includes('compras')) {
+      let pregunta = `Hola ${primerNombre}. Estás en Compras. ¿Deseas auditar solicitudes de adquisición y generar el informe en Word?`;
+      if (esGerente) {
+        pregunta = `Hola Gerente ${primerNombre}. Supervisa los gastos de abastecimiento de la empresa. ¿Deseas generar el informe de compras en Word?`;
+      }
+      return {
+        key: 'compras',
+        nombre: 'Gestión de Compras',
+        title: 'Gestiva IA • Compras',
+        pregunta
+      };
+    } else if (url.includes('ventas') || url.includes('prefacturacion')) {
+      let pregunta = `Hola ${primerNombre}. Detecto operaciones comerciales en Ventas. ¿Deseas que genere el informe ejecutivo en Word con los totales facturados?`;
+      if (esOperativoVentas) {
+        pregunta = `Hola ${primerNombre}. Recuerda registrar oportunamente cada venta y revisar tu arqueo de caja. ¿Deseas generar el informe de ventas en Word?`;
+      } else if (esGerente) {
+        pregunta = `Hola Gerente ${primerNombre}. Resumen comercial listo. ¿Deseas compilar el informe oficial de ventas y facturación en Word?`;
+      }
       return {
         key: 'ventas',
         nombre: 'Ventas y Facturación',
         title: 'Gestiva IA • Ventas',
-        pregunta: '📊 Detecto operaciones comerciales en Ventas. ¿Deseas que genere un informe ejecutivo en Word con las estadísticas y totales facturados?'
+        pregunta
       };
-    } else if (url.includes('gestion-humana') || url.includes('empleados') || url.includes('formalizacion') || url.includes('autogestion')) {
+    } else if (url.includes('gestion-humana') || url.includes('formalizacion')) {
+      let pregunta = `Hola ${primerNombre}. Estás en Talento Humano. ¿Deseas generar el informe de colaboradores, contratos y formalización en Word?`;
+      if (esRRHH) {
+        pregunta = `Hola ${primerNombre}. Supervisa la legalización del personal y afiliaciones a seguridad social. ¿Deseas descargar el informe en Word?`;
+      } else if (esGerente) {
+        pregunta = `Hola Gerente ${primerNombre}. Aquí validas la formalización legal de tu equipo. ¿Deseas el balance de nómina y talento humano en Word?`;
+      }
       return {
         key: 'empleados',
         nombre: 'Gestión Humana',
         title: 'Gestiva IA • Gestión Humana',
-        pregunta: '👥 Estás en Gestión Humana. ¿Deseas generar el informe de talento humano, contratos y colaboradores en Word?'
+        pregunta
       };
-    } else if (url.includes('inventario') || url.includes('compras') || url.includes('proveedores')) {
+    } else if (url.includes('inventario')) {
+      let pregunta = `Hola ${primerNombre}. Estás en Inventario y Almacén. ¿Deseas auditar existencias y generar el informe de stock en Word?`;
+      if (esOperativoInventario) {
+        pregunta = `Hola ${primerNombre}. Revisa productos críticos y movimientos de entrada/salida. ¿Deseas generar el informe de inventario en Word?`;
+      } else if (esGerente) {
+        pregunta = `Hola Gerente ${primerNombre}. Control de valorización y stock. ¿Deseas descargar la auditoría de inventario en Word?`;
+      }
       return {
         key: 'inventario',
         nombre: 'Inventario y Almacén',
         title: 'Gestiva IA • Inventario',
-        pregunta: '📦 Estás en Inventario. ¿Deseas auditar existencias y generar el informe de stock y productos en Word?'
+        pregunta
       };
-    } else if (url.includes('servicios') || url.includes('agenda') || url.includes('gestion-de-clientes') || url.includes('gestion-de-operarios') || url.includes('reportes')) {
+    } else if (url.includes('servicios') || url.includes('agenda') || url.includes('gestion-de-operarios') || url.includes('reportes')) {
+      let pregunta = `Hola ${primerNombre}. Estás en Servicios. ¿Deseas generar el balance de órdenes técnicas y cumplimiento en Word?`;
+      if (esOperativoServicios) {
+        pregunta = `Hola ${primerNombre}. Revisa tus intervenciones y servicios asignados. ¿Deseas compilar el reporte operativo en Word?`;
+      } else if (esGerente) {
+        pregunta = `Hola Gerente ${primerNombre}. Supervisión de órdenes y catálogo de servicios. ¿Deseas generar el informe consolidado en Word?`;
+      }
       return {
         key: 'servicios',
         nombre: 'Servicios y Operaciones',
         title: 'Gestiva IA • Servicios',
-        pregunta: '🛠️ Estás en Servicios. ¿Deseas generar el informe de tickets, órdenes y servicios prestados en Word?'
+        pregunta
       };
-    } else if (url.includes('clientes')) {
+    } else if (url.includes('gestion-de-tareas')) {
+      return {
+        key: 'tareas',
+        nombre: 'Gestión de Tareas',
+        title: 'Gestiva IA • Tareas',
+        pregunta: `Hola ${primerNombre}. Estás en Gestión de Tareas. ¿Deseas auditar el avance de compromisos y generar el reporte en Word?`
+      };
+    } else if (url.includes('clientes') || url.includes('gestion-de-clientes')) {
       return {
         key: 'clientes',
         nombre: 'Clientes y CRM',
         title: 'Gestiva IA • Clientes',
-        pregunta: '🤝 Estás en Clientes. ¿Deseas un resumen de cartera comercial y fidelización en Word?'
+        pregunta: `Hola ${primerNombre}. Estás en Clientes y CRM. ¿Deseas un resumen de fidelización, cartera y contactos en Word?`
       };
     } else if (url.includes('caja') || url.includes('finanzas')) {
       return {
         key: 'caja',
         nombre: 'Caja y Finanzas',
         title: 'Gestiva IA • Finanzas',
-        pregunta: '💰 Estás en Caja/Finanzas. ¿Deseas generar el balance de movimientos y arqueo en Word?'
+        pregunta: `Hola ${primerNombre}. Estás en Caja y Finanzas. ¿Deseas generar el balance de ingresos, egresos y arqueo en Word?`
+      };
+    } else if (url.includes('administracion')) {
+      return {
+        key: 'administracion',
+        nombre: 'Administración del Sistema',
+        title: 'Gestiva IA • Administración',
+        pregunta: `Hola ${primerNombre}. En Administración configuras empresa, roles y usuarios. ¿Deseas generar el informe de gobernanza en Word?`
+      };
+    } else if (url.includes('autogestion')) {
+      return {
+        key: 'autogestion',
+        nombre: 'Autogestión de Empleado',
+        title: 'Gestiva IA • Autogestión',
+        pregunta: `Hola ${primerNombre}. En Autogestión puedes solicitar permisos, vacaciones o certificados. ¿Deseas generar un comprobante en Word?`
       };
     } else {
       return {
         key: 'general',
         nombre: 'Gestiva AI',
         title: 'Gestiva IA • Asistente',
-        pregunta: '📈 ¡Hola! Soy Gestiva IA. ¿Deseas que prepare un informe ejecutivo consolidado de tu empresa en Word?'
+        pregunta: `¡Hola ${primerNombre}! Soy tu asistente inteligente Gestiva AI. ¿Deseas que prepare un informe ejecutivo de este módulo en Word?`
       };
     }
   }
@@ -444,7 +547,13 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
   private obtenerRespuestaContingencia(prompt: string): string {
     const p = prompt.toLowerCase();
     if (p.includes('directriz') || p.includes('cumplir')) {
-      return `📢 **Directriz Corporativa:**\nPara cumplir exitosamente con la directriz de Gerencia:\n1. Revisa tus registros del módulo actual (${this.currentModuleNombre}).\n2. Ejecuta los movimientos pendientes antes del cierre del día.\n3. Puedes presionar el botón superior para **Descargar el Informe en Word** y validar las cifras alcanzadas.`;
+      return `📢 **Directriz Corporativa Asignada:**\nPara cumplir con las directrices de la Gerencia:\n1. Revisa tus registros en el módulo actual (${this.currentModuleNombre}).\n2. Ejecuta o actualiza los ítems pendientes según tu rol.\n3. Presiona el botón superior **'Descargar Word'** para presentar tu informe de avance.`;
+    }
+    if (p.includes('servicio') || p.includes('atender') || p.includes('ticket') || p.includes('orden')) {
+      return `🛠️ **Servicios y Operaciones:**\nPara dar cumplimiento a la directriz sobre servicios:\n1. Ve a **Servicios** en el menú lateral.\n2. Filtra la lista por estado **'Pendiente'** o **'En Proceso'** para identificar atenciones atrasadas.\n3. Coordina con los operarios asignados y actualiza el avance.\n4. Puedes generar el informe ejecutivo en Word para auditar los servicios atendidos.`;
+    }
+    if (p.includes('proveedor') || p.includes('cuenta por pagar') || p.includes('compra')) {
+      return `🚚 **Gestión de Proveedores:**\nEn Proveedores puedes verificar órdenes de compra, cuentas por pagar y evaluaciones contractuales. Haz clic en 'Descargar Word' para obtener el balance consolidado.`;
     }
     if (p.includes('empleado') || p.includes('contrato') || p.includes('novedad')) {
       return `👥 En **Gestión Humana** puedes registrar empleados, cargar contratos y gestionar solicitudes de autogestión o vacaciones. Si requieres el balance legal del personal, puedes descargar el informe en Word ahora mismo.`;
@@ -454,6 +563,9 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
     }
     if (p.includes('venta') || p.includes('factura') || p.includes('caja')) {
       return `📊 En **Ventas** puedes emitir facturas en el Punto de Venta (POS) y consultar el historial de clientes. Recuerda verificar tu arqueo diario de caja.`;
+    }
+    if (p.includes('tarea') || p.includes('pendiente') || p.includes('meta')) {
+      return `📋 En **Gestión de Tareas** puedes verificar tus compromisos asignados, actualizar estados y cumplir las metas del período fijadas por Gerencia.`;
     }
     return `¡Entendido! Como asistente de Gestiva AI estoy monitoreando activamente el módulo de **${this.currentModuleNombre}**. ¿Deseas que genere el informe oficial en Word con las métricas actuales?`;
   }
