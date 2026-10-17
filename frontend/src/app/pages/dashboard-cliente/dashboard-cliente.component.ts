@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { AccessibilityService } from '../../services/accessibility/accessibility.service';
 import { ModulosService, MODULOS_BASE_UI, RUTA_MODULO, ICONO_MODULO } from '../../services/modulos.service';
@@ -31,6 +31,7 @@ export class DashboardClienteComponent implements OnInit {
   private modulosService = inject(ModulosService);
   private iaStateService = inject(IaStateService);
   private router = inject(Router);
+  public route = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
 

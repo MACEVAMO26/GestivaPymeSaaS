@@ -71,7 +71,7 @@
       <nav class="nav-menu">
         <!-- Ítems dinámicos según módulos contratados -->
         @for (modulo of modulosSidebar; track modulo.id) {
-          <a class="nav-item" [routerLink]="modulo.ruta" routerLinkActive="active">
+          <a class="nav-item" [routerLink]="modulo.ruta" [relativeTo]="route" routerLinkActive="active">
             <span class="nav-icon"><i [class]="modulo.icono"></i></span>
             <span class="nav-label">{{ modulo.nombre }}</span>
           </a>
