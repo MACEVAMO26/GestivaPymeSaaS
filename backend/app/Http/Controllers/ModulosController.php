@@ -35,7 +35,7 @@ class ModulosController extends Controller
         return $this->obtenerModulosParaEmpresa($empresa);
     }
 
-    private function obtenerModulosParaEmpresa(Empresa $empresa)
+    public function obtenerModulosParaEmpresa(Empresa $empresa)
     {
 
         if ($empresa->modulos()->count() === 0) {

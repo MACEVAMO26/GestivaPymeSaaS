@@ -43,8 +43,10 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
         $emailLimpio = strtolower(trim($request->email));
+        // Búsqueda directa optimizada por índice, con relaciones necesarias
         $user = User::with(['empresa', 'cargo', 'rol', 'empleado.area', 'empleado.cargo'])
-                    ->whereRaw('LOWER(email) = ?', [$emailLimpio])
+                    ->where('email', $emailLimpio)
+                    ->orWhereRaw('LOWER(email) = ?', [$emailLimpio])
                     ->first();
         if (!$user || !Hash::check($request->password, $user->password_hash)) {
             throw ValidationException::withMessages([
@@ -60,9 +62,6 @@ class AuthController extends Controller
                 'message' => 'Por seguridad, debes cambiar tu clave inicial antes de continuar.'
             ]);
         }
-
-        // Limpieza de tokens expirados o abandonados con más de 12 horas sin actividad
-        $user->tokens()->where('created_at', '<', now()->subHours(12))->delete();
 
         // Control Inteligente de Sesiones Simultáneas
         // Permite operar en desarrollo local (localhost) sin colisionar con producción (Vercel / móvil),
@@ -87,13 +86,24 @@ class AuthController extends Controller
             ], 409);
         }
 
-        // Cierra de forma inmediata cualquier sesión previa de este entorno
+        // Cierra de forma inmediata cualquier sesión previa de este entorno y genera el token
         $user->tokens()->where('name', $tokenName)->delete();
         $token = $user->createToken($tokenName)->plainTextToken;
 
-        // Cargar módulos activos para evitar llamadas extras en el frontend
+        // Cargar módulos estructurados de inmediato para entregarlos al frontend y evitar peticiones posteriores
+        $modulosEstructurados = [];
         $modulosActivos = [];
         if ($user->empresa_id) {
+            try {
+                $modulosController = new ModulosController();
+                if ($user->empresa) {
+                    $modulosRes = $modulosController->obtenerModulosParaEmpresa($user->empresa);
+                    $modulosEstructurados = $modulosRes->getData(true)['modulos'] ?? [];
+                }
+            } catch (\Throwable $e) {
+                // Fallback silencioso en caso de error
+            }
+
             $modulos = \Illuminate\Support\Facades\DB::table('empresa_modulo')
                         ->where('empresa_id', $user->empresa_id)
                         ->get();
@@ -106,6 +116,7 @@ class AuthController extends Controller
             'message' => 'Inicio de sesión exitoso!',
             'user' => $user,
             'modulos_activos' => $modulosActivos,
+            'modulos_empresa' => $modulosEstructurados,
             'token' => $token
         ]);
     }
