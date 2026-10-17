@@ -35,7 +35,7 @@
   <div class="bot-chat-panel slide-up" *ngIf="showChat">
     <div class="chat-header">
       <div class="bot-info">
-        <img src="/assets/images/GestivaIA/IA_Gestiva.png" alt="Gestiva" class="chat-avatar">
+        <img src="assets/images/GestivaIA/IA_Gestiva.png" onerror="this.src='/assets/images/GestivaIA/IA_Gestiva.png'" alt="Gestiva" class="chat-avatar">
         <div>
           <h4>Gestiva IA</h4>
           <span>Asistente Inteligente • {{ currentModuleNombre }}</span>
@@ -109,7 +109,7 @@
 
   <!-- Avatar Flotante con indicador interactivo -->
   <div class="bot-avatar-wrapper" (click)="toggleChat()" title="Clic para interactuar con Gestiva IA">
-    <img src="/assets/images/GestivaIA/IA_Gestiva.png" alt="Gestiva" class="bot-avatar bounce">
+    <img src="assets/images/GestivaIA/IA_Gestiva.png" onerror="this.src='/assets/images/GestivaIA/IA_Gestiva.png'" alt="Gestiva" class="bot-avatar bounce">
     <span class="notification-dot" *ngIf="showBubble" title="Sugerencia activa"></span>
   </div>
 

@@ -54,8 +54,8 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
     }
 
     // 1. Evaluar inmediatamente la ruta actual para desplegar la sugerencia contextual
-    const currentUrl = this.router.url || (typeof window !== 'undefined' ? window.location.pathname : '');
-    this.evaluateRoute(currentUrl);
+    this.evaluateRoute();
+    setTimeout(() => this.evaluateRoute(), 150);
 
     // 2. Cargar directrices activas de la empresa para el rol del usuario
     this.cargarDirectrices();
@@ -64,7 +64,7 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
     this.routerSub = this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
-      this.evaluateRoute(event.urlAfterRedirects || event.url || this.router.url);
+      this.evaluateRoute(event.urlAfterRedirects || event.url);
     });
   }
 
@@ -92,30 +92,40 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
     });
   }
 
-  evaluateRoute(url: string) {
-    const fullUrl = (url || this.router.url || (typeof window !== 'undefined' ? window.location.pathname : '')).toLowerCase();
+  evaluateRoute(url?: string) {
+    const routerUrl = (url && url !== '/') ? url : ((this.router.url && this.router.url !== '/') ? this.router.url : '');
+    const winPath = typeof window !== 'undefined' ? window.location.pathname : '';
+    const fullUrl = (routerUrl || winPath).toLowerCase();
     const cleanPath = fullUrl.split('?')[0].split('#')[0];
 
-    // REGLA FUNDAMENTAL: Ocultar el bot exclusivamente si está en /inicio, /login, fuera del dashboard cliente o no autenticado
-    const isInicio = cleanPath.endsWith('/inicio') || 
-                     cleanPath.endsWith('/inicio/') || 
-                     cleanPath === '/' || 
-                     cleanPath === '' || 
-                     cleanPath.includes('/login') || 
+    // Extraer segmentos de la ruta: /:entorno/:modulo/...
+    // Importante: ignorar segments[0] (:entorno, ej. 'techventasysoluciones') para que la palabra 'ventas' en el nombre de la empresa no altere la detección del módulo
+    const segments = cleanPath.split('/').filter(Boolean);
+    const modulePath = segments.length > 1 ? segments.slice(1).join('/') : (segments[0] || '');
+
+    // REGLA FUNDAMENTAL: Ocultar el bot exclusivamente si está en /inicio o fuera de los módulos del dashboard cliente
+    const isInicio = modulePath === '' ||
+                     modulePath === 'inicio' ||
+                     modulePath.startsWith('inicio/') ||
+                     cleanPath.endsWith('/inicio') ||
+                     cleanPath.endsWith('/inicio/') ||
+                     cleanPath.includes('/login') ||
                      cleanPath.includes('/saas-admin');
 
-    if (isInicio || !this.authService.getToken()) {
+    if (isInicio) {
       this.showBot = false;
       this.showBubble = false;
       this.cdr.markForCheck();
       return;
     }
 
-    // En CUALQUIER otro módulo del cliente, el bot debe aparecer en la esquina derecha
+    // En CUALQUIER otro módulo del cliente, el bot debe aparecer en la esquina inferior derecha
     this.showBot = true;
-    this.showBubble = true;
+    if (!this.showChat) {
+      this.showBubble = true;
+    }
 
-    const config = this.getModuleConfig(cleanPath);
+    const config = this.getModuleConfig(modulePath);
     this.currentModuleKey = config.key;
     this.currentModuleNombre = config.nombre;
     this.bubbleTitle = config.title;
@@ -410,8 +420,84 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
       `;
       diagnostico = 'El inventario muestra rotación fluida con abastecimiento suficiente en el 96% de las referencias de stock.';
       recomendacion = 'Generar órdenes de compra preventivas para las 3 referencias identificadas con stock crítico antes del cierre de quincena.';
+    } else if (modulo === 'clientes') {
+      moduloTitulo = 'Clientes, Cartera y CRM';
+      kpis = `
+        <td style='width:25%; background:#f0fdf4; border:1px solid #bbf7d0; border-left:4px solid #059669; padding:12px; text-align:center;'>
+          <div style='font-size:8.5pt; text-transform:uppercase; color:#047857; font-weight:bold;'>Clientes Registrados</div>
+          <div style='font-size:16pt; font-weight:bold; color:#065f46;'>45</div>
+        </td>
+        <td style='width:25%; background:#f0fdf4; border:1px solid #bbf7d0; border-left:4px solid #059669; padding:12px; text-align:center;'>
+          <div style='font-size:8.5pt; text-transform:uppercase; color:#047857; font-weight:bold;'>Clientes Activos</div>
+          <div style='font-size:16pt; font-weight:bold; color:#065f46;'>42</div>
+        </td>
+        <td style='width:25%; background:#f0fdf4; border:1px solid #bbf7d0; border-left:4px solid #059669; padding:12px; text-align:center;'>
+          <div style='font-size:8.5pt; text-transform:uppercase; color:#047857; font-weight:bold;'>Retención CRM</div>
+          <div style='font-size:16pt; font-weight:bold; color:#065f46;'>93.3%</div>
+        </td>
+        <td style='width:25%; background:#f0fdf4; border:1px solid #bbf7d0; border-left:4px solid #059669; padding:12px; text-align:center;'>
+          <div style='font-size:8.5pt; text-transform:uppercase; color:#047857; font-weight:bold;'>Cartera al Día</div>
+          <div style='font-size:16pt; font-weight:bold; color:#065f46;'>98%</div>
+        </td>`;
+      tabla = `
+        <tr><td style='padding:8px 12px; border:1px solid #cbd5e1;'>900.412.889-1</td><td style='padding:8px 12px; border:1px solid #cbd5e1;'>Distribuidora del Norte SAS</td><td style='padding:8px 12px; border:1px solid #cbd5e1;'>Corporativo</td><td style='padding:8px 12px; border:1px solid #cbd5e1;'>Activo</td><td style='padding:8px 12px; border:1px solid #cbd5e1; font-weight:bold; text-align:right;'>$ 12.450.000</td></tr>
+        <tr><td style='padding:8px 12px; border:1px solid #cbd5e1;'>830.119.402-5</td><td style='padding:8px 12px; border:1px solid #cbd5e1;'>Comercializadora Andina Ltda</td><td style='padding:8px 12px; border:1px solid #cbd5e1;'>Recurrente</td><td style='padding:8px 12px; border:1px solid #cbd5e1;'>Activo</td><td style='padding:8px 12px; border:1px solid #cbd5e1; font-weight:bold; text-align:right;'>$ 8.920.000</td></tr>
+        <tr><td style='padding:8px 12px; border:1px solid #cbd5e1;'>901.223.510-8</td><td style='padding:8px 12px; border:1px solid #cbd5e1;'>Inversiones La Sabana SAS</td><td style='padding:8px 12px; border:1px solid #cbd5e1;'>Corporativo</td><td style='padding:8px 12px; border:1px solid #cbd5e1;'>Activo</td><td style='padding:8px 12px; border:1px solid #cbd5e1; font-weight:bold; text-align:right;'>$ 6.300.000</td></tr>
+      `;
+      diagnostico = 'La cartera de clientes presenta un índice de fidelización del 93.3% con alta concentración en cuentas corporativas al día.';
+      recomendacion = 'Ejecutar campañas de seguimiento posventa en los 3 clientes inactivos del trimestre para reactivar pedidos recurrentes.';
+    } else if (modulo === 'proveedores' || modulo === 'compras') {
+      moduloTitulo = 'Gestión de Proveedores y Abastecimiento';
+      kpis = `
+        <td style='width:25%; background:#f0fdf4; border:1px solid #bbf7d0; border-left:4px solid #059669; padding:12px; text-align:center;'>
+          <div style='font-size:8.5pt; text-transform:uppercase; color:#047857; font-weight:bold;'>Proveedores Activos</div>
+          <div style='font-size:16pt; font-weight:bold; color:#065f46;'>14</div>
+        </td>
+        <td style='width:25%; background:#f0fdf4; border:1px solid #bbf7d0; border-left:4px solid #059669; padding:12px; text-align:center;'>
+          <div style='font-size:8.5pt; text-transform:uppercase; color:#047857; font-weight:bold;'>Órdenes Emitidas</div>
+          <div style='font-size:16pt; font-weight:bold; color:#065f46;'>19</div>
+        </td>
+        <td style='width:25%; background:#f0fdf4; border:1px solid #bbf7d0; border-left:4px solid #059669; padding:12px; text-align:center;'>
+          <div style='font-size:8.5pt; text-transform:uppercase; color:#047857; font-weight:bold;'>Cumplimiento Entrega</div>
+          <div style='font-size:16pt; font-weight:bold; color:#065f46;'>95%</div>
+        </td>
+        <td style='width:25%; background:#f0fdf4; border:1px solid #bbf7d0; border-left:4px solid #059669; padding:12px; text-align:center;'>
+          <div style='font-size:8.5pt; text-transform:uppercase; color:#047857; font-weight:bold;'>Cuentas por Pagar</div>
+          <div style='font-size:16pt; font-weight:bold; color:#065f46;'>$ 6.800.000</div>
+        </td>`;
+      tabla = `
+        <tr><td style='padding:8px 12px; border:1px solid #cbd5e1;'>OC-2026-019</td><td style='padding:8px 12px; border:1px solid #cbd5e1;'>Mayorista Tecnológico Global</td><td style='padding:8px 12px; border:1px solid #cbd5e1;'>Hardware</td><td style='padding:8px 12px; border:1px solid #cbd5e1;'>Recibido</td><td style='padding:8px 12px; border:1px solid #cbd5e1; font-weight:bold; text-align:right;'>$ 4.200.000</td></tr>
+        <tr><td style='padding:8px 12px; border:1px solid #cbd5e1;'>OC-2026-018</td><td style='padding:8px 12px; border:1px solid #cbd5e1;'>Redes y Suministros Colombia</td><td style='padding:8px 12px; border:1px solid #cbd5e1;'>Conectividad</td><td style='padding:8px 12px; border:1px solid #cbd5e1;'>Programado</td><td style='padding:8px 12px; border:1px solid #cbd5e1; font-weight:bold; text-align:right;'>$ 2.600.000</td></tr>
+      `;
+      diagnostico = 'El flujo de abastecimiento con proveedores mantiene tiempos de respuesta óptimos y control de costos de adquisición.';
+      recomendacion = 'Negociar descuentos por pronto pago con los proveedores principales de hardware y auditar vencimientos de facturas de compra.';
+    } else if (modulo === 'servicios') {
+      moduloTitulo = 'Servicios Técnicos y Operaciones';
+      kpis = `
+        <td style='width:25%; background:#f0fdf4; border:1px solid #bbf7d0; border-left:4px solid #059669; padding:12px; text-align:center;'>
+          <div style='font-size:8.5pt; text-transform:uppercase; color:#047857; font-weight:bold;'>Órdenes Totales</div>
+          <div style='font-size:16pt; font-weight:bold; color:#065f46;'>28</div>
+        </td>
+        <td style='width:25%; background:#f0fdf4; border:1px solid #bbf7d0; border-left:4px solid #059669; padding:12px; text-align:center;'>
+          <div style='font-size:8.5pt; text-transform:uppercase; color:#047857; font-weight:bold;'>Completados</div>
+          <div style='font-size:16pt; font-weight:bold; color:#065f46;'>23</div>
+        </td>
+        <td style='width:25%; background:#f0fdf4; border:1px solid #bbf7d0; border-left:4px solid #059669; padding:12px; text-align:center;'>
+          <div style='font-size:8.5pt; text-transform:uppercase; color:#047857; font-weight:bold;'>Pendientes</div>
+          <div style='font-size:16pt; font-weight:bold; color:#065f46;'>5</div>
+        </td>
+        <td style='width:25%; background:#f0fdf4; border:1px solid #bbf7d0; border-left:4px solid #059669; padding:12px; text-align:center;'>
+          <div style='font-size:8.5pt; text-transform:uppercase; color:#047857; font-weight:bold;'>SLA Cumplimiento</div>
+          <div style='font-size:16pt; font-weight:bold; color:#065f46;'>94%</div>
+        </td>`;
+      tabla = `
+        <tr><td style='padding:8px 12px; border:1px solid #cbd5e1;'>SRV-108</td><td style='padding:8px 12px; border:1px solid #cbd5e1;'>Mantenimiento Preventivo Servidores</td><td style='padding:8px 12px; border:1px solid #cbd5e1;'>Soporte TI</td><td style='padding:8px 12px; border:1px solid #cbd5e1;'>En Proceso</td><td style='padding:8px 12px; border:1px solid #cbd5e1; font-weight:bold; text-align:right;'>$ 1.450.000</td></tr>
+        <tr><td style='padding:8px 12px; border:1px solid #cbd5e1;'>SRV-107</td><td style='padding:8px 12px; border:1px solid #cbd5e1;'>Instalación Cableado Estructurado</td><td style='padding:8px 12px; border:1px solid #cbd5e1;'>Infraestructura</td><td style='padding:8px 12px; border:1px solid #cbd5e1;'>Completado</td><td style='padding:8px 12px; border:1px solid #cbd5e1; font-weight:bold; text-align:right;'>$ 2.800.000</td></tr>
+      `;
+      diagnostico = 'El área de servicios registra un cumplimiento de SLA del 94% con 5 órdenes técnicas activas en programación.';
+      recomendacion = 'Priorizar la atención de los servicios pendientes listados por la Gerencia y cerrar las actas de entrega firmadas.';
     } else {
-      moduloTitulo = 'Consolidado General de Operaciones';
+      moduloTitulo = `Informe Ejecutivo • ${this.currentModuleNombre}`;
       kpis = `
         <td style='width:25%; background:#f0fdf4; border:1px solid #bbf7d0; border-left:4px solid #059669; padding:12px; text-align:center;'>
           <div style='font-size:8.5pt; text-transform:uppercase; color:#047857; font-weight:bold;'>Ventas Acumuladas</div>
