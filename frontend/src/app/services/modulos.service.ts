@@ -70,16 +70,6 @@ export class ModulosService {
   }
 
   getMisModulos(): Observable<{ modulos: PaquetesRespuesta }> {
-    try {
-      const cached = sessionStorage.getItem('modulos_empresa_cache');
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
-          return of({ modulos: parsed });
-        }
-      }
-    } catch (e) {}
-
     return this.http.get<{ modulos: PaquetesRespuesta }>(`${this.apiUrl}/mis-modulos`, this.getHeaders());
   }
 

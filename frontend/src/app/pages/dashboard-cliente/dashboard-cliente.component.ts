@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router, ActivatedRoute } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { AccessibilityService } from '../../services/accessibility/accessibility.service';
 import { ModulosService, MODULOS_BASE_UI, RUTA_MODULO, ICONO_MODULO } from '../../services/modulos.service';
@@ -31,7 +31,6 @@ export class DashboardClienteComponent implements OnInit {
   private modulosService = inject(ModulosService);
   private iaStateService = inject(IaStateService);
   private router = inject(Router);
-  private route = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
 
@@ -42,7 +41,6 @@ export class DashboardClienteComponent implements OnInit {
   // --- VARIABLES DE ESTADO ---
   user: any = null;
   planActual: string = 'Especial';
-  entorno: string = '';
 
   modulosSidebar: ModuloSidebar[] = [];
   isSidebarCollapsed = false;
@@ -72,17 +70,6 @@ export class DashboardClienteComponent implements OnInit {
 
   ngOnInit(): void {
     this.user = this.authService.getUser();
-
-    // Obtener entorno para rutas absolutas seguras y estables
-    const routeParam = this.route.snapshot.params['entorno'];
-    if (routeParam) {
-      this.entorno = routeParam;
-    } else if (this.user?.empresa?.dominio) {
-      this.entorno = this.user.empresa.dominio;
-    } else if (this.user?.empresa?.razon_social) {
-      this.entorno = this.slugify(this.user.empresa.razon_social);
-    }
-
     this.construirSidebar();
 
     // Heartbeat de sesión activa: detecta si la sesión fue cerrada remotamente desde otro dispositivo
@@ -101,11 +88,6 @@ export class DashboardClienteComponent implements OnInit {
     }
   }
 
-  public getModuloRuta(slug: string): string {
-    const cleanSlug = slug.replace(/^\.\//, '').replace(/^\//, '');
-    return this.entorno ? `/${this.entorno}/${cleanSlug}` : `/${cleanSlug}`;
-  }
-
   // --- LÓGICA DEL SIDEBAR (CATÁLOGO REAL DESDE LA BD) ---
   private construirSidebar() {
     // Módulos base del producto SIEMPRE visibles (Inicio, Administración, etc.)
@@ -115,7 +97,7 @@ export class DashboardClienteComponent implements OnInit {
         id: mod.id,
         nombre: mod.nombre,
         icono: mod.icono,
-        ruta: this.getModuloRuta(mod.ruta)
+        ruta: mod.ruta
       };
     });
 
@@ -140,7 +122,7 @@ export class DashboardClienteComponent implements OnInit {
               id: mod.id,
               nombre: mod.nombre,
               icono: mod.icono,
-              ruta: this.getModuloRuta(mod.ruta)
+              ruta: mod.ruta
             };
           });
 
@@ -155,7 +137,7 @@ export class DashboardClienteComponent implements OnInit {
                     id: sub.id,
                     nombre: sub.nombre,
                     icono: ICONO_MODULO[sub.id] || 'fas fa-circle',
-                    ruta: this.getModuloRuta(RUTA_MODULO[sub.id] || this.slugify(sub.nombre))
+                    ruta: RUTA_MODULO[sub.id] || this.slugify(sub.nombre)
                   };
                 }
               });
@@ -165,6 +147,7 @@ export class DashboardClienteComponent implements OnInit {
               if (isActivo) {
                 let id = paqueteId;
                 let nombre = paqueteId === 'rrhh' ? 'Gestión Humana' : (paqueteId === 'finanzas' ? 'Finanzas' : (paqueteId === 'addons' ? 'Addons+' : ''));
+                let ruta = this.slugify(nombre);
                 if (paqueteId === 'base') {
                   // El paquete 'base' de la BD (Recordatorios, Reuniones, etc.) no genera botón propio
                   return;
@@ -173,7 +156,7 @@ export class DashboardClienteComponent implements OnInit {
                   id,
                   nombre,
                   icono: ICONO_MODULO[id] || 'fas fa-circle',
-                  ruta: this.getModuloRuta(this.slugify(nombre))
+                  ruta
                 };
               }
             }
@@ -188,6 +171,7 @@ export class DashboardClienteComponent implements OnInit {
       this.aplicarOrdenamiento(botones);
     }
   }
+
 
   // Plan según el tipo de empresa
   private calcularPlan(tipoEmpresaUsuario: string): string {
@@ -226,7 +210,7 @@ export class DashboardClienteComponent implements OnInit {
         id: 'v_cxc',
         nombre: 'Clientes',
         icono: 'fas fa-address-book',
-        ruta: this.getModuloRuta('clientes')
+        ruta: 'clientes'
       };
     }
 
@@ -382,7 +366,15 @@ export class DashboardClienteComponent implements OnInit {
   }
 
   getInicioRoute(): string {
-    return this.getModuloRuta('inicio');
+    if (this.user && this.user.empresa) {
+      if (this.user.empresa.dominio) {
+        return '/' + this.user.empresa.dominio + '/inicio';
+      } else if (this.user.empresa.razon_social) {
+        const slug = this.user.empresa.razon_social.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '');
+        return '/' + slug + '/inicio';
+      }
+    }
+    return '/inicio';
   }
 
   logout(): void {

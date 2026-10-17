@@ -6,17 +6,19 @@ import { authInterceptor } from './services/auth.interceptor';
 
 import { routes } from './app.routes';
 
-// Estrategia de precarga acelerada: descarga en segundo plano todos los módulos del aplicativo
-// después de que la pantalla inicial se ha dibujado, haciendo que la navegación por el menú lateral sea 100% instantánea.
+// Estrategia de precarga selectiva: descarga en segundo plano los chunks de las
+// rutas que el usuario usa primero (saas-admin, dashboard y sus módulos iniciales).
 export class RutasClavePreloadingStrategy implements PreloadingStrategy {
+  private rutasACargar = [
+    '', 'login', 'saas-admin', 'dashboard',
+    'inicio', 'administracion', 'gestion-de-tareas', 'gestiva-ia', 'autogestion',
+    'gestion-humana', 'finanzas'
+  ];
+
   preload(route: Route, load: () => Observable<any>): Observable<any> {
     const path = route.path ?? '';
-    // Excluir rutas comodín
-    if (path === ':modulo' || path === '**') {
-      return of(null);
-    }
-    // Si la ruta tiene componente perezoso (loadComponent), precargarla en segundo plano
-    if (route.loadComponent) {
+    const primerSegmento = path.split('/')[0];
+    if (this.rutasACargar.includes(path) || this.rutasACargar.includes(primerSegmento)) {
       return load();
     }
     return of(null);

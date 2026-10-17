@@ -52,9 +52,6 @@ export class AuthService {
           if (response.modulos_activos) {
             this.saveModulosActivos(response.modulos_activos);
           }
-          if (response.modulos_empresa) {
-            this.saveModulosEmpresa(response.modulos_empresa);
-          }
           if (this.authChannel) {
             this.authChannel.postMessage({ type: 'NEW_LOGIN', userId: response.user?.id });
           }
@@ -187,21 +184,6 @@ export class AuthService {
   getModulosActivos(): Record<string, boolean> | null {
     try {
       const modulosJson = sessionStorage.getItem('modulos_activos');
-      return modulosJson ? JSON.parse(modulosJson) : null;
-    } catch (e) { return null; }
-  }
-
-  // 10. Guardar modulos estructurados de la empresa
-  saveModulosEmpresa(modulos: any): void {
-    try {
-      sessionStorage.setItem('modulos_empresa_cache', JSON.stringify(modulos));
-    } catch (e) { console.warn('sessionStorage not accessible'); }
-  }
-
-  // 11. Obtener modulos estructurados de la empresa en cache
-  getModulosEmpresa(): any | null {
-    try {
-      const modulosJson = sessionStorage.getItem('modulos_empresa_cache');
       return modulosJson ? JSON.parse(modulosJson) : null;
     } catch (e) { return null; }
   }

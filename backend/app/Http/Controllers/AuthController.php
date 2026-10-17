@@ -90,20 +90,9 @@ class AuthController extends Controller
         $user->tokens()->where('name', $tokenName)->delete();
         $token = $user->createToken($tokenName)->plainTextToken;
 
-        // Cargar módulos estructurados de inmediato para entregarlos al frontend y evitar peticiones posteriores
-        $modulosEstructurados = [];
+        // Cargar módulos activos para evitar llamadas extras en el frontend
         $modulosActivos = [];
         if ($user->empresa_id) {
-            try {
-                $modulosController = new ModulosController();
-                if ($user->empresa) {
-                    $modulosRes = $modulosController->obtenerModulosParaEmpresa($user->empresa);
-                    $modulosEstructurados = $modulosRes->getData(true)['modulos'] ?? [];
-                }
-            } catch (\Throwable $e) {
-                // Fallback silencioso en caso de error
-            }
-
             $modulos = \Illuminate\Support\Facades\DB::table('empresa_modulo')
                         ->where('empresa_id', $user->empresa_id)
                         ->get();
@@ -116,7 +105,6 @@ class AuthController extends Controller
             'message' => 'Inicio de sesión exitoso!',
             'user' => $user,
             'modulos_activos' => $modulosActivos,
-            'modulos_empresa' => $modulosEstructurados,
             'token' => $token
         ]);
     }
