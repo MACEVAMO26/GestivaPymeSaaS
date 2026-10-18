@@ -72,7 +72,7 @@
 
 .nav-btn-login {
   padding: 0.6rem 1.5rem;
-  background-color: #059669;
+  background-color: #047857;
   color: #ffffff;
   font-size: 16px;
   font-weight: 700;
@@ -84,7 +84,7 @@
   display: inline-block;
   
   &:hover {
-    background-color: #047857;
+    background-color: #065f46;
     transform: translateY(-0.125rem);
   }
 }
@@ -148,7 +148,7 @@
 .mobile-nav-btn-login {
   margin-top: 0.5rem;
   padding: 0.75rem 1.25rem;
-  background-color: #059669;
+  background-color: #047857;
   color: #ffffff;
   font-size: 16px;
   font-weight: 700;
@@ -159,7 +159,7 @@
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: #047857;
+    background-color: #065f46;
   }
 }
 
@@ -205,14 +205,14 @@
 }
 
 .hero-title {
-  font-size: 24px;
+  font-size: 20px;
   line-height: 1.3;
   font-weight: 800;
   color: #ffffff;
 }
 
 @media (min-width: 1024px) {
-  .hero-title { font-size: 28px; line-height: 1.25; }
+  .hero-title { font-size: 20px; line-height: 1.25; }
 }
 
 .text-emerald-500 {
@@ -272,7 +272,7 @@
 
 .btn-start {
   padding: 0.9rem 2.25rem;
-  background-color: #059669;
+  background-color: #047857;
   color: #ffffff;
   font-weight: 700;
   border-radius: 9999px;
@@ -286,7 +286,7 @@
   display: inline-block;
   
   &:hover {
-    background-color: #047857;
+    background-color: #065f46;
     transform: translateY(-0.25rem);
   }
 }
@@ -341,7 +341,7 @@
 
 /* --- 4. ESTILOS COMUNES --- */
 .section-title {
-  font-size: 22px;
+  font-size: 20px;
   line-height: 1.35;
   font-weight: 700;
   color: #ffffff;
@@ -433,7 +433,7 @@
 }
 
 .mv-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   color: #ffffff;
   margin-bottom: 1rem;
@@ -482,7 +482,7 @@
 }
 
 .social-title {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   color: #ffffff;
   margin-bottom: 2rem;
@@ -510,7 +510,7 @@
 }
 
 .social-badge-icon {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .social-badge-text {
@@ -592,7 +592,7 @@
 }
 
 .feature-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   color: #ffffff;
   margin-bottom: 1rem;
@@ -757,14 +757,14 @@
   }
 }
 .btn-empresarial {
-  background-color: #059669;
+  background-color: #047857;
   color: #ffffff;
   border: 2px solid #34d399;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
   transition: all 0.3s;
   
   &:hover {
-    background-color: #047857;
+    background-color: #065f46;
     box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.35);
   }
 }
@@ -790,7 +790,7 @@
 }
 
 .price-amount {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 800;
 }
 
@@ -872,7 +872,7 @@
 }
 
 .addons-title {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 800;
   color: #ffffff;
   margin-bottom: 0.75rem;
@@ -935,19 +935,19 @@
 }
 
 .addon-icon {
-  font-size: 1.75rem;
+  font-size: 20px;
   margin-bottom: 0.75rem;
 }
 
 .addon-name {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   color: #ffffff;
   margin-bottom: 0.5rem;
 }
 
 .addon-desc {
-  font-size: 15px;
+  font-size: 16px;
   color: #e2e8f0;
   line-height: 1.55;
   margin-bottom: 1.25rem;
@@ -968,7 +968,7 @@
 }
 
 .addons-note {
-  font-size: 15px;
+  font-size: 16px;
   color: #e2e8f0;
   background-color: rgba(15, 23, 42, 0.75);
   border: 1px solid rgba(100, 116, 139, 0.6);
@@ -1012,7 +1012,7 @@
 }
 
 @media (min-width: 768px) {
-  .cookies-box { padding: 1.5rem; font-size: 15px; }
+  .cookies-box { padding: 1.5rem; font-size: 16px; }
 }
 
 .cookies-link {

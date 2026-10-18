@@ -20,9 +20,9 @@ $bg-input: #0f172a;
 $text-main: #f8fafc;
 $text-secondary: #cbd5e1;
 $border-contrast: #64748b;
-$btn-primary: #059669;
+$btn-primary: #047857;
 $btn-primary-border: #10b981;
-$btn-primary-hover: #047857;
+$btn-primary-hover: #065f46;
 $btn-volver-bg: #1e293b;
 $btn-volver-border: #64748b;
 
@@ -93,7 +93,7 @@ $btn-volver-border: #64748b;
 }
 
 .welcome-text {
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1.4;
   margin-bottom: 0.5rem;
   text-transform: uppercase;
@@ -387,7 +387,7 @@ $btn-volver-border: #64748b;
 }
 
 .modal-title-susp {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: $text-main;
   margin-bottom: 0.5rem;

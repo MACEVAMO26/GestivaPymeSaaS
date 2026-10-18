@@ -66,7 +66,7 @@ $alert-blue-text: #93c5fd;
   margin-bottom: 1.5rem;
   
   .action-title {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     color: $text-white;
     text-transform: uppercase;
@@ -148,7 +148,7 @@ $alert-blue-text: #93c5fd;
 
       .value {
         color: white;
-        font-size: 22px;
+        font-size: 20px;
         line-height: 1.1;
         margin-top: 4px;
         font-weight: 700;
@@ -202,7 +202,7 @@ $alert-blue-text: #93c5fd;
   margin-top: 2rem;
   
   .welcome-title {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     color: white;
     margin: 0 0 1.25rem 0;
@@ -245,25 +245,25 @@ $alert-blue-text: #93c5fd;
     }
 
     .card-value {
-      font-size: 24px;
+      font-size: 20px;
       line-height: 1.1;
       font-weight: 700;
     }
 
     &.active-card {
-      background: rgba(16, 185, 129, 0.18);
-      color: #6ee7b7;
+      background: #064e3b;
+      color: #a7f3d0;
       border-color: #10b981;
     }
 
     &.mora-card {
-      background: rgba(245, 158, 11, 0.18);
+      background: #78350f;
       color: #fde68a;
       border-color: #f59e0b;
     }
 
     &.pending-card {
-      background: rgba(59, 130, 246, 0.18);
+      background: #1e3a8a;
       color: #bfdbfe;
       border-color: #60a5fa;
     }
@@ -432,7 +432,7 @@ $alert-blue-text: #93c5fd;
     font-size: 16px;
     
     i {
-      font-size: 1.5rem;
+      font-size: 20px;
       margin-bottom: 0.5rem;
       opacity: 0.7;
       display: block;

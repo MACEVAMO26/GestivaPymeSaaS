@@ -56,8 +56,10 @@ export class SaasAdminComponent implements OnInit {
   // --- VARIABLES PARA EL CONTROL DE IA ---
   iaConfigSeleccionada = {
     empresaId: null as number | null,
+    fuente: 'gestivapyme' as 'gestivapyme' | 'propia', // gestivapyme = IA del plan, propia = BYOK
     proveedor: 'gemini', // gemini, openai, claude, personalizada
     apiKey: '',
+    tieneLlave: false, // indica si ya hay una llave guardada en DB (para mostrar indicador)
     modo: 'apagado', // apagado, simple, avanzado
     tareas: {
       resumir: false,
@@ -701,54 +703,89 @@ export class SaasAdminComponent implements OnInit {
   }
 
   // --- MÉTODOS PARA CONTROL DE IA ---
+  onEmpresaIAChange(id: any) {
+    this.iaConfigSeleccionada.empresaId = id ? +id : null;
+    this.cargarConfiguracionIA();
+  }
+
   cargarConfiguracionIA() {
-    this.http.get('/api/saas/ia-config').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    if (!this.iaConfigSeleccionada.empresaId) {
+      this.iaConfigSeleccionada.fuente     = 'gestivapyme';
+      this.iaConfigSeleccionada.proveedor  = 'gemini';
+      this.iaConfigSeleccionada.apiKey     = '';
+      this.iaConfigSeleccionada.tieneLlave = false;
+      this.iaConfigSeleccionada.modo       = 'apagado';
+      this.iaConfigSeleccionada.tareas     = { resumir: false, redactar: false, analizar: false, automatizar: false };
+      return;
+    }
+    const token = sessionStorage.getItem('auth_token');
+    const headers = { Authorization: `Bearer ${token}` };
+    const params = `?empresa_id=${this.iaConfigSeleccionada.empresaId}`;
+    this.http.get(`/api/saas/ia-config${params}`, { headers }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res: any) => {
         const data = res?.data;
         if (data) {
-          this.iaConfigSeleccionada.proveedor = data.proveedor || 'gemini';
-          this.iaConfigSeleccionada.modo = data.modo || 'apagado';
-          this.iaConfigSeleccionada.apiKey = data.api_key || '';
+          this.iaConfigSeleccionada.fuente     = data.fuente      || 'gestivapyme';
+          this.iaConfigSeleccionada.proveedor  = data.proveedor   || 'gemini';
+          this.iaConfigSeleccionada.modo       = data.modo        || 'apagado';
+          this.iaConfigSeleccionada.apiKey     = data.api_key     || '';
+          this.iaConfigSeleccionada.tieneLlave = data.tiene_llave || false;
+          this.iaConfigSeleccionada.tareas     = data.tareas      || { resumir: false, redactar: false, analizar: false, automatizar: false };
+        } else {
+          this.iaConfigSeleccionada.fuente     = 'gestivapyme';
+          this.iaConfigSeleccionada.apiKey     = '';
+          this.iaConfigSeleccionada.tieneLlave = false;
+          this.iaConfigSeleccionada.modo       = 'apagado';
+          this.iaConfigSeleccionada.tareas     = { resumir: false, redactar: false, analizar: false, automatizar: false };
         }
       },
       error: (err) => {
         console.error('Error cargando configuración de IA', err);
+        this.toastService.error('No se pudo cargar la configuración de IA. Verifica tu sesión.');
       }
     });
   }
 
   guardarConfiguracionIA() {
     if (!this.iaConfigSeleccionada.empresaId) {
-      alert('Por favor, selecciona una empresa primero.');
+      this.toastService.error('Por favor, selecciona una empresa primero.');
       return;
     }
-    if (this.iaConfigSeleccionada.modo !== 'apagado' && !this.iaConfigSeleccionada.apiKey) {
-      alert('Debes ingresar una API Key para habilitar la IA.');
+    if (
+      this.iaConfigSeleccionada.fuente === 'propia' &&
+      this.iaConfigSeleccionada.modo !== 'apagado' &&
+      !this.iaConfigSeleccionada.apiKey &&
+      !this.iaConfigSeleccionada.tieneLlave
+    ) {
+      this.toastService.error('Debes ingresar una API Key para habilitar la IA propia.');
       return;
     }
 
-    // Si la llave aún muestra el valor enmascarado (********), se conserva la guardada en el servidor
+    const token = sessionStorage.getItem('auth_token');
+    const headers = { Authorization: `Bearer ${token}` };
     const mantenerLlave = this.iaConfigSeleccionada.apiKey.startsWith('********');
 
     const payload: any = {
-      proveedor: this.iaConfigSeleccionada.proveedor,
-      empresa_id: this.iaConfigSeleccionada.empresaId, // Enviado por si a futuro se hace por empresa
-      modo: this.iaConfigSeleccionada.modo,
+      empresa_id:     this.iaConfigSeleccionada.empresaId,
+      fuente:         this.iaConfigSeleccionada.fuente,
+      proveedor:      this.iaConfigSeleccionada.proveedor,
+      modo:           this.iaConfigSeleccionada.modo,
+      tareas:         this.iaConfigSeleccionada.tareas,
       mantener_llave: mantenerLlave
     };
-    if (!mantenerLlave) {
+
+    if (!mantenerLlave && this.iaConfigSeleccionada.fuente === 'propia') {
       payload.api_key = this.iaConfigSeleccionada.apiKey;
     }
 
-    // Llamada HTTP al backend para guardar la configuración
-    this.http.post('/api/saas/ia-config', payload).subscribe({
+    this.http.post('/api/saas/ia-config', payload, { headers }).subscribe({
       next: (res: any) => {
-        alert(res.message || 'Configuración de Inteligencia Artificial guardada con éxito.');
+        this.toastService.success(res.message || 'Configuración de IA guardada con éxito.');
         this.cargarConfiguracionIA();
       },
       error: (err) => {
         console.error('Error guardando IA', err);
-        alert('Error al guardar la configuración de IA. Verifica la conexión.');
+        this.toastService.error('Error al guardar la configuración de IA. Verifica la conexión.');
       }
     });
   }
@@ -756,6 +793,7 @@ export class SaasAdminComponent implements OnInit {
   setComercialTab(tab: 'interesados' | 'correos') {
     this.comercialTab = tab;
   }
+
 
   cargarLeads() {
     const token = sessionStorage.getItem('auth_token');

@@ -58,15 +58,19 @@ class Empresa extends Model
         'ia_byok_activo',
         'ia_byok_proveedor',
         'ia_byok_key',
-        'ia_byok_modelo'
+        'ia_byok_modelo',
+        'ia_byok_modo',
+        'ia_byok_tareas',
+        'ia_fuente',
     ];
 
     protected $casts = [
         'descuentos_aplicados' => 'array',
-        'cargos_extra' => 'array',
-        'addons_personalizados' => 'array',
-        'fecha_firma' => 'datetime',
-        'ia_byok_activo' => 'boolean'
+        'cargos_extra'         => 'array',
+        'addons_personalizados'=> 'array',
+        'fecha_firma'          => 'datetime',
+        'ia_byok_activo'       => 'boolean',
+        'ia_byok_tareas'       => 'array',
     ];
 
     public function contratoSaas()
