@@ -10,15 +10,17 @@ use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class DocumentoEmpleadoController extends Controller
 {
+    // Bloque para listar los documentos de un empleado específico
     public function getDocumentos($empleadoId)
     {
         $documentos = DocumentoEmpleado::where('empleado_id', $empleadoId)->orderBy('created_at', 'desc')->get();
         return response()->json($documentos);
     }
 
+    // Bloque para listar los documentos propios del empleado autenticado
     public function misDocumentos(Request $request)
     {
-        // Obtener el empleado del usuario autenticado
+        // Bloque para obtener la entidad del empleado autenticado
         $empleado = Empleado::where('usuario_id', $request->user()->id)->first();
         if (!$empleado) {
             return response()->json([], 200); // Si no es empleado, no tiene documentos
@@ -28,6 +30,7 @@ class DocumentoEmpleadoController extends Controller
         return response()->json($documentos);
     }
 
+    // Bloque para subir y registrar un documento de empleado en Cloudinary
     public function store(Request $request, $empleadoId)
     {
         $request->validate([
@@ -41,7 +44,7 @@ class DocumentoEmpleadoController extends Controller
         $file = $request->file('archivo');
         $extension = $file->getClientOriginalExtension();
         
-        // Determinar tipo
+        // Bloque para determinar la extensión y formato del archivo
         $tipo = 'otro';
         if (in_array(strtolower($extension), ['pdf'])) $tipo = 'pdf';
         if (in_array(strtolower($extension), ['doc', 'docx'])) $tipo = 'word';
@@ -49,7 +52,7 @@ class DocumentoEmpleadoController extends Controller
         if (in_array(strtolower($extension), ['ppt', 'pptx'])) $tipo = 'powerpoint';
 
         try {
-            // Subir a Cloudinary como archivo crudo (raw) para PDFs, Word, Excel, PPT
+            // Bloque para cargar el documento a Cloudinary en formato crudo
             $uploadedFileUrl = cloudinary()->upload($file->getRealPath(), [
                 'folder' => 'gestivapyme/documentos_empleados',
                 'resource_type' => 'raw'
@@ -70,6 +73,7 @@ class DocumentoEmpleadoController extends Controller
         }
     }
 
+    // Bloque para eliminar un documento de empleado y removerlo de Cloudinary
     public function destroy($id)
     {
         $documento = DocumentoEmpleado::findOrFail($id);

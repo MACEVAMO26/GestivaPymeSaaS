@@ -8,6 +8,7 @@ use App\Models\MovimientoInventario;
 
 class MovimientoInventarioController extends Controller
 {
+    // Bloque para listar el histórico de movimientos de inventario de la empresa
     public function index()
     {
         $user = Auth::user();
@@ -42,6 +43,7 @@ class MovimientoInventarioController extends Controller
         return response()->json($movimientos);
     }
 
+    // Bloque para registrar un nuevo movimiento de inventario (entrada, salida o ajuste)
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -49,6 +51,7 @@ class MovimientoInventarioController extends Controller
             return response()->json(['error' => 'No autorizado'], 401);
         }
 
+        // Bloque de reglas de validación
         $validated = $request->validate([
             'inventario_id' => 'required|integer',
             'tipo_movimiento' => 'required|in:entrada,salida,ajuste,recepcion,venta',
@@ -56,6 +59,7 @@ class MovimientoInventarioController extends Controller
             'observaciones' => 'nullable|string',
         ]);
 
+        // Bloque de guardado en BD
         $movimiento = MovimientoInventario::create([
             'producto_id' => $validated['inventario_id'],
             'usuario_id' => $user->id,

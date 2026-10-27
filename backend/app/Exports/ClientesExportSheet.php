@@ -19,7 +19,7 @@ class ClientesExportSheet implements FromCollection, WithHeadings, WithTitle, Wi
         $this->isTemplate = $isTemplate;
     }
 
-    public function collection()
+    public function collection(): \Illuminate\Support\Collection
     {
         if ($this->isTemplate || !$this->empresaId) {
             return collect([]);

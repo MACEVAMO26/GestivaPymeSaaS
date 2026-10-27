@@ -9,10 +9,7 @@ use Illuminate\Support\Facades\Crypt;
 
 class IaConfigController extends Controller
 {
-    /**
-     * Devuelve la configuración de IA de una empresa específica.
-     * Si no se pasa empresa_id, devuelve la config global activa (legado).
-     */
+    // Bloque para consultar la configuración activa de inteligencia artificial
     public function index(Request $request)
     {
         $empresaId = $request->query('empresa_id');
@@ -27,7 +24,7 @@ class IaConfigController extends Controller
             $tareasDefault = ['resumir' => false, 'redactar' => false, 'analizar' => false, 'automatizar' => false];
             $tareas = is_array($empresa->ia_byok_tareas) ? array_merge($tareasDefault, $empresa->ia_byok_tareas) : $tareasDefault;
 
-            // Clave censurada: muestra ******** + últimos 4 caracteres reales
+            // Bloque para enmascarar clave de API de inteligencia artificial
             $claveCensurada = null;
             if ($empresa->ia_byok_key) {
                 try {
@@ -51,7 +48,7 @@ class IaConfigController extends Controller
             ]);
         }
 
-        // --- Config global (legado) ---
+        // Bloque para recuperar configuración global de respaldo
         $config = IaConfig::where('is_active', true)->first();
 
         if ($config) {
@@ -78,11 +75,7 @@ class IaConfigController extends Controller
         return response()->json(['success' => true, 'data' => null]);
     }
 
-    /**
-     * Guarda la configuración de IA de una empresa.
-     * Si se manda empresa_id, guarda en la tabla empresa.
-     * Si no, guarda en ia_configs (config global, legado).
-     */
+    // Bloque para guardar y actualizar la configuración de inteligencia artificial
     public function store(Request $request)
     {
         $request->validate([
@@ -103,7 +96,7 @@ class IaConfigController extends Controller
         $modo          = $request->input('modo', 'apagado');
         $tareas        = $request->input('tareas', ['resumir' => false, 'redactar' => false, 'analizar' => false, 'automatizar' => false]);
 
-        // Validar que si es propia y no apagado, debe tener llave
+        // Bloque de validación de clave requerida para proveedor propio
         if ($fuente === 'propia' && $modo !== 'apagado' && !$mantenerLlave && !$request->filled('api_key')) {
             return response()->json([
                 'success' => false,
@@ -127,7 +120,7 @@ class IaConfigController extends Controller
             if (!$mantenerLlave && $request->filled('api_key')) {
                 $empresa->ia_byok_key = Crypt::encryptString($request->api_key);
             } elseif ($fuente === 'gestivapyme') {
-                // Si elige la IA de GestivaPyme, borramos la clave propia
+                // Bloque para restablecer clave al utilizar proveedor nativo
                 $empresa->ia_byok_key = null;
             }
 
@@ -139,7 +132,7 @@ class IaConfigController extends Controller
             ]);
         }
 
-        // --- Config global (legado) ---
+        // Bloque para actualizar configuración global de respaldo
         IaConfig::where('is_active', true)->update(['is_active' => false]);
 
         $config = IaConfig::where('proveedor', $request->proveedor)->first();

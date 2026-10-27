@@ -1,13 +1,16 @@
+<!-- HTML CONTENEDOR PRINCIPAL -->
 <div [ngClass]="isEmbedded ? '' : 'module-container fade-in'">
   @if(!isEmbedded) {
+  <!-- HTML ENCABEZADO -->
   <div class="module-header text-center mb-4 relative">
-    <h1>Reportes y Analíticas de Servicios</h1>
-    <p>Visualice las métricas de eficiencia de los técnicos, estados operativos y servicios más solicitados.</p>
+    <h1 class="titulo-principal">Reportes y Analíticas de Servicios</h1>
+    <p class="descripcion-general">Visualice las métricas de eficiencia de los técnicos, estados operativos y servicios más solicitados.</p>
   </div>
   }
 
   <div [ngClass]="isEmbedded ? '' : 'tab-content neumorphic-panel-inner p-4'">
     @if(!isEmbedded) {
+    <!-- HTML BOTON VOLVER -->
     <div class="volver-wrapper">
       <button class="btn-volver btn-pill" appVolver>
         <i class="fas fa-arrow-left"></i> Volver
@@ -15,35 +18,39 @@
     </div>
     }
 
+    <!-- HTML PANEL CONTENIDO -->
     <div class="neumorphic-panel fade-in">
+      <!-- HTML FILTROS POR FECHA -->
       <h2 class="subtitulo">Filtros de Reporte por Fecha</h2>
-      <div class="form-grid" style="align-items: end; display: flex; gap: 1rem; flex-wrap: wrap;">
-        <div class="form-group" style="flex: 1; min-width: 180px;">
+      <div class="form-grid rep-filter-grid">
+        <div class="form-group flex-1-min-180">
           <label class="form-label">Desde:</label>
           <input type="date" class="input-neumorphic" [(ngModel)]="desde">
         </div>
-        <div class="form-group" style="flex: 1; min-width: 180px;">
+        <div class="form-group flex-1-min-180">
           <label class="form-label">Hasta:</label>
           <input type="date" class="input-neumorphic" [(ngModel)]="hasta">
         </div>
-        <div class="form-group" style="padding-bottom: 0.2rem;">
+        <div class="form-group pb-02">
           <button type="button" class="btn-general-2 btn-pill" (click)="generarReporte()">
             <i class="fas fa-filter"></i> Filtrar Métricas
           </button>
         </div>
       </div>
 
+      <!-- HTML SPINNER DE CARGA -->
       @if(cargando) {
-        <div class="text-center" style="padding: 2rem;">
-          <i class="fas fa-spinner fa-spin" style="font-size: 16px;"></i>
-          <p class="descripcion-general" style="margin-top: 0.5rem;">Calculando métricas...</p>
+        <div class="text-center table-empty-cell">
+          <i class="fas fa-spinner fa-spin icon-16"></i>
+          <p class="descripcion-general mt-05">Calculando métricas...</p>
         </div>
       } @else {
+        <!-- HTML SECCION METRICAS -->
         <div class="mt-4">
           <h2 class="subtitulo mb-3">Métricas Generales y Operativas</h2>
           
-          <div class="metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-
+          <!-- HTML METRICAS OPERATIVAS -->
+          <div class="metrics-grid">
             <div class="neumorphic-panel-inner text-center p-3">
               <p class="metric-label text-xs font-bold text-muted">Servicios Finalizados</p>
               <strong class="metric-value-accent text-lg text-positivo d-block mt-1">{{totalAtendidos}}</strong>
@@ -73,20 +80,19 @@
               <p class="metric-label text-xs font-bold text-muted">Tasa de Finalización</p>
               <strong class="metric-value text-lg text-positivo d-block mt-1">{{tasaFinalizacion}}%</strong>
             </div>
-
           </div>
 
-          <div class="grid-dos-cols mt-4" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+          <!-- HTML DESTACADOS Y RANKINGS -->
+          <div class="grid-dos-cols mt-4">
             <div class="neumorphic-panel-inner p-3">
               <h4 class="text-xs font-bold text-azul mb-2"><i class="fas fa-trophy"></i> Técnico con Más Servicios:</h4>
-              <p class="text-dark font-bold text-md" style="margin: 0;">{{tecnicoTop}}</p>
+              <p class="text-dark font-bold text-md m-0">{{tecnicoTop}}</p>
             </div>
             <div class="neumorphic-panel-inner p-3">
               <h4 class="text-xs font-bold text-azul mb-2"><i class="fas fa-chart-line"></i> Servicio Más Demandado:</h4>
-              <p class="text-dark font-bold text-md" style="margin: 0;">{{servicioTop}}</p>
+              <p class="text-dark font-bold text-md m-0">{{servicioTop}}</p>
             </div>
           </div>
-
         </div>
       }
     </div>

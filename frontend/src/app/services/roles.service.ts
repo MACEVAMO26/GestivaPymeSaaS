@@ -9,7 +9,7 @@ export class RolesService {
   private http = inject(HttpClient);
   private apiUrl = '/api/roles';
 
-  // Los headers de autenticación los inyecta automáticamente el authInterceptor
+  
 
   getRoles(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl);

@@ -13,7 +13,7 @@ export class EmpleadoService {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
 
-  // Obtener headers de autorización
+  // Bloque para obtener encabezados de autorización HTTP
   private getHeaders() {
     return {
       headers: {
@@ -22,34 +22,34 @@ export class EmpleadoService {
     };
   }
 
-  // --- GESTIÓN HUMANA ---
+  // --- GESTION HUMANA ---
   
-  // Trae los usuarios "cáscara" pendientes de formalizar
+  // Bloque para consultar usuarios pendientes de formalización
   getPendientes(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/empleados/pendientes`, this.getHeaders());
   }
 
-  // Trae los empleados ya formalizados
+  // Bloque para consultar el listado de empleados formalizados
   getEmpleados(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/empleados`, this.getHeaders());
   }
 
-  // Formaliza un usuario y lo convierte en empleado
+  // Bloque para formalizar un usuario y registrar su contrato
   formalizarEmpleado(usuarioId: number, data: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/empleados/${usuarioId}/formalizar`, data, this.getHeaders());
   }
 
-  // Actualiza los datos del contrato (tipo, fechas, salario)
+  // Bloque para actualizar los términos contractuales del empleado
   updateContrato(empleadoId: number, data: any): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/empleados/${empleadoId}/contrato`, data, this.getHeaders());
   }
 
-  // Genera el certificado laboral en PDF
+  // Bloque para generar y descargar certificado laboral en PDF
   descargarCertificado(empleadoId: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/empleados/${empleadoId}/certificado`, { ...this.getHeaders(), responseType: 'blob' as 'json' });
   }
 
-  // Despide / Da de baja a un empleado
+  // Bloque para tramitar el retiro o desvinculación de un empleado
   solicitarBaja(empleadoId: number, motivo: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/empleados/${empleadoId}/solicitar-baja`, { motivo }, this.getHeaders());
   }
@@ -58,8 +58,9 @@ export class EmpleadoService {
     return this.http.post(`${this.apiUrl}/empleados/${empleadoId}/aprobar-baja`, {}, this.getHeaders());
   }
 
-  // --- Cargos, Áreas y Roles (Listados para el formulario) ---
+  // --- ESTRUCTURA ORGANIZACIONAL ---
   private cargos$?: Observable<any[]>;
+  // Bloque para consultar el catálogo de cargos de la empresa
   getCargos(): Observable<any[]> {
     if (!this.cargos$) {
       this.cargos$ = this.http.get<any[]>(`${this.apiUrl}/cargos`, this.getHeaders()).pipe(shareReplay(1));
@@ -67,8 +68,6 @@ export class EmpleadoService {
     return this.cargos$;
   }
 
-  // Asumimos que existe un endpoint /areas en api.php
-  // Si no existe, lo tendremos que crear o usar roles provisionalmente
   private areas$?: Observable<any[]>;
   getAreas(): Observable<any[]> {
     if (!this.areas$) {
@@ -111,7 +110,7 @@ export class EmpleadoService {
     return this.http.delete<any>(`${this.apiUrl}/documentos/${documentoId}`, this.getHeaders());
   }
 
-  // --- CRUD ÁREAS Y CARGOS ---
+  // --- CRUD AREAS Y CARGOS ---
   createArea(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/areas`, data, this.getHeaders());
   }
@@ -128,12 +127,12 @@ export class EmpleadoService {
     return this.http.put(`${this.apiUrl}/cargos/${id}`, data, this.getHeaders());
   }
 
-  // --- CONFIGURACIÓN RRHH ---
+  // --- CONFIGURACION RRHH ---
   updateRRHHSettings(data: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/empresas/rrhh/settings`, data, this.getHeaders());
   }
 
-  // --- AUTOGESTIÓN: AFILIACIONES ---
+  // --- AUTOGESTION AFILIACIONES ---
   getMisAfiliaciones(): Observable<any> {
     return this.http.get(`${this.apiUrl}/autogestion/afiliaciones`, this.getHeaders());
   }

@@ -9,7 +9,7 @@ use App\Models\User;
 
 class ProfileController extends Controller
 {
-    // Para actualizar el nombre y el correo del usuario actual
+    // Bloque para actualizar los datos básicos de perfil del usuario
     public function update(Request $request)
     {
         $user = $request->user();
@@ -33,16 +33,16 @@ class ProfileController extends Controller
         ]);
     }
 
-    // Para forzar el reseteo de la clave del usuario actual
+    // Bloque para forzar el restablecimiento de contraseña del usuario
     public function forcePasswordReset(Request $request)
     {
         $user = $request->user();
         
-        // Marcamos al usuario para que deba cambiar su clave en el próximo login
+        // Bloque de guardado en BD
         $user->debe_cambiar_clave = true;
         $user->save();
 
-        // Invalidar sus tokens actuales para forzar el logout
+        // Bloque para invalidar tokens de acceso
         $user->tokens()->delete();
 
         return response()->json([
@@ -50,7 +50,7 @@ class ProfileController extends Controller
         ]);
     }
 
-    // Para subir y actualizar el avatar del usuario
+    // Bloque para actualizar la imagen de perfil del usuario
     public function uploadAvatar(Request $request)
     {
         $file = $request->file('avatar');
@@ -68,7 +68,7 @@ class ProfileController extends Controller
         $user = $request->user();
 
         if ($request->hasFile('avatar') && $file->isValid()) {
-            // Validar extensión manualmente para evitar problemas de finfo en Windows
+            // Bloque de reglas de validación
             $ext = strtolower($file->getClientOriginalExtension());
             if (!in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
                 return response()->json(['message' => 'El archivo debe ser una imagen (JPG, PNG, GIF, WEBP).'], 422);

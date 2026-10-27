@@ -1,3 +1,5 @@
+/* --- 0. BACKGROUND PRINCIPAL DEL MÓDULO INICIO --- */
+/* --- 1. VARIABLES GLOBALES --- */
 @use 'sass:color';
 
 /* --- 1. VARIABLES GLOBALES DE COLOR --- */
@@ -16,7 +18,7 @@ $btn-gen-4: #8E5B75;
 $btn-gen-5: #B5654A;
 $btn-gen-6: #A38B6D;
 
-/* --- 2. FONDOS Y LAYOUT PRINCIPAL --- */
+/* --- 2. LAYOUT PRINCIPAL Y CUADRÍCULA BENTO --- */
 .module-container {
   padding: 1.5rem;
   background: $bg-color;
@@ -24,8 +26,8 @@ $btn-gen-6: #A38B6D;
   color: $text-dark;
 }
 
-/* --- 3. TIPOGRAFIA (Jerarquia estricta) --- */
-/* Titulo principal: 16px, centrado, mayusculas, negrita */
+/* --- 3. TIPOGRAFÍA Y JERARQUÍA VISUAL --- */
+
 .module-header h1, h1.titulo-principal, .header-section h1 {
   font-size: 16px;
   font-weight: bold;
@@ -36,7 +38,7 @@ $btn-gen-6: #A38B6D;
   color: $text-dark;
 }
 
-/* Subtitulo: 13px, izquierda, mayusculas, sin negrita */
+
 .subtitulo, h2.subtitulo, h3.subtitulo {
   font-size: 14px;
   font-weight: normal;
@@ -46,7 +48,7 @@ $btn-gen-6: #A38B6D;
   margin-bottom: 0.5rem;
 }
 
-/* Descripciones y Notas: 10px, centradas, mayusculas */
+
 .module-header p, .descripcion, .descripcion-general, .subtitle, .header-section p, .nota, .text-muted-small, .badge-small {
   font-size: 14px;
   font-weight: normal;
@@ -59,13 +61,13 @@ $btn-gen-6: #A38B6D;
   line-height: 1.4;
 }
 
-/* Texto general: 12px */
+
 .form-label, p, td, th, li, label, .text-general {
   font-size: 14px;
   font-weight: normal;
 }
 
-/* --- 4. TARJETAS Y PANELES NEUMORFICOS --- */
+/* --- 4. TARJETAS Y PANELES NEUMÓRFICOS --- */
 .neumorphic-panel, .glass-panel {
   background: $bg-color;
   border-radius: 16px;
@@ -102,7 +104,7 @@ $btn-gen-6: #A38B6D;
   }
 }
 
-/* --- 6. BOTONES (DISENO PILDORA) --- */
+/* --- 6. BOTONES ESTILO PÍLDORA --- */
 .btn-neumorphic {
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
@@ -135,7 +137,7 @@ $btn-gen-6: #A38B6D;
 .btn-general-5 { @extend .btn-neumorphic; background-color: $btn-gen-5; border: 2px solid color.adjust($btn-gen-5, $lightness: -10%); color: #ffffff; }
 .btn-general-6 { @extend .btn-neumorphic; background-color: $btn-gen-6; border: 2px solid color.adjust($btn-gen-6, $lightness: -10%); color: #ffffff; }
 
-/* --- 7. NAVEGACION TABS CON CONTENEDOR HUNDIDO (DOBLE BORDE RECTÁNGULO PÍLDORA) --- */
+/* --- 7. NAVEGACIÓN Y PESTAÑAS --- */
 .tabs-nav-wrapper {
   background: $bg-color;
   border-radius: 9999px;
@@ -189,7 +191,7 @@ $btn-gen-6: #A38B6D;
   text-decoration: none;
 }
 
-/* Titulos de panel interno */
+
 .panel-title, h3.panel-title {
   font-family: 'Montserrat', sans-serif;
   font-size: 16px;
@@ -200,9 +202,9 @@ $btn-gen-6: #A38B6D;
   margin: 0 0 0.5rem 0;
 }
 
-/* ========================================= */
-/* FIN BASE NEUMORFICA - INICIO DE LOCALES   */
-/* ========================================= */
+
+
+
 
 
 
@@ -220,7 +222,7 @@ $text-muted: #2d3748;
   color: $text-dark;
 }
 
-/* --- CLASE REUTILIZABLE PARA TARJETAS NEUMÓRFICAS --- */
+
 .neu-card {
   background: $bg-color;
   border-radius: 12px;
@@ -231,7 +233,7 @@ $text-muted: #2d3748;
   overflow: hidden;
 }
 
-/* --- ESTRUCTURA GRID (BENTO BOX) --- */
+
 .inicio-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -240,7 +242,7 @@ $text-muted: #2d3748;
   gap: 1.5rem;
 }
 
-/* Asignación de columnas */
+
 .left-col {
   grid-column: span 2;
   display: flex;
@@ -255,19 +257,19 @@ $text-muted: #2d3748;
   gap: 1.5rem;
 }
 
-/* Las secciones ya no necesitan grid-column porque están dentro de flex containers */
+
 .section-reuniones, .section-calendario, .section-recordatorios, .section-notificaciones {
   grid-column: unset;
 }
 
-/* Responsividad básica */
+
 @media (max-width: 1024px) {
   .inicio-grid {
     grid-template-columns: repeat(2, 1fr);
   }
   
   .left-col, .right-col {
-    grid-column: span 2; /* En tablet, ambas columnas ocupan todo el ancho */
+    grid-column: span 2; 
   }
 }
 

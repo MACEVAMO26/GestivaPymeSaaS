@@ -26,8 +26,7 @@ export interface ModuloBaseUi {
   ruta: string;
 }
 
-// Catálogo UI del producto: módulos base siempre visibles en el sidebar del cliente
-// (No son datos de negocio: son estructura de navegación del aplicativo).
+// --- CATALOGO BASE DEL PRODUCTO ---
 export const MODULOS_BASE_UI: ModuloBaseUi[] = [
   { id: 'd_ini', nombre: 'Inicio', icono: 'fas fa-home', ruta: 'inicio' },
   { id: 'd_adm', nombre: 'Administración', icono: 'fas fa-cog', ruta: 'administracion' },
@@ -37,8 +36,7 @@ export const MODULOS_BASE_UI: ModuloBaseUi[] = [
   { id: 'd_aut', nombre: 'Autogestión', icono: 'fas fa-user-circle', ruta: 'autogestion' },
 ];
 
-// Rutas del router para cada módulo de negocio (ventas/servicios). Los nombres en BD
-// no siempre coinciden con la ruta (ej: "Agenda y Calendario" -> /agenda).
+// --- MAPEO DE RUTAS DE NEGOCIO ---
 export const RUTA_MODULO: Record<string, string> = {
   v_pos: 'ventas', v_inv: 'inventario', v_cxc: 'clientes', v_rep: 'compras', v_prov: 'proveedores',
   s_age: 'agenda', s_crm: 'gestion-de-clientes', s_cat: 'servicios', s_ope: 'gestion-de-operarios', s_rep: 'reportes',
@@ -81,13 +79,12 @@ export class ModulosService {
     return this.http.post(`${this.apiUrl}/empresas/${empresaId}/modulos/paquete`, { modulos: modulosState }, this.getHeaders());
   }
 
-  // Catálogo UI del producto para la gestión global de módulos del SAAS admin.
-  // Los estados activo/asignado SIEMPRE provienen de la BD (actualizarUIModulos).
+  // --- CATALOGO GLOBAL ADMINISTRATIVO ---
   getCatalogoModulos(): Observable<any[]> {
     return of(CATALOGO_MODULOS_UI);
   }
 
-  // CRUD Global de Módulos (Catálogo)
+  // --- CRUD CATALOGO DE MODULOS ---
   crearModuloGlobal(id: string, nombre: string, paquete: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/modulos`, { id, nombre, paquete }, this.getHeaders());
   }
@@ -101,7 +98,7 @@ export class ModulosService {
   }
 }
 
-// Estructura de paquetes del producto (solo UI: nombres, iconos). Sin datos de negocio.
+// --- PAQUETES COMERCIALES ---
 const CATALOGO_MODULOS_UI: any[] = [
   {
     id: 'ventas',

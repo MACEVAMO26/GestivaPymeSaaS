@@ -13,6 +13,7 @@ use App\Models\Producto;
 
 class TicketServicioController extends Controller
 {
+    // Bloque para listar los tickets de servicio con sus materiales y técnicos asignados
     public function index()
     {
         $user = Auth::user();
@@ -28,6 +29,7 @@ class TicketServicioController extends Controller
         return response()->json($tickets);
     }
 
+    // Bloque para crear y despachar un nuevo ticket de servicio
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -35,6 +37,7 @@ class TicketServicioController extends Controller
             return response()->json(['error' => 'No autorizado'], 401);
         }
 
+        // Bloque de reglas de validación
         $validated = $request->validate([
             'cliente_nombre' => 'required|string|max:255',
             'servicio_requerido' => 'required|string|max:255',
@@ -57,6 +60,7 @@ class TicketServicioController extends Controller
 
         $consecutivo = 'T-' . now()->format('Ymd') . '-' . str_pad((string)$countToday, 4, '0', STR_PAD_LEFT);
 
+        // Bloque de guardado en BD
         $ticket = TicketServicio::create([
             'empresa_id' => $user->empresa_id,
             'consecutivo' => $consecutivo,
@@ -75,7 +79,7 @@ class TicketServicioController extends Controller
             'costo_total' => $validated['costo_total'] ?? 0,
         ]);
 
-        // Si se enviaron materiales iniciales
+        // Bloque para registrar materiales iniciales asociados
         if ($request->has('materiales') && is_array($request->materiales)) {
             foreach ($request->materiales as $mat) {
                 if (!empty($mat['producto_id']) && !empty($mat['cantidad'])) {
@@ -97,6 +101,7 @@ class TicketServicioController extends Controller
         return response()->json($ticket->load(['materiales.producto', 'tecnico.usuario']), 201);
     }
 
+    // Bloque para actualizar el estado operativo del ticket y liquidar consumo de inventario
     public function cambiarEstado(Request $request, $id)
     {
         $user = Auth::user();
@@ -146,27 +151,24 @@ class TicketServicioController extends Controller
             $ticket->feedback_cliente = $request->feedback_cliente;
         }
 
-        // Si se finaliza el servicio
+        // Bloque de finalización y descuento de inventario
         if ($nuevoEstado === 'Finalizado') {
             if (!$ticket->fecha_finalizacion) {
                 $ticket->fecha_finalizacion = now();
             }
 
-            // Descontar inventario si no se ha finalizado previamente
             if ($estadoAnterior !== 'Finalizado') {
                 $materiales = TicketMaterial::where('ticket_id', $ticket->id)->get();
                 foreach ($materiales as $mat) {
                     $mat->estado_material = 'Utilizado';
                     $mat->save();
 
-                    // Actualizar o decrementar en tabla inventario
                     $inv = Inventario::where('producto_id', $mat->producto_id)->first();
                     if ($inv) {
                         $inv->stock_actual = max(0, $inv->stock_actual - (int)$mat->cantidad);
                         $inv->save();
                     }
 
-                    // Registrar movimiento de auditoría
                     MovimientoInventario::create([
                         'producto_id' => $mat->producto_id,
                         'usuario_id' => $user->id,
@@ -184,6 +186,7 @@ class TicketServicioController extends Controller
         return response()->json($ticket->load(['materiales.producto', 'tecnico.usuario']));
     }
 
+    // Bloque para anexar un nuevo material o repuesto al servicio
     public function agregarMaterial(Request $request, $id)
     {
         $user = Auth::user();
@@ -215,6 +218,7 @@ class TicketServicioController extends Controller
         return response()->json($material->load('producto'), 201);
     }
 
+    // Bloque para remover un material asignado al ticket
     public function eliminarMaterial(Request $request, $id, $materialId)
     {
         $user = Auth::user();
@@ -229,6 +233,7 @@ class TicketServicioController extends Controller
         return response()->json(['message' => 'Material eliminado del servicio']);
     }
 
+    // Bloque para registrar la calificación mutua entre técnico y cliente
     public function calificar(Request $request, $id)
     {
         $user = Auth::user();

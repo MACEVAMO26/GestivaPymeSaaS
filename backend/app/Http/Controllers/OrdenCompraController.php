@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class OrdenCompraController extends Controller
 {
-    // Lista las órdenes de compra con sus detalles y proveedor filtradas por empresa
+    // Bloque para listar las órdenes de compra con proveedor y detalles por empresa
     public function index()
     {
         $empresaId = request()->header('X-Empresa-Id') ?? (auth()->user()?->empresa_id ?? null);
@@ -27,9 +27,10 @@ class OrdenCompraController extends Controller
         return response()->json($ordenes);
     }
 
-    // Registra una nueva orden de compra, sus detalles y genera la cuenta por pagar correspondiente
+    // Bloque para registrar una orden de compra, sus ítems y generar la cuenta por pagar
     public function store(Request $request)
     {
+        // Bloque de reglas de validación
         $validatedData = $request->validate([
             'proveedor_id' => 'required|exists:proveedores,id',
             'usuario_id' => 'nullable|exists:usuarios,id',
@@ -42,6 +43,7 @@ class OrdenCompraController extends Controller
 
         $usuarioId = $validatedData['usuario_id'] ?? auth()->id() ?? 1;
 
+        // Bloque de transacción para registrar orden de compra y cuenta por pagar en BD
         $orden = DB::transaction(function () use ($validatedData, $usuarioId) {
             $ordenCompra = OrdenCompra::create([
                 'proveedor_id' => $validatedData['proveedor_id'],
@@ -65,7 +67,7 @@ class OrdenCompraController extends Controller
             $ordenCompra->total = $totalOrden;
             $ordenCompra->save();
 
-            // Generar automáticamente la cuenta por pagar vinculada a la compra
+            // Bloque para generar automáticamente la cuenta por pagar vinculada a la compra
             $proveedor = Proveedor::find($ordenCompra->proveedor_id);
             CuentaPorPagar::create([
                 'proveedor_id' => $ordenCompra->proveedor_id,
@@ -81,7 +83,7 @@ class OrdenCompraController extends Controller
             return $ordenCompra;
         });
 
-        // Enviar notificación al proveedor si tiene correo configurado
+        // Bloque para enviar notificación por correo al proveedor
         $proveedor = Proveedor::find($validatedData['proveedor_id']);
         if ($proveedor && $proveedor->email && class_exists('\App\Mail\OrdenCompraMail')) {
             try {
@@ -94,14 +96,14 @@ class OrdenCompraController extends Controller
         return response()->json($orden->load(['detalles.producto', 'proveedor']), 201);
     }
 
-    // Muestra el detalle completo de una orden de compra
+    // Bloque para consultar el detalle completo de una orden de compra
     public function show($id)
     {
         $orden = OrdenCompra::with(['proveedor', 'detalles.producto', 'usuario'])->findOrFail($id);
         return response()->json($orden);
     }
 
-    // Anula una orden de compra en estado pendiente
+    // Bloque para anular una orden de compra y su cuenta por pagar asociada
     public function destroy($id)
     {
         $orden = OrdenCompra::findOrFail($id);
@@ -110,9 +112,10 @@ class OrdenCompraController extends Controller
         }
 
         $orden->estado = 'anulada';
+        // Bloque de guardado en BD
         $orden->save();
 
-        // Anular también la cuenta por pagar asociada si aún no tiene abonos
+        // Bloque para anular la cuenta por pagar asociada en BD
         $cpp = CuentaPorPagar::where('factura_numero', 'FAC-OC-' . str_pad($orden->id, 4, '0', STR_PAD_LEFT))->first();
         if ($cpp && $cpp->saldo_pendiente == $cpp->total) {
             $cpp->estado = 'Anulada';

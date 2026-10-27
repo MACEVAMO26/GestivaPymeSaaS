@@ -1,15 +1,18 @@
 <div class="soporte-module fade-in">
+  <!-- HTML BOTON VOLVER -->
   <div class="volver-wrapper">
     <button class="btn-volver btn-pill" appVolver>
       <i class="fas fa-arrow-left"></i> VOLVER
     </button>
   </div>
 
+  <!-- HTML ENCABEZADO MODULO SOPORTE -->
   <div class="module-header">
     <h1 class="titulo-principal text-center">SOPORTE TÉCNICO AL SAAS</h1>
     <p class="descripcion-general">Envía solicitudes, comprobantes y pide ayuda técnica a la administración central.</p>
   </div>
 
+  <!-- HTML FORMULARIO CREAR SOLICITUD -->
   <div class="form-container neumorphic-panel mb-4">
     <h2 class="subtitulo">CREAR NUEVA SOLICITUD</h2>
     <form (ngSubmit)="enviarTicket()">
@@ -32,8 +35,8 @@
         @if (requireFile) {
           <div class="form-group full-width fade-in mt-3">
             <label class="form-label">Adjuntar Archivo Requerido <span class="text-danger">*</span></label>
-            <input type="file" id="archivoRequerido" class="input-neumorphic" (change)="onFileSelected($event)" [accept]="fileAcceptType" style="padding: 10px;">
-            <small class="text-muted" style="margin-top: 5px; display: block;">Por favor adjunta el archivo correspondiente para esta solicitud.</small>
+            <input type="file" id="archivoRequerido" class="input-neumorphic" (change)="onFileSelected($event)" [accept]="fileAcceptType" class="input-file-pad">
+            <small class="text-muted" class="file-hint">Por favor adjunta el archivo correspondiente para esta solicitud.</small>
           </div>
         }
       </div>
@@ -50,7 +53,56 @@
     </form>
   </div>
 
+  <!-- HTML HISTORIAL DE TICKETS -->
   <h2 class="subtitulo mt-4">HISTORIAL DE TICKETS</h2>
+
+  <!-- HTML FILTROS HISTORIAL DE TICKETS -->
+  <div class="filtros-container neumorphic-panel mb-3 p-3">
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Buscar por Asunto / Tipo</label>
+        <input
+          type="text"
+          class="input-neumorphic"
+          [(ngModel)]="filtroTexto"
+          (ngModelChange)="onFiltroChange()"
+          placeholder="Buscar en mis tickets..."
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Estado</label>
+        <select
+          class="input-neumorphic"
+          [(ngModel)]="filtroEstado"
+          (ngModelChange)="onFiltroChange()"
+        >
+          <option value="">Todos los estados</option>
+          <option value="Abierto">Abierto / Pendiente</option>
+          <option value="En progreso">En progreso</option>
+          <option value="Resuelto">Resuelto</option>
+          <option value="Cerrado">Cerrado</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fecha</label>
+        <input
+          type="date"
+          class="input-neumorphic"
+          [(ngModel)]="filtroFecha"
+          (ngModelChange)="onFiltroChange()"
+        />
+      </div>
+      @if (filtroTexto || filtroEstado || filtroFecha) {
+        <div class="form-group flex-items-end">
+          <button type="button" class="btn-cancel btn-pill" (click)="limpiarFiltros()">
+            <i class="fas fa-times icon-mr-5"></i> Limpiar
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- HTML TABLA DE TICKETS -->
   <div class="table-container neumorphic-panel">
     @if (isLoading) {
       <div class="fade-in">
@@ -61,7 +113,7 @@
         <thead>
           <tr>
             <th>Fecha</th>
-            <th>Asunto</th>
+            <th>Asunto / Tipo</th>
             <th>Estado</th>
             <th>Resolución/Notas</th>
           </tr>
@@ -70,26 +122,48 @@
           @for (ticket of paginatedTickets; track ticket.id) {
             <tr>
               <td>{{ ticket.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
-              <td><strong>{{ ticket.asunto }}</strong><br><small class="text-muted">{{ ticket.mensaje }}</small></td>
+              <td>
+                <div class="flex-items-center gap-2 mb-1">
+                  @if (ticket.tipo) {
+                    <span class="badge badge-proceso text-xs">{{ ticket.tipo }}</span>
+                  }
+                  <strong>{{ ticket.asunto }}</strong>
+                </div>
+                <small class="text-muted">{{ ticket.mensaje }}</small>
+              </td>
               <td>
                 <span class="badge" [ngClass]="getEstadoBadgeClass(ticket.estado)">
                   {{ ticket.estado }}
                 </span>
               </td>
-              <td>{{ ticket.notas_resolucion || 'Aún sin revisión' }}</td>
+              <td>
+                @if (ticket.notas_resolucion) {
+                  <div class="text-success font-medium">
+                    <i class="fas fa-check-circle icon-mr-5"></i> {{ ticket.notas_resolucion }}
+                  </div>
+                } @else {
+                  <span class="text-muted">Aún en revisión técnica</span>
+                }
+              </td>
             </tr>
           }
-          @if (tickets.length === 0) {
+          @if (paginatedTickets.length === 0) {
             <tr>
-              <td colspan="4" class="text-center tabla-vacia">No tienes tickets de soporte generados.</td>
+              <td colspan="4" class="text-center tabla-vacia">
+                @if (tickets.length === 0) {
+                  No tienes tickets de soporte generados.
+                } @else {
+                  No se encontraron tickets con los filtros seleccionados.
+                }
+              </td>
             </tr>
           }
         </tbody>
       </table>
 
-      @if (tickets.length > pageSize) {
+      @if (totalPagesTickets > 1) {
         <div class="neu-pagination-bar">
-          <span class="pagination-info">Página {{ pageTickets }} de {{ totalPagesTickets }} ({{ tickets.length }} tickets)</span>
+          <span class="pagination-info">Página {{ pageTickets }} de {{ totalPagesTickets }} ({{ ticketsFiltrados.length }} tickets)</span>
           <div class="pagination-controls">
             <button class="pagination-btn" [disabled]="pageTickets === 1" (click)="pageTickets = pageTickets - 1">
               <i class="fas fa-chevron-left"></i> Anterior

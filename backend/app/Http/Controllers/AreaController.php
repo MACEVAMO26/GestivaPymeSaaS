@@ -7,14 +7,14 @@ use App\Models\Area;
 
 class AreaController extends Controller
 {
-    // Trae las areas de la empresa del usuario con sus modulos
+    // Bloque para traer las áreas de la empresa con sus módulos asociados
     public function index()
     {
         $empresaId = auth()->user()->empresa_id;
         return response()->json(Area::with('modulos')->where('empresa_id', $empresaId)->get());
     }
 
-    // Para guardar una nueva área
+    // Bloque para guardar una nueva área en la empresa
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -37,7 +37,7 @@ class AreaController extends Controller
         return response()->json($area, 201);
     }
 
-    // Para actualizar un área
+    // Bloque para actualizar los datos y módulos asociados de un área
     public function update(Request $request, $id)
     {
         $area = Area::where('id', $id)
@@ -65,7 +65,7 @@ class AreaController extends Controller
         return response()->json($area);
     }
 
-    // Para inactivar o activar un área
+    // Bloque para alternar el estado activo o inactivo de un área
     public function changeStatus($id)
     {
         $area = Area::where('id', $id)

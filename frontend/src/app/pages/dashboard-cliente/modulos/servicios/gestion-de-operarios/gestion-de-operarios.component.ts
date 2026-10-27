@@ -5,7 +5,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OperariosTicketsService, ServicioTicket } from '../../../../../services/operarios-tickets.service';
 import { ToastService } from '../../../../../services/toast.service';
-
 import { timeout } from 'rxjs';
 
 @Component({
@@ -16,25 +15,20 @@ import { timeout } from 'rxjs';
   styleUrl: './gestion-de-operarios.component.scss'
 })
 export class GestionDeOperariosComponent implements OnInit {
+  // --- PROPIEDADES DE ENTRADA ---
   @Input() isEmbedded: boolean = false;
+
+  // --- SERVICIOS INYECTADOS ---
   private cdr = inject(ChangeDetectorRef);
   private ticketsService = inject(OperariosTicketsService);
   private toast = inject(ToastService);
 
+  // --- VARIABLES DE ESTADO ---
   tickets: ServicioTicket[] = [];
   cargando = false;
   guardando = false;
-
   pageSize = 8;
   pageTickets = 1;
-
-  get paginatedTickets(): ServicioTicket[] {
-    const start = (this.pageTickets - 1) * this.pageSize;
-    return this.tickets.slice(start, start + this.pageSize);
-  }
-  get totalPagesTickets(): number {
-    return Math.ceil(this.tickets.length / this.pageSize) || 1;
-  }
 
   nuevoTicket: ServicioTicket = {
     cliente_nombre: '',
@@ -42,10 +36,22 @@ export class GestionDeOperariosComponent implements OnInit {
     estado: 'Pendiente'
   };
 
+  // --- GETTERS Y PAGINACION ---
+  get paginatedTickets(): ServicioTicket[] {
+    const start = (this.pageTickets - 1) * this.pageSize;
+    return this.tickets.slice(start, start + this.pageSize);
+  }
+
+  get totalPagesTickets(): number {
+    return Math.ceil(this.tickets.length / this.pageSize) || 1;
+  }
+
+  // Bloque de ciclo de vida OnInit para cargar tickets
   ngOnInit() {
     this.cargarTickets();
   }
 
+  // Bloque para consultar tickets de operarios desde el backend
   cargarTickets() {
     this.cargando = true;
     this.ticketsService.getTickets().pipe(timeout(15000)).subscribe({
@@ -66,6 +72,7 @@ export class GestionDeOperariosComponent implements OnInit {
     });
   }
 
+  // Bloque para validar y registrar un nuevo ticket de servicio
   crearTicket() {
     if (!this.nuevoTicket.cliente_nombre || !this.nuevoTicket.servicio_requerido) {
       return this.toast.warning('Cliente y Servicio son obligatorios');
@@ -91,6 +98,7 @@ export class GestionDeOperariosComponent implements OnInit {
     });
   }
 
+  // Bloque para mapear el estado del ticket a una clase visual de badge
   getBadgeEstado(estado: string): string {
     switch (estado) {
       case 'Completado': return 'badge-success';
@@ -101,6 +109,3 @@ export class GestionDeOperariosComponent implements OnInit {
     }
   }
 }
-
-
-

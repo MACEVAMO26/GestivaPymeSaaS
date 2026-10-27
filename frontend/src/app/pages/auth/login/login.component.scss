@@ -1,4 +1,4 @@
-/* --- 0. BACKGROUND PRINCIPAL DEL MÓDULO LOGIN (ESTILO LANDING Y SAAS ADMIN) --- */
+/* --- 0. BACKGROUND PRINCIPAL DEL MÓDULO LOGIN --- */
 .login-container {
   min-height: 100vh;
   display: flex;
@@ -13,7 +13,7 @@
   position: relative;
 }
 
-/* --- 1. VARIABLES GLOBALES DEL LOGIN (DARK SLATE + ESMERALDA) --- */
+/* --- 1. VARIABLES GLOBALES DEL LOGIN --- */
 $bg-base: #0f172a;
 $bg-card: #1e293b;
 $bg-input: #0f172a;
@@ -45,7 +45,7 @@ $btn-volver-border: #64748b;
   }
 }
 
-/* --- 3. NAVEGACIÓN (BOTÓN VOLVER A GESTIVAPYME) --- */
+/* --- 3. NAVEGACIÓN Y ENLACE VOLVER --- */
 .back-link {
   position: absolute;
   top: 1.25rem;
@@ -248,7 +248,7 @@ $btn-volver-border: #64748b;
   }
 }
 
-/* --- 6. COMPONENTES EXTRA (SPINNER, ALERTAS, CAMBIO DE CLAVE) --- */
+/* --- 6. COMPONENTES EXTRA Y CAMBIO DE CLAVE --- */
 .flex-center-all {
   display: flex;
   align-items: center;
@@ -475,7 +475,7 @@ $btn-volver-border: #64748b;
   }
 }
 
-/* --- BANNER DE SESIÓN EXPULSADA REMOTAMENTE --- */
+/* --- 8. BANNER DE SESIÓN EXPULSADA REMOTAMENTE --- */
 .alert-remote-logout {
   display: flex;
   align-items: center;
@@ -527,7 +527,7 @@ $btn-volver-border: #64748b;
   }
 }
 
-/* --- MODAL CONTROL DE SESIONES SIMULTÁNEAS --- */
+/* --- 9. MODAL CONTROL DE SESIONES SIMULTÁNEAS --- */
 .modal-conflict {
   max-width: 30rem;
 }
@@ -617,7 +617,7 @@ $btn-volver-border: #64748b;
   }
 }
 
-/* --- 8. CAMPO DE CONTRASEÑA Y BOTÓN VER CLAVE --- */
+/* --- 10. CAMPO DE CONTRASEÑA Y BOTÓN VER CLAVE --- */
 .password-wrapper {
   position: relative;
   display: flex;
@@ -662,7 +662,7 @@ $btn-volver-border: #64748b;
   background-color: $btn-primary;
 }
 
-/* --- 9. WIDGET DE ACCESIBILIDAD VISUAL --- */
+/* --- 11. WIDGET DE ACCESIBILIDAD VISUAL --- */
 .accessibility-widget {
   position: absolute;
   top: 1.25rem;

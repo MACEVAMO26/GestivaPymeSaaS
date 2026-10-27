@@ -1,6 +1,7 @@
 <!-- HTML VISTA PRINCIPAL DE ESTRUCTURA ORGANIZACIONAL -->
 <div class="gestion-humana-container fade-in">
   <div [hidden]="isModalSedeOpen || isModalAreaOpen || isModalCargoOpen" class="main-view-wrapper">
+    <!-- HTML BOTON VOLVER -->
     <div class="volver-wrapper">
       <button class="btn-volver btn-pill" appVolver>
         <i class="fas fa-arrow-left icon-mr-5"></i> Volver
@@ -34,7 +35,7 @@
           <app-loading-spinner message="Cargando datos..."></app-loading-spinner>
         </div>
       } @else {
-        <!-- TAB SEDES -->
+        <!-- HTML TAB SEDES -->
         @if (activeTab === 'sedes') {
           <h2 class="subtitulo">SEDES REGISTRADAS</h2>
           <div class="table-container fade-in">
@@ -71,7 +72,7 @@
                   </tr>
                 }
                 @if (sedes.length === 0) {
-                  <tr><td colspan="5" class="text-center" style="padding: 2rem;">No hay sedes registradas.</td></tr>
+                  <tr><td colspan="5" class="text-center" class="table-empty-cell">No hay sedes registradas.</td></tr>
                 }
               </tbody>
             </table>
@@ -93,18 +94,18 @@
           </div>
         }
 
-        <!-- TAB ÁREAS -->
+        <!-- HTML TAB AREAS -->
         @if (activeTab === 'areas') {
           <h2 class="subtitulo">ÁREAS REGISTRADAS</h2>
           <div class="table-container fade-in">
             <table class="data-table">
               <thead>
                 <tr>
-                  <th style="width: 20%;">Nombre del Área</th>
-                  <th style="width: 30%;">Descripción</th>
-                  <th style="width: 25%;">Módulos Asignados</th>
-                  <th style="width: 10%;">Estado</th>
-                  <th style="width: 15%; text-align: center;">Acciones</th>
+                  <th class="col-area-20">Nombre del Área</th>
+                  <th class="col-area-30">Descripción</th>
+                  <th class="col-area-25">Módulos Asignados</th>
+                  <th class="col-area-10">Estado</th>
+                  <th class="col-area-15">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -113,12 +114,12 @@
                     <td><strong>{{ area.nombre }}</strong></td>
                     <td class="text-muted">{{ area.descripcion || 'Sin descripción' }}</td>
                     <td>
-                      <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                      <div class="modulos-tag-list">
                         @for (mod of area.modulos; track mod.id) {
-                          <span class="badge badge-activo" style="font-size: 14px; padding: 3px 8px;">{{ mod.nombre }}</span>
+                          <span class="badge badge-activo" class="badge badge-activo badge-modulo-tag">{{ mod.nombre }}</span>
                         }
                         @if (!area.modulos || area.modulos.length === 0) {
-                          <span style="color: #2d3748; font-size: 14px;">
+                          <span class="sin-modulos-text">
                             {{ area.nombre.toLowerCase() === 'gerencia' ? 'Todos los módulos' : 'Ninguno' }}
                           </span>
                         }
@@ -144,7 +145,7 @@
                   </tr>
                 }
                 @if (areas.length === 0) {
-                  <tr><td colspan="5" class="text-center" style="padding: 2rem;">No hay áreas registradas.</td></tr>
+                  <tr><td colspan="5" class="text-center" class="table-empty-cell">No hay áreas registradas.</td></tr>
                 }
               </tbody>
             </table>
@@ -166,14 +167,14 @@
           </div>
         }
 
-        <!-- TAB CARGOS -->
+        <!-- HTML TAB CARGOS -->
         @if (activeTab === 'cargos') {
           <h2 class="subtitulo">CARGOS REGISTRADOS</h2>
           <div class="fade-in">
             @for (rol of roles; track rol.id) {
               @if (getCargosByRol(rol.id).length > 0) {
-                <h3 class="panel-title text-left mt-4 mb-2" style="color: #6B8F71; font-size: 14px; text-transform: uppercase; border-bottom: 1px solid #d1d1bc; padding-bottom: 4px;">{{ rol.nombre }}</h3>
-                <div class="table-container mb-4" style="box-shadow: none; border: 1px solid rgba(0,0,0,0.05); background: transparent;">
+                <h3 class="panel-title text-left mt-4 mb-2" class="panel-title text-left mt-4 mb-2 cargos-rol-header">{{ rol.nombre }}</h3>
+                <div class="table-container mb-4" class="table-container mb-4 table-transparent-wrap">
                   <table class="data-table">
                     <thead>
                       <tr>
@@ -214,7 +215,7 @@
             }
             
             @if (cargos.length === 0) {
-              <div class="text-center" style="padding: 2rem;">No hay cargos registrados.</div>
+              <div class="text-center" class="table-empty-cell">No hay cargos registrados.</div>
             }
           </div>
         }
@@ -222,7 +223,7 @@
     </div>
   </div>
 
-  <!-- PANEL NUEVA/EDITAR SEDE -->
+  <!-- HTML PANEL NUEVA Y EDITAR SEDE -->
   @if (isModalSedeOpen) {
   <div class="view-switch-panel fade-in">
     <div class="neu-card neu-card-wide">
@@ -257,7 +258,7 @@
             </div>
           </div>
         }
-        <div class="acciones-centro" style="margin-top: 2rem;">
+        <div class="acciones-centro acciones-centro-mt2">
           <button type="button" class="btn-general-5 btn-pill btn-action" (click)="cerrarModales()" [disabled]="isSaving">Cancelar</button>
           <button type="button" class="btn-save btn-pill btn-action" (click)="guardarSede()" [disabled]="isSaving">
             @if (isSaving) { Guardando... } @else { Guardar }
@@ -268,7 +269,7 @@
   </div>
   }
 
-  <!-- PANEL NUEVA ÁREA -->
+  <!-- HTML PANEL NUEVA AREA -->
   @if (isModalAreaOpen) {
   <div class="view-switch-panel fade-in">
     <div class="neu-card neu-card-wide">
@@ -285,25 +286,25 @@
           <textarea class="input-neumorphic" name="descripcion" [(ngModel)]="nuevaArea.descripcion" rows="3"></textarea>
         </div>
 
-        <!-- HTML SELECTOR DE MÓDULOS POR ÁREA -->
+        <!-- HTML SELECTOR DE MODULOS POR AREA -->
         <div class="form-group mb-4">
-          <label class="form-label" style="font-weight: bold; display: block; margin-bottom: 5px;">Módulos Asignados al Área</label>
-          <p style="margin-bottom: 5px; font-size: 14px; color: #2d3748;">Selecciona los módulos a los que tendrán acceso los cargos de esta área.</p>
-          <p style="margin-bottom: 15px; font-size: 14px; color: #2d3748;"><em>Nota: Los módulos base (Inicio, Administración, Formalización, Autogestión, Gestiva IA, Tareas) son fijos por sistema y no requieren asignación por área.</em></p>
-          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; padding: 15px; border-radius: 12px; background: #f5f5dc; box-shadow: inset 4px 4px 8px #d0d0bb, inset -4px -4px 8px #ffffff;">
+          <label class="form-label" class="form-label label-bold-mb">Módulos Asignados al Área</label>
+          <p class="help-text-mb">Selecciona los módulos a los que tendrán acceso los cargos de esta área.</p>
+          <p class="nota-base-text"><em>Nota: Los módulos base (Inicio, Administración, Formalización, Autogestión, Gestiva IA, Tareas) son fijos por sistema y no requieren asignación por área.</em></p>
+          <div class="modulos-grid-neumorphic">
             @for (mod of modulosDisponiblesParaAreaSeleccionada; track mod.id) {
-              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                <input type="checkbox" [checked]="isModuloUiSeleccionado(mod.id)" (change)="toggleModuloArea(mod.id)" style="width: 16px; height: 16px; accent-color: #45a1ae;">
-                <span style="font-size: 14px; font-weight: 500;">{{ mod.nombre }}</span>
+              <label class="modulo-checkbox-label">
+                <input type="checkbox" [checked]="isModuloUiSeleccionado(mod.id)" (change)="toggleModuloArea(mod.id)" class="checkbox-accent">
+                <span class="modulo-nombre-text">{{ mod.nombre }}</span>
               </label>
             }
             @if (modulosDisponiblesParaAreaSeleccionada.length === 0) {
-              <span style="font-size: 14px; color: #2d3748;">Cargando módulos...</span>
+              <span class="loading-modulos-text">Cargando módulos...</span>
             }
           </div>
         </div>
 
-        <div class="acciones-centro" style="margin-top: 2rem;">
+        <div class="acciones-centro acciones-centro-mt2">
           <button type="button" class="btn-general-5 btn-pill btn-action" (click)="cerrarModales()" [disabled]="isSaving">Cancelar</button>
           <button type="button" class="btn-save btn-pill btn-action" (click)="guardarArea()" [disabled]="isSaving">
             @if (isSaving) { Guardando... } @else { Guardar }
@@ -314,7 +315,7 @@
   </div>
   }
 
-  <!-- PANEL NUEVO CARGO -->
+  <!-- HTML PANEL NUEVO CARGO -->
   @if (isModalCargoOpen) {
   <div class="view-switch-panel fade-in">
     <div class="neu-card neu-card-wide">
@@ -352,7 +353,7 @@
           <label class="form-label">Funciones</label>
           <textarea class="input-neumorphic" name="funciones" [(ngModel)]="nuevoCargo.funciones" rows="2"></textarea>
         </div>
-        <div class="acciones-centro" style="margin-top: 2rem;">
+        <div class="acciones-centro acciones-centro-mt2">
           <button type="button" class="btn-general-5 btn-pill btn-action" (click)="cerrarModales()" [disabled]="isSaving">Cancelar</button>
           <button type="button" class="btn-save btn-pill btn-action" (click)="guardarCargo()" [disabled]="isSaving">
             @if (isSaving) { Guardando... } @else { Guardar }

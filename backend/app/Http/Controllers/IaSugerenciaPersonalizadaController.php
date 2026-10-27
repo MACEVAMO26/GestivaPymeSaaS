@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\Auth;
 
 class IaSugerenciaPersonalizadaController extends Controller
 {
-    // Solo Gerente o Gerente General deberían tener acceso a esto, 
-    // pero eso se puede controlar con un middleware o aquí mismo.
+    // Bloque de verificación de permisos exclusivos para Gerencia
+    
     private function checkGerente()
     {
         $user = Auth::user();
@@ -19,6 +19,7 @@ class IaSugerenciaPersonalizadaController extends Controller
         return $user;
     }
 
+    // Bloque para listar las directrices personalizadas de IA de la empresa
     public function index()
     {
         $user = clone $this->checkGerente();
@@ -30,6 +31,7 @@ class IaSugerenciaPersonalizadaController extends Controller
         return response()->json($sugerencias);
     }
 
+    // Bloque para registrar una nueva directriz personalizada de IA
     public function store(Request $request)
     {
         $user = clone $this->checkGerente();
@@ -50,6 +52,7 @@ class IaSugerenciaPersonalizadaController extends Controller
         return response()->json(['message' => 'Directriz de IA creada con éxito', 'data' => $sugerencia], 201);
     }
 
+    // Bloque para actualizar una directriz personalizada de IA
     public function update(Request $request, $id)
     {
         $user = clone $this->checkGerente();
@@ -66,6 +69,7 @@ class IaSugerenciaPersonalizadaController extends Controller
         return response()->json(['message' => 'Directriz de IA actualizada con éxito', 'data' => $sugerencia]);
     }
 
+    // Bloque para eliminar una directriz personalizada de IA
     public function destroy($id)
     {
         $user = clone $this->checkGerente();

@@ -1,10 +1,12 @@
-/* --- SOLICITUD DE INACTIVACIÓN (REUTILIZABLE) --- */
+/* --- 0. BACKGROUND PRINCIPAL DEL MÓDULO SOLICITUD INACTIVACIÓN --- */
+/* --- 1. VARIABLES GLOBALES DE COLOR --- */
 $bg-color: #f5f5dc;
 $shadow-light: #ffffff;
 $shadow-dark: #d1d1bc;
 $text-dark: #1a1a1a;
 $text-muted: #2d3748;
 
+/* --- 2. BOTONES DE ACCIÓN CIRCULARES Y BANDERA --- */
 .btn-action-circle {
   width: 36px;
   height: 36px;
@@ -68,6 +70,7 @@ $text-muted: #2d3748;
   box-shadow: inset 4px 4px 8px rgba(0,0,0,0.1), inset -4px -4px 8px rgba(255,255,255,0.5);
 }
 
+/* --- 3. MODAL Y OVERLAY DE SOLICITUDES --- */
 .sol-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -128,6 +131,7 @@ $text-muted: #2d3748;
   padding: 0.75rem 1rem;
 }
 
+/* --- 4. FORMULARIO Y CAMPOS DE TEXTO --- */
 .sol-nueva {
   display: flex;
   flex-direction: column;
@@ -201,6 +205,7 @@ $text-muted: #2d3748;
   cursor: pointer;
 }
 
+/* --- 5. LISTA DE SOLICITUDES Y BADGES DE ESTADO --- */
 .sol-lista {
   display: flex;
   flex-direction: column;
@@ -266,6 +271,7 @@ $text-muted: #2d3748;
 .badge-ejecutada { color: #066810; border: 1px solid rgba(6, 104, 16, 0.35); }
 .badge-rechazada { color: #de3737; border: 1px solid rgba(222, 55, 55, 0.35); }
 
+/* --- 6. HILO DE RÉPLICAS Y MENSAJES --- */
 .sol-hilo {
   background: rgba(0,0,0,0.03);
   border-radius: 8px;
@@ -291,6 +297,7 @@ $text-muted: #2d3748;
 
 .sol-replica .sol-input { flex: 1; }
 
+/* --- 7. ACCIONES DE DECISIÓN Y RESPUESTAS --- */
 .sol-decision {
   display: flex;
   flex-direction: column;

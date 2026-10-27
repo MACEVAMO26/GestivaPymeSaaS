@@ -22,7 +22,7 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private routerSub!: Subscription;
 
-  // El globo flotante SIEMPRE está visible; el panel de sugerencias se abre al clickearlo
+  // --- VARIABLES DE ESTADO ---
   showBot = true;
   showBubble = false;
   showChat = false;
@@ -32,12 +32,12 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
   directrizDestacada = '';
   moduleSuggestions: string[] = [];
 
-  // Contexto del módulo
+  // --- CONTEXTO DEL MODULO ---
   currentModuleKey = 'general';
   currentModuleNombre = 'Gestiva AI';
   isGeneratingDoc = false;
 
-  // Chat IA y Plan Contratado
+  // --- CHAT IA Y PLAN CONTRATADO ---
   userMessage = '';
   isAdvancedMode = true;
   isLoading = false;
@@ -98,10 +98,7 @@ export class GestivaBotComponent implements OnInit, OnDestroy {
     const routerUrl = (url && url !== '/') ? url : ((this.router.url && this.router.url !== '/') ? this.router.url : '');
     const winPath = typeof window !== 'undefined' ? window.location.pathname : '';
     const fullUrl = (routerUrl || winPath).toLowerCase();
-    const cleanPath = fullUrl.split('?')[0].split('#')[0];
-
-    // Extraer segmentos de la ruta: /:entorno/:modulo/...
-    // Se ignora segments[0] (:entorno, ej. 'techventasysoluciones') para detectar con exactitud el módulo real
+    const cleanPath = fullUrl.split('?')[0].split('#')[0];  // Bloque para extraer segmentos de la ruta: /:entorno/:modulo/...  // Bloque para se ignora segments[0] (:entorno, ej. 'techventasysoluciones') para detectar con exactitud el módulo real
     const segments = cleanPath.split('/').filter(Boolean);
     const modulePath = segments.length > 1 ? segments.slice(1).join('/') : (segments[0] || '');
 

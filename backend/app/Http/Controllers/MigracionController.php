@@ -6,10 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\MasterTemplateExport;
-// use App\Imports\MasterDataImport; // We will create this later if needed
 
 class MigracionController extends Controller
 {
+    // Bloque para descargar la plantilla Excel de migración de datos
     public function descargarPlantilla()
     {
         $user = Auth::user();
@@ -18,6 +18,7 @@ class MigracionController extends Controller
         return Excel::download(new MasterTemplateExport(null, true), "Plantilla_Migracion_SaaS.xlsx");
     }
 
+    // Bloque para generar y descargar el respaldo completo de la empresa en Excel
     public function descargarBackup()
     {
         $user = Auth::user();
@@ -26,6 +27,7 @@ class MigracionController extends Controller
         return Excel::download(new MasterTemplateExport($user->empresa_id, false), "Backup_GestivaPyme_Empresa_" . $user->empresa_id . ".xlsx");
     }
 
+    // Bloque para procesar y almacenar la solicitud de migración masiva de datos
     public function subirMigracion(Request $request)
     {
         $user = Auth::user();
@@ -35,8 +37,7 @@ class MigracionController extends Controller
             "archivo" => "required|file|mimes:xlsx,xls,csv"
         ]);
 
-        // Aqui podemos delegar a un import, o simplemente guardar el archivo para que el Admin SaaS lo procese
-        // Vamos a guardar el archivo en storage y crear un "AdminRequest"
+        // Bloque para almacenar el archivo en disco y generar la solicitud administrativa
         $file = $request->file("archivo");
         $path = $file->store("migraciones", "public");
 

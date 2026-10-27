@@ -41,7 +41,7 @@ class ImpersonateController extends Controller
         $auditor->load(["empresa", "rol"]);
         $token = $auditor->createToken("auth_token")->plainTextToken;
 
-        // Fetch modulos activos to mimic standard login
+        // Bloque para consultar módulos activos asignados al usuario suplantado
         $modulosActivos = [];
         $modulos = \Illuminate\Support\Facades\DB::table("empresa_modulo")
                     ->where("empresa_id", $empresaId)

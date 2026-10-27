@@ -17,7 +17,7 @@ export class ToastService {
     const id = this.idCounter++;
     this.toasts.update(t => [...t, { id, message, type }]);
 
-    // Auto dismiss after 4 seconds
+    
     setTimeout(() => {
       this.remove(id);
     }, durationMs);
@@ -39,6 +39,7 @@ export class ToastService {
     this.show(message, 'info');
   }
 
+  // Bloque para remover una notificación toast por su ID
   remove(id: number) {
     this.toasts.update(t => t.filter(toast => toast.id !== id));
   }

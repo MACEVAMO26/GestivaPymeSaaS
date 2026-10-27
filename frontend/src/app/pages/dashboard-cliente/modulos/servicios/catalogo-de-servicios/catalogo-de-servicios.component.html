@@ -19,7 +19,7 @@
 
   <!-- HTML CONTENIDO DE TABS -->
   <div class="tab-content neumorphic-panel-inner p-4">
-    <!-- Botón Volver Inyectado -->
+    <!-- HTML BOTON VOLVER -->
     <div class="volver-wrapper">
       <button class="btn-volver btn-pill" appVolver>
         <i class="fas fa-arrow-left"></i> Volver
@@ -65,11 +65,11 @@
             <div class="taller-card-box p-3 mb-3 border-rounded">
               <h5 class="text-azul text-xs font-bold mb-2"><i class="fas fa-tools"></i> Datos del Equipo Recibido:</h5>
               <div class="form-fila">
-                <div class="form-group" style="flex: 1;">
+                <div class="form-group flex-1">
                   <label class="label-xs">Equipo / Marca / Modelo</label>
                   <input type="text" class="input-neumorphic" [(ngModel)]="formTicket.equipo" placeholder="Ej: Laptop ASUS ZenBook 14">
                 </div>
-                <div class="form-group" style="flex: 1;">
+                <div class="form-group flex-1">
                   <label class="label-xs">Número de Serie (S/N)</label>
                   <input type="text" class="input-neumorphic" [(ngModel)]="formTicket.serie" placeholder="Ej: SN-994820">
                 </div>
@@ -91,17 +91,17 @@
           }
 
           <div class="form-fila">
-            <div class="form-group" style="flex: 1;">
+            <div class="form-group flex-1">
               <label>Fecha Solicitada</label>
               <input type="date" class="input-neumorphic" [(ngModel)]="formTicket.fecha">
             </div>
-            <div class="form-group" style="flex: 1;">
+            <div class="form-group flex-1">
               <label>Hora Sugerida</label>
               <input type="time" class="input-neumorphic" [(ngModel)]="formTicket.hora">
             </div>
           </div>
 
-          <div style="text-align: right; margin-top: 1rem;">
+          <div class="text-right mt-4">
             <button class="btn-save btn-pill" (click)="crearTicket()" [disabled]="guardando">
               @if(guardando) { <i class="fas fa-spinner fa-spin"></i> Registrando... }
               @else { 
@@ -114,10 +114,10 @@
 
         <!-- HTML TABLA TICKETS HISTORICOS -->
         <div class="fsm-historial-col">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
-            <h3 class="panel-titulo" style="margin: 0;">Historial de Solicitudes ({{getTicketsFiltrados().length}})</h3>
+          <div class="tickets-header-flex">
+            <h3 class="panel-titulo m-0">Historial de Solicitudes ({{getTicketsFiltrados().length}})</h3>
             
-            <!-- Filtros de estado -->
+            <!-- HTML FILTROS DE ESTADO -->
             <div class="filtros-estado-pills">
               <button class="btn-filtro" [class.btn-filtro-active]="filtroEstado === 'TODOS'" (click)="filtroEstado = 'TODOS'">Todos</button>
               <button class="btn-filtro" [class.btn-filtro-active]="filtroEstado === 'Pendiente'" (click)="filtroEstado = 'Pendiente'">Pendiente</button>
@@ -137,7 +137,7 @@
                   <th>TÉCNICO</th>
                   <th>ESTADO</th>
                   <th>CALIFICACIÓN</th>
-                  <th style="text-align: center;">ACCIÓN</th>
+                  <th class="text-center">ACCIÓN</th>
                 </tr>
               </thead>
               <tbody>
@@ -183,7 +183,7 @@
                         <span class="text-xs text-muted">En proceso</span>
                       }
                     </td>
-                    <td style="text-align: center;">
+                    <td class="text-center">
                       @if(tk.estado === 'Finalizado') {
                         <button class="btn-action-circle btn-circle-star" (click)="abrirModalCalificacion(tk)" title="Calificar / Evaluar al Técnico y al Cliente">
                           <i class="fas fa-star"></i>
@@ -228,7 +228,7 @@
     <!-- HTML AGENDA DESPACHO -->
     @if(activeTab === 'agenda') {
       <div class="neumorphic-panel fade-in">
-        <p class="descripcion-general" style="margin-bottom: 1.5rem;">
+        <p class="descripcion-general mb-6">
           Despacha a tus técnicos en campo o asigna servicios de taller. Monitorea su estado operativo en tiempo real.
         </p>
         
@@ -241,7 +241,7 @@
                 <th>FECHA / HORA</th>
                 <th>TÉCNICO ASIGNADO</th>
                 <th>ESTADO ACTUAL</th>
-                <th style="text-align: center;">ACCIONES DE DESPACHO</th>
+                <th class="text-center">ACCIONES DE DESPACHO</th>
               </tr>
             </thead>
             <tbody>
@@ -256,7 +256,7 @@
                     }
                   </td>
                   <td>{{tk.fecha_solicitada}} <br><span class="text-xs text-muted">{{tk.hora_sugerida}}</span></td>
-                  <td class="text-azul" style="font-weight: bold;">
+                  <td class="text-azul font-bold">
                     {{nombreTecnico(tk.tecnico_id)}}
                   </td>
                   <td>
@@ -264,8 +264,8 @@
                       <i [class]="getIconoEstado(tk.estado)"></i> {{tk.estado}}
                     </span>
                   </td>
-                  <td style="text-align: center;">
-                    <div class="btn-group-acciones" style="display: flex; gap: 0.35rem; justify-content: center;">
+                  <td class="text-center">
+                    <div class="btn-group-acciones flex-gap-center">
                       <button class="btn-action-circle btn-circle-user" (click)="abrirAsignacion(tk)" [disabled]="!puedeAsignarOperarios()" title="Asignar Operario Técnico">
                         <i class="fas fa-user-edit"></i>
                       </button>
@@ -312,7 +312,7 @@
       </div>
     }
 
-    <!-- EJECUCIÓN / MINI-INVENTARIO -->
+    <!-- HTML EJECUCION Y MINI INVENTARIO -->
     @if(activeTab === 'ejecucion') {
       <div class="neumorphic-panel fade-in">
         <div class="header-section-mini mb-4">
@@ -326,8 +326,8 @@
           @for(tk of tickets; track tk.id) {
             @if(tk.estado === 'Asignado' || tk.estado === 'En Camino' || tk.estado === 'En Sitio' || tk.estado === 'Recibido') {
               <div class="neumorphic-panel ticket-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                  <h3 style="margin: 0; font-size: 14px; font-weight: bold;">{{tk.consecutivo}}</h3>
+                <div class="ticket-head-row">
+                  <h3 class="ticket-consecutivo-title">{{tk.consecutivo}}</h3>
                   <span class="badge" [ngClass]="getBadgeEstado(tk.estado)">
                     <i [class]="getIconoEstado(tk.estado)"></i> {{tk.estado}}
                   </span>
@@ -346,13 +346,13 @@
                   </div>
                 }
 
-                <!-- Mini inventario asignado -->
+                <!-- HTML MINI INVENTARIO ASIGNADO -->
                 <div class="mini-inventario-preview p-2 mt-2 mb-3 border-rounded bg-white">
                   <span class="label-xs text-azul font-bold d-block mb-1">
                     <i class="fas fa-toolbox"></i> Repuestos / Materiales Asignados ({{tk.materiales?.length || 0}}):
                   </span>
                   @if(tk.materiales && tk.materiales.length > 0) {
-                    <ul class="lista-materiales-xs" style="padding-left: 1.2rem; margin: 0; font-size: 14px;">
+                    <ul class="lista-materiales-xs">
                       @for(mat of tk.materiales; track mat.id) {
                         <li>
                           <strong>{{mat.cantidad}}x</strong> {{mat.producto?.nombre || nombreProducto(mat.producto_id)}}
@@ -382,10 +382,10 @@
         <!-- HTML LISTA TECNICOS -->
         <div class="rendimiento-tecnicos neumorphic-panel-inner">
           <h3 class="panel-titulo">Plantilla Técnica</h3>
-          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <div class="tecnicos-list-col">
             @for(tec of tecnicos; track tec.id) {
               <div class="tech-card" [class.tech-card-active]="tecnicoDashboard?.id === tec.id" (click)="seleccionarTecnicoRender(tec)">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="card-tecnico-header">
                   <strong>{{tec.nombre}}</strong>
                   <span class="stars-gold text-xs">⭐ {{tec.promedioEstrellas || '5.0'}}</span>
                 </div>
@@ -393,8 +393,8 @@
               </div>
             } @empty {
               <div class="empty-state">
-                <i class="fas fa-users-slash mb-2" style="font-size: 16px; opacity: 0.5;"></i>
-                <p class="descripcion-general" style="margin: 0;">No hay personal técnico registrado aún. Agregue operarios/técnicos en Gestión Humana.</p>
+                <i class="fas fa-users-slash mb-2 icon-dim-16"></i>
+                <p class="descripcion-general m-0">No hay personal técnico registrado aún. Agregue operarios/técnicos en Gestión Humana.</p>
               </div>
             }
           </div>
@@ -403,10 +403,10 @@
         <!-- HTML DASHBOARD GRAFICO -->
         <div class="rendimiento-dashboard neumorphic-panel-inner">
           @if(tecnicoDashboard) {
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap;">
+            <div class="tecnico-detail-header">
               <div>
-                <h1 class="rendimiento-titulo" style="margin: 0;">Rendimiento: <span class="text-azul">{{tecnicoDashboard.nombre}}</span></h1>
-                <p class="text-muted text-xs" style="margin: 0.25rem 0 0 0;">Métricas en vivo de satisfacción, puntualidad y cumplimiento del servicio.</p>
+                <h1 class="rendimiento-titulo m-0">Rendimiento: <span class="text-azul">{{tecnicoDashboard.nombre}}</span></h1>
+                <p class="text-muted text-xs mt-1">Métricas en vivo de satisfacción, puntualidad y cumplimiento del servicio.</p>
               </div>
               <div class="rating-badge-large p-2 border-rounded text-center bg-white">
                 <span class="text-xs text-muted d-block">Calificación Promedio</span>
@@ -420,7 +420,7 @@
               
               <!-- HTML BARRA CITAS CUMPLIDAS -->
               <div class="bar-row">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <div class="metric-row-between">
                   <span class="bar-label">Servicios Finalizados</span>
                   <span class="valor-ok font-bold">{{tecnicoDashboard.rendimiento.cumplidas}} / {{tecnicoDashboard.rendimiento.total}}</span>
                 </div>
@@ -431,7 +431,7 @@
 
               <!-- HTML BARRA CITAS SATISFACTORIAS -->
               <div class="bar-row">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <div class="metric-row-between">
                   <span class="bar-label">Servicios Satisfactorios (SLA >= 4 ⭐)</span>
                   <span class="valor-info font-bold">{{tecnicoDashboard.rendimiento.satisfactorias}}</span>
                 </div>
@@ -442,7 +442,7 @@
 
               <!-- HTML BARRA QUEJAS GARANTIAS -->
               <div class="bar-row">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <div class="metric-row-between">
                   <span class="bar-label">Incidencias / Quejas</span>
                   <span class="valor-alerta font-bold">{{tecnicoDashboard.rendimiento.quejas}}</span>
                 </div>
@@ -453,20 +453,20 @@
 
             </div>
 
-            <!-- FEEDBACKS RECIENTES DE CLIENTES -->
+            <!-- HTML FEEDBACKS RECIENTES DE CLIENTES -->
             <div class="feedbacks-section mt-4">
               <h4 class="text-xs font-bold text-dark mb-2"><i class="fas fa-comments"></i> Comentarios y Valoraciones de Clientes:</h4>
               @if(tecnicoDashboard.feedbacks && tecnicoDashboard.feedbacks.length > 0) {
-                <div class="feedback-cards-grid" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <div class="feedback-cards-grid">
                   @for(fb of tecnicoDashboard.feedbacks; track fb.cliente) {
                     <div class="feedback-card p-2 bg-white border-rounded">
-                      <div style="display: flex; justify-content: space-between;">
+                      <div class="feedback-item-header">
                         <strong class="text-xs">{{fb.cliente}}</strong>
                         <span class="stars-gold text-xs">
                           @for(s of getStarArray(fb.estrellas); track s) { <i class="fas fa-star"></i> }
                         </span>
                       </div>
-                      <p class="text-muted text-xs" style="margin: 0.25rem 0 0 0;">"{{fb.comentario}}"</p>
+                      <p class="text-muted text-xs mt-1">"{{fb.comentario}}"</p>
                     </div>
                   }
                 </div>
@@ -476,8 +476,8 @@
             </div>
 
           } @else {
-            <div class="empty-state" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 4rem 0;">
-              <i class="fas fa-chart-line fa-3x mb-4" style="opacity: 0.5;"></i>
+            <div class="empty-state empty-tecnico-placeholder">
+              <i class="fas fa-chart-line fa-3x mb-4 opacity-50"></i>
               <p class="text-muted">Seleccione un técnico para visualizar sus métricas.</p>
             </div>
           }
@@ -489,16 +489,15 @@
     <!-- HTML CATALOGO TARIFADO -->
     @if(activeTab === 'catalogo') {
       <div class="neumorphic-panel fade-in">
-        <p class="text-muted" style="margin-bottom: 1.5rem;">Definición de servicios base para la empresa. Estos alimentan las cotizaciones y facturas.</p>
+        <p class="text-muted mb-6">Definición de servicios base para la empresa. Estos alimentan las cotizaciones y facturas.</p>
         
-        <!-- BARRA DE BÚSQUEDA DE SERVICIOS -->
-        <div class="search-filter-bar mb-4" *ngIf="catalogo.length > 0" style="display: flex; gap: 1rem; align-items: center; max-width: 500px; margin: 0 auto 1.5rem auto;">
-          <div style="position: relative; width: 100%;">
-            <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #2d3748; font-size: 14px;"></i>
+        <!-- HTML BARRA DE BUSQUEDA DE SERVICIOS -->
+        <div class="search-filter-bar search-bar-centered mb-4" *ngIf="catalogo.length > 0">
+          <div class="search-rel-box">
+            <i class="fas fa-search search-icon-input"></i>
             <input
               type="text"
-              class="input-neumorphic"
-              style="padding-left: 36px; padding-right: 36px;"
+              class="input-neumorphic search-input-padded"
               placeholder="Buscar servicio por nombre, descripción o código..."
               [(ngModel)]="searchTermCatalogo"
               (ngModelChange)="onSearchTermCatalogoChange()"
@@ -507,7 +506,7 @@
               *ngIf="searchTermCatalogo"
               type="button"
               (click)="limpiarBusquedaCatalogo()"
-              style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #2d3748; cursor: pointer; font-size: 14px;"
+              class="search-clear-input-btn"
               title="Limpiar búsqueda"
             >
               <i class="fas fa-times"></i>
@@ -523,7 +522,7 @@
                 <th>NOMBRE DEL SERVICIO</th>
                 <th>DURACIÓN ESTIMADA</th>
                 <th>TARIFA BASE</th>
-                <th style="text-align: center;">ACCIÓN</th>
+                <th class="text-center">ACCIÓN</th>
               </tr>
             </thead>
             <tbody>
@@ -533,7 +532,7 @@
                   <td>{{cat.nombre}}</td>
                   <td><i class="fas fa-clock"></i> {{cat.tiempo_estimado || 'N/D'}}</td>
                   <td class="text-positivo">{{cat.tarifa | currency:'COP':'symbol':'1.0-0'}}</td>
-                  <td style="text-align: center;">
+                  <td class="text-center">
                     <app-solicitud-inactivacion [area]="'s_cat'" [entidad]="'servicios'" [entidadId]="cat.id"
                       [nombreEntidad]="cat.nombre" [iconOnly]="true"></app-solicitud-inactivacion>
                   </td>
@@ -546,10 +545,10 @@
               }
               @if(catalogo.length > 0 && catalogoFiltrado.length === 0) {
                 <tr>
-                  <td colspan="5" class="tabla-vacia" style="padding: 2rem;">
+                  <td colspan="5" class="tabla-vacia">
                     No se encontraron servicios con "{{ searchTermCatalogo }}".
                     <br>
-                    <button class="btn-pill mt-2" (click)="limpiarBusquedaCatalogo()" style="background: #45a1ae; color: white; padding: 4px 12px; font-size: 14px; border: none; border-radius: 9999px; cursor: pointer;">
+                    <button class="btn-pill mt-2 btn-reset-search" (click)="limpiarBusquedaCatalogo()">
                       Limpiar búsqueda
                     </button>
                   </td>
@@ -590,18 +589,18 @@
   </div>
 </div>
 
-<!-- ================= MODALES ================= -->
+<!-- HTML SECCION MODALES -->
 
 <!-- HTML MODAL ASIGNACION AGENDA -->
 @if (modalAsignacion && ticketSeleccionado) {
 <div class="view-switch-panel fade-in">
-  <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+  <div class="neu-card card-max-800">
     <div class="panel-header mb-4">
       <h1>DESPACHAR TÉCNICO A SERVICIO</h1>
       <button class="btn-close" (click)="cerrarAsignacion()">&times;</button>
     </div>
     <div class="panel-body">
-      <p class="text-muted" style="margin-bottom: 1rem;">
+      <p class="text-muted mb-4">
         Ticket: <strong>{{ticketSeleccionado.consecutivo}}</strong> — {{ticketSeleccionado.servicio_requerido}} ({{ticketSeleccionado.cliente_nombre}})
       </p>
       
@@ -630,23 +629,23 @@
 </div>
 }
 
-<!-- HTML MODAL EJECUCION & MINI-INVENTARIO -->
+<!-- HTML MODAL EJECUCION Y MINI INVENTARIO -->
 @if (modalEjecucion && ticketSeleccionado) {
 <div class="view-switch-panel fade-in">
-  <div class="neu-card" style="max-width: 900px; margin: 0 auto;">
+  <div class="neu-card card-max-900">
     <div class="panel-header mb-3">
       <h1>CERRAR Y EJECUTAR SERVICIO ({{ticketSeleccionado.consecutivo}})</h1>
       <button class="btn-close" (click)="cerrarEjecucion()">&times;</button>
     </div>
     <div class="panel-body">
       
-      <div class="grid-dos-cols" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+      <div class="grid-dos-cols mb-6">
         <div>
           <h4 class="text-xs font-bold text-azul mb-2"><i class="fas fa-info-circle"></i> Datos del Servicio:</h4>
-          <p class="text-xs" style="margin: 0.25rem 0;"><strong>Cliente:</strong> {{ticketSeleccionado.cliente_nombre}}</p>
-          <p class="text-xs" style="margin: 0.25rem 0;"><strong>Servicio:</strong> {{ticketSeleccionado.servicio_requerido}}</p>
-          <p class="text-xs" style="margin: 0.25rem 0;"><strong>Técnico:</strong> {{nombreTecnico(ticketSeleccionado.tecnico_id)}}</p>
-          <p class="text-xs" style="margin: 0.25rem 0;"><strong>Dirección:</strong> {{ticketSeleccionado.direccion}}</p>
+          <p class="text-xs my-1"><strong>Cliente:</strong> {{ticketSeleccionado.cliente_nombre}}</p>
+          <p class="text-xs my-1"><strong>Servicio:</strong> {{ticketSeleccionado.servicio_requerido}}</p>
+          <p class="text-xs my-1"><strong>Técnico:</strong> {{nombreTecnico(ticketSeleccionado.tecnico_id)}}</p>
+          <p class="text-xs my-1"><strong>Dirección:</strong> {{ticketSeleccionado.direccion}}</p>
         </div>
         <div>
           <div class="form-group">
@@ -660,15 +659,15 @@
         </div>
       </div>
 
-      <!-- CAJA DE MINI INVENTARIO -->
+      <!-- HTML CAJA DE MINI INVENTARIO -->
       <div class="material-box">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-          <h4 style="margin: 0;"><i class="fas fa-boxes"></i> Mini-Inventario: Repuestos y Materiales Utilizados</h4>
+        <div class="ticket-head-row">
+          <h4 class="m-0"><i class="fas fa-boxes"></i> Mini-Inventario: Repuestos y Materiales Utilizados</h4>
           <span class="badge badge-info text-xs">Total Materiales: {{getTotalMateriales() | currency:'COP':'symbol':'1.0-0'}}</span>
         </div>
         
-        <div style="display: flex; gap: 0.5rem; align-items: flex-end; margin-bottom: 1rem;">
-          <div class="form-group" style="flex: 2; margin: 0;">
+        <div class="materials-add-row">
+          <div class="form-group flex-2 m-0">
             <label class="label-xs">Seleccionar Repuesto / Producto de Inventario</label>
             <select class="input-neumorphic" [(ngModel)]="materialSeleccionado">
               <option value="">Seleccionar producto del stock...</option>
@@ -679,16 +678,16 @@
               }
             </select>
           </div>
-          <div class="form-group" style="flex: 1; margin: 0;">
+          <div class="form-group flex-1 m-0">
             <label class="label-xs">Cantidad</label>
             <input type="number" class="input-neumorphic" [(ngModel)]="cantidadMaterial" min="1">
           </div>
-          <button class="btn-add btn-pill" style="height: 38px;" (click)="agregarMaterial()">
+          <button class="btn-add btn-pill h-38" (click)="agregarMaterial()">
             <i class="fas fa-plus"></i> Agregar
           </button>
         </div>
 
-        <!-- LISTA MATERIALES DESCONTAR -->
+        <!-- HTML LISTA MATERIALES DESCONTAR -->
         @if(materialesUsados.length > 0) {
           <div class="table-responsive">
             <table class="data-table text-xs">
@@ -698,7 +697,7 @@
                   <th>CANT.</th>
                   <th>PRECIO UNIT.</th>
                   <th>SUBTOTAL</th>
-                  <th style="text-align: center;">QUITAR</th>
+                  <th class="text-center">QUITAR</th>
                 </tr>
               </thead>
               <tbody>
@@ -708,7 +707,7 @@
                     <td><strong>{{mat.cantidad}}</strong></td>
                     <td>{{(mat.precio_unitario || precioProducto(mat.producto_id)) | currency:'COP':'symbol':'1.0-0'}}</td>
                     <td class="text-positivo">{{((mat.precio_unitario || precioProducto(mat.producto_id)) * mat.cantidad) | currency:'COP':'symbol':'1.0-0'}}</td>
-                    <td style="text-align: center;">
+                    <td class="text-center">
                       <button class="btn-volver btn-pill btn-xs" (click)="eliminarMaterial(mat, $index)">
                         <i class="fas fa-trash"></i>
                       </button>
@@ -719,22 +718,22 @@
             </table>
           </div>
         } @else {
-          <p class="text-muted text-xs" style="margin: 0;">No se han asignado materiales adicionales a este servicio.</p>
+          <p class="text-muted text-xs m-0">No se han asignado materiales adicionales a este servicio.</p>
         }
       </div>
 
-      <!-- NOTAS TÉCNICAS -->
+      <!-- HTML NOTAS TECNICAS -->
       <div class="form-group mb-3">
         <label class="label-xs">Notas Técnicas de Entrega y Cierre</label>
         <textarea class="input-neumorphic" rows="2" [(ngModel)]="notasEjecucion" placeholder="Detalle de trabajos realizados, pruebas de funcionamiento..."></textarea>
       </div>
 
-      <!-- SECCIÓN DE CALIFICACIONES MUTUAS -->
-      <div class="calificaciones-box p-3 border-rounded mb-3 bg-white" style="border: 1px solid #e2e8f0;">
+      <!-- HTML SECCION DE CALIFICACIONES MUTUAS -->
+      <div class="calificaciones-box p-3 border-rounded mb-3 bg-white border-light">
         <h4 class="text-xs font-bold text-azul mb-3"><i class="fas fa-star"></i> Evaluación Mutua del Servicio:</h4>
         
-        <div class="grid-dos-cols" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-          <!-- Calificar al Técnico -->
+        <div class="grid-dos-cols">
+          <!-- HTML CALIFICAR AL TECNICO -->
           <div class="calificar-card p-3 border-rounded bg-gray-50">
             <label class="label-xs font-bold d-block mb-1">⭐ Calificación al Técnico (Calidad y Puntualidad):</label>
             <div class="star-rating-selector mb-2">
@@ -746,7 +745,7 @@
             <input type="text" class="input-neumorphic text-xs" [(ngModel)]="feedbackTecnico" placeholder="Comentarios sobre el trabajo del técnico...">
           </div>
 
-          <!-- Calificar al Cliente -->
+          <!-- HTML CALIFICAR AL CLIENTE -->
           <div class="calificar-card p-3 border-rounded bg-gray-50">
             <label class="label-xs font-bold d-block mb-1">⭐ Calificación al Cliente (Atención y Facilidades):</label>
             <div class="star-rating-selector mb-2">
@@ -760,15 +759,15 @@
         </div>
       </div>
 
-      <!-- RESUMEN FINAL DE COSTOS -->
-      <div class="costo-total-bar p-3 border-rounded mb-3" style="background: #eef7ee; display: flex; justify-content: space-between; align-items: center;">
+      <!-- HTML RESUMEN FINAL DE COSTOS -->
+      <div class="costo-total-bar p-3 border-rounded mb-3">
         <span class="font-bold text-dark">COSTO TOTAL DEL SERVICIO:</span>
-        <span class="text-positivo font-bold" style="font-size: 16px;">
+        <span class="text-positivo font-bold text-base-16">
           {{getCostoTotalCalculado() | currency:'COP':'symbol':'1.0-0'}}
         </span>
       </div>
 
-      <p class="text-danger text-xs" style="text-align: center; margin: 0;">
+      <p class="text-danger text-xs text-center m-0">
         * Al finalizar, los materiales se descontarán automáticamente del inventario central de la empresa.
       </p>
 
@@ -787,7 +786,7 @@
 <!-- HTML MODAL CALIFICACION INDEPENDIENTE -->
 @if (modalCalificacion && ticketParaCalificar) {
 <div class="view-switch-panel fade-in">
-  <div class="neu-card" style="max-width: 700px; margin: 0 auto;">
+  <div class="neu-card card-max-700">
     <div class="panel-header mb-3">
       <h1>CALIFICAR SERVICIO ({{ticketParaCalificar.consecutivo}})</h1>
       <button class="btn-close" (click)="cerrarModalCalificacion()">&times;</button>
@@ -797,7 +796,7 @@
         Servicio: <strong>{{ticketParaCalificar.servicio_requerido}}</strong> para <strong>{{ticketParaCalificar.cliente_nombre}}</strong>.
       </p>
 
-      <!-- Calificar Técnico -->
+      <!-- HTML CALIFICAR AL TECNICO INDEPENDIENTE -->
       <div class="calificar-card p-3 border-rounded bg-gray-50 mb-3">
         <label class="label-xs font-bold d-block mb-1">
           <i class="fas fa-user-tie text-azul"></i> Calificación al Técnico ({{nombreTecnico(ticketParaCalificar.tecnico_id)}}):
@@ -811,7 +810,7 @@
         <textarea class="input-neumorphic text-xs" rows="2" [(ngModel)]="feedbackTecnico" placeholder="Comentarios de satisfacción sobre el técnico..."></textarea>
       </div>
 
-      <!-- Calificar Cliente -->
+      <!-- HTML CALIFICAR AL CLIENTE INDEPENDIENTE -->
       <div class="calificar-card p-3 border-rounded bg-gray-50 mb-3">
         <label class="label-xs font-bold d-block mb-1">
           <i class="fas fa-building text-azul"></i> Calificación al Cliente ({{ticketParaCalificar.cliente_nombre}}):

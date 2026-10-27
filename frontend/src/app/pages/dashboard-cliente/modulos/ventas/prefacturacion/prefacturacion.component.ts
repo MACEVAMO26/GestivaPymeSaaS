@@ -20,6 +20,7 @@ export class PrefacturacionComponent implements OnInit {
   private toast = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
 
+  // --- VARIABLES DE ESTADO ---
   activeTab: string = 'caja';
 
   cajas: Caja[] = [];
@@ -63,9 +64,12 @@ export class PrefacturacionComponent implements OnInit {
   guardando: boolean = false;
   cargando = false;
 
+  // Bloque de ciclo de vida OnInit para cargar cajas y prefacturas
   ngOnInit() {
-    this.cargarCajas();
-    this.cargarPrefacturas();
+    this.// Bloque para consultar el estado actual de las cajas
+  cargarCajas();
+    this.// Bloque para consultar las cotizaciones y prefacturas pendientes
+  cargarPrefacturas();
   }
 
   cargarCajas() {
@@ -90,6 +94,7 @@ export class PrefacturacionComponent implements OnInit {
     });
   }
 
+  // Bloque para consultar los movimientos registrados en la caja activa
   cargarMovimientos(cajaId: number) {
     this.cajaService.getMovimientos(cajaId).pipe(timeout(15000)).subscribe({
       next: (res) => {
@@ -122,21 +127,25 @@ export class PrefacturacionComponent implements OnInit {
     });
   }
 
+  // Bloque para alternar entre pestañas de prefacturación y caja
   switchTab(tab: string) {
     this.activeTab = tab;
     if (tab === 'caja') this.cargarCajas();
     if (tab === 'prefacturas') this.cargarPrefacturas();
   }
 
+  // Bloque para abrir el modal de apertura de caja
   abrirCajaModal() {
     this.montoApertura = 0;
     this.showModalApertura = true;
   }
 
+  // Bloque para cerrar el modal de apertura de caja
   cerrarCajaModal() {
     this.showModalApertura = false;
   }
 
+  // Bloque para validar y registrar la apertura de caja en el backend
   confirmarApertura() {
     this.guardando = true;
     this.cajaService.crearCaja(this.montoApertura || 0).pipe(timeout(10000)).subscribe({
@@ -162,14 +171,17 @@ export class PrefacturacionComponent implements OnInit {
     });
   }
 
+  // Bloque para abrir el diálogo de arqueo y cierre de caja
   abrirCierreModal() {
     this.showModalCierre = true;
   }
 
+  // Bloque para cerrar el diálogo de cierre
   cerrarCierreModal() {
     this.showModalCierre = false;
   }
 
+  // Bloque para procesar el balance y cerrar la caja activa
   confirmarCierre() {
     if (!this.cajaActiva?.id) return;
     this.guardando = true;
@@ -198,6 +210,7 @@ export class PrefacturacionComponent implements OnInit {
     });
   }
 
+  // Bloque para registrar un movimiento manual de caja
   registrarMovimiento() {
     if (!this.conceptoMovimiento || this.montoMovimiento <= 0) {
       this.toast.warning('Complete el monto y concepto');
@@ -237,16 +250,19 @@ export class PrefacturacionComponent implements OnInit {
     });
   }
 
+  // Bloque para determinar la clase cromática del badge según el estado
   getBadgeClass(estado: string): string {
     if (estado === 'aprobado' || estado === 'Procesada') return 'badge-aprobada';
     if (estado === 'rechazado' || estado === 'Rechazada') return 'badge-rechazada';
     return 'badge-pendiente';
   }
 
+  // Bloque utilitario para formatear la fecha del movimiento
   fechaMovimiento(mov: any): string {
     return mov.fecha_hora || mov.created_at || mov.fecha || '';
   }
 
+  // Bloque utilitario para resolver el nombre del cliente en la prefactura
   nombreClientePref(pref: any): string {
     if (pref.cliente?.razon_social) return pref.cliente.razon_social;
     if (pref.cliente?.nombre) return pref.cliente.nombre;
@@ -254,18 +270,22 @@ export class PrefacturacionComponent implements OnInit {
     return '-';
   }
 
+  // Bloque utilitario para formatear el consecutivo de la prefactura
   consecutivoPref(pref: any): string {
     return pref.consecutivo || `PRE-${String(pref.id).padStart(4, '0')}`;
   }
 
+  // Bloque utilitario para obtener la fecha de emisión
   fechaPref(pref: any): string {
     return pref.fecha_hora || pref.fecha || '';
   }
 
+  // Bloque utilitario para obtener el estado de la prefactura
   estadoPref(pref: any): string {
     return pref.estado || 'Pendiente';
   }
 
+  // Bloque para liquidar y emitir la factura final desde la prefactura
   generarDocumento(id?: number) {
     if (!id) return;
     this.prefacturacionService.cambiarEstado(id, 'aprobado').pipe(timeout(10000)).subscribe({

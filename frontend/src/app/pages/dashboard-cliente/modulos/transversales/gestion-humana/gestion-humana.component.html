@@ -1,7 +1,7 @@
 <div class="gestion-humana-container fade-in">
   <div [hidden]="(isContratoModalOpen && empleadoContrato) || isNovedadModalOpen" class="main-view-wrapper">
 
-  <!-- ENCABEZADO -->
+  <!-- HTML ENCABEZADO -->
   <div class="module-header text-center mb-4 relative">
     <h1 class="titulo-principal">GESTIÓN HUMANA</h1>
     <p class="descripcion-general">Administra contratos, perfiles laborales y novedades del personal.</p>
@@ -11,7 +11,7 @@
         <i class="fas fa-file-excel icon-mr-5"></i> Exportar a Excel
       </button>
       <button class="btn-general-2 btn-pill" (click)="abrirModuloTiempo()">
-        <svg class="icon" style="width:16px;height:16px;margin-right:5px;" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <svg class="icon icon-svg-16" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
         </svg>
         Módulo de Gestión de Tiempos
@@ -19,36 +19,35 @@
     </div>
   </div>
 
-  <!-- NAVEGACIÓN TABS -->
+  <!-- HTML NAVEGACION DE PESTAÑAS -->
   <div class="tabs-nav-wrapper">
-    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'pendientes'" (click)="setTab('pendientes')"> <span class="icon">⏳</span> Solicitudes <span class="badge badge-pendiente" *ngIf="vacacionesPendientes.length > 0" style="margin-left: 5px;">{{vacacionesPendientes.length}}</span> </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'pendientes'" (click)="setTab('pendientes')"> <span class="icon">⏳</span> Solicitudes <span class="badge badge-pendiente ml-1" *ngIf="vacacionesPendientes.length > 0">{{vacacionesPendientes.length}}</span> </button>
     <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'activos'" (click)="setTab('activos')"> <span class="icon">✅</span> Personal Activo </button>
     <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'inactivos'" (click)="setTab('inactivos')"> <span class="icon">✅</span> Inactivos </button>
     <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'ausentes'" (click)="setTab('ausentes')"> <span class="icon">🏖️</span> Ausentes / Vacaciones </button>
-    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'contratos'" (click)="setTab('contratos')"> <span class="icon">📑</span> Contratos <span class="badge badge-pendiente" *ngIf="alertasContratos > 0" style="margin-left: 5px;">{{alertasContratos}}</span> </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'contratos'" (click)="setTab('contratos')"> <span class="icon">📑</span> Contratos <span class="badge badge-pendiente ml-1" *ngIf="alertasContratos > 0">{{alertasContratos}}</span> </button>
     
     
     
     <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'configuracion'" (click)="setTab('configuracion')"> <span class="icon">📌</span> Configuración </button>
   </div>
 
-  <!-- CONTENIDO DE TABS -->
+  <!-- HTML CONTENIDO DE PESTAÑAS -->
   <div class="tab-content neumorphic-panel-inner p-4">
-    <!-- Botón Volver Inyectado -->
+    <!-- HTML BOTON VOLVER -->
     <div class="volver-wrapper">
       <button class="btn-volver btn-pill" appVolver>
         <i class="fas fa-arrow-left"></i> Volver
       </button>
     </div>
 
-    <!-- BARRA DE BÚSQUEDA GLOBAL DE EMPLEADOS -->
-    <div class="search-filter-bar mb-4" *ngIf="currentTab === 'activos' || currentTab === 'inactivos' || currentTab === 'ausentes'" style="display: flex; gap: 1rem; align-items: center; max-width: 520px; margin: 0 auto 1.5rem auto;">
-      <div style="position: relative; width: 100%;">
-        <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #2d3748; font-size: 14px;"></i>
+    <!-- HTML BARRA DE BUSQUEDA GLOBAL DE EMPLEADOS -->
+    <div class="search-filter-bar search-bar-520 mb-4" *ngIf="currentTab === 'activos' || currentTab === 'inactivos' || currentTab === 'ausentes'">
+      <div class="search-rel-box">
+        <i class="fas fa-search search-icon-input"></i>
         <input
           type="text"
-          class="input-neumorphic"
-          style="padding-left: 36px; padding-right: 36px;"
+          class="input-neumorphic search-input-padded"
           placeholder="Buscar empleado por nombre, documento, cargo o área..."
           [(ngModel)]="searchTerm"
           (ngModelChange)="onSearchTermChange()"
@@ -57,7 +56,7 @@
           *ngIf="searchTerm"
           type="button"
           (click)="limpiarBusqueda()"
-          style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #2d3748; cursor: pointer; font-size: 14px;"
+          class="search-clear-input-btn"
           title="Limpiar búsqueda"
         >
           <i class="fas fa-times"></i>
@@ -65,7 +64,7 @@
       </div>
     </div>
 
-  <!-- TAB SOLICITUDES -->
+  <!-- HTML PESTAÑA SOLICITUDES DE VACACIONES -->
   <div class="neumorphic-panel fade-in" *ngIf="currentTab === 'pendientes'">
     <h2 class="subtitulo">SOLICITUDES DE VACACIONES PENDIENTES</h2>
     <div class="table-container">
@@ -87,7 +86,7 @@
               <td>{{ vac.tipo }}</td>
               <td>{{ vac.observaciones || 'Ninguna' }}</td>
               <td class="text-center">
-                <div class="acciones-fila" style="justify-content: center;">
+                <div class="acciones-fila justify-center">
                   <button class="btn-action-circle" (click)="abrirModalVacaciones(vac)" title="Revisar Solicitud de Vacaciones" aria-label="Revisar Solicitud">
                     <i class="fas fa-clipboard-check"></i>
                   </button>
@@ -97,7 +96,7 @@
           }
           @if (vacacionesPendientes.length === 0) {
             <tr>
-              <td colspan="5" class="text-center" style="padding: 2rem;">No hay solicitudes de vacaciones pendientes.</td>
+              <td colspan="5" class="text-center p-8">No hay solicitudes de vacaciones pendientes.</td>
             </tr>
           }
         </tbody>
@@ -120,7 +119,7 @@
     }
   </div>
 
-  <!-- TAB ACTIVOS -->
+  <!-- HTML PESTAÑA EMPLEADOS ACTIVOS -->
   <div class="neumorphic-panel fade-in" *ngIf="currentTab === 'activos'">
     <h2 class="subtitulo">PERSONAL ACTIVO</h2>
     <div class="table-container">
@@ -149,7 +148,7 @@
                 <span class="badge badge-baja" *ngIf="emp.baja_solicitada">BAJA EN PROCESO</span>
               </td>
               <td class="text-center">
-                <div class="acciones-fila" style="justify-content: center;">
+                <div class="acciones-fila justify-center">
                   <button class="btn-action-circle" (click)="verDetalles(emp)" [title]="empleadoExpandido?.id === emp.id ? 'Ocultar Expediente' : 'Ver Expediente Digital'" aria-label="Expediente Digital">
                     <i class="fas" [ngClass]="empleadoExpandido?.id === emp.id ? 'fa-eye-slash' : 'fa-id-card'"></i>
                   </button>
@@ -159,13 +158,13 @@
                 </div>
               </td>
             </tr>
-            <!-- EXPEDIENTE DIGITAL (expandible) -->
+            <!-- HTML EXPEDIENTE DIGITAL EXPANDIBLE -->
             <tr *ngIf="empleadoExpandido?.id === emp.id">
               <td colspan="7" class="expediente-cell">
                 <div class="expediente-panel neumorphic-panel-inner">
                   <h3 class="subtitulo">EXPEDIENTE DIGITAL DE {{ nombreCompletoUsuario(emp.usuario) }}</h3>
 
-                  <!-- SUBIR DOCUMENTO -->
+                  <!-- HTML SUBIR DOCUMENTO -->
                   <div class="expediente-upload">
                     <div class="form-group">
                       <label class="form-label">Nombre del documento</label>
@@ -188,7 +187,7 @@
                     </div>
                   </div>
 
-                  <!-- DOCUMENTOS AGRUPADOS POR CATEGORÍA -->
+                  <!-- HTML DOCUMENTOS AGRUPADOS POR CATEGORIA -->
                   <div class="expediente-grupos">
                     <div *ngFor="let grupo of categoriasConDocumentos" class="expediente-grupo">
                       <h4 class="expediente-categoria">{{ grupo.categoria }} <span class="badge badge-pendiente">{{ grupo.docs.length }}</span></h4>
@@ -202,7 +201,7 @@
                         </li>
                       </ul>
                     </div>
-                    <p *ngIf="documentosEmpleado.length === 0" class="texto-normal" style="text-align:center;padding:1rem;">
+                    <p *ngIf="documentosEmpleado.length === 0" class="texto-normal text-center p-4">
                       Aún no hay documentos en el expediente de este empleado.
                     </p>
                   </div>
@@ -211,13 +210,13 @@
             </tr>
           </ng-container>
           <tr *ngIf="empleadosActivos.length === 0">
-            <td colspan="7" class="text-center" style="padding: 2rem;">No hay empleados activos en el sistema.</td>
+            <td colspan="7" class="text-center p-8">No hay empleados activos en el sistema.</td>
           </tr>
           <tr *ngIf="empleadosActivos.length > 0 && empleadosActivosFiltrados.length === 0">
-            <td colspan="7" class="text-center" style="padding: 2rem;">
+            <td colspan="7" class="text-center p-8">
               No se encontraron empleados activos con "{{ searchTerm }}".
               <br>
-              <button class="btn-pill mt-2" (click)="limpiarBusqueda()" style="background: #45a1ae; color: white; padding: 4px 12px; font-size: 14px; border: none; border-radius: 9999px; cursor: pointer;">
+              <button class="btn-pill mt-2 btn-reset-search" (click)="limpiarBusqueda()">
                 Limpiar búsqueda
               </button>
             </td>
@@ -242,7 +241,7 @@
     }
   </div>
 
-  <!-- TAB INACTIVOS -->
+  <!-- HTML PESTAÑA EMPLEADOS INACTIVOS -->
   <div class="neumorphic-panel fade-in" *ngIf="currentTab === 'inactivos'">
     <h2 class="subtitulo">PERSONAL INACTIVO</h2>
     <div class="table-container">
@@ -270,15 +269,15 @@
           }
           @if (empleadosInactivos.length === 0) {
             <tr>
-              <td colspan="6" class="text-center" style="padding: 2rem;">No hay empleados inactivos.</td>
+              <td colspan="6" class="text-center p-8">No hay empleados inactivos.</td>
             </tr>
           }
           @if (empleadosInactivos.length > 0 && empleadosInactivosFiltrados.length === 0) {
             <tr>
-              <td colspan="6" class="text-center" style="padding: 2rem;">
+              <td colspan="6" class="text-center p-8">
                 No se encontraron empleados inactivos con "{{ searchTerm }}".
                 <br>
-                <button class="btn-pill mt-2" (click)="limpiarBusqueda()" style="background: #45a1ae; color: white; padding: 4px 12px; font-size: 14px; border: none; border-radius: 9999px; cursor: pointer;">
+                <button class="btn-pill mt-2 btn-reset-search" (click)="limpiarBusqueda()">
                   Limpiar búsqueda
                 </button>
               </td>
@@ -304,12 +303,12 @@
     }
   </div>
 
-  <!-- TAB AUSENTES -->
+  <!-- HTML PESTAÑA EMPLEADOS AUSENTES -->
   <div class="neumorphic-panel fade-in" *ngIf="currentTab === 'ausentes'">
-    <div class="flex-between mb-3" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div class="flex-between flex-between-wrap-gap mb-3">
       <div>
-        <h2 class="subtitulo" style="margin: 0;">PERSONAL AUSENTE Y NOVEDADES LABORALES</h2>
-        <p class="descripcion-general" style="text-align: left; margin-bottom: 0;">
+        <h2 class="subtitulo m-0">PERSONAL AUSENTE Y NOVEDADES LABORALES</h2>
+        <p class="descripcion-general text-left mb-0">
           Registro y seguimiento de ausencias justificadas (Vacaciones, Incapacidades Médicas, Licencias y Permisos).
         </p>
       </div>
@@ -345,7 +344,7 @@
               </td>
               <td>{{ obtenerMotivoAusencia(emp) }}</td>
               <td class="text-center">
-                <div class="acciones-fila" style="justify-content: center;">
+                <div class="acciones-fila justify-center">
                   <button class="btn-action-circle text-success" (click)="reincorporarEmpleado(emp)" title="Reincorporar a estado Activo" aria-label="Reincorporar a estado Activo">
                     <i class="fas fa-user-check"></i>
                   </button>
@@ -355,15 +354,15 @@
           }
           @if (empleadosAusentes.length === 0) {
             <tr>
-              <td colspan="7" class="text-center" style="padding: 2rem;">No hay empleados ausentes en este momento.</td>
+              <td colspan="7" class="text-center p-8">No hay empleados ausentes en este momento.</td>
             </tr>
           }
           @if (empleadosAusentes.length > 0 && empleadosAusentesFiltrados.length === 0) {
             <tr>
-              <td colspan="7" class="text-center" style="padding: 2rem;">
+              <td colspan="7" class="text-center p-8">
                 No se encontraron empleados ausentes con "{{ searchTerm }}".
                 <br>
-                <button class="btn-pill mt-2" (click)="limpiarBusqueda()" style="background: #45a1ae; color: white; padding: 4px 12px; font-size: 14px; border: none; border-radius: 9999px; cursor: pointer;">
+                <button class="btn-pill mt-2 btn-reset-search" (click)="limpiarBusqueda()">
                   Limpiar búsqueda
                 </button>
               </td>
@@ -389,7 +388,7 @@
     }
   </div>
 
-  <!-- TAB CONTRATOS -->
+  <!-- HTML PESTAÑA CONTRATOS -->
   <div class="neumorphic-panel fade-in" *ngIf="currentTab === 'contratos'">
     <h2 class="subtitulo">CONTRATOS DEL PERSONAL</h2>
 
@@ -426,7 +425,7 @@
               <td>{{ emp.fecha_fin_contrato ? (emp.fecha_fin_contrato | date:'shortDate') : '—' }}</td>
               <td><span class="badge" [ngClass]="claseContrato(emp)">{{ etiquetaContrato(emp) }}</span></td>
               <td class="text-center">
-                <div class="acciones-fila" style="justify-content: center;">
+                <div class="acciones-fila justify-center">
                   <button class="btn-action-circle" (click)="abrirModalContrato(emp)" title="Editar Contrato" aria-label="Editar Contrato">
                     <i class="fas fa-edit"></i>
                   </button>
@@ -439,7 +438,7 @@
           }
           @if (todosEmpleados.length === 0) {
             <tr>
-              <td colspan="9" class="text-center" style="padding: 2rem;">No hay empleados registrados.</td>
+              <td colspan="9" class="text-center p-8">No hay empleados registrados.</td>
             </tr>
           }
         </tbody>
@@ -462,10 +461,10 @@
     }
   </div>
 
-  <!-- TAB CONFIGURACION -->
+  <!-- HTML PESTAÑA CONFIGURACION EMPRESA -->
   <div class="neumorphic-panel fade-in" *ngIf="currentTab === 'configuracion'">
     <h2 class="subtitulo">CONFIGURACIÓN DE SEGURIDAD SOCIAL</h2>
-    <p class="descripcion-general" style="text-align: left;">Establezca la ARL y la Caja de Compensación para toda la empresa.</p>
+    <p class="descripcion-general text-left">Establezca la ARL y la Caja de Compensación para toda la empresa.</p>
     
     <form (ngSubmit)="guardarConfiguracionRRHH()">
       <div class="form-row-divider">
@@ -478,7 +477,7 @@
           <input type="text" class="input-neumorphic" name="caja_compensacion" [(ngModel)]="configuracionRRHH.caja_compensacion" placeholder="Ej. Comfama" required>
         </div>
       </div>
-      <div class="acciones-centro" style="margin-top: 2rem;">
+      <div class="acciones-centro mt-8">
         <button type="submit" class="btn-save btn-pill" [disabled]="isConfigSubmitting">Guardar Configuración</button>
       </div>
     </form>
@@ -487,10 +486,10 @@
 
   </div>
 
-  <!-- PANEL EDITAR CONTRATO -->
+  <!-- HTML PANEL EDITAR CONTRATO -->
   @if (isContratoModalOpen && empleadoContrato) {
   <div class="view-switch-panel fade-in">
-    <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+    <div class="neu-card card-max-800">
       <div class="text-center mb-4">
         <h3 class="titulo-principal">EDITAR CONTRATO</h3>
         <p class="texto-normal">{{ nombreCompletoUsuario(empleadoContrato.usuario) }}</p>
@@ -523,7 +522,7 @@
             <input type="number" class="input-neumorphic" name="salario" [(ngModel)]="contratoForm.salario">
           </div>
         </div>
-        <div class="acciones-centro" style="margin-top: 2rem;">
+        <div class="acciones-centro mt-8">
           <button type="button" class="btn-general-5 btn-pill btn-action" (click)="cerrarModalContrato()">Cancelar</button>
           <button type="submit" class="btn-save btn-pill btn-action" [disabled]="isSubmitting">
             @if (isSubmitting) { <span class="spinner-small"></span> } @else { Guardar }
@@ -534,16 +533,16 @@
   </div>
   }
 
-  <!-- SUB-PÁGINA DEDICADA REGISTRAR NOVEDAD / AUSENCIA -->
+  <!-- HTML SECCION REGISTRAR NOVEDAD O AUSENCIA -->
   @if (isNovedadModalOpen) {
   <div class="view-switch-panel fade-in">
-    <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+    <div class="neu-card card-max-800">
       <div class="panel-header mb-4">
         <h1>REGISTRAR NOVEDAD / AUSENCIA LABORAL</h1>
         <button class="btn-close" (click)="cerrarModalNovedad()">&times;</button>
       </div>
 
-      <p class="descripcion-general mb-3" style="text-align: left;">
+      <p class="descripcion-general text-left mb-3">
         Registra una ausencia justificada con su respectivo soporte y motivo válido para el control del personal.
       </p>
 

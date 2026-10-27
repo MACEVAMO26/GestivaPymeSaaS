@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class NotificacionController extends Controller
 {
-    // Trae todas las notificaciones del usuario logueado
+    // Bloque para obtener todas las notificaciones del usuario autenticado
     public function index()
     {
         $misNotificaciones = Notificacion::where('usuario_id', Auth::id())
@@ -18,7 +18,7 @@ class NotificacionController extends Controller
         return response()->json($misNotificaciones);
     }
 
-    // Crea una nueva notificacion en la base de datos
+    // Bloque para registrar una nueva notificación en la base de datos
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -33,7 +33,7 @@ class NotificacionController extends Controller
         return response()->json($notificacion, 201);
     }
 
-    // Marca la notificación como leída
+    // Bloque para marcar una notificación específica como leída
     public function marcarLeida(int $id)
     {
         $notificacion = Notificacion::where('usuario_id', Auth::id())->findOrFail($id);

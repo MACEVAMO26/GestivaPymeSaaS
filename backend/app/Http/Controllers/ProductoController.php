@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Auth;
 use App\Models\Producto;
 use App\Models\Inventario;
@@ -11,6 +10,7 @@ use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class ProductoController extends Controller
 {
+    // Bloque para listar los productos activos pertenecientes a la empresa autenticada
     public function index()
     {
         $user = Auth::user();
@@ -27,8 +27,10 @@ class ProductoController extends Controller
         return response()->json($productos);
     }
 
+    // Bloque para registrar un nuevo producto en catálogo con inventario inicial
     public function store(Request $request)
     {
+        // Bloque de reglas de validación
         $request->validate([
             'categoria_id' => 'required|exists:categorias,id',
             'nombre' => 'required|string|max:255',
@@ -51,9 +53,10 @@ class ProductoController extends Controller
             $data['imagen_url'] = $uploadedFileUrl;
         }
 
+        // Bloque de guardado en BD
         $producto = Producto::create($data);
 
-        // Crear registro en inventario inicial
+        // Bloque para inicializar las existencias en inventario
         Inventario::create([
             'producto_id' => $producto->id,
             'stock_actual' => $producto->stock_inicial,
@@ -67,14 +70,17 @@ class ProductoController extends Controller
         ], 201);
     }
 
+    // Bloque para consultar el detalle de un producto específico
     public function show($id)
     {
         $producto = Producto::with('categoria')->findOrFail($id);
         return response()->json($producto);
     }
 
+    // Bloque para actualizar los datos comerciales y catálogo de un producto
     public function update(Request $request, $id)
     {
+        // Bloque de reglas de validación
         $request->validate([
             'categoria_id' => 'sometimes|exists:categorias,id',
             'nombre' => 'sometimes|string|max:255',
@@ -93,6 +99,7 @@ class ProductoController extends Controller
             $data['imagen_url'] = $uploadedFileUrl;
         }
 
+        // Bloque de guardado en BD
         $producto->update($data);
 
         return response()->json([
@@ -101,11 +108,13 @@ class ProductoController extends Controller
         ]);
     }
 
+    // Bloque para inactivar lógicamente un producto del catálogo
     public function destroy($id)
     {
         $producto = Producto::findOrFail($id);
         $producto->activo = false;
         $producto->inactive_at = now();
+        // Bloque de guardado en BD
         $producto->save();
 
         return response()->json(['message' => 'Producto eliminado correctamente']);

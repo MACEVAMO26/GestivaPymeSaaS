@@ -17,12 +17,14 @@ import { ToastService } from '../../../../../../services/toast.service';
   styleUrl: './admin-empresa.scss',
 })
 export class AdminEmpresa implements OnInit {
+  // --- INYECCION DE DEPENDENCIAS Y SERVICIOS ---
   private empresaService = inject(EmpresaService);
   private authService = inject(AuthService);
   private soporteService = inject(SoporteService);
   private toastService = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
 
+  // --- VARIABLES DE ESTADO Y FORMULARIO ---
   empresaData: any = {
     nombre: '',
     nit: '',
@@ -35,40 +37,36 @@ export class AdminEmpresa implements OnInit {
 
   isLoading = true;
   isSaving = false;
-
   logoSeleccionado: File | null = null;
   logoPreview: string | null = null;
-  
   toasts: any[] = [];
 
+  // Bloque de ciclo de vida para inicializar y cargar la empresa
   ngOnInit(): void {
     this.cargarEmpresa();
   }
 
+  // Bloque para cargar la informacion de la empresa actual
   cargarEmpresa() {
     this.isLoading = true;
     const currentUser = this.authService.getUser();
     if (currentUser && currentUser.empresa_id) {
       this.empresaService.getEmpresa(currentUser.empresa_id).subscribe({
         next: (data) => {
-          // Aseguramos que data sea un objeto válido
           this.empresaData = data || {};
-          
-          // Mapeos de base de datos a frontend para que no falten propiedades
           this.empresaData.nombre = data?.razon_social || '';
           this.empresaData.nit = data?.nit || '';
           this.empresaData.direccion = data?.direccion || '';
           this.empresaData.telefono = data?.telefono || '';
           this.empresaData.tipo_empresa = data?.tipo_empresa || 'Servicios';
-          
           this.isLoading = false;
-          this.cdr.detectChanges(); // Forzar actualización de la vista
+          this.cdr.detectChanges();
         },
         error: (err) => {
           console.error('[AdminEmpresa] Error al cargar empresa:', err);
           this.mostrarToast('Error al cargar datos', 'error', 'No se pudo conectar con el servidor.');
           this.isLoading = false;
-          this.cdr.detectChanges(); // Forzar actualización de la vista
+          this.cdr.detectChanges();
         }
       });
     } else {
@@ -76,6 +74,7 @@ export class AdminEmpresa implements OnInit {
     }
   }
 
+  // Bloque para capturar el logo seleccionado y generar previsualizacion
   onLogoSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
@@ -89,6 +88,7 @@ export class AdminEmpresa implements OnInit {
     }
   }
 
+  // Bloque para guardar los cambios de la empresa o enviar solicitud de logo
   guardarCambios() {
     if (!this.empresaData.nombre || !this.empresaData.nit) {
       this.mostrarToast('Campos Incompletos', 'warning', 'Por favor llena los campos obligatorios.');
@@ -98,8 +98,6 @@ export class AdminEmpresa implements OnInit {
     this.isSaving = true;
     const currentUser = this.authService.getUser();
 
-    // Si se seleccionó un nuevo logo, se envía como solicitud administrativa
-    // y el administrador del SaaS debe aprobarlo antes de aplicarse.
     if (this.logoSeleccionado) {
       const formData = new FormData();
       formData.append('tipo', 'cambio_datos');
@@ -136,7 +134,7 @@ export class AdminEmpresa implements OnInit {
     const payload = {
       ...this.empresaData,
       razon_social: this.empresaData.nombre,
-      tipo_empresa: this.empresaData.tipo_empresa || 'Servicios' // Fallback si no está
+      tipo_empresa: this.empresaData.tipo_empresa || 'Servicios'
     };
     
     this.empresaService.updateEmpresa(currentUser.empresa_id, payload).pipe(timeout(10000)).subscribe({
@@ -157,18 +155,18 @@ export class AdminEmpresa implements OnInit {
     });
   }
 
-  // --- Sistema Neumórfico de Toasts ---
+  // Bloque para mostrar notificaciones toast en interfaz neumorfica
   mostrarToast(titulo: string, tipo: 'success'|'error'|'warning'|'info', descripcion?: string) {
     const nuevoToast = { id: Date.now(), titulo, tipo, descripcion };
-    this.toasts.unshift(nuevoToast); // Agregar al inicio de la pila
+    this.toasts.unshift(nuevoToast);
     this.toastService.show(descripcion ? `${titulo}: ${descripcion}` : titulo, tipo);
 
-    // Desaparecer automáticamente después de 4 segundos
     setTimeout(() => {
       this.cerrarToast(nuevoToast.id);
     }, 4000);
   }
 
+  // Bloque para cerrar una notificacion toast especifica
   cerrarToast(id: number) {
     this.toasts = this.toasts.filter(t => t.id !== id);
   }

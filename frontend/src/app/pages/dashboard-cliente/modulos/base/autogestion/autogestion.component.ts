@@ -26,11 +26,11 @@ export class AutogestionComponent implements OnInit {
   user: any; // Mapeado del auth service
   pestanaActual = 'vacaciones'; // 'vacaciones' | 'turnos' | 'documentos'
   
-  // Perfil / Avatar
+  // Bloque de datos de perfil y avatar
   profileImageUrl: string | null = null;
   isUploadingAvatar = false;
 
-  // Afiliaciones
+  // Bloque de datos de afiliaciones
   afiliacion: any = {};
   formAfiliacion: any = { estado: 'nuevo' };
   isHR = false;
@@ -40,11 +40,11 @@ export class AutogestionComponent implements OnInit {
   moduloRRHH = false;
   archivoAfiliacion: File | null = null;
 
-  // ARL y Caja de Compensación global de la empresa (configurada por RRHH)
+  // Bloque de datos globales de ARL y Caja de Compensación de la empresa
   arlEmpresa: string | null = null;
   cajaCompensacionEmpresa: string | null = null;
 
-  // Vacaciones
+  // Bloque de datos de vacaciones
   misVacaciones: any[] = [];
   nuevaVacacion = {
     fecha_inicio: '',
@@ -69,28 +69,30 @@ export class AutogestionComponent implements OnInit {
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   }
 
+  // Bloque para calcular automáticamente la fecha de fin y reincorporación de vacaciones
   onFechaInicioChange() {
     if (this.nuevaVacacion.fecha_fin && this.nuevaVacacion.fecha_fin <= this.nuevaVacacion.fecha_inicio) {
       this.nuevaVacacion.fecha_fin = '';
     }
   }
 
-  // Documentos
+  // Bloque de documentos
   misDocumentos: any[] = [];
   archivoSeleccionado: File | null = null;
   nombreArchivo = '';
 
-  // Turnos
+  // Bloque de turnos
   misTurnos: any[] = [];
 
   cargando = false;
   guardando = false;
 
+  // Bloque de ciclo de vida para inicializar el módulo de autogestión
   ngOnInit() {
     this.usuarioActual = this.authService.getUser();
     this.user = this.usuarioActual;
     
-    // Si el usuario es de Recursos Humanos (Jefe de Area)
+    // Bloque de verificación de rol de Recursos Humanos
     this.isHR = this.user?.rol?.nombre === 'Jefe de Área';
     
     this.cargarVacaciones();
@@ -98,7 +100,8 @@ export class AutogestionComponent implements OnInit {
     this.cargarAfiliacion();
   }
 
-  // --- AVATAR ---
+  // --- GESTION DE AVATAR ---
+  // Bloque para procesar y subir la nueva foto de perfil del usuario
   onFileSelected(event: any) {
     if (event.target.files.length > 0) {
       this.isUploadingAvatar = true;
@@ -113,6 +116,7 @@ export class AutogestionComponent implements OnInit {
     }
   }
 
+  // Bloque para cambiar entre pestañas de autogestión
   cambiarPestana(pestana: string) {
     this.pestanaActual = pestana;
     if (pestana === 'vacaciones') this.cargarVacaciones();
@@ -120,14 +124,15 @@ export class AutogestionComponent implements OnInit {
     if (pestana === 'turnos') this.cargarTurnos();
   }
 
-  // --- AFILIACIONES ---
+  // --- GESTION DE AFILIACIONES ---
+  // Bloque para cargar la información de afiliaciones del usuario autenticado
   cargarAfiliacion() {
     if (!this.usuarioActual) return;
     this.empleadoService.getMisAfiliaciones().pipe(timeout(15000)).subscribe({
       next: (res) => {
         this.afiliacion = res.afiliacion || {};
         this.moduloRRHH = !!res.modulo_rrhh_activo;
-        // Datos globales de Seguridad Social configurados por RRHH para todos los empleados
+        // Bloque de carga de datos globales de Seguridad Social
         this.arlEmpresa = res.arl_empresa || null;
         this.cajaCompensacionEmpresa = res.caja_compensacion_empresa || null;
         const af = this.afiliacion;
@@ -166,10 +171,12 @@ export class AutogestionComponent implements OnInit {
     return this.afiliacion?.veces_modificada || 0;
   }
 
+  // Bloque para seleccionar archivo de soporte de afiliación
   onAfiliacionFileSelected(event: any) {
     this.archivoAfiliacion = event.target.files[0] || null;
   }
 
+  // Bloque para enviar solicitud de actualización de afiliaciones con soporte
   guardarAfiliaciones() {
     if (!this.puedeModificarAfiliaciones) {
       this.toast.warning('Límite alcanzado: las afiliaciones solo pueden modificarse 2 veces. Contacta a Gestión Humana o Gerencia.');
@@ -214,6 +221,7 @@ export class AutogestionComponent implements OnInit {
     });
   }
 
+  // Bloque administrativo para que RRHH apruebe o rechace afiliaciones
   gestionarAfiliacionAdmin() {
     if (!this.usuarioActual?.id) return;
     this.isSavingAdmin = true;
@@ -265,10 +273,10 @@ export class AutogestionComponent implements OnInit {
         const file = new Blob([blob], { type: 'application/pdf' });
         const fileURL = URL.createObjectURL(file);
         
-        // Abrir en nueva pestaña para vista previa e impresión
+        // Bloque para abrir el documento en nueva pestaña
         window.open(fileURL, '_blank');
         
-        // Descargar automáticamente como archivo PDF
+        // Bloque para descargar automáticamente el archivo PDF
         const a = document.createElement('a');
         a.href = fileURL;
         a.download = `Certificado_Laboral_${this.usuarioActual.documento || this.usuarioActual.id}.pdf`;
@@ -287,11 +295,13 @@ export class AutogestionComponent implements OnInit {
     });
   }
 
+  // Bloque para descargar el contrato laboral firmado en PDF
   descargarContrato() {
     this.toast.success('Descargando copia del contrato...');
   }
 
-  // --- VACACIONES ---
+  // --- GESTION DE VACACIONES ---
+  // Bloque para cargar el historial de vacaciones y días hábiles disponibles
   cargarVacaciones() {
     if (!this.usuarioActual) return;
     this.cargando = true;
@@ -312,6 +322,7 @@ export class AutogestionComponent implements OnInit {
     });
   }
 
+  // Bloque para solicitar días de vacaciones laborales
   solicitarVacaciones() {
     if (!this.nuevaVacacion.fecha_inicio || !this.nuevaVacacion.fecha_fin) {
       this.toast.warning('Complete las fechas de inicio y fin');
@@ -349,7 +360,8 @@ export class AutogestionComponent implements OnInit {
     });
   }
 
-  // --- DOCUMENTOS ---
+  // --- GESTION DE DOCUMENTOS ---
+  // Bloque para cargar los documentos laborales del empleado
   cargarDocumentos() {
     this.cargando = true;
     this.empleadoService.getMisDocumentos().pipe(timeout(15000)).subscribe({
@@ -364,6 +376,7 @@ export class AutogestionComponent implements OnInit {
     });
   }
 
+  // Bloque para subir un nuevo documento laboral con archivo adjunto
   subirDocumento() {
     if (!this.archivoSeleccionado || !this.nombreArchivo || !this.usuarioActual) {
       this.toast.warning('Complete nombre y seleccione un archivo');
@@ -390,6 +403,7 @@ export class AutogestionComponent implements OnInit {
     });
   }
 
+  // Bloque para eliminar un documento laboral existente
   eliminarDocumento(id: number) {
     if (confirm('¿Eliminar este documento?')) {
       this.empleadoService.deleteDocumento(id).subscribe({
@@ -402,7 +416,8 @@ export class AutogestionComponent implements OnInit {
     }
   }
 
-  // --- TURNOS ---
+  // --- GESTION DE TURNOS ---
+  // Bloque para cargar los turnos de trabajo asignados al empleado
   cargarTurnos() {
     this.cargando = true;
     this.tiempoService.getTurnos().subscribe({

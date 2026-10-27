@@ -7,8 +7,7 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class AuthService {
-
-  // 1. URL base de nuestra API en Laravel
+  // --- VARIABLES DE ESTADO ---
   private apiUrl = '/api';
   private heartbeatInterval: any = null;
   private authChannel: BroadcastChannel | null = null;
@@ -36,16 +35,14 @@ export class AuthService {
     }
   }
 
-  // 2. Método para el inicio de sesión
+  // Bloque para iniciar sesión y autenticar usuario
   login(credentials: {email: string, password: string, force_logout?: boolean}): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
       tap(response => {
-        // Si requiere cambio de clave, NO guardamos token ni usuario todavía
         if (response.requires_password_change) {
           return;
         }
 
-        // Si el login es exitoso y normal, guardamos el token y los datos del usuario
         if (response.token && response.user) {
           this.saveToken(response.token);
           this.saveUser(response.user);
@@ -61,24 +58,24 @@ export class AuthService {
     );
   }
 
-  // 2.5 Método para cambiar contraseña inicial
+  // Bloque para cambiar la contraseña inicial obligatoria
   changeInitialPassword(data: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/change-initial-password`, data);
   }
 
-  // 2.6 Método para solicitar recuperación de contraseña
+  // Bloque para solicitar recuperación de contraseña
   recuperarPassword(email: string): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/recuperar-password`, { email });
   }
 
-  // 2.7 Método de verificación de sesión activa (heartbeat / ping)
+  // Bloque para verificar el estado activo de la sesión (heartbeat)
   checkSession(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/session-check`);
   }
 
+  // Bloque para iniciar el monitoreo periódico de sesión activa
   startHeartbeat(): void {
     this.stopHeartbeat();
-    // Ejecutar chequeo cada 20 segundos para detectar si otra sesión cerró la actual
     this.heartbeatInterval = setInterval(() => {
       if (!this.getToken()) {
         this.stopHeartbeat();
@@ -95,6 +92,7 @@ export class AuthService {
     }, 20000);
   }
 
+  // Bloque para detener el monitoreo periódico de sesión
   stopHeartbeat(): void {
     if (this.heartbeatInterval) {
       clearInterval(this.heartbeatInterval);
@@ -102,15 +100,13 @@ export class AuthService {
     }
   }
 
-  // 3. Método para cerrar sesión de forma inmediata
+  // Bloque para cerrar sesión de forma inmediata y revocar token
   logout(redirectToLogin: boolean = true): void {
     this.stopHeartbeat();
     const token = this.getToken();
 
-    // Limpiamos el almacenamiento local de inmediato para no bloquear la interfaz
     this.clearSessionStorage();
 
-    // Revocamos el token en el servidor en segundo plano sin bloquear la navegación
     if (token) {
       this.http.post(`${this.apiUrl}/logout`, {}, {
         headers: { Authorization: `Bearer ${token}` }
@@ -120,13 +116,12 @@ export class AuthService {
       });
     }
 
-    // Redirigimos al usuario a la página de login reemplazando el historial
     if (redirectToLogin) {
       this.router.navigate(['/login'], { replaceUrl: true });
     }
   }
 
-  // Limpia todos los datos de sesión almacenados en el navegador
+  // Bloque para limpiar los datos de sesión almacenados en el navegador
   clearSessionStorage(): void {
     this.stopHeartbeat();
     try {
@@ -134,34 +129,34 @@ export class AuthService {
       sessionStorage.removeItem('current_user');
       sessionStorage.removeItem('modulos_activos');
       localStorage.removeItem('saas_current_view');
+      localStorage.removeItem('gestiva_last_activity');
     } catch (e) {}
   }
 
+  // --- GESTION DE ALMACENAMIENTO LOCAL ---
 
-  // --- Métodos de Ayuda (Helpers) para manejar el Local Storage ---
-
-  // 4. Guardar el token en el Local Storage
+  // Bloque para guardar el token de autenticación
   private saveToken(token: string): void {
     try {
       sessionStorage.setItem('auth_token', token);
     } catch (e) { console.warn('sessionStorage not accessible'); }
   }
 
-  // 5. Obtener el token del Local Storage
+  // Bloque para obtener el token de autenticación almacenado
   getToken(): string | null {
     try {
       return sessionStorage.getItem('auth_token');
     } catch (e) { return null; }
   }
 
-  // 6. Guardar los datos del usuario en el Local Storage
+  // Bloque para guardar los datos del usuario autenticado
   private saveUser(user: any): void {
     try {
       sessionStorage.setItem('current_user', JSON.stringify(user));
     } catch (e) { console.warn('sessionStorage not accessible'); }
   }
 
-  // 7. Obtener los datos del usuario del Local Storage
+  // Bloque para obtener los datos del usuario autenticado
   getUser(): any | null {
     try {
       const user = sessionStorage.getItem('current_user');
@@ -169,18 +164,19 @@ export class AuthService {
     } catch (e) { return null; }
   }
 
+  // Bloque para actualizar los datos del usuario en almacenamiento local
   setUser(userData: any): void {
     sessionStorage.setItem('current_user', JSON.stringify(userData));
   }
 
-  // 8. Guardar modulos activos
+  // Bloque para guardar los módulos activos asignados
   private saveModulosActivos(modulos: any): void {
     try {
       sessionStorage.setItem('modulos_activos', JSON.stringify(modulos));
     } catch (e) { console.warn('sessionStorage not accessible'); }
   }
 
-  // 9. Obtener modulos activos
+  // Bloque para obtener la lista de módulos activos asignados
   getModulosActivos(): Record<string, boolean> | null {
     try {
       const modulosJson = sessionStorage.getItem('modulos_activos');

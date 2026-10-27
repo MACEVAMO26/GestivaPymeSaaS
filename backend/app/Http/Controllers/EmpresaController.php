@@ -13,13 +13,12 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class EmpresaController extends Controller
 {
-    // --- GESTIÓN DE EMPRESAS ---
-    // Obtiene la lista de todas las empresas registradas (incluye el nombre del gerente)
+    // Bloque para obtener la lista de todas las empresas registradas incluyendo el usuario gerente
     public function index()
     {
         $empresas = Empresa::orderBy('created_at', 'asc')->get();
 
-        // Adjunta el gerente de cada empresa para que el SAAS admin pueda pre-cargar sus datos
+        // Bloque para adjuntar el gerente a cada empresa para precarga de datos en el panel SaaS
         $empresas->each(function ($empresa) {
             $rolGerente = \App\Models\Role::where('empresa_id', $empresa->id)
                 ->where('nombre', 'Gerente General')->first();
@@ -41,7 +40,7 @@ class EmpresaController extends Controller
         return response()->json($empresas);
     }
 
-    // Obtiene las estadísticas de suscripciones y la lista detallada de empresas (MRR, clientes, morosos)
+    // Bloque para obtener estadísticas de suscripciones y desglose de empresas
     public function suscripcionesStats()
     {
         $empresas = Empresa::with('tarifasCatalogo')->orderBy('created_at', 'asc')->get();
@@ -55,20 +54,20 @@ class EmpresaController extends Controller
         $lista = $empresas->map(function ($emp) {
             $tipo = $emp->tipo_empresa;
             
-            // Determinar módulos transversales activos basados en el catálogo
+            // Bloque de determinación de módulos transversales activos según catálogo
             $modulosExtra = $emp->tarifasCatalogo->where('tipo', 'modulo_adicional')->count();
             
-            // Addons estructurados desde el catálogo
+            // Bloque de estructuración de addons desde el catálogo de tarifas
             $addons = $emp->tarifasCatalogo->where('tipo', 'addon')->map(function ($t) {
                 return ['nombre' => $t->nombre, 'valor' => $t->pivot->valor_aplicado];
             })->values()->toArray();
 
-            // Descuentos aplicados desde el catálogo
+            // Bloque de cálculo de descuentos aplicados desde el catálogo
             $descuentos = $emp->tarifasCatalogo->where('tipo', 'descuento')->map(function ($t) {
                 return ['descripcion' => $t->nombre, 'porcentaje' => $t->pivot->valor_aplicado];
             })->values()->toArray();
 
-            // Desglose del carrito para el frontend
+            // Bloque de construcción del desglose del carrito de compras para el frontend
             $cartItems = $emp->tarifasCatalogo->map(function ($t) {
                 return [
                     'id' => $t->id,
@@ -77,14 +76,14 @@ class EmpresaController extends Controller
                 ];
             })->values()->toArray();
 
-            // Paquetes adicionales (Gestión Humana, Finanzas, Addons) según el catálogo de tarifas
+            // Bloque de cálculo de paquetes adicionales según catálogo de tarifas
             $tarifasTipos = $emp->tarifasCatalogo->pluck('tipo', 'id');
             $paquetesAdicionales = [];
             if ($tarifasTipos->has('modulo_rrhh')) $paquetesAdicionales[] = 'Gestión Humana';
             if ($tarifasTipos->has('modulo_finanzas')) $paquetesAdicionales[] = 'Finanzas';
             if ($tarifasTipos->where('tipo', 'addon')->count() > 0) $paquetesAdicionales[] = 'Addons';
 
-            // Descuentos definidos desde el formulario de Empresa
+            // Bloque de formateo de descuentos definidos desde el formulario de empresa
             $descuentoEmpresa = ($emp->descuento && $emp->descuento !== 'N/A') ? $emp->descuento : 'Ninguno';
 
             return [
@@ -122,7 +121,7 @@ class EmpresaController extends Controller
         ]);
     }
 
-    // Actualiza las tarifas personalizadas de una empresa (Carrito de compras)
+    // Bloque para actualizar las tarifas y suscripción personalizada de una empresa
     public function updateTarifas(Request $request, $id)
     {
         $request->validate([
@@ -143,28 +142,28 @@ class EmpresaController extends Controller
             $tipoEmpresa = 'Ventas y Servicios';
         }
 
-        // 1. Regla de Validación de Negocio: Módulos Adicionales sólo con paquete base
+        // Bloque de validación de negocio para paquetes base y módulos adicionales
         $hasBasePackage = in_array($tipoEmpresa, ['Ventas', 'Servicios', 'Ventas y Servicios']);
         
         $subtotal = 0.00;
         $descuentoPorcentaje = 0.00;
         $planSeleccionado = 'Mensual';
 
-        // Detach de las tarifas actuales
+        // Bloque de desvinculación de tarifas actuales de la empresa
         $empresa->tarifasCatalogo()->detach();
 
-        // 2. Procesar ítems del carrito
+        // Bloque de procesamiento de ítems del carrito de compras
         foreach ($request->items as $itemData) {
             $tarifa = \App\Models\TarifaCatalogo::findOrFail($itemData['id']);
 
-            // Validar restricción de módulos adicionales
+            // Bloque de validación de restricción de módulos adicionales
             if ($tarifa->tipo === 'modulo_adicional' && !$hasBasePackage) {
                 return response()->json([
                     'error' => 'No se pueden asignar módulos adicionales si el tipo de negocio base no está seleccionado.'
                 ], 422);
             }
 
-            // Calcular cobro según mecanismo
+            // Bloque de cálculo de cobro según mecanismo tarifario
             if ($tarifa->mecanismo === 'fijo') {
                 $subtotal += $tarifa->valor;
             } elseif ($tarifa->mecanismo === 'por_usuario') {
@@ -173,23 +172,23 @@ class EmpresaController extends Controller
                 $descuentoPorcentaje += $tarifa->valor;
             }
 
-            // Registrar plan base
+            // Bloque de registro de plan base de la suscripción
             if ($tarifa->tipo === 'plan') {
                 $planSeleccionado = str_replace('Plan ', '', $tarifa->nombre);
             }
 
-            // Guardar en la tabla pivote
+            // Bloque de guardado de tarifas en la tabla pivote
             $empresa->tarifasCatalogo()->attach($tarifa->id, [
                 'cantidad' => $itemData['cantidad'],
                 'valor_aplicado' => $tarifa->valor
             ]);
         }
 
-        // Calcular descuentos
+        // Bloque de cálculo y aplicación de descuentos comerciales
         $descuentoMonto = $subtotal * ($descuentoPorcentaje / 100);
         $totalCalculado = max(0, $subtotal - $descuentoMonto);
 
-        // 3. Configuración de API de IA propia (BYOK)
+        // Bloque de configuración de inteligencia artificial con API propia
         $empresa->ia_byok_activo = $request->ia_byok_activo;
         $empresa->ia_byok_proveedor = $request->ia_byok_proveedor;
         $empresa->ia_byok_modelo = $request->ia_byok_modelo;
@@ -197,13 +196,13 @@ class EmpresaController extends Controller
             $empresa->ia_byok_key = \Illuminate\Support\Facades\Crypt::encryptString($request->ia_byok_key);
         }
 
-        // 4. Guardar Empresa
+        // Bloque de guardado y persistencia del modelo de empresa
         $empresa->tipo_empresa = $tipoEmpresa;
         $empresa->plan_suscripcion = $planSeleccionado;
         $empresa->monto_mensual = $totalCalculado;
         $empresa->save();
 
-        // 5. Sincronizar Módulos y Áreas según la Suscripción Pagada
+        // Bloque de sincronización de módulos y áreas según la suscripción pagada
         app(\App\Http\Controllers\ModulosController::class)->sincronizarModulosPorSuscripcion($empresa);
 
         return response()->json([
@@ -212,10 +211,10 @@ class EmpresaController extends Controller
         ]);
     }
 
-    // Calcula y retorna las estadísticas generales del sistema (uptime, última actividad)
+    // Bloque para calcular y retornar las estadísticas generales del sistema
     public function systemStats()
     {
-        // Calcula el tiempo transcurrido desde la última actividad registrada por cualquier usuario
+        // Bloque de cálculo del tiempo transcurrido desde la última actividad registrada
         $lastActivityUser = \Illuminate\Support\Facades\DB::table('usuarios')
             ->whereNotNull('last_activity_at')
             ->orderBy('last_activity_at', 'desc')
@@ -241,11 +240,10 @@ class EmpresaController extends Controller
         ]);
     }
 
-    // Crea una nueva empresa y genera automáticamente su usuario gerente administrador
+    // Bloque para registrar una nueva empresa y generar automáticamente su usuario gerente administrador
     public function store(Request $request)
     {
-        // 'Mixto' es un alias de presentación; la BD guarda 'Ventas y Servicios'
-        // Normalizar campos del gerente para que acepte tanto los campos separados como los legacy
+        // Bloque de normalización de datos de la empresa y campos del gerente
         if ($request->filled('nombre_gerente') && !$request->filled('primer_nombre_gerente')) {
             $nombres = explode(' ', trim((string)$request->input('nombre_gerente')), 2);
             $request->merge([
@@ -287,22 +285,21 @@ class EmpresaController extends Controller
             'documento_gerente' => 'nullable|string|max:255',
         ]);
 
-        // Utiliza una transacción para garantizar la creación conjunta de empresa y gerente
+        // Bloque de transacción de base de datos para creación atómica de empresa y gerente
         DB::beginTransaction();
         try {
 
-            // La fecha de creación/inscripción se toma obligatoriamente de la fecha actual del sistema
+            // Bloque de asignación de fecha obligatoria de inscripción del sistema
             $validatedData['fecha_inscripcion'] = date('Y-m-d');
-            // El formulario ya no define el tipo de negocio: los paquetes se gestionan en Suscripciones.
-            // Se deja un valor por defecto para que la inicialización de módulos base siga funcionando.
+            // Bloque de inicialización de módulos base por defecto
             $validatedData['tipo_empresa'] = $validatedData['tipo_empresa'] ?? 'Ventas y Servicios';
             $validatedData['plan_suscripcion'] = $validatedData['plan_suscripcion'] ?? 'Emprendedor';
             $empresa = Empresa::create($validatedData);
 
-            // Construye el correo máscara institucional usando el dominio
+            // Bloque de construcción de correo máscara institucional usando el dominio
             $adminEmail = 'gerencia@' . $empresa->dominio . '.gestivapyme.com';
 
-            // Crea el rol "Gerente" para la empresa
+            // Bloque de creación del rol Gerente para la empresa
             $rolGerente = \App\Models\Role::create([
                 'empresa_id' => $empresa->id,
                 'nombre' => 'Gerente General',
@@ -310,7 +307,7 @@ class EmpresaController extends Controller
                 'activo' => 1
             ]);
 
-            // Asigna todos los permisos al rol Gerente (inserción masiva para evitar N+1 round-trips)
+            // Bloque de asignación masiva de permisos al rol Gerente
             $modulos = \Illuminate\Support\Facades\DB::table('modulos')->pluck('id');
             $permisosGerente = [];
             foreach ($modulos as $modId) {
@@ -325,7 +322,7 @@ class EmpresaController extends Controller
             }
             \Illuminate\Support\Facades\DB::table('permisos')->insert($permisosGerente);
 
-            // Crea el Área por defecto "Gerencia"
+            // Bloque de creación del área corporativa por defecto Gerencia
             $areaGerencia = \App\Models\Area::create([
                 'empresa_id' => $empresa->id,
                 'nombre' => 'Gerencia',
@@ -333,7 +330,7 @@ class EmpresaController extends Controller
                 'activo' => 1
             ]);
 
-            // Crea el rol "Operativo" (personal operativo, sin poder inactivar/eliminar)
+            // Bloque de creación del rol Operativo para personal base
             $rolOperario = \App\Models\Role::create([
                 'empresa_id' => $empresa->id,
                 'nombre' => 'Operativo',
@@ -341,7 +338,7 @@ class EmpresaController extends Controller
                 'activo' => 1
             ]);
 
-            // Permisos base del Operario: solo ver, editable luego por el Gerente (inserción masiva)
+            // Bloque de asignación de permisos base de visualización al rol Operativo
             $permisosOperario = [];
             foreach ($modulos as $modId) {
                 $permisosOperario[] = [
@@ -355,7 +352,7 @@ class EmpresaController extends Controller
             }
             \Illuminate\Support\Facades\DB::table('permisos')->insert($permisosOperario);
 
-            // Crea el Cargo "Operativo" ligado al rol
+            // Bloque de creación del cargo Operativo vinculado al rol
             \App\Models\Cargo::create([
                 'empresa_id' => $empresa->id,
                 'rol_id' => $rolOperario->id,
@@ -364,7 +361,7 @@ class EmpresaController extends Controller
                 'activo' => 1
             ]);
 
-            // Crea el Cargo por defecto "Gerente General"
+            // Bloque de creación del cargo por defecto Gerente General
             $cargoGerente = \App\Models\Cargo::create([
                 'empresa_id' => $empresa->id,
                 'rol_id' => $rolGerente->id,
@@ -373,7 +370,7 @@ class EmpresaController extends Controller
                 'activo' => 1
             ]);
 
-            // Registra el usuario gerente con rol de administrador y lo asocia a la empresa
+            // Bloque de creación del usuario gerente con rol administrativo
             $gerenteUser = User::create([
                 'empresa_id' => $empresa->id,
                 'rol_id' => $rolGerente->id,
@@ -392,7 +389,7 @@ class EmpresaController extends Controller
             ]);
 
             
-            // Crea el usuario de pruebas automáticamente
+            // Bloque de creación automática del usuario de pruebas para el tenant
             $testEmail = "test@" . $empresa->dominio . ".gestivapyme.com";
             $testUser = User::create([
                 "empresa_id" => $empresa->id,
@@ -409,7 +406,7 @@ class EmpresaController extends Controller
                 "perfil_formalizado" => true
             ]);
 
-            // Formaliza al gerente como empleado
+            // Bloque de formalización del usuario gerente como empleado de la empresa
             \App\Models\Empleado::create([
                 'usuario_id' => $gerenteUser->id,
                 'empresa_id' => $empresa->id,
@@ -420,7 +417,7 @@ class EmpresaController extends Controller
                 'estado' => 'activo'
             ]);
 
-            // Enviar credenciales reales al correo personal/contacto a través de Brevo
+            // Bloque de envío de credenciales transaccionales al correo de contacto vía Brevo
             $tempPassword = $request->input('documento_gerente') ?: $empresa->nit;
             $emailDestino = $gerenteUser->email_personal ?: $empresa->email;
 
@@ -447,18 +444,18 @@ class EmpresaController extends Controller
         }
     }
 
-    // Retorna los detalles de una empresa específica
+    // Bloque para consultar los detalles de una empresa específica
     public function show($id)
     {
         return response()->json(Empresa::findOrFail($id));
     }
 
-    // Actualiza la información de una empresa existente validando campos requeridos
+    // Bloque para actualizar la información de una empresa existente validando campos obligatorios
     public function update(Request $request, $id)
     {
         $empresa = Empresa::findOrFail($id);
 
-        // 'Mixto' es un alias de presentación; la BD guarda 'Ventas y Servicios'
+        // Bloque de normalización del tipo de empresa
         if ($request->input('tipo_empresa') === 'Mixto') {
             $request->merge(['tipo_empresa' => 'Ventas y Servicios']);
         }
@@ -482,8 +479,7 @@ class EmpresaController extends Controller
 
         $empresa->update($validatedData);
 
-        // Cambio de gerente desde el SAAS admin: actualiza los nombres del usuario gerente.
-        // Regla: el gerente NO se elimina ni se inactiva; solo se le actualizan sus datos.
+        // Bloque de actualización de datos del usuario gerente de la empresa
         $gerenteNombres = $request->only([
             'primer_nombre_gerente', 'segundo_nombre_gerente',
             'primer_apellido_gerente', 'segundo_apellido_gerente'
@@ -499,7 +495,7 @@ class EmpresaController extends Controller
                     ->orderBy('id')->first();
 
                 if ($gerenteUser) {
-                    // Mínimo: un nombre y dos apellidos; el segundo nombre es opcional.
+                    // Bloque de normalización y ensamblado de nombres y apellidos
                     $primerNombre = trim($gerenteNombres['primer_nombre_gerente'] ?? '');
                     $primerApellido = trim($gerenteNombres['primer_apellido_gerente'] ?? '');
                     $segundoApellido = trim($gerenteNombres['segundo_apellido_gerente'] ?? '');
@@ -523,7 +519,7 @@ class EmpresaController extends Controller
         return response()->json($empresa);
     }
 
-    // Actualiza la configuración global de Seguridad Social (ARL, Caja) desde RRHH
+    // Bloque para actualizar la configuración de seguridad social de la empresa
     public function updateRRHHSettings(Request $request)
     {
         $empresaId = auth()->user()->empresa_id;
@@ -541,7 +537,7 @@ class EmpresaController extends Controller
         ]);
     }
 
-    // Devuelve la configuración RRHH (ARL, Caja de Compensación) de la empresa
+    // Bloque para consultar la configuración de RRHH de la empresa
     public function getConfiguracionRRHH($id)
     {
         $empresa = Empresa::findOrFail($id);
@@ -552,7 +548,7 @@ class EmpresaController extends Controller
         ]);
     }
 
-    // Guarda la configuración RRHH (ARL, Caja de Compensación) de la empresa
+    // Bloque para guardar la configuración de RRHH de la empresa
     public function updateConfiguracionRRHH(Request $request, $id)
     {
         $empresa = Empresa::findOrFail($id);
@@ -569,7 +565,7 @@ class EmpresaController extends Controller
         ]);
     }
 
-    // Registra la renovación de la suscripción mensual sumando 30 días a la fecha de pago
+    // Bloque para registrar la renovación de suscripción mensual extendiendo fecha de pago
     public function registrarRenovacion($id)
     {
         $empresa = Empresa::findOrFail($id);
@@ -583,7 +579,7 @@ class EmpresaController extends Controller
         return response()->json(['message' => 'Renovación registrada exitosamente', 'empresa' => $empresa]);
     }
 
-    // Marca la suscripción como no renovada, dejando la empresa inactiva
+    // Bloque para registrar la no renovación de suscripción dejando la empresa inactiva
     public function noRenovar($id)
     {
         $empresa = Empresa::findOrFail($id);
@@ -595,7 +591,7 @@ class EmpresaController extends Controller
         return response()->json(['message' => 'Suscripción marcada como no renovada. Empresa inactiva.', 'empresa' => $empresa]);
     }
 
-    // Modifica el estado de la empresa alternando su disponibilidad o marcándola en mora
+    // Bloque para alternar el estado operativo y disponibilidad de la empresa
     public function changeStatus(Request $request, $id)
     {
         $empresa = Empresa::findOrFail($id);
@@ -622,9 +618,7 @@ class EmpresaController extends Controller
         return response()->json(['message' => $message]);
     }
 
-    // --- MÓDULO CONTRATOS SAAS ---
-    
-    // Acepta el contrato, guarda la firma y registra la IP/Fecha
+    // Bloque para registrar la firma y aceptación del contrato SaaS con IP y fecha
     public function aceptarContrato(Request $request, $id)
     {
         $empresa = Empresa::findOrFail($id);
@@ -642,7 +636,7 @@ class EmpresaController extends Controller
         return response()->json(['message' => 'Contrato aceptado exitosamente.']);
     }
 
-    // Genera y descarga el PDF del contrato de la empresa
+    // Bloque para generar y descargar el documento PDF del contrato SaaS de la empresa
     public function descargarContratoPDF($id)
     {
         $empresa = Empresa::findOrFail($id);
@@ -651,11 +645,11 @@ class EmpresaController extends Controller
             return response()->json(['error' => 'El contrato aún no ha sido firmado.'], 403);
         }
 
-        // Obtener la versión específica del contrato que firmó
+        // Bloque para consultar la versión del contrato suscrito por la empresa
         $contrato = \App\Models\SaasContrato::find($empresa->contrato_id);
         $contenidoContrato = $contrato ? $contrato->contenido : '<p>Contrato no encontrado</p>';
 
-        // Obtener al gerente de la empresa
+        // Bloque para obtener los datos del usuario gerente de la empresa
         $gerente = User::where('empresa_id', $empresa->id)
             ->whereHas('rol', function($q) {
                 $q->where('nombre', 'like', '%Gerente%');
@@ -664,10 +658,10 @@ class EmpresaController extends Controller
         $nombreGerente = $gerente ? ($gerente->nombres . ' ' . $gerente->apellidos) : 'Representante Legal';
         $documentoGerente = $gerente ? $gerente->documento : 'N/A';
 
-        // Estructura de datos para la vista del PDF
+        // Bloque de estructuración de datos para la plantilla del PDF
         $fechaFirmaFormateada = $empresa->fecha_firma ? \Carbon\Carbon::parse($empresa->fecha_firma)->format('d \d\e m \d\e Y, h:i A') : date('d/m/Y');
         
-        // Obtener detalles de IA
+        // Bloque para consultar la configuración de IA asociada a la empresa
         $detalleIa = '';
         if ($empresa->ia_byok_activo) {
             $detalleIa = 'Servicio IA Habilitado bajo el conector de API propia (BYOK) - Sin límites por GestivaPyme.';
@@ -677,7 +671,7 @@ class EmpresaController extends Controller
             $detalleIa = "Modo Simple: {$simpleUsers} usuarios (15 acciones/día); Modo Avanzado: {$advancedUsers} usuarios (bolsa de 2M tokens/mes, exceso a $15.000 COP por millón).";
         }
 
-        // Mapear los placeholders para reemplazarlos dinámicamente
+        // Bloque de mapeo de variables para sustitución dinámica en el contrato
         $reemplazos = [
             '{CLIENTE_RAZON_SOCIAL}' => $empresa->razon_social,
             '{CLIENTE_NIT}' => $empresa->nit,
@@ -690,7 +684,7 @@ class EmpresaController extends Controller
             '{FECHA_FIRMA}' => $fechaFirmaFormateada,
             '{DETALLE_IA}' => $detalleIa,
             
-            // Datos del proveedor por defecto
+            // Bloque de definición de datos institucionales del proveedor GestivaPyme
             '{PROVEEDOR_NOMBRE}' => 'GestivaPyme S.A.S',
             '{PROVEEDOR_NIT}' => '901.456.789-0',
             '{PROVEEDOR_REPRESENTANTE}' => 'Representante Legal de GestivaPyme S.A.S',
@@ -698,12 +692,12 @@ class EmpresaController extends Controller
             '{PROVEEDOR_PAIS}' => 'Colombia'
         ];
 
-        // Reemplazar marcadores en el contenido
+        // Bloque de reemplazo de marcadores en el contenido contractual
         $contenidoContrato = str_replace(array_keys($reemplazos), array_values($reemplazos), $contenidoContrato);
 
         $firmaSrc = $empresa->firma_gerente_url; // Base64 desde frontend
 
-        // Crear una vista HTML para el PDF usando el texto dinámico procesado
+        // Bloque de renderizado HTML del contrato procesado para el motor de PDF
         $html = '
         <div style="font-family: Helvetica, sans-serif; padding: 20px;">
             <div style="margin-bottom: 20px; text-align: right; color: #666; font-size: 11px;">
@@ -734,7 +728,7 @@ class EmpresaController extends Controller
     {
         $empresa = Empresa::findOrFail($id);
         
-        // Find the gerente
+        // Bloque para consultar el usuario gerente de la empresa
         $gerente = \App\Models\User::where('empresa_id', $empresa->id)
                     ->whereHas('rol', function($q) {
                         $q->where('nombre', 'Gerente General');
@@ -748,7 +742,7 @@ class EmpresaController extends Controller
             return response()->json(['success' => false, 'message' => 'La empresa no tiene un correo de contacto configurado.'], 400);
         }
 
-        // Generate a new password
+        // Bloque de generación de nueva contraseña aleatoria
         $tempPassword = 'Admin_' . rand(1000, 9999);
         
         $gerente->password_hash = \Illuminate\Support\Facades\Hash::make($tempPassword);

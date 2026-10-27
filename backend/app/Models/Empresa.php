@@ -9,16 +9,13 @@ class Empresa extends Model
 {
     use HasFactory;
 
-    // --- TABLA ---
-
+    // Bloque de definición de tabla en la base de datos
     protected $table = 'empresa';
 
-    // --- TIMESTAMPS ---
-    
+    // Bloque de configuración de marcas de tiempo del modelo
     public $timestamps = false;
 
-    // --- CAMPOS ---
-    
+    // Bloque de atributos asignables en masa
     protected $fillable = [
         'razon_social',
         'dominio',
@@ -64,6 +61,7 @@ class Empresa extends Model
         'ia_fuente',
     ];
 
+    // Bloque de casteo y conversión de tipos de atributos
     protected $casts = [
         'descuentos_aplicados' => 'array',
         'cargos_extra'         => 'array',
@@ -73,11 +71,13 @@ class Empresa extends Model
         'ia_byok_tareas'       => 'array',
     ];
 
+    // Bloque para obtener la relación con el contrato SaaS firmado
     public function contratoSaas()
     {
         return $this->belongsTo(SaasContrato::class, 'contrato_id');
     }
 
+    // Bloque para obtener las tarifas del catálogo asociadas a la empresa
     public function tarifasCatalogo()
     {
         return $this->belongsToMany(TarifaCatalogo::class, 'empresa_tarifas', 'empresa_id', 'tarifa_id')
@@ -85,6 +85,7 @@ class Empresa extends Model
                     ->withTimestamps();
     }
 
+    // Bloque para obtener los módulos contratados y activos de la empresa
     public function modulos()
     {
         return $this->belongsToMany(Modulo::class, 'empresa_modulo')
@@ -92,13 +93,16 @@ class Empresa extends Model
                     ->withTimestamps();
     }
 
+    // Bloque de atributos calculados que se agregan al serializar el modelo
     protected $appends = ['meses_activos', 'ganancia_total'];
 
+    // Bloque accesor para calcular el total de meses activos de la suscripción
     public function getMesesActivosAttribute()
     {
-        return $this->renovaciones + 1; // El mes inicial + renovaciones
+        return $this->renovaciones + 1;
     }
 
+    // Bloque accesor para calcular la ganancia monetaria total generada por la empresa
     public function getGananciaTotalAttribute()
     {
         return $this->meses_activos * $this->monto_mensual;

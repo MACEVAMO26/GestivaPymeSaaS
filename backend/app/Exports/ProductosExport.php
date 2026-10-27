@@ -16,7 +16,7 @@ class ProductosExport implements FromCollection, WithHeadings, WithMapping
         $this->empresa_id = $empresa_id;
     }
 
-    public function collection()
+    public function collection(): \Illuminate\Support\Collection
     {
         return Producto::with(['categoria'])->where('empresa_id', $this->empresa_id)->get();
     }

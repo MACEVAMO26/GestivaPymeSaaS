@@ -1,5 +1,5 @@
 <div class="fade-in">
-  <!-- Botón Volver Inyectado -->
+  <!-- HTML BOTON VOLVER -->
   <div class="volver-wrapper">
     <button class="btn-volver btn-pill" appVolver>
       <i class="fas fa-arrow-left"></i> VOLVER
@@ -43,7 +43,7 @@
           </tr>
           } @for (log of paginatedLogs; track log.id) {
           <tr>
-            <td style="white-space: nowrap">
+            <td class="cell-nowrap">
               {{ (log.fecha_hora || log.created_at) | date:'short' }}
             </td>
             <td>
@@ -58,7 +58,7 @@
             </td>
             <td>
               <div
-                style="max-width: 400px; overflow-wrap: break-word"
+                class="cell-detalles"
                 class="text-muted"
               >
                 {{ log.descripcion || log.detalles || 'Sin detalles' }}

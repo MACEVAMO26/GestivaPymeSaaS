@@ -9,15 +9,14 @@ use Illuminate\Validation\Rule;
 class CargoController extends Controller
 {
     
-    // --- GESTIÓN DE CARGOS ---
-    // Obtiene la lista de todos los cargos asociados a la empresa del usuario
+    // Bloque para obtener la lista de todos los cargos asociados a la empresa
     public function index()
     {
         return Cargo::where('empresa_id', auth()->user()->empresa_id)->get();
     }
 
     
-    // Registra un nuevo cargo en el sistema validando que el nombre no exista
+    // Bloque para registrar un nuevo cargo en el sistema validando campos obligatorios
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -37,14 +36,14 @@ class CargoController extends Controller
     }
 
     
-    // Retorna los detalles de un cargo específico
+    // Bloque para retornar los detalles de un cargo específico
     public function show($id)
     {
         return Cargo::findOrFail($id);
     }
 
     
-    // Actualiza los datos de un cargo existente ignorando la validación de nombre propio
+    // Bloque para actualizar los datos de un cargo existente
     public function update(Request $request, $id)
     {
         $cargo = Cargo::findOrFail($id);
@@ -60,12 +59,12 @@ class CargoController extends Controller
         return response()->json($cargo, 200);
     }
 
-    // Alterna el estado activo/inactivo del cargo y registra la fecha de inactivación si aplica
+    // Bloque para alternar el estado activo o inactivo del cargo y registrar fecha de inactivación
     public function changeStatus($id)
     {
         $cargo = Cargo::findOrFail($id);
 
-        // LEY: El cargo "Gerente General" es el primer cargo creado y no se puede inactivar.
+        // Bloque de validación de regla legal: el cargo Gerente General no puede ser inactivado
         if ($cargo->nombre === 'Gerente General') {
             return response()->json([
                 'error' => 'El cargo Gerente General no puede ser inactivado.'

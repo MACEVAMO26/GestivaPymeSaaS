@@ -1,146 +1,152 @@
+<!-- HTML CONTENEDOR PRINCIPAL -->
 <div class="module-container fade-in">
+  <!-- HTML ENCABEZADO -->
   <div class="module-header text-center mb-4 relative">
     <h1 class="titulo-principal">AGENDA Y CALENDARIO</h1>
     <p class="descripcion-general">Programe citas, visitas técnicas y reuniones.</p>
   </div>
 
   <div class="tab-content neumorphic-panel-inner p-4">
-    <!-- Botón Volver Inyectado -->
+    <!-- HTML BOTON VOLVER -->
     <div class="volver-wrapper">
       <button class="btn-volver btn-pill" appVolver>
         <i class="fas fa-arrow-left"></i> Volver
       </button>
     </div>
 
+    <!-- HTML FORMULARIO AGENDAR EVENTO -->
     <div class="neumorphic-panel fade-in">
       @if(!esOperativo) {
-      <div style="margin-bottom: 2rem;">
+      <div class="volver-wrapper">
         <h2 class="subtitulo">Agendar Nuevo Evento</h2>
-      <form (ngSubmit)="guardarEvento()">
-        
-        <div class="form-grid">
-          <div class="form-group full-width">
-            <label class="form-label">Título del Evento: *</label>
-            <input type="text" class="input-neumorphic" name="titulo" [(ngModel)]="nuevoEvento.titulo" required>
-          </div>
-
-          <div class="form-group full-width">
-            <label class="form-label">Descripción / Detalles:</label>
-            <textarea class="input-neumorphic" name="descripcion" [(ngModel)]="nuevoEvento.descripcion" rows="2"></textarea>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Fecha y Hora de Inicio: *</label>
-            <input type="datetime-local" class="input-neumorphic" name="fecha_inicio" [(ngModel)]="nuevoEvento.fecha_inicio" [min]="fechaMinimaActual" required>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Fecha y Hora de Fin: *</label>
-            <input type="datetime-local" class="input-neumorphic" name="fecha_fin" [(ngModel)]="nuevoEvento.fecha_fin" [min]="nuevoEvento.fecha_inicio || fechaMinimaActual" required>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Color de Etiqueta:</label>
-            <input type="color" class="input-neumorphic color-input" name="color_etiqueta" [(ngModel)]="nuevoEvento.color_etiqueta">
-          </div>
-        </div>
-
-        <div class="form-actions">
-          <button type="submit" class="btn-add btn-pill" [disabled]="guardando">
-            @if (guardando) {
-              <span class="spinner-small"></span> Guardando...
-            } @else {
-              + Guardar Evento
-            }
-          </button>
-        </div>
-      </form>
-    </div>
-    }
-
-    <div class="mt-4">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
-        <h2 class="subtitulo" style="margin-bottom: 0;">Próximos Eventos y Citas</h2>
-
-        <!-- Buscador en tiempo real -->
-        <div *ngIf="eventos.length > 0" style="position: relative; width: 100%; max-width: 380px;">
-          <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 14px;"></i>
-          <input
-            type="text"
-            class="input-neumorphic"
-            style="padding-left: 36px; padding-right: 36px; width: 100%; height: 38px; font-size: 14px;"
-            placeholder="Buscar evento por título, fecha o detalle..."
-            [(ngModel)]="busqueda"
-            (ngModelChange)="pageEventos = 1"
-          />
-          <button
-            *ngIf="busqueda"
-            type="button"
-            (click)="busqueda = ''; pageEventos = 1"
-            style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 14px;"
-            title="Limpiar búsqueda"
-          >
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-      </div>
-      
-      @if (cargando) {
-        <div class="loading-overlay neumorphic-panel">
-          <div class="spinner"></div>
-          <p>Cargando agenda...</p>
-        </div>
-      }
-
-      @if (!cargando) {
-        <div class="table-container">
-          <table class="data-table neumorphic-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Color</th>
-                <th>Título</th>
-                <th>Descripción</th>
-                <th>Inicio</th>
-                <th>Fin</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let e of paginatedEventos">
-                <td>{{ e.id }}</td>
-                <td>
-                  <div class="color-swatch" [style.backgroundColor]="e.color_etiqueta"></div>
-                </td>
-                <td><strong>{{ e.titulo }}</strong></td>
-                <td>{{ e.descripcion }}</td>
-                <td>{{ e.fecha_inicio | date:'short' }}</td>
-                <td>{{ e.fecha_fin | date:'short' }}</td>
-              </tr>
-              <tr *ngIf="eventosFiltrados.length === 0">
-                <td colspan="6" class="text-center">
-                  {{ busqueda ? 'No se encontraron eventos que coincidan con la búsqueda.' : 'No hay eventos programados.' }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          @if (eventosFiltrados.length > pageSize) {
-            <div class="neu-pagination-bar">
-              <span class="pagination-info">Página {{ pageEventos }} de {{ totalPagesEventos }} ({{ eventosFiltrados.length }} eventos)</span>
-              <div class="pagination-controls">
-                <button class="pagination-btn" [disabled]="pageEventos === 1" (click)="pageEventos = pageEventos - 1">
-                  <i class="fas fa-chevron-left"></i> Anterior
-                </button>
-                <span class="pagination-badge">{{ pageEventos }}</span>
-                <button class="pagination-btn" [disabled]="pageEventos >= totalPagesEventos" (click)="pageEventos = pageEventos + 1">
-                  Siguiente <i class="fas fa-chevron-right"></i>
-                </button>
-              </div>
+        <form (ngSubmit)="guardarEvento()">
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label class="form-label">Título del Evento: *</label>
+              <input type="text" class="input-neumorphic" name="titulo" [(ngModel)]="nuevoEvento.titulo" required>
             </div>
-          }
-        </div>
+
+            <div class="form-group full-width">
+              <label class="form-label">Descripción / Detalles:</label>
+              <textarea class="input-neumorphic" name="descripcion" [(ngModel)]="nuevoEvento.descripcion" rows="2"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Fecha y Hora de Inicio: *</label>
+              <input type="datetime-local" class="input-neumorphic" name="fecha_inicio" [(ngModel)]="nuevoEvento.fecha_inicio" [min]="fechaMinimaActual" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Fecha y Hora de Fin: *</label>
+              <input type="datetime-local" class="input-neumorphic" name="fecha_fin" [(ngModel)]="nuevoEvento.fecha_fin" [min]="nuevoEvento.fecha_inicio || fechaMinimaActual" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Color de Etiqueta:</label>
+              <input type="color" class="input-neumorphic color-input" name="color_etiqueta" [(ngModel)]="nuevoEvento.color_etiqueta">
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-add btn-pill" [disabled]="guardando">
+              @if (guardando) {
+                <span class="spinner-small"></span> Guardando...
+              } @else {
+                + Guardar Evento
+              }
+            </button>
+          </div>
+        </form>
+      </div>
       }
+
+      <!-- HTML SECCION PROXIMOS EVENTOS -->
+      <div class="mt-4">
+        <!-- HTML ENCABEZADO Y BUSCADOR -->
+        <div class="eventos-header-flex">
+          <h2 class="subtitulo m-0">Próximos Eventos y Citas</h2>
+
+          <!-- HTML BARRA DE BUSQUEDA -->
+          <div *ngIf="eventos.length > 0" class="search-input-wrapper-380">
+            <i class="fas fa-search search-icon-left"></i>
+            <input
+              type="text"
+              class="input-neumorphic search-input-pad"
+              placeholder="Buscar evento por título, fecha o detalle..."
+              [(ngModel)]="busqueda"
+              (ngModelChange)="pageEventos = 1"
+            />
+            <button
+              *ngIf="busqueda"
+              type="button"
+              (click)="busqueda = ''; pageEventos = 1"
+              class="search-clear-btn"
+              title="Limpiar búsqueda"
+            >
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- HTML SPINNER DE CARGA -->
+        @if (cargando) {
+          <div class="loading-overlay neumorphic-panel">
+            <div class="spinner"></div>
+            <p>Cargando agenda...</p>
+          </div>
+        }
+
+        <!-- HTML TABLA RESULTADOS EVENTOS -->
+        @if (!cargando) {
+          <div class="table-container">
+            <table class="data-table neumorphic-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Color</th>
+                  <th>Título</th>
+                  <th>Descripción</th>
+                  <th>Inicio</th>
+                  <th>Fin</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let e of paginatedEventos">
+                  <td>{{ e.id }}</td>
+                  <td>
+                    <div class="color-swatch" [style.backgroundColor]="e.color_etiqueta"></div>
+                  </td>
+                  <td><strong>{{ e.titulo }}</strong></td>
+                  <td>{{ e.descripcion }}</td>
+                  <td>{{ e.fecha_inicio | date:'short' }}</td>
+                  <td>{{ e.fecha_fin | date:'short' }}</td>
+                </tr>
+                <tr *ngIf="eventosFiltrados.length === 0">
+                  <td colspan="6" class="text-center">
+                    {{ busqueda ? 'No se encontraron eventos que coincidan con la búsqueda.' : 'No hay eventos programados.' }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- HTML CONTROLES DE PAGINACION -->
+            @if (eventosFiltrados.length > pageSize) {
+              <div class="neu-pagination-bar">
+                <span class="pagination-info">Página {{ pageEventos }} de {{ totalPagesEventos }} ({{ eventosFiltrados.length }} eventos)</span>
+                <div class="pagination-controls">
+                  <button class="pagination-btn" [disabled]="pageEventos === 1" (click)="pageEventos = pageEventos - 1">
+                    <i class="fas fa-chevron-left"></i> Anterior
+                  </button>
+                  <span class="pagination-badge">{{ pageEventos }}</span>
+                  <button class="pagination-btn" [disabled]="pageEventos >= totalPagesEventos" (click)="pageEventos = pageEventos + 1">
+                    Siguiente <i class="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
     </div>
-  </div>
   </div>
 </div>

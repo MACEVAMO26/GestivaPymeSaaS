@@ -8,13 +8,13 @@ use Illuminate\Validation\Rule;
 
 class RoleController extends Controller
 {
-    // Trae los roles que pertenecen a la empresa actual
+    // Bloque para traer los roles que pertenecen a la empresa actual
     public function index()
     {
         return Role::where('empresa_id', auth()->user()->empresa_id)->get();
     }
 
-    // Registra un nuevo rol en la empresa del usuario
+    // Bloque para registrar un nuevo rol en la empresa del usuario
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -30,13 +30,13 @@ class RoleController extends Controller
         return response()->json($role, 201);
     }
 
-    // Trae la informacion de un rol especifico
+    // Bloque para traer la información de un rol específico
     public function show($id)
     {
         return Role::findOrFail($id);
     }
 
-    // Modifica los datos de un rol
+    // Bloque para modificar los datos de un rol
     public function update(Request $request, $id)
     {
         $role = Role::findOrFail($id);
@@ -45,7 +45,7 @@ class RoleController extends Controller
             'descripcion' => 'nullable|string',
         ];
 
-        // Solo permitir cambiar el nombre si NO es un rol base
+        // Bloque de validación condicional para roles base del sistema
         if (!$role->es_base) {
             $rules['nombre'] = ['required', 'string', 'max:255', Rule::unique('roles')->ignore($role->id)];
         }
@@ -56,7 +56,7 @@ class RoleController extends Controller
         return response()->json($role);
     }
 
-    // Cambia el estado activo o inactivo del rol
+    // Bloque para cambiar el estado activo o inactivo del rol
     public function changeStatus($id)
     {
         $role = Role::findOrFail($id);

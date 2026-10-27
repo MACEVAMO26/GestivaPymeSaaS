@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class TareaController extends Controller
 {
-    // Para listar tareas dependiendo del rol del usuario
+    // Bloque para listar tareas según el rol y área del usuario
     public function index(Request $request)
     {
         $user = Auth::user();
@@ -29,7 +29,7 @@ class TareaController extends Controller
                   ->orWhere('asignado_id', $user->id);
             });
         } else {
-            // Empleado/Operario: ve sus tareas individuales + las cooperativas de su área
+            // Bloque para filtrar tareas individuales y cooperativas por área
             $query->where(function ($q) use ($user, $areaId) {
                 $q->where('asignado_id', $user->id)
                   ->orWhere(function ($sub) use ($areaId) {
@@ -46,14 +46,14 @@ class TareaController extends Controller
         return response()->json($query->orderBy('id', 'desc')->get());
     }
 
-    // Para asignar una nueva tarea
+    // Bloque para asignar una nueva tarea individual o cooperativa
     public function store(Request $request)
     {
         $user = Auth::user();
         $rolNombre = $user->rol->nombre ?? '';
 
         if (!in_array($rolNombre, ['Gerente General', 'Jefe de Área'])) {
-            // Un empleado normal solo puede asignarse tareas a sí mismo
+            // Bloque de validación de permisos de asignación de tareas
             if ($request->asignado_id != $user->id) {
                 return response()->json(['message' => 'No autorizado para asignar tareas a otros'], 403);
             }
@@ -82,7 +82,7 @@ class TareaController extends Controller
         return response()->json(['message' => 'Tarea creada con éxito', 'tarea' => $tarea], 201);
     }
 
-    // Para actualizar el estado de una tarea
+    // Bloque para actualizar el estado del flujo de una tarea
     public function updateStatus(Request $request, $id)
     {
         $user = Auth::user();
@@ -100,7 +100,7 @@ class TareaController extends Controller
             'estado' => $request->estado,
         ]);
 
-        // Si la tarea entra en dificultades, notificar al asignador (gerente/jefe de área)
+        // Bloque para notificar alerta de dificultad en la tarea
         if ($request->estado === 'con_dificultades' && $tarea->asignador_id !== $user->id) {
             Notificacion::create([
                 'usuario_id' => $tarea->asignador_id,

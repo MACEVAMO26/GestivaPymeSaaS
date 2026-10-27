@@ -47,12 +47,21 @@ Route::delete('/modulos/{id}', [\App\Http\Controllers\ModulosController::class, 
 
 // --- RUTAS PROTEGIDAS (Requieren Token) ---
 
-Route::get('/migrar-bd', function () {
-    \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-    return 'Base de datos actualizada exitosamente!';
-});
-
 Route::middleware('auth:sanctum')->group(function () {
+
+    // Ejecución segura de migraciones (solo administradores autenticados)
+    Route::post('/migrar-bd', function (Request $request) {
+        $user = $request->user();
+        $esAdmin = $user && ($user->rol?->nombre === 'Gerente General' || $user->rol?->nombre === 'Gerente' || $user->email === 'admin@gestivapyme.com');
+        if (!$esAdmin) {
+            return response()->json(['error' => 'No autorizado para ejecutar migraciones.'], 403);
+        }
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        return response()->json([
+            'message' => 'Base de datos actualizada exitosamente.',
+            'output' => \Illuminate\Support\Facades\Artisan::output()
+        ]);
+    });
     
     Route::get('/mis-modulos', [\App\Http\Controllers\ModulosController::class, 'getMisModulos']);
 

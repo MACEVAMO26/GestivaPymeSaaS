@@ -1,7 +1,7 @@
-<!-- HTML GESTIÓN DE ROLES -->
+<!-- HTML GESTION DE ROLES -->
 <div class="fade-in">
   <div [hidden]="isModalOpen || isPermisosOpen" class="main-view-wrapper">
-    <!-- Botón Volver Inyectado -->
+    <!-- HTML BOTON VOLVER -->
     <div class="volver-wrapper">
       <button class="btn-volver btn-pill" appVolver>
         <i class="fas fa-arrow-left"></i> VOLVER
@@ -62,7 +62,7 @@
               </td>
               <td>
                 <div class="acciones-tabla">
-                  <!-- Mostrar botón de permisos si es Gerente o Auditor, sino el de expandir áreas -->
+                  <!-- HTML ACCIONES SEGUN ROL Y PERMISOS -->
                   @if (rol.nombre.toLowerCase() === 'gerente general' ||
                   rol.nombre.toLowerCase() === 'auditor') {
                   <button
@@ -116,10 +116,11 @@
     </div>
   </div>
 
+  <!-- HTML MODAL CREAR ROL -->
   @if (isModalOpen) {
   <div class="view-switch-panel fade-in">
-    <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
-      <div class="panel-header mb-4" style="display: flex; justify-content: space-between; align-items: center;">
+    <div class="neu-card neu-card-center-800">
+      <div class="panel-header mb-4 panel-header-flex">
         <h1>Crear Nuevo Rol</h1>
         <button class="btn-volver btn-pill" (click)="cerrarModal()" [disabled]="isSaving">
           <i class="fas fa-arrow-left"></i> Volver
@@ -157,7 +158,7 @@
               </p>
             </div>
           </div>
-          <div class="form-actions" style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: flex-end;">
+          <div class="form-actions form-actions-flex-end">
             <button type="button" class="btn-volver btn-pill" (click)="cerrarModal()" [disabled]="isSaving">Cancelar</button>
             <button
               type="button"
@@ -176,11 +177,11 @@
   </div>
   }
 
-  <!-- MODAL EDITOR DE PERMISOS -->
+  <!-- HTML MODAL EDITOR DE PERMISOS -->
   @if (isPermisosOpen) {
   <div class="view-switch-panel fade-in">
-    <div class="neu-card" style="max-width: 900px; margin: 0 auto;">
-      <div class="panel-header mb-4" style="display: flex; justify-content: space-between; align-items: center;">
+    <div class="neu-card neu-card-center-900">
+      <div class="panel-header panel-header-flex mb-4">
         <h1>
           Permisos del rol: {{ rolPermisos?.nombre }}
         </h1>
@@ -197,24 +198,24 @@
         Marque qué acciones puede realizar este rol sobre cada módulo.
       </p>
 
-      <div class="permisos-acciones-top" style="display: flex; gap: 10px; margin-bottom: 15px;">
-        <button type="button" class="btn-general-1 btn-pill btn-xs" style="padding: 6px 12px; font-size: 14px;" (click)="seleccionarTodos()">
+      <div class="permisos-acciones-top permisos-top-bar">
+        <button type="button" class="btn-general-1 btn-pill btn-xs btn-sm-action" (click)="seleccionarTodos()">
           <i class="fas fa-check-square"></i> Seleccionar Todos
         </button>
-        <button type="button" class="btn-general-5 btn-pill btn-xs" style="padding: 6px 12px; font-size: 14px;" (click)="deseleccionarTodos()">
+        <button type="button" class="btn-general-5 btn-pill btn-xs btn-sm-action" (click)="deseleccionarTodos()">
           <i class="fas fa-square"></i> Deseleccionar Todos
         </button>
       </div>
 
-      <div class="permisos-scroll-container" style="max-height: 60vh; overflow-y: auto;">
+      <div class="permisos-scroll-container permisos-scroll-box">
         @for (paquete of getPaquetesCatalogo(); track paquete) {
-          <h3 class="panel-title text-left mt-3 mb-2" style="color: #6B8F71; font-size: 14px; text-transform: uppercase; border-bottom: 1px solid #d1d1bc; padding-bottom: 4px;">{{ getPaqueteNombre(paquete) }}</h3>
+          <h3 class="panel-title text-left mt-3 mb-2" class="panel-title text-left mt-3 mb-2 paquete-header">{{ getPaqueteNombre(paquete) }}</h3>
           
-          <div class="table-container permisos-table-wrap mb-4" style="box-shadow: none; border: 1px solid rgba(0,0,0,0.05); background: transparent;">
+          <div class="table-container permisos-table-wrap mb-4 table-transparent-wrap">
             <table class="neu-table permisos-table">
               <thead>
                 <tr>
-                  <th style="width: 30%">Módulo</th>
+                  <th class="col-modulo-30">Módulo</th>
                   @for (acc of acciones; track acc.key) {
                   <th class="text-center">{{ acc.label }}</th>
                   }
@@ -225,7 +226,7 @@
                 <tr>
                   <td>
                     <div class="area-cell">
-                      <span class="area-nombre" style="font-weight: 500;">{{ modulo.nombre }}</span>
+                      <span class="area-nombre modulo-label">{{ modulo.nombre }}</span>
                     </div>
                   </td>
                   @for (acc of acciones; track acc.key) {

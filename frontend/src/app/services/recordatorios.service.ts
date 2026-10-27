@@ -15,21 +15,26 @@ export interface Recordatorio {
   providedIn: 'root'
 })
 export class RecordatoriosService {
+  // --- INYECCIÓN DE DEPENDENCIAS Y SERVICIOS ---
   private http = inject(HttpClient);
   private apiUrl = '/api/recordatorios';
 
+  // Bloque para consultar el listado de recordatorios activos desde el backend
   getRecordatorios(): Observable<Recordatorio[]> {
     return this.http.get<Recordatorio[]>(this.apiUrl);
   }
 
+  // Bloque para registrar un nuevo recordatorio en la base de datos
   agregarRecordatorio(recordatorio: any): Observable<Recordatorio> {
     return this.http.post<Recordatorio>(this.apiUrl, recordatorio);
   }
 
+  // Bloque para eliminar un recordatorio por identificador
   eliminarRecordatorio(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
+  // Bloque para alternar el estado de completado de un recordatorio
   marcarCompletado(id: number, completado: boolean): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}/completado`, { completado });
   }

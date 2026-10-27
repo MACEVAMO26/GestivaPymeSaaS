@@ -6,8 +6,7 @@ import { authInterceptor } from './services/auth.interceptor';
 
 import { routes } from './app.routes';
 
-// Estrategia de precarga selectiva: descarga en segundo plano los chunks de las
-// rutas que el usuario usa primero (saas-admin, dashboard y sus módulos iniciales).
+
 export class RutasClavePreloadingStrategy implements PreloadingStrategy {
   private rutasACargar = [
     '', 'login', 'saas-admin', 'dashboard',

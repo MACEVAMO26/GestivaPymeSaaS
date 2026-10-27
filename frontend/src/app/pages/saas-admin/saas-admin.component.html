@@ -1,5 +1,5 @@
 <div class="saas-layout" [attr.data-daltonism]="accessibilityService.currentMode()">
-  <!-- GLOBAL HEADER -->
+  <!-- HTML ENCABEZADO GLOBAL -->
   <header class="global-header">
     <div class="header-left">
       <div class="logo-container flex flex-col items-center justify-center pt-2">
@@ -14,7 +14,7 @@
         <p class="text-sm text-slate-200">Panel de Control de GestivaPyme.</p>
       </div>
       <div class="topbar-actions flex items-center gap-4">
-        <!-- Perfil y Logout -->
+        <!-- HTML PERFIL Y LOGOUT -->
         <div class="user-profile" (click)="logout()" title="Cerrar Sesión">
           @if (userAvatar) {
             <img
@@ -28,7 +28,7 @@
           <button type="button" class="btn-logout" (click)="logout(); $event.stopPropagation()">Cerrar Sesión</button>
         </div>
 
-        <!-- Botón Accesibilidad Daltonismo -->
+        <!-- HTML BOTON ACCESIBILIDAD DALTONISMO -->
         <div class="saas-floating-widget relative">
           <button
             (click)="toggleAccessibilityMenu()"
@@ -56,7 +56,7 @@
             </svg>
           </button>
 
-          <!-- Menú Desplegable -->
+          <!-- HTML MENU DESPLEGABLE -->
           @if (isAccessibilityMenuOpen) {
             <div
               class="saas-access-menu absolute right-0 top-12 mt-2 w-56 bg-gray-800 rounded-lg shadow-xl border border-slate-500 overflow-hidden z-50"
@@ -101,10 +101,10 @@
     </div>
   </header>
 
-  <!-- MAIN BODY -->
+  <!-- HTML CUERPO PRINCIPAL -->
   <div class="main-body">
     <aside class="sidebar-saas" [class.collapsed]="isSidebarCollapsed">
-      <!-- Boton Toggle (Flecha) -->
+      <!-- HTML BOTON TOGGLE BARRA LATERAL -->
       <button class="toggle-btn" (click)="toggleSidebar()" title="Colapsar menú">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -289,7 +289,7 @@
           }
         </a>
 
-        <!-- CONTRATOS SAAS -->
+        <!-- HTML NAVEGACION CONTRATOS SAAS -->
         <a
           class="nav-item"
           [class.active]="currentView === 'contratos'"
@@ -311,7 +311,7 @@
           <span class="nav-text">Contratos</span>
         </a>
 
-        <!-- SEGURIDAD Y PERFIL -->
+        <!-- HTML NAVEGACION SEGURIDAD Y PERFIL -->
         <a
           class="nav-item mt-auto border-t border-gray-800 pt-2"
           [class.active]="currentView === 'seguridad'"
@@ -335,7 +335,7 @@
       </nav>
     </aside>
 
-    <!-- CONTENT ROUTER OUTLET -->
+    <!-- HTML ENRUTADOR DE CONTENIDO PRINCIPAL -->
     <main class="content-area content-area-styled">
       @if (currentView === 'dashboard') {
         @if (ticketsSoportePendientes > 0) {
@@ -382,21 +382,98 @@
 
       @if (currentView === 'soporte') {
         @if (!isModalTicketOpen) {
-          <!-- BANDEJA DE SOPORTE TÉCNICO (VISTA LISTADO CON PAGINACIÓN DE 8) -->
+          <!-- HTML BANDEJA DE SOPORTE TECNICO CON PAGINACION DE 8 -->
           <div class="glass-panel mt-2rem">
-            <div class="mb-8 flex justify-between items-center">
+            <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <h2 class="text-[16px] font-bold text-white tracking-wide uppercase mb-2">
+                <h2 class="text-[16px] font-bold text-white tracking-wide uppercase mb-1">
                   Módulo de Soporte Técnico
                 </h2>
-                <p class="text-slate-200 font-medium">
-                  Gestión de tickets de soporte de empresas cliente
+                <p class="text-slate-200 font-medium text-sm m-0">
+                  Gestión integral de tickets, solicitudes y asistencia técnica a empresas cliente
                 </p>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                  Total: {{ ticketsSoporte.length }} tickets
+                </span>
+                <span class="px-3 py-1 rounded-full text-xs font-semibold bg-orange-500/20 text-orange-300 border border-orange-500/30">
+                  Pendientes: {{ ticketsSoportePendientes }}
+                </span>
+              </div>
+            </div>
+
+            <!-- HTML BARRA DE BUSQUEDA Y FILTROS DE SOPORTE -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 p-4 rounded-xl bg-gray-900/60 border border-slate-700/60">
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Buscar por Empresa / NIT</label>
+                <div class="relative">
+                  <input
+                    type="text"
+                    [(ngModel)]="filtroEmpresaTicket"
+                    (ngModelChange)="onFiltroTicketChange()"
+                    placeholder="Nombre de empresa o NIT..."
+                    class="w-full bg-[#0f172a] border border-slate-600 text-white rounded-lg px-4 py-2 pl-9 text-sm focus:outline-none focus:border-blue-500 transition-colors"
+                  />
+                  <i class="fas fa-search absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Tipo de Soporte</label>
+                <select
+                  [(ngModel)]="filtroTipoTicket"
+                  (ngModelChange)="onFiltroTicketChange()"
+                  class="w-full bg-[#0f172a] border border-slate-600 text-white rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors"
+                >
+                  <option value="">Todos los tipos</option>
+                  @for (tipo of tiposSoporteDisponibles; track tipo) {
+                    <option [value]="tipo">{{ tipo }}</option>
+                  }
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Estado del Ticket</label>
+                <select
+                  [(ngModel)]="filtroEstadoTicket"
+                  (ngModelChange)="onFiltroTicketChange()"
+                  class="w-full bg-[#0f172a] border border-slate-600 text-white rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors"
+                >
+                  <option value="">Todos los estados</option>
+                  <option value="Abierto">Abierto</option>
+                  <option value="En progreso">En progreso</option>
+                  <option value="Resuelto">Resuelto</option>
+                  <option value="Cerrado">Cerrado</option>
+                </select>
+              </div>
+
+              <div class="flex items-end gap-2">
+                <div class="flex-1">
+                  <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Fecha de Creación</label>
+                  <input
+                    type="date"
+                    [(ngModel)]="filtroFechaTicket"
+                    (ngModelChange)="onFiltroTicketChange()"
+                    class="dark-date-input w-full bg-[#0f172a] border border-orange-500/40 text-white rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-orange-500 transition-colors"
+                    title="Filtrar por fecha"
+                  />
+                </div>
+                @if (filtroEmpresaTicket || filtroTipoTicket || filtroEstadoTicket || filtroFechaTicket) {
+                  <button
+                    type="button"
+                    (click)="limpiarFiltrosTicket()"
+                    class="saas-btn saas-btn--secondary text-xs px-3 py-2 flex items-center gap-1 shrink-0"
+                    title="Limpiar filtros"
+                  >
+                    <i class="fas fa-times"></i> Limpiar
+                  </button>
+                }
               </div>
             </div>
 
             <div
-              class="bg-gray-800/50 rounded-xl overflow-hidden border border-slate-500/50 mt-6 shadow-xl relative backdrop-blur-sm"
+              class="bg-gray-800/50 rounded-xl overflow-hidden border border-slate-500/50 mt-4 shadow-xl relative backdrop-blur-sm"
             >
               <div class="overflow-x-auto">
                 <table class="saas-table w-full text-left border-collapse">
@@ -406,6 +483,7 @@
                     >
                       <th class="px-2 py-4 font-semibold">ID</th>
                       <th class="px-2 py-4 font-semibold">Empresa</th>
+                      <th class="px-2 py-4 font-semibold">Tipo</th>
                       <th class="px-2 py-4 font-semibold">Asunto</th>
                       <th class="px-2 py-4 font-semibold">Prioridad</th>
                       <th class="px-2 py-4 font-semibold">Estado</th>
@@ -416,11 +494,17 @@
                   <tbody class="divide-y divide-gray-800/50">
                     @for (ticket of paginatedTickets; track ticket.id) {
                       <tr class="hover:bg-gray-700/30 transition-colors duration-200">
-                        <td class="px-2 py-4 text-slate-200 text-sm">#{{ ticket.id }}</td>
+                        <td class="px-2 py-4 text-slate-200 text-sm font-semibold">#{{ ticket.id }}</td>
                         <td class="px-2 py-4 font-medium text-white">
-                          {{ ticket.empresa?.razon_social || 'Desconocida' }}
+                          <div>{{ ticket.empresa?.razon_social || 'Desconocida' }}</div>
+                          <div class="text-xs text-slate-400">NIT: {{ ticket.empresa?.nit || 'N/A' }}</div>
                         </td>
-                        <td class="px-2 py-4 text-gray-300">{{ ticket.asunto }}</td>
+                        <td class="px-2 py-4 text-sm">
+                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-cyan-950/70 text-cyan-300 border border-cyan-800/50">
+                            {{ ticket.tipo || 'General' }}
+                          </span>
+                        </td>
+                        <td class="px-2 py-4 text-gray-200 font-medium">{{ ticket.asunto }}</td>
                         <td class="px-2 py-4">
                           <span
                             class="px-3 py-1 rounded-full text-sm font-semibold
@@ -432,7 +516,7 @@
                                   : 'bg-green-500/20 text-green-400 border border-green-500/30'
                             }}"
                           >
-                            {{ ticket.prioridad }}
+                            {{ ticket.prioridad || 'Media' }}
                           </span>
                         </td>
                         <td class="px-2 py-4">
@@ -443,13 +527,15 @@
                                 ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
                                 : ticket.estado === 'En progreso'
                                   ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                                  : 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/30'
+                                  : ticket.estado === 'Resuelto'
+                                    ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/30'
+                                    : 'bg-purple-500/20 text-purple-200 border border-purple-500/30'
                             }}"
                           >
                             {{ ticket.estado }}
                           </span>
                         </td>
-                        <td class="px-2 py-4 text-slate-200 text-sm">
+                        <td class="px-2 py-4 text-slate-200 text-sm whitespace-nowrap">
                           {{ ticket.created_at | date: 'dd/MM/yyyy HH:mm' }}
                         </td>
                         <td class="px-2 py-4 text-center align-middle whitespace-nowrap">
@@ -457,7 +543,7 @@
                             <button
                               (click)="abrirTicket(ticket)"
                               class="saas-action-btn saas-action-btn--indigo"
-                              title="Atender ticket #{{ ticket.id }}"
+                              title="Ver historial y atender ticket #{{ ticket.id }}"
                               aria-label="Atender ticket"
                             >
                               <svg class="saas-action-icon" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -468,9 +554,9 @@
                         </td>
                       </tr>
                     }
-                    @if (ticketsSoporte.length === 0) {
+                    @if (paginatedTickets.length === 0) {
                       <tr>
-                        <td colspan="7" class="p-8 text-center text-slate-200">
+                        <td colspan="8" class="p-8 text-center text-slate-200">
                           <svg
                             class="w-12 h-12 mx-auto mb-3 opacity-50"
                             fill="none"
@@ -484,7 +570,11 @@
                               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                             ></path>
                           </svg>
-                          No hay tickets de soporte disponibles.
+                          @if (ticketsSoporte.length === 0) {
+                            No hay tickets de soporte disponibles en el sistema.
+                          } @else {
+                            No se encontraron tickets con los filtros aplicados.
+                          }
                         </td>
                       </tr>
                     }
@@ -492,13 +582,13 @@
                 </table>
               </div>
 
-              <!-- Paginación de Soporte (8 por página) -->
+              <!-- HTML PAGINACION DE SOPORTE -->
               @if (totalPagesTickets > 1) {
                 <div class="saas-pagination-bar px-4 pb-4">
                   <div class="pagination-info">
                     Mostrando <strong>{{ (pageTickets - 1) * pageSize + 1 }}</strong> a
-                    <strong>{{ Math.min(pageTickets * pageSize, ticketsSoporte.length) }}</strong> de
-                    <strong>{{ ticketsSoporte.length }}</strong> tickets
+                    <strong>{{ Math.min(pageTickets * pageSize, ticketsSoporteFiltrados.length) }}</strong> de
+                    <strong>{{ ticketsSoporteFiltrados.length }}</strong> tickets
                   </div>
                   <div class="pagination-controls">
                     <button
@@ -530,7 +620,7 @@
             </div>
           </div>
         } @else {
-          <!-- VISTA COMPLETA: ATENCIÓN DE TICKET (PÁGINA DEDICADA SIN MODAL FLOTANTE) -->
+          <!-- HTML VISTA COMPLETA ATENCION DE TICKET -->
           @if (ticketSeleccionado) {
             <div class="glass-panel mt-2rem fade-in">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6 border-b border-gray-800">
@@ -546,8 +636,9 @@
                     </h2>
                     <p class="text-slate-100 text-sm mt-1 mb-0">
                       Empresa: <strong class="text-white">{{ ticketSeleccionado.empresa?.razon_social }}</strong> | 
+                      Tipo: <span class="font-bold text-cyan-300">{{ ticketSeleccionado.tipo || 'Técnico' }}</span> | 
                       Fecha: {{ ticketSeleccionado.created_at | date: 'dd/MM/yyyy HH:mm' }} | 
-                      Prioridad: <span class="font-bold text-yellow-400">{{ ticketSeleccionado.prioridad }}</span>
+                      Prioridad: <span class="font-bold text-yellow-400">{{ ticketSeleccionado.prioridad || 'Media' }}</span>
                     </p>
                   </div>
                 </div>
@@ -564,24 +655,62 @@
               </div>
 
               <div class="max-w-4xl mx-auto space-y-6">
+                <!-- HTML DETALLE DEL PROBLEMA REPORTADO -->
                 <div class="p-5 bg-gray-900/60 rounded-xl border border-gray-800">
-                  <h3 class="text-sm font-semibold text-slate-200 uppercase tracking-wider mb-2">
-                    Descripción del Problema Reportado
-                  </h3>
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 pb-2 border-b border-gray-800">
+                    <h3 class="text-sm font-semibold text-slate-200 uppercase tracking-wider m-0">
+                      Descripción del Problema Reportado
+                    </h3>
+                    <span class="text-xs text-slate-400">
+                      Reportado por: <strong class="text-white">{{ ticketSeleccionado.usuario?.primer_nombre }} {{ ticketSeleccionado.usuario?.primer_apellido }}</strong> ({{ ticketSeleccionado.usuario?.email }})
+                    </span>
+                  </div>
                   <p class="text-gray-200 text-base leading-relaxed whitespace-pre-line m-0">
                     {{ ticketSeleccionado.mensaje }}
                   </p>
                 </div>
 
+                <!-- HTML HISTORIAL DE RESOLUCION O RESPUESTA PREVIA -->
+                @if (ticketSeleccionado.notas_resolucion) {
+                  <div class="p-5 bg-emerald-950/40 rounded-xl border border-emerald-500/40">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 pb-2 border-b border-emerald-500/30">
+                      <h3 class="text-sm font-semibold text-emerald-300 uppercase tracking-wider flex items-center gap-2 m-0">
+                        <i class="fas fa-check-circle text-emerald-400"></i> Historial y Solución Técnica Registrada
+                      </h3>
+                      <span class="text-xs text-emerald-200">
+                        Atendido por: <strong class="text-white">{{ ticketSeleccionado.tecnico?.primer_nombre || 'Soporte Central' }}</strong>
+                        @if (ticketSeleccionado.updated_at) {
+                          ({{ ticketSeleccionado.updated_at | date: 'dd/MM/yyyy HH:mm' }})
+                        }
+                      </span>
+                    </div>
+                    <p class="text-emerald-100 text-sm leading-relaxed whitespace-pre-line m-0">
+                      {{ ticketSeleccionado.notas_resolucion }}
+                    </p>
+                  </div>
+                }
+
+                <!-- HTML FORMULARIO DE RESPUESTA Y ACTUALIZACION -->
                 <div class="form-group">
                   <label class="block text-sm font-semibold text-gray-300 mb-2">
-                    Respuesta Oficial (se notificará al cliente):
+                    {{ ticketSeleccionado.estado === 'Cerrado' || ticketSeleccionado.estado === 'Resuelto' ? 'Actualizar Resolución / Nota Técnica:' : 'Respuesta Oficial (se notificará al cliente):' }}
                   </label>
                   <textarea
                     [(ngModel)]="respuestaTicket"
                     class="saas-input w-full min-h-[140px] text-base"
                     placeholder="Escribe la respuesta, solución o indicaciones técnicas brindadas a la empresa..."
                   ></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Estado al Guardar</label>
+                    <select [(ngModel)]="estadoNuevoTicket" class="saas-input w-full text-sm">
+                      <option value="En progreso">En progreso</option>
+                      <option value="Resuelto">Resuelto</option>
+                      <option value="Cerrado">Cerrado</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-800">
@@ -620,12 +749,12 @@
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         ></path>
                       </svg>
-                      Enviando Solución...
+                      Guardando Solución...
                     } @else {
                       <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
                       </svg>
-                      Resolver y Enviar Respuesta
+                      Guardar y Actualizar Ticket
                     }
                   </button>
                 </div>
@@ -636,7 +765,7 @@
       }
 
       @if (currentView === 'seguridad') {
-        <!-- MÓDULO SEGURIDAD Y PERFIL -->
+        <!-- HTML MODULO SEGURIDAD Y PERFIL -->
         <div class="glass-panel mt-2rem max-w-4xl mx-auto font-inter">
           <div class="mb-8">
             <h2 class="text-[16px] font-bold text-white tracking-wide text-center uppercase mb-2">
@@ -648,7 +777,7 @@
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- AVATAR SECTION -->
+            <!-- HTML SECCION AVATAR -->
             <div
               class="col-span-1 flex flex-col items-center justify-start bg-[#0f172a] rounded-2xl p-6 shadow-inner border border-gray-800"
             >
@@ -705,9 +834,9 @@
               </p>
             </div>
 
-            <!-- FORM SECTION -->
+            <!-- HTML SECCION FORMULARIO PERFIL -->
             <div class="col-span-1 md:col-span-2 flex flex-col gap-6">
-              <!-- Datos Básicos -->
+              <!-- HTML DATOS BASICOS PERFIL -->
               <div class="bg-[#0f172a] rounded-2xl p-6 shadow-inner border border-gray-800">
                 <h3 class="text-white font-bold text-base mb-4 flex items-center gap-2">
                   <svg
@@ -771,7 +900,7 @@
                 </form>
               </div>
 
-              <!-- Seguridad (Contraseña) -->
+              <!-- HTML SEGURIDAD CAMBIO CONTRASENA -->
               <div
                 class="bg-[#0f172a] rounded-2xl p-6 shadow-inner border border-red-500/20 relative overflow-hidden"
               >
@@ -836,7 +965,7 @@
 
       @if (currentView === 'empresas') {
         @if (!showModal) {
-          <!-- COMPANIES TABLE (VISTA LISTADO CON PAGINACIÓN DE 8) -->
+          <!-- HTML TABLA DE EMPRESAS CON PAGINACION DE 8 -->
           <div class="glass-panel mt-2rem">
             <div class="mb-8 flex flex-col items-center justify-center gap-2">
               <h2 class="text-[16px] font-bold text-white tracking-wide text-center uppercase m-0">
@@ -848,7 +977,7 @@
               <button (click)="abrirModal()" class="btn-new mt-2">+ Nueva Empresa</button>
             </div>
 
-            <!-- BARRA DE BÚSQUEDA EN TIEMPO REAL -->
+            <!-- HTML BARRA DE BUSQUEDA EN TIEMPO REAL -->
             <div class="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
               <div class="relative w-full sm:max-w-md">
                 <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-200">
@@ -877,7 +1006,7 @@
                 }
               </div>
 
-              <!-- Indicador de conteo -->
+              <!-- HTML INDICADOR DE CONTEO EMPRESAS -->
               <div class="text-sm text-slate-200 whitespace-nowrap flex items-center gap-2">
                 @if (busquedaEmpresas) {
                   <span class="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium bg-emerald-500/10 text-emerald-200 border border-emerald-500/20">
@@ -1010,7 +1139,7 @@
                         </td>
                         <td class="actions text-center align-middle whitespace-nowrap">
                           <div class="flex items-center justify-center gap-1.5 mx-auto">
-                            <!-- Auditoria / Modo Dios -->
+                            <!-- HTML ACCION AUDITORIA MODO DIOS -->
                             <button
                               (click)="auditarEmpresa(empresa)"
                               class="saas-action-btn saas-action-btn--blue"
@@ -1023,7 +1152,7 @@
                               </svg>
                             </button>
 
-                            <!-- Ir a Suscripción (carga el precio según el plan) -->
+                            <!-- HTML ACCION IR A SUSCRIPCION SEGUN PLAN -->
                             <button
                               (click)="abrirSuscripcionDeEmpresa(empresa)"
                               class="saas-action-btn saas-action-btn--emerald"
@@ -1035,7 +1164,7 @@
                               </svg>
                             </button>
 
-                            <!-- Activar (Check Circle) -->
+                            <!-- HTML ACCION ACTIVAR EMPRESA -->
                             <button
                               (click)="cambiarEstadoEmpresa(empresa, 'activar')"
                               class="saas-action-btn saas-action-btn--emerald"
@@ -1047,7 +1176,7 @@
                               </svg>
                             </button>
 
-                            <!-- Inactivar (Block) -->
+                            <!-- HTML ACCION INACTIVAR EMPRESA -->
                             <button
                               (click)="cambiarEstadoEmpresa(empresa, 'mora')"
                               class="saas-action-btn saas-action-btn--amber"
@@ -1059,7 +1188,7 @@
                               </svg>
                             </button>
 
-                            <!-- Inactivar Total (Trash) -->
+                            <!-- HTML ACCION INACTIVAR TOTAL EMPRESA -->
                             <button
                               (click)="cambiarEstadoEmpresa(empresa, 'inactivar')"
                               class="saas-action-btn saas-action-btn--red"
@@ -1071,7 +1200,7 @@
                               </svg>
                             </button>
 
-                            <!-- Editar (Edit) -->
+                            <!-- HTML ACCION EDITAR EMPRESA -->
                             <button
                               (click)="editarEmpresa(empresa)"
                               class="saas-action-btn saas-action-btn--fuchsia"
@@ -1083,7 +1212,7 @@
                               </svg>
                             </button>
 
-                            <!-- Reenviar Credenciales -->
+                            <!-- HTML ACCION REENVIAR CREDENCIALES -->
                             <button
                               (click)="reenviarCredenciales(empresa)"
                               class="saas-action-btn saas-action-btn--blue"
@@ -1101,7 +1230,7 @@
                   </tbody>
                 </table>
 
-                <!-- Paginación de Empresas (8 por página) -->
+                <!-- HTML PAGINACION DE EMPRESAS -->
                 @if (totalPagesEmpresas > 1) {
                   <div class="saas-pagination-bar">
                     <div class="pagination-info">
@@ -1154,7 +1283,7 @@
             </div>
           </div>
         } @else {
-          <!-- VISTA COMPLETA: CREAR / EDITAR EMPRESA (PÁGINA DEDICADA SIN MODAL FLOTANTE) -->
+          <!-- HTML VISTA COMPLETA CREAR EDITAR EMPRESA -->
           <div class="glass-panel mt-2rem fade-in">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6 border-b border-gray-800">
               <div>
@@ -1272,7 +1401,7 @@
                 </select>
               </div>
 
-              <!-- Campos del Gerente -->
+              <!-- HTML FORMULARIO CAMPOS DEL GERENTE -->
               <h3 class="text-emerald-200 font-bold mt-6 mb-3 border-b border-gray-800 pb-2">
                 Datos del Gerente General
               </h3>
@@ -1348,7 +1477,7 @@
                 </div>
               </div>
 
-              <!-- Suscripción y Descuentos -->
+              <!-- HTML FORMULARIO SUSCRIPCION Y DESCUENTOS -->
               <h3 class="text-emerald-200 font-bold mt-6 mb-3 border-b border-gray-800 pb-2">
                 Plan y Contratación
               </h3>
@@ -1479,7 +1608,7 @@
 
       @if (currentView === 'solicitudes') {
         @if (!isModalSolicitudOpen) {
-          <!-- BANDEJA DE SOLICITUDES (VISTA LISTADO CON PAGINACIÓN DE 8) -->
+          <!-- HTML BANDEJA DE SOLICITUDES CON PAGINACION DE 8 -->
           <div class="glass-panel mt-2rem">
             <div class="mb-8">
               <h2 class="text-[16px] font-bold text-white mb-2 tracking-wide text-center uppercase">
@@ -1490,7 +1619,7 @@
               </p>
             </div>
 
-            <!-- Filtros -->
+            <!-- HTML FILTROS DE SOLICITUDES -->
             <div class="flex flex-col sm:flex-row gap-4 mb-6">
               <div class="flex-1">
                 <input
@@ -1552,7 +1681,7 @@
                   }
                 </div>
 
-                <!-- Paginación de Solicitudes (8 por página) -->
+                <!-- HTML PAGINACION DE SOLICITUDES -->
                 @if (totalPagesSolicitudes > 1) {
                   <div class="saas-pagination-bar">
                     <div class="pagination-info">
@@ -1593,7 +1722,7 @@
             </div>
           </div>
         } @else {
-          <!-- VISTA COMPLETA: DETALLE DE SOLICITUD (PÁGINA DEDICADA SIN MODAL FLOTANTE) -->
+          <!-- HTML VISTA COMPLETA DETALLE DE SOLICITUD -->
           @if (solicitudSeleccionada) {
             <div class="glass-panel mt-2rem fade-in">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6 border-b border-gray-800">
@@ -1921,7 +2050,7 @@
         }
       }
 
-      <!-- VISTA: CONTROL DE IA -->
+      <!-- HTML VISTA CONTROL DE IA -->
       @if (currentView === 'control-ia') {
         <div class="glass-panel mt-2rem">
           <div class="mb-8">
@@ -1936,7 +2065,7 @@
 
           <div class="content-grid single-col max-w-4xl mx-auto">
             <div class="soft-ui-card">
-              <!-- PASO 1: Empresa -->
+              <!-- HTML CONTROL IA PASO 1 SELECCION DE EMPRESA -->
               <div class="form-group mb-8">
                 <div class="flex items-center gap-3 mb-4">
                   <div
@@ -1959,7 +2088,7 @@
                   }
                 </select>
 
-                <!-- Banner: resumen del estado guardado -->
+                <!-- HTML CONTROL IA BANNER RESUMEN ESTADO GUARDADO -->
                 @if (iaConfigSeleccionada.empresaId && iaConfigSeleccionada.modo !== 'apagado') {
                   <div class="mt-4 p-4 rounded-lg border border-emerald-500/40 bg-emerald-900/20 flex flex-col gap-2">
                     <p class="text-sm font-bold text-emerald-400 flex items-center gap-2">
@@ -1986,7 +2115,7 @@
                         </strong>
                       </span>
                     </div>
-                    <!-- Tareas activas -->
+                    <!-- HTML CONTROL IA TAREAS ACTIVAS -->
                     @if (iaConfigSeleccionada.tareas.resumir || iaConfigSeleccionada.tareas.redactar || iaConfigSeleccionada.tareas.analizar || iaConfigSeleccionada.tareas.automatizar) {
                       <div class="flex flex-wrap gap-2 mt-1">
                         <span class="text-xs text-slate-400">Tareas habilitadas:</span>
@@ -2007,7 +2136,7 @@
 
               <hr class="border-gray-800 my-8" />
 
-              <!-- PASO 2: Fuente de IA (GestivaPyme vs BYOK) -->
+              <!-- HTML CONTROL IA PASO 2 FUENTE DE IA -->
               <div class="form-group mb-8">
                 <div class="flex items-center gap-3 mb-4">
                   <div
@@ -2018,7 +2147,7 @@
                   <h3 class="text-base font-bold text-white">Fuente de Inteligencia Artificial</h3>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <!-- Opción: IA de GestivaPyme -->
+                  <!-- HTML CONTROL IA OPCION SERVICIO GESTIVAPYME -->
                   <label
                     class="flex flex-col gap-2 cursor-pointer p-4 rounded-lg border-2 transition-all"
                     [class.border-emerald-400]="iaConfigSeleccionada.fuente === 'gestivapyme'"
@@ -2029,7 +2158,7 @@
                     <span class="text-base font-semibold text-white">🤖 IA de GestivaPyme</span>
                     <p class="text-sm text-slate-200">Incluida en el plan. Sin configuración adicional requerida.</p>
                   </label>
-                  <!-- Opción: IA propia (BYOK) -->
+                  <!-- HTML CONTROL IA OPCION PROPIA BYOK -->
                   <label
                     class="flex flex-col gap-2 cursor-pointer p-4 rounded-lg border-2 transition-all"
                     [class.border-purple-400]="iaConfigSeleccionada.fuente === 'propia'"
@@ -2046,7 +2175,7 @@
               <hr class="border-gray-800 my-8" />
 
 
-              <!-- PASO 3 (solo si fuente=propia): Proveedor y API Key -->
+              <!-- HTML CONTROL IA PASO 3 PROVEEDOR Y API KEY -->
               @if (iaConfigSeleccionada.fuente === 'propia') {
                 <div class="form-group mb-8">
                   <div class="flex items-center gap-3 mb-4">
@@ -2097,7 +2226,7 @@
 
 
 
-              <!-- PASO 4: Modo de Operación y Tareas -->
+              <!-- HTML CONTROL IA PASO 4 MODO DE OPERACION Y TAREAS -->
               <div class="form-group mb-8">
                 <div class="flex items-center gap-3 mb-4">
                   <div
@@ -2110,7 +2239,7 @@
 
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <!-- Modos -->
+                  <!-- HTML CONTROL IA MODOS DE OPERACION -->
                   <div>
                     <label class="form-label text-slate-200 text-sm block mb-3"
                       >Nivel de Integración</label
@@ -2173,7 +2302,7 @@
                     </div>
                   </div>
 
-                  <!-- Tareas -->
+                  <!-- HTML CONTROL IA TAREAS ESPECIFICAS -->
                   <div>
                     <label class="form-label text-slate-200 text-sm block mb-3"
                       >Tareas Permitidas</label
@@ -2224,7 +2353,7 @@
                 </div>
               </div>
 
-              <!-- BOTÓN GUARDAR -->
+              <!-- HTML CONTROL IA BOTON GUARDAR CONFIGURACION -->
               <div class="mt-8 pt-6 border-t border-gray-800">
                 <button
                   class="w-full glass-btn-blue text-white font-bold py-3.5 px-6 rounded-lg transition-colors uppercase tracking-wide flex items-center justify-center gap-2"
@@ -2252,7 +2381,7 @@
       }
 
       @if (currentView === 'suscripciones') {
-        <!-- BANDEJA DE SUSCRIPCIONES -->
+        <!-- HTML BANDEJA DE SUSCRIPCIONES -->
         <div class="glass-panel mt-2rem">
           <div class="mb-8">
             <h2 class="text-[16px] font-bold text-white tracking-wide text-center uppercase mb-2">
@@ -2518,7 +2647,7 @@
                   </table>
                 </div>
 
-                <!-- Paginación de Suscripciones (8 por página) -->
+                <!-- HTML PAGINACION DE SUSCRIPCIONES -->
                 @if (totalPagesSuscripciones > 1) {
                   <div class="saas-pagination-bar">
                     <div class="pagination-info">
@@ -2557,7 +2686,7 @@
                 <div class="empty-state">No hay datos de suscripciones para mostrar.</div>
               }
             } @else if (modalTarifasGlobalesVisible) {
-              <!-- VISTA COMPLETA: CATÁLOGO DE TARIFAS GLOBALES (SUBPÁGINA DEDICADA SIN MODAL FLOTANTE) -->
+              <!-- HTML VISTA COMPLETA CATALOGO DE TARIFAS GLOBALES -->
               <div class="w-full text-white font-inter fade-in">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6 border-b border-gray-800">
                   <div class="flex items-center gap-3">
@@ -2633,7 +2762,7 @@
                 </div>
               </div>
             } @else {
-              <!-- CARRITO DE SUSCRIPCIONES INLINE -->
+              <!-- HTML CARRITO DE SUSCRIPCIONES INLINE -->
               <div class="w-full text-white font-inter">
                 <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-800">
                   <h2 class="text-[16px] font-bold text-emerald-200 uppercase tracking-wider">
@@ -2655,9 +2784,9 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  <!-- PARTE IZQUIERDA: CONFIGURADOR (CARRO) - 2 COLUMNAS -->
+                  <!-- HTML CONFIGURADOR CARRITO COLUMNA IZQUIERDA -->
                   <div class="lg:col-span-2 space-y-6">
-                    <!-- PESTAÑAS (TABS) DEL CONFIGURADOR -->
+                    <!-- HTML PESTANAS TABS DEL CONFIGURADOR -->
                     <div class="flex border-b border-gray-800 gap-2 mb-4 overflow-x-auto pb-1">
                       <button
                         (click)="activeTabCarrito = 'plan_base'"
@@ -2689,7 +2818,7 @@
                       </button>
                     </div>
 
-                    <!-- TAB 1: PLAN BASE & TIPO EMPRESA (SOLO LECTURA: definidos en el módulo Empresas) -->
+                    <!-- HTML TAB 1 PLAN BASE Y TIPO EMPRESA -->
                     <div
                       *ngIf="activeTabCarrito === 'plan_base'"
                       class="space-y-4 bg-gray-800/40 p-4 rounded-xl border border-gray-800"
@@ -2757,9 +2886,9 @@
                       </div>
                     </div>
 
-                    <!-- TAB 2: MÓDULOS ADICIONALES (ESPECIALES) -->
+                    <!-- HTML TAB 2 MODULOS ADICIONALES ESPECIALES -->
                     <div *ngIf="activeTabCarrito === 'modulos'" class="space-y-4">
-                      <!-- Regla de Validación de Negocio visual -->
+                      <!-- HTML ALERTA REGLA DE VALIDACION DE NEGOCIO -->
                       <div
                         *ngIf="
                           !['Ventas', 'Servicios', 'Ventas y Servicios'].includes(
@@ -2829,12 +2958,12 @@
                       </div>
                     </div>
 
-                    <!-- TAB 3: INTELIGENCIA ARTIFICIAL (GEMINI FLASH) -->
+                    <!-- HTML TAB 3 INTELIGENCIA ARTIFICIAL GEMINI -->
                     <div
                       *ngIf="activeTabCarrito === 'ia'"
                       class="space-y-4 bg-gray-800/40 p-4 rounded-xl border border-gray-800"
                     >
-                      <!-- Toggle de API Propia (BYOK) -->
+                      <!-- HTML TOGGLE API PROPIA BYOK -->
                       <div
                         class="flex items-center justify-between p-3 bg-gray-900 rounded-xl border border-gray-800"
                       >
@@ -2857,7 +2986,7 @@
 
                       <hr class="border-gray-800 my-4" />
 
-                      <!-- Opción A: Cobro SaaS por usuarios de IA -->
+                      <!-- HTML OPCION COBRO SAAS POR USUARIOS DE IA -->
                       <div *ngIf="!iaByokActivo" class="space-y-4">
                         <label
                           class="block text-sm uppercase tracking-wider text-slate-200 font-semibold mb-2"
@@ -2865,7 +2994,7 @@
                         >
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <!-- IA Simple -->
+                          <!-- HTML PLAN IA SIMPLE -->
                           <div class="p-4 bg-gray-900 rounded-xl border border-gray-800">
                             <div class="flex items-center justify-between mb-3">
                               <label
@@ -2896,7 +3025,7 @@
                             </div>
                           </div>
 
-                          <!-- IA Avanzada -->
+                          <!-- HTML PLAN IA AVANZADA -->
                           <div class="p-4 bg-gray-900 rounded-xl border border-gray-800">
                             <div class="flex items-center justify-between mb-3">
                               <label
@@ -2929,7 +3058,7 @@
                         </div>
                       </div>
 
-                      <!-- Opción B: Formulario BYOK -->
+                      <!-- HTML FORMULARIO CREDENCIALES BYOK -->
                       <div *ngIf="iaByokActivo" class="space-y-4">
                         <label
                           class="block text-sm uppercase tracking-wider text-slate-200 font-semibold mb-2"
@@ -2978,7 +3107,7 @@
                       </div>
                     </div>
 
-                    <!-- TAB 4: ADD-ONS (CONECTORES) -->
+                    <!-- HTML TAB 4 ADD-ONS Y CONECTORES -->
                     <div
                       *ngIf="activeTabCarrito === 'addons'"
                       class="bg-gray-800/40 p-4 rounded-xl border border-gray-800 space-y-3"
@@ -3015,7 +3144,7 @@
                     </div>
                   </div>
 
-                  <!-- PARTE DERECHA: RESUMEN DE COMPRA (INLINE CHECKOUT) - 1 COLUMNA -->
+                  <!-- HTML RESUMEN DE COMPRA CHECKOUT COLUMNA DERECHA -->
                   <div class="space-y-6">
                     <div
                       class="bg-gray-800/70 p-5 rounded-xl border border-slate-500 shadow-lg space-y-4"
@@ -3026,7 +3155,7 @@
                         Resumen de Suscripción
                       </h3>
 
-                      <!-- Datos de Empresa -->
+                      <!-- HTML CHECKOUT DATOS DE LA EMPRESA -->
                       <div>
                         <div class="text-sm text-slate-200">CLIENTE</div>
                         <div class="font-bold text-white text-sm">
@@ -3042,7 +3171,7 @@
 
                       <hr class="border-slate-500" />
 
-                      <!-- Detalle del Carrito -->
+                      <!-- HTML CHECKOUT DETALLE DEL CARRITO -->
                       <div class="space-y-2 max-h-[30vh] overflow-y-auto pr-1">
                         <div class="text-sm text-slate-200">CONCEPTOS DE COBRO</div>
 
@@ -3077,7 +3206,7 @@
                           </div>
                         </ng-container>
 
-                        <!-- Add-on BYOK si aplica -->
+                        <!-- HTML CHECKOUT ADDON BYOK -->
                         <div
                           *ngIf="iaByokActivo"
                           class="flex justify-between items-start text-sm text-gray-300"
@@ -3089,7 +3218,7 @@
 
                       <hr class="border-slate-500" />
 
-                      <!-- Subtotal y Descuentos -->
+                      <!-- HTML CHECKOUT SUBTOTAL Y DESCUENTOS -->
                       <div class="space-y-1.5 text-sm text-gray-300">
                         <div class="flex justify-between">
                           <span>Sin descuento:</span>
@@ -3111,7 +3240,7 @@
 
                       <hr class="border-slate-500" />
 
-                      <!-- Gran Total MRR -->
+                      <!-- HTML CHECKOUT GRAN TOTAL MRR -->
                       <div
                         class="bg-gray-900/60 p-3 rounded-lg border border-gray-800 flex justify-between items-center"
                       >
@@ -3126,7 +3255,7 @@
                         </span>
                       </div>
 
-                      <!-- Botones de Acción -->
+                      <!-- HTML CHECKOUT BOTONES DE ACCION -->
                       <div class="pt-4 flex flex-col gap-2">
                         <button
                           (click)="guardarCarritoSuscripcion()"
@@ -3165,9 +3294,9 @@
               Asignación estratégica de permisos y configuración de servidores cliente.
             </p>
 
-            <!-- Monitores de Estado -->
+            <!-- HTML MONITORES DE ESTADO -->
             <div class="flex flex-wrap justify-center items-center gap-6">
-              <!-- Monitor Global (Siempre visible) -->
+              <!-- HTML MONITOR GLOBAL DEL SISTEMA -->
               <div
                 class="bg-gray-800 border border-slate-500 p-3 rounded-lg flex items-center gap-4 shadow-sm"
               >
@@ -3197,7 +3326,7 @@
                 </div>
               </div>
 
-              <!-- Monitor Empresarial (Solo al seleccionar empresa) -->
+              <!-- HTML MONITOR EMPRESARIAL ESPECIFICO -->
               @if (empresaSeleccionadaId) {
                 <div
                   class="bg-[#0f172a] border border-[#1e293b] p-3 rounded-lg flex items-center gap-4 shadow-sm"
@@ -3223,7 +3352,7 @@
             </div>
           </div>
 
-          <!-- Selector de Empresas -->
+          <!-- HTML SELECTOR DE EMPRESAS MODULOS -->
           <div
             class="mb-6 bg-gray-900 p-4 rounded-lg border border-slate-500 flex flex-col md:flex-row items-start md:items-center gap-4"
           >
@@ -3243,7 +3372,7 @@
 
           @if (empresaSeleccionadaId) {
             <div class="grid grid-cols-1 gap-6">
-              <!-- MÓDULOS BASE INCLUIDOS -->
+              <!-- HTML MODULOS BASE INCLUIDOS -->
               <div class="soft-ui-card">
                 <div class="flex items-center gap-3 mb-6 border-b border-slate-500/50 pb-4">
                   <div
@@ -3266,7 +3395,7 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <!-- Administración -->
+                  <!-- HTML MODULO BASE ADMINISTRACION -->
                   <div
                     class="bg-gray-800/40 border border-slate-500/50 p-4 rounded-xl flex items-center gap-4 hover:bg-gray-800/80 transition-colors"
                   >
@@ -3298,7 +3427,7 @@
                     </div>
                   </div>
 
-                  <!-- Formalización -->
+                  <!-- HTML MODULO BASE FORMALIZACION -->
                   <div
                     class="bg-gray-800/40 border border-slate-500/50 p-4 rounded-xl flex items-center gap-4 hover:bg-gray-800/80 transition-colors"
                   >
@@ -3325,7 +3454,7 @@
                     </div>
                   </div>
 
-                  <!-- Autogestión -->
+                  <!-- HTML MODULO BASE AUTOGESTION -->
                   <div
                     class="bg-gray-800/40 border border-slate-500/50 p-4 rounded-xl flex items-center gap-4 hover:bg-gray-800/80 transition-colors"
                   >
@@ -3352,7 +3481,7 @@
                     </div>
                   </div>
 
-                  <!-- Tareas -->
+                  <!-- HTML MODULO BASE TAREAS -->
                   <div
                     class="bg-gray-800/40 border border-slate-500/50 p-4 rounded-xl flex items-center gap-4 hover:bg-gray-800/80 transition-colors"
                   >
@@ -3379,7 +3508,7 @@
                     </div>
                   </div>
 
-                  <!-- Gestiva IA -->
+                  <!-- HTML MODULO BASE GESTIVA IA -->
                   <div
                     class="bg-gray-800/40 border border-slate-500/50 p-4 rounded-xl flex items-center gap-4 hover:bg-gray-800/80 transition-colors"
                   >
@@ -3502,7 +3631,7 @@
                       </div>
                     </div>
 
-                    <!-- MASTER SWITCH SOFT UI Y CHEVRON -->
+                    <!-- HTML MASTER SWITCH SOFT UI Y DESPLEGABLE -->
                     <div class="flex items-center gap-4">
                       <div class="flex items-center gap-3" (click)="$event.stopPropagation()">
                         <span class="text-sm text-slate-200 font-bold tracking-wider">TODO</span>
@@ -3795,7 +3924,7 @@
                   </table>
                 </div>
 
-                <!-- Paginación de Leads (8 por página) -->
+                <!-- HTML PAGINACION DE LEADS -->
                 @if (totalPagesLeads > 1) {
                   <div class="saas-pagination-bar">
                     <div class="pagination-info">
@@ -3831,7 +3960,7 @@
                   </div>
                 }
               } @else {
-                <!-- VISTA COMPLETA: GESTIÓN DE NOTAS DEL LEAD (SUBPÁGINA DEDICADA SIN MODAL FLOTANTE) -->
+                <!-- HTML VISTA COMPLETA GESTION DE NOTAS DEL LEAD -->
                 <div class="glass-panel mt-6 font-inter fade-in">
                   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6 border-b border-gray-800">
                     <div class="flex items-center gap-3">
@@ -4031,7 +4160,7 @@
         </div>
       }
       @if (currentView === 'contratos') {
-        <!-- VISTA DE CONTRATOS SAAS -->
+        <!-- HTML VISTA DE CONTRATOS SAAS -->
         <div class="glass-panel mt-2rem font-inter">
           <div class="mb-8">
             <h2 class="text-[16px] font-bold text-white tracking-wide text-center uppercase mb-2">
@@ -4044,7 +4173,7 @@
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Izquierda: Redactor -->
+            <!-- HTML CONTRATOS REDACTOR PANEL IZQUIERDO -->
             <div
               class="bg-[#0f172a] rounded-2xl p-6 shadow-inner border border-gray-800 flex flex-col h-full"
             >
@@ -4142,7 +4271,7 @@
               </div>
             </div>
 
-            <!-- Derecha: Historial -->
+            <!-- HTML CONTRATOS HISTORIAL PANEL DERECHO -->
             <div class="bg-[#0f172a] rounded-2xl p-6 shadow-inner border border-gray-800">
               <h3 class="text-white font-bold text-base mb-4 flex items-center gap-2">
                 <svg
@@ -4209,7 +4338,7 @@
         </div>
       }
 
-    <!-- FOOTER DISCRETO SAAS ADMIN -->
+    <!-- HTML PIE DE PAGINA SAAS ADMIN -->
     <footer class="mt-10 py-6 border-t border-white/5 flex flex-col items-center justify-center gap-2">
       <img src="assets/images/Logos/GESTIVAPYME(6).png" alt="GestivaPyme Logo" 
            class="h-6 opacity-50 grayscale transition-all duration-500 hover:opacity-100 hover:grayscale-0 hover:scale-105 cursor-default">
@@ -4225,7 +4354,7 @@
 
 
 
-  <!-- Modal Éxito (Credenciales) -->
+  <!-- HTML MODAL EXITO CREDENCIALES -->
   <div *ngIf="showSuccessModal" class="saas-success-overlay">
     <div class="saas-success-content">
       <button (click)="cerrarSuccessModal()" class="saas-success-close">&times;</button>
@@ -4256,7 +4385,7 @@
   </div>
 
 
-  <!-- MODAL DE CONFIRMACIÓN GLOBAL -->
+  <!-- HTML MODAL CONFIRMACION GLOBAL -->
   @if (confirmModalVisible) {
     <div
       class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[110] flex items-center justify-center p-4"

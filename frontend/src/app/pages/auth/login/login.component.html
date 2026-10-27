@@ -79,7 +79,7 @@
       />
     </div>
 
-    <!-- AVISO DE SESIÓN EXPULSADA REMOTAMENTE -->
+    <!-- HTML AVISO DE SESION EXPULSADA REMOTAMENTE O POR INACTIVIDAD -->
     @if (remoteLogoutNotice) {
       <div class="alert-remote-logout fade-in" role="alert">
         <div class="alert-remote-icon">
@@ -295,7 +295,7 @@
     </div>
   }
 
-  <!-- HTML MODAL RECUPERACIÓN DE CONTRASEÑA -->
+  <!-- HTML MODAL RECUPERACION DE CONTRASENA -->
   @if (showRecoveryModal) {
     <div class="modal-overlay-susp fade-in" (click)="cerrarModalRecuperar()">
       <div class="modal-content-susp modal-recovery" (click)="$event.stopPropagation()">
@@ -342,7 +342,7 @@
     </div>
   }
 
-  <!-- HTML MODAL CONTROL DE SESIONES SIMULTÁNEAS -->
+  <!-- HTML MODAL CONTROL DE SESIONES SIMULTANEAS -->
   @if (showSessionConflictModal) {
     <div class="modal-overlay-susp fade-in" (click)="cancelarConflictoSesion()">
       <div class="modal-content-susp modal-conflict" (click)="$event.stopPropagation()">

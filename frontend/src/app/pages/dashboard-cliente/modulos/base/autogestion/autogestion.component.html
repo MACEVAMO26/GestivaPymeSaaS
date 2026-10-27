@@ -10,6 +10,7 @@
 
   <div class="tab-content neumorphic-panel-inner p-4">
     
+    <!-- HTML BOTON VOLVER -->
     <div class="volver-wrapper">
       <button class="btn-volver btn-pill" appVolver>
         <i class="fas fa-arrow-left"></i> Volver
@@ -25,8 +26,8 @@
       <!-- HTML TARJETA PERFIL -->
       <div class="neu-dark-panel profile-card">
         <div class="profile-header">
-          <!-- Input oculto para subir foto -->
-          <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none;">
+          <!-- HTML INPUT SUBIR FOTO -->
+          <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" class="hidden-file-input">
           
           <div class="avatar-wrapper" (click)="!isUploadingAvatar && fileInput.click()" title="Haz clic para cambiar tu foto">
             @if (profileImageUrl || user?.avatar_url) {
@@ -101,17 +102,17 @@
       <!-- HTML AFILIACIONES (SEGURIDAD SOCIAL GESTIONADA POR EMPRESA) -->
       <div class="neu-dark-panel form-card">
         <div class="card-header flex-between mb-3">
-          <h3 class="subtitulo" style="margin: 0;">Seguridad Social y Afiliaciones</h3>
+          <h3 class="subtitulo" class="m-0">Seguridad Social y Afiliaciones</h3>
           <span class="status-badge approved">Cobertura Activa</span>
         </div>
 
-        <p class="descripcion-general mb-4" style="text-align: left;">
+        <p class="descripcion-general mb-4" class="text-left">
           Tu seguridad social es gestionada y pagada por la empresa conforme a tu contratación laboral. Si requieres actualizar alguna entidad, solicita el cambio con Gestión Humana o en tu formalización.
         </p>
 
-        <!-- CUADRITO DE ENTIDADES DE SEGURIDAD SOCIAL -->
+        <!-- HTML ENTIDADES DE SEGURIDAD SOCIAL -->
         <div class="grid-form">
-          <!-- ARL (100% Empresa) -->
+          <!-- HTML AFILIACION ARL -->
           <div class="form-group">
             <label>ARL <span class="hint-text-small">(Aporte 100% Empresa)</span></label>
             <div class="input-readonly-pill" title="La ARL es cubierta en su totalidad por la empresa">
@@ -119,7 +120,7 @@
             </div>
           </div>
 
-          <!-- Caja de Compensación (100% Empresa) -->
+          <!-- HTML AFILIACION CAJA DE COMPENSACION -->
           <div class="form-group">
             <label>Caja de Compensación <span class="hint-text-small">(Aporte 100% Empresa)</span></label>
             <div class="input-readonly-pill" title="La Caja de Compensación es cubierta en su totalidad por la empresa">
@@ -127,7 +128,7 @@
             </div>
           </div>
 
-          <!-- EPS -->
+          <!-- HTML AFILIACION EPS -->
           <div class="form-group">
             <label>Entidad Promotora de Salud (EPS)</label>
             <div class="input-readonly-pill" title="Entidad promotora de salud asignada">
@@ -135,7 +136,7 @@
             </div>
           </div>
 
-          <!-- Fondo de Pensión -->
+          <!-- HTML AFILIACION FONDO DE PENSION -->
           <div class="form-group">
             <label>Fondo de Pensiones (AFP)</label>
             <div class="input-readonly-pill" title="Fondo de pensiones asignado">
@@ -143,7 +144,7 @@
             </div>
           </div>
 
-          <!-- Fondo de Cesantías -->
+          <!-- HTML AFILIACION FONDO DE CESANTIAS -->
           <div class="form-group">
             <label>Fondo de Cesantías</label>
             <div class="input-readonly-pill" title="Fondo de cesantías asignado">
@@ -151,18 +152,18 @@
             </div>
           </div>
 
-          <!-- Estado de Cobertura -->
+          <!-- HTML ESTADO DE COBERTURA -->
           <div class="form-group">
             <label>Estado de Afiliación</label>
-            <div class="input-readonly-pill estado-aprobado" style="font-weight: 500;">
+            <div class="input-readonly-pill estado-aprobado" class="font-weight-500">
               <i class="fas fa-check-circle"></i> Activa / Al día
             </div>
           </div>
         </div>
 
         @if (formAfiliacion.fecha_contratacion) {
-          <div class="mt-3 p-3 neumorphic-panel-inner" style="background: rgba(255,255,255,0.3); border-radius: 8px;">
-            <span class="descripcion-general" style="display: block; font-size: 14px;">
+          <div class="mt-3 p-3 neumorphic-panel-inner" class="bg-translucent-card">
+            <span class="descripcion-general" class="d-block font-size-14">
               <i class="fas fa-calendar-check"></i> Vinculado formalmente desde: <strong>{{ formAfiliacion.fecha_contratacion | date:'longDate' }}</strong>
             </span>
           </div>

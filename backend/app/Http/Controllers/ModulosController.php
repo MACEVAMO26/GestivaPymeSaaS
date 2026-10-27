@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\DB;
 
 class ModulosController extends Controller
 {
-    // --- GESTIÓN DE MÓDULOS DE EMPRESA ---
-    // Obtiene los módulos asignados a una empresa e inicializa los predeterminados si no tiene
+    // Bloque para gestionar módulos asignados a la empresa
+    
     public function getModulosPorEmpresa($empresaId)
     {
         $empresa = Empresa::find($empresaId);
@@ -22,6 +22,7 @@ class ModulosController extends Controller
         return $this->obtenerModulosParaEmpresa($empresa);
     }
 
+    // Bloque para obtener los módulos correspondientes al usuario autenticado
     public function getMisModulos(Request $request)
     {
         $empresaId = $request->user()->empresa_id;
@@ -35,6 +36,7 @@ class ModulosController extends Controller
         return $this->obtenerModulosParaEmpresa($empresa);
     }
 
+    // Bloque para consolidar el estado de módulos de una empresa
     public function obtenerModulosParaEmpresa(Empresa $empresa)
     {
 
@@ -123,11 +125,11 @@ class ModulosController extends Controller
         if ($tipo === 'Ventas' || $tipo === 'Ventas y Servicios') $paquetesPermitidos[] = 'ventas';
         if ($tipo === 'Servicios' || $tipo === 'Ventas y Servicios') $paquetesPermitidos[] = 'servicios';
         
-        // Módulos Especiales (Adicionales)
+        // Bloque para procesar módulos adicionales de soporte e inteligencia
         if (in_array('modulo_rrhh', $tarifas)) $paquetesPermitidos[] = 'rrhh';
         if (in_array('modulo_finanzas', $tarifas)) $paquetesPermitidos[] = 'finanzas';
         
-        // Addons
+        // Bloque para procesar addons y extensiones contratadas
         if (in_array('addon_factura', $tarifas) || in_array('addon_contable', $tarifas)) {
             $paquetesPermitidos[] = 'addons';
         }
@@ -143,7 +145,7 @@ class ModulosController extends Controller
                        ->first();
 
             if ($permitido) {
-                // Si el módulo está cubierto por el pago y no existe en la BD, se asigna y activa
+                // Bloque para activar módulo cubierto por suscripción
                 if (!$pivot) {
                     DB::table('empresa_modulo')->insert([
                         'empresa_id' => $empresa->id,
@@ -154,9 +156,9 @@ class ModulosController extends Controller
                     ]);
 
                 }
-                // Si ya existe, NO se sobrescribe 'activo' para respetar la configuración manual del SaaS Admin
+                // Bloque para preservar estado administrativo previo del módulo
             } else {
-                // Si NO está cubierto por el pago y está activo, se APAGA forzosamente
+                // Bloque para desactivar módulos no cubiertos por el plan activo
                 if ($pivot && $pivot->activo) {
                     DB::table('empresa_modulo')
                         ->where('empresa_id', $empresa->id)
@@ -196,7 +198,7 @@ class ModulosController extends Controller
             
             return response()->json(['message' => 'Módulo actualizado', 'activo' => $nuevoEstado]);
         } else {
-            // Asigna y activa el módulo simulando la compra de un addon
+            // Bloque para habilitar módulo adquirido mediante addon
             DB::table('empresa_modulo')->insert([
                 'empresa_id' => $empresaId,
                 'modulo_id' => $moduloId,
@@ -258,8 +260,8 @@ class ModulosController extends Controller
         return response()->json(['message' => 'Paquete actualizado correctamente']);
     }
 
-    // --- GESTIÓN GLOBAL DE MÓDULOS ---
-    // Registra un nuevo módulo global en el sistema
+    // Bloque para administración global de catálogo de módulos
+    
     public function store(Request $request)
     {
         $request->validate([
@@ -302,7 +304,7 @@ class ModulosController extends Controller
             return response()->json(['error' => 'Módulo no encontrado'], 404);
         }
 
-        // Elimina las asignaciones del módulo en todas las empresas antes de borrarlo
+        // Bloque para remover asignaciones de módulo antes de su eliminación
         DB::table('empresa_modulo')->where('modulo_id', $id)->delete();
         $modulo->delete();
 

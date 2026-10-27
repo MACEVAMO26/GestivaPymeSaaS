@@ -15,7 +15,7 @@
             </div>
         </div>
 
-        <!-- TABS NEUMORPHIC (ACTUALIZADAS) -->
+        <!-- HTML NAVEGACION DE PESTAÑAS -->
         <div class="tabs-nav-wrapper">
             <button class="tab-neu-inactive" [class.tab-neu-active]="tabActiva === 'directorio'" (click)="tabActiva = 'directorio'"> <span class="icon">👥</span> Directorio de Clientes </button>
             <button class="tab-neu-inactive" [class.tab-neu-active]="tabActiva === 'crm'" (click)="tabActiva = 'crm'"> <span class="icon">🤝</span> CRM / Vista 360° </button>
@@ -29,7 +29,7 @@
               </button>
             </div>
 
-            <!-- BARRA DE BUSQUEDA Y FILTROS -->
+            <!-- HTML BARRA DE BUSQUEDA Y FILTROS -->
             <div class="search-filter-bar mb-4">
                 <div class="search-group">
                     <i class="fas fa-search search-icon"></i>
@@ -123,10 +123,10 @@
         }
     </div>
 
-    <!-- HTML SUB-PAGE CREACION / EDICION -->
+    <!-- HTML MODAL FORMULARIO CLIENTE -->
     @if(showModal) {
     <div class="view-switch-panel fade-in">
-        <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+        <div class="neu-card neu-card-center">
             <div class="panel-header mb-4">
                 <h1>{{ isEditMode ? 'Editar Cliente' : 'Registrar Nuevo Cliente' }}</h1>
                 <button class="btn-icon" (click)="cerrarModal()">✕</button>

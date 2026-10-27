@@ -8,13 +8,13 @@ use Illuminate\Support\Facades\DB;
 
 class PermisoController extends Controller
 {
-    // Devuelve todos los permisos registrados
+    // Bloque para traer todos los permisos registrados en el sistema
     public function index()
     {
         return Permiso::all();
     }
 
-    // Registra un nuevo permiso en el sistema
+    // Bloque para registrar un nuevo permiso en el sistema
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -32,13 +32,13 @@ class PermisoController extends Controller
         return response()->json($permiso, 201);
     }
 
-    // Muestra los detalles de un permiso especifico
+    // Bloque para mostrar los detalles de un permiso específico
     public function show($id)
     {
         return Permiso::findOrFail($id);
     }
 
-    // Actualiza la informacion de un permiso existente
+    // Bloque para actualizar la información de un permiso existente
     public function update(Request $request, $id)
     {
         $permiso = Permiso::findOrFail($id);
@@ -57,7 +57,7 @@ class PermisoController extends Controller
         return response()->json($permiso, 200);
     }
 
-    // Elimina un permiso de la base de datos
+    // Bloque para eliminar un permiso de la base de datos
     public function destroy($id)
     {
         $permiso = Permiso::findOrFail($id);
@@ -66,7 +66,7 @@ class PermisoController extends Controller
         return response()->json(null, 204);
     }
 
-    // Actualiza o crea multiples permisos en bloque (optimizacion)
+    // Bloque para actualizar o crear múltiples permisos en bloque transaccional
     public function batchUpdate(Request $request)
     {
         $permisos = $request->input('permisos', []);

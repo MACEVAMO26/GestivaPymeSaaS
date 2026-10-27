@@ -1,5 +1,10 @@
 @use 'sass:color';
 
+/* --- 0. BACKGROUND PRINCIPAL DEL MÓDULO SOPORTE --- */
+.soporte-module {
+  padding: 1.5rem;
+}
+
 /* --- 1. VARIABLES GLOBALES DE COLOR --- */
 $bg-color: #f5f5dc;
 $shadow-light: #ffffff;
@@ -16,6 +21,10 @@ $btn-gen-4: #8E5B75;
 $btn-gen-5: #B5654A;
 $btn-gen-6: #A38B6D;
 
+$color-info: #7C6FA6;
+$color-success: #6B8F71;
+$color-warning: #C9A227;
+
 /* --- 2. FONDOS Y LAYOUT PRINCIPAL --- */
 .module-container {
   padding: 1.5rem;
@@ -24,8 +33,7 @@ $btn-gen-6: #A38B6D;
   color: $text-dark;
 }
 
-/* --- 3. TIPOGRAFIA (Jerarquia estricta) --- */
-/* Titulo principal: 16px, centrado, mayusculas, negrita */
+/* --- 3. TIPOGRAFIA Y JERARQUIA --- */
 .module-header h1, h1.titulo-principal, .header-section h1 {
   font-size: 16px;
   font-weight: bold;
@@ -36,7 +44,6 @@ $btn-gen-6: #A38B6D;
   color: $text-dark;
 }
 
-/* Subtitulo: 13px, izquierda, mayusculas, sin negrita */
 .subtitulo, h2.subtitulo, h3.subtitulo {
   font-size: 14px;
   font-weight: normal;
@@ -46,7 +53,6 @@ $btn-gen-6: #A38B6D;
   margin-bottom: 0.5rem;
 }
 
-/* Descripciones y Notas: 10px, centradas, mayusculas */
 .module-header p, .descripcion, .descripcion-general, .subtitle, .header-section p, .nota, .text-muted-small, .badge-small {
   font-size: 14px;
   font-weight: normal;
@@ -59,8 +65,7 @@ $btn-gen-6: #A38B6D;
   line-height: 1.4;
 }
 
-/* Texto general: 12px */
-.form-label, p, td, th, li, label, .text-general {
+.form-label, p, td, th, li, label, .text-general, .texto-normal {
   font-size: 14px;
   font-weight: normal;
 }
@@ -102,14 +107,13 @@ $btn-gen-6: #A38B6D;
   }
 }
 
-/* --- 6. BOTONES (DISENO PILDORA) --- */
+/* --- 6. BOTONES Y ACCIONES --- */
 .btn-neumorphic {
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
   font-family: 'Montserrat', sans-serif;
   font-size: 14px;
   font-weight: 500;
-  
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 4px 4px 8px $shadow-dark, -1px -1px 2px rgba(255, 255, 255, 0.2);
@@ -135,7 +139,7 @@ $btn-gen-6: #A38B6D;
 .btn-general-5 { @extend .btn-neumorphic; background-color: $btn-gen-5; border: 2px solid color.adjust($btn-gen-5, $lightness: -10%); color: #ffffff; }
 .btn-general-6 { @extend .btn-neumorphic; background-color: $btn-gen-6; border: 2px solid color.adjust($btn-gen-6, $lightness: -10%); color: #ffffff; }
 
-/* --- 7. NAVEGACION TABS CON CONTENEDOR HUNDIDO (DOBLE BORDE RECTÁNGULO PÍLDORA) --- */
+/* --- 7. NAVEGACION TABS Y CONTENEDOR HUNDIDO --- */
 .tabs-nav-wrapper {
   background: $bg-color;
   border-radius: 9999px;
@@ -189,7 +193,10 @@ $btn-gen-6: #A38B6D;
   text-decoration: none;
 }
 
-/* Titulos de panel interno */
+.tabs-nav-wrapper a, .tabs-nav-wrapper button, .tabs-nav-wrapper span {
+  font-weight: bold !important;
+}
+
 .panel-title, h3.panel-title {
   font-family: 'Montserrat', sans-serif;
   font-size: 16px;
@@ -200,50 +207,7 @@ $btn-gen-6: #A38B6D;
   margin: 0 0 0.5rem 0;
 }
 
-/* ========================================= */
-/* FIN BASE NEUMORFICA - INICIO DE LOCALES   */
-/* ========================================= */
-
-
-
-/* --- VARIABLES MÓDULO SOPORTE --- */
-$color-info: #7C6FA6;
-$color-success: #6B8F71;
-$color-warning: #C9A227;
-
-/* Título: 16px */
-.titulo-principal, h1 {
-  font-size: 16px;
-  font-weight: bold;
-  text-transform: uppercase;
-  text-align: center;
-  margin-bottom: 0.5rem;
-  color: #333333;
-}
-
-/* Subtítulo: 13px */
-.subtitulo, h3 {
-  font-size: 14px;
-  font-weight: normal;
-  text-transform: uppercase;
-  text-align: left;
-  margin-bottom: 0.75rem;
-  color: #2d3748;
-}
-
-/* Texto general: 12px */
-.texto-normal, label, td, th, p {
-  font-size: 14px;
-  color: #333333;
-}
-
-/* Descripción: 10px */
-.descripcion-general, .text-muted {
-  font-size: 14px;
-  color: #2d3748;
-}
-
-/* Tarjeta de ticket */
+/* --- 8. TICKETS DE SOPORTE Y ESTILOS ESPECIFICOS --- */
 .ticket-card {
   background: #f5f5dc;
   border-radius: 12px;
@@ -253,7 +217,6 @@ $color-warning: #C9A227;
   border-left: 4px solid $color-info;
 }
 
-/* Badge estado */
 .badge-estado {
   display: inline-block;
   padding: 2px 8px;
@@ -266,14 +229,22 @@ $color-warning: #C9A227;
 .badge-cerrado  { background: $color-success; color: #fff; }
 .badge-proceso  { background: $color-info;    color: #fff; }
 
-.tabs-nav-wrapper a, .tabs-nav-wrapper button, .tabs-nav-wrapper span {
-  font-weight: bold !important;
-}
-
-
 .form-actions {
   display: flex;
   justify-content: flex-end;
   gap: 15px;
   margin-top: 1.5rem;
+}
+
+.input-file-pad {
+  padding: 10px;
+}
+
+.file-hint {
+  margin-top: 5px;
+  display: block;
+}
+
+.volver-wrapper {
+  margin-bottom: 1.5rem;
 }

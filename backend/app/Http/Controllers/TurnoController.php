@@ -9,15 +9,16 @@ use Illuminate\Http\Request;
 
 class TurnoController extends Controller
 {
-    // Trae la lista de turnos y sus asignaciones
+    // Bloque para consultar el catálogo de turnos con sus asignaciones de empleados
     public function index()
     {
         return Turno::with('asignaciones.usuario')->get();
     }
 
-    // Crea un nuevo turno
+    // Bloque para registrar un nuevo turno laboral en el sistema
     public function store(Request $request)
     {
+        // Bloque de reglas de validación
         $validatedData = $request->validate([
             'nombre_turno' => 'required|string|max:255',
             'hora_entrada' => 'required|date_format:H:i',
@@ -25,17 +26,18 @@ class TurnoController extends Controller
             'dias_semana' => 'required|string|max:255',
         ]);
 
+        // Bloque de guardado en BD
         $turno = Turno::create($validatedData);
         return response()->json($turno, 201);
     }
 
-    // Muestra la informacion detallada de un turno
+    // Bloque para consultar la información detallada de un turno y su personal asignado
     public function show($id)
     {
         return Turno::with('asignaciones.usuario')->findOrFail($id);
     }
 
-    // Actualiza los datos de un turno existente
+    // Bloque para actualizar los parámetros de horario y días de un turno
     public function update(Request $request, $id)
     {
         $turno = Turno::findOrFail($id);
@@ -51,7 +53,7 @@ class TurnoController extends Controller
         return response()->json($turno);
     }
 
-    // Cambia el estado activo o inactivo del turno
+    // Bloque para alternar el estado activo o inactivo del turno laboral
     public function changeStatus($id)
     {
         $turno = Turno::findOrFail($id);
@@ -63,7 +65,7 @@ class TurnoController extends Controller
         return response()->json(['message' => $message]);
     }
 
-    // Asigna un turno a un usuario validando sus vacaciones
+    // Bloque para asignar un turno al usuario validando que no tenga vacaciones aprobadas
     public function asignarTurno(Request $request, $id)
     {
         $turno = Turno::findOrFail($id);

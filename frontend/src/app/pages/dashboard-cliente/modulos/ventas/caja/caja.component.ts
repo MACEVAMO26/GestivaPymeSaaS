@@ -22,6 +22,7 @@ export class CajaComponent implements OnInit {
 
   subTabActiva: 'operacion' | 'auditoria' | 'semanal' = 'operacion';
 
+  // --- VARIABLES DE ESTADO ---
   cajas: Caja[] = [];
   cajaActiva: Caja | null = null;
   movimientos: any[] = [];
@@ -54,8 +55,6 @@ export class CajaComponent implements OnInit {
     comprobante_url: '',
     estado_verificacion: 'Aprobado'
   };
-
-  // Visor Auditoría Modal
   modalAuditoria = false;
   movimientoAuditoria: any = null;
 
@@ -65,10 +64,12 @@ export class CajaComponent implements OnInit {
 
   searchTermMovimientos: string = '';
 
+  // Bloque de evento al escribir en el buscador de movimientos
   onSearchTermMovimientosChange() {
     this.pageMovimientos = 1;
   }
 
+  // Bloque para restablecer la búsqueda de movimientos
   limpiarBusquedaMovimientos() {
     this.searchTermMovimientos = '';
     this.pageMovimientos = 1;
@@ -103,8 +104,6 @@ export class CajaComponent implements OnInit {
   get totalPagesAuditoria(): number {
     return Math.ceil(this.movimientosPendientes.length / this.pageSize) || 1;
   }
-
-  // Datos mock de auditoría pendiente
   movimientosPendientes: any[] = [
     {
       id: 101,
@@ -129,8 +128,6 @@ export class CajaComponent implements OnInit {
       cliente: 'Techventas SAS'
     }
   ];
-
-  // Resumen Semanal acumulado (Lunes a Domingo)
   resumenSemanal = [
     { dia: 'Lunes', apertura: '08:00 AM', cierre: '06:00 PM', efectivo: 150000, banco: 320000, aprobados: 8, rechazados: 0, total: 470000 },
     { dia: 'Martes', apertura: '08:00 AM', cierre: '06:00 PM', efectivo: 210000, banco: 450000, aprobados: 12, rechazados: 1, total: 660000 },
@@ -141,10 +138,13 @@ export class CajaComponent implements OnInit {
     { dia: 'Domingo', apertura: 'Cerrado', cierre: 'Cerrado', efectivo: 0, banco: 0, aprobados: 0, rechazados: 0, total: 0 }
   ];
 
+  // Bloque de ciclo de vida OnInit para cargar cajas y verificar roles
   ngOnInit() {
-    this.cargarCajas();
+    this.// Bloque para consultar las cajas disponibles en el sistema
+  cargarCajas();
   }
 
+  // Bloque de verificación de permisos para rol de Jefe de Finanzas o Gerencia
   esJefeFinanzasOGerente(): boolean {
     const user = this.authService.getUser();
     if (!user) return false;
@@ -159,6 +159,7 @@ export class CajaComponent implements OnInit {
     );
   }
 
+  // Bloque para alternar entre subpestañas operativas de caja
   switchSubTab(tab: 'operacion' | 'auditoria' | 'semanal') {
     if (tab === 'auditoria' && !this.esJefeFinanzasOGerente()) {
       this.toast.warning('Solo el Jefe de Finanzas y Gerencia tienen acceso a la Auditoría de Comprobantes.');
@@ -188,6 +189,7 @@ export class CajaComponent implements OnInit {
     });
   }
 
+  // Bloque para crear e inicializar una nueva caja con base monetaria
   crearNuevaCaja() {
     if (this.baseNuevaCaja < 0) {
       this.toast.warning('Ingrese una base inicial válida');
@@ -210,12 +212,14 @@ export class CajaComponent implements OnInit {
     });
   }
 
+  // Bloque para seleccionar una caja y cargar sus transacciones
   seleccionarCaja(caja: Caja) {
     this.cajaActiva = caja;
     this.nuevoMovimiento.caja_id = caja.id || 0;
     this.cargarMovimientos(caja.id!);
   }
 
+  // Bloque para consultar el histórico de movimientos de la caja
   cargarMovimientos(cajaId: number) {
     this.pageMovimientos = 1;
     this.cajaService.getMovimientos(cajaId).pipe(timeout(15000)).subscribe({
@@ -230,6 +234,7 @@ export class CajaComponent implements OnInit {
     });
   }
 
+  // Bloque para abrir formalmente la caja seleccionada
   abrirCaja() {
     if (!this.cajaActiva?.id) return;
     this.procesando = true;
@@ -251,6 +256,7 @@ export class CajaComponent implements OnInit {
     });
   }
 
+  // Bloque para realizar el cuadre y cierre diario de caja
   cerrarCaja() {
     if (!this.cajaActiva?.id) return;
     this.procesando = true;
@@ -272,11 +278,11 @@ export class CajaComponent implements OnInit {
     });
   }
 
+  // Bloque para capturar el comprobante digital de pago adjunto
   onArchivoSeleccionado(event: any) {
     const file = event.target.files[0];
     if (file) {
       this.subiendoComprobante = true;
-      // Simula subida a Cloudinary
       setTimeout(() => {
         this.nuevoMovimiento.comprobante_url = 'https://res.cloudinary.com/demo/image/upload/v1631234567/comprobante_adjunto.jpg';
         this.subiendoComprobante = false;
@@ -286,6 +292,7 @@ export class CajaComponent implements OnInit {
     }
   }
 
+  // Bloque para registrar un nuevo ingreso o egreso en la caja activa
   registrarMovimiento() {
     if (!this.nuevoMovimiento.monto || this.nuevoMovimiento.monto <= 0) {
       this.toast.warning('Ingrese un monto válido');
@@ -336,17 +343,20 @@ export class CajaComponent implements OnInit {
     });
   }
 
-  // --- AUDITORÍA DE COMPROBANTES (JEFE DE FINANZAS) ---
+  // --- SECCION AUDITORIA DE COMPROBANTES ---
+  // Bloque para previsualizar el soporte o comprobante de la transacción
   verComprobante(mov: any) {
     this.movimientoAuditoria = mov;
     this.modalAuditoria = true;
   }
 
+  // Bloque para cerrar el visor modal de auditoría
   cerrarAuditoriaModal() {
     this.modalAuditoria = false;
     this.movimientoAuditoria = null;
   }
 
+  // Bloque para emitir la aprobación de una transacción auditada
   aprobarTransaccion(mov: any) {
     mov.estado_verificacion = 'Aprobado';
     this.toast.success(`Transacción #${mov.id} aprobada sin novedad por Finanzas.`);
@@ -355,6 +365,7 @@ export class CajaComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
+  // Bloque para rechazar una transacción con observaciones
   rechazarTransaccion(mov: any) {
     mov.estado_verificacion = 'Rechazado';
     this.toast.error(`Transacción #${mov.id} rechazada. Se cancela/revierte la venta/servicio asociado.`);
@@ -362,8 +373,6 @@ export class CajaComponent implements OnInit {
     this.cerrarAuditoriaModal();
     this.cdr.detectChanges();
   }
-
-  // Totales
   get totalIngresosEfectivo(): number {
     return this.movimientos
       .filter(m => m.tipo === 'ingreso' && (!m.medio_pago || m.medio_pago === 'Efectivo'))

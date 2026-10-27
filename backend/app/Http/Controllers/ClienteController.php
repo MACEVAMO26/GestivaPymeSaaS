@@ -11,11 +11,13 @@ use App\Models\TicketServicio;
 
 class ClienteController extends Controller
 {
+    // Bloque para obtener el identificador de la empresa activa
     private function getEmpresaId()
     {
         return request()->header('X-Empresa-Id') ?? (Auth::user()?->empresa_id ?? null);
     }
 
+    // Bloque para listar los clientes activos de la empresa
     public function index()
     {
         $empresaId = $this->getEmpresaId();
@@ -31,6 +33,7 @@ class ClienteController extends Controller
         return response()->json($clientes);
     }
 
+    // Bloque para consultar el detalle completo de un cliente con sus relaciones
     public function show($id)
     {
         $empresaId = $this->getEmpresaId();
@@ -50,6 +53,7 @@ class ClienteController extends Controller
         return response()->json($cliente);
     }
 
+    // Bloque para registrar un nuevo cliente en el sistema CRM
     public function store(Request $request)
     {
         $empresaId = $this->getEmpresaId();
@@ -57,6 +61,7 @@ class ClienteController extends Controller
             return response()->json(['error' => 'Empresa no especificada'], 400);
         }
 
+        // Bloque de reglas de validación
         $validated = $request->validate([
             'nombres' => 'nullable|string|max:255',
             'apellidos' => 'nullable|string|max:255',
@@ -83,6 +88,7 @@ class ClienteController extends Controller
         }
         $validated['activo'] = 1;
 
+        // Bloque de guardado en BD
         $cliente = Cliente::create($validated);
 
         return response()->json([
@@ -91,6 +97,7 @@ class ClienteController extends Controller
         ], 201);
     }
 
+    // Bloque para actualizar los datos comerciales y de contacto del cliente
     public function update(Request $request, $id)
     {
         $empresaId = $this->getEmpresaId();
@@ -132,6 +139,7 @@ class ClienteController extends Controller
         ]);
     }
 
+    // Bloque para inactivar lógicamente un cliente
     public function destroy($id)
     {
         $empresaId = $this->getEmpresaId();
@@ -147,6 +155,7 @@ class ClienteController extends Controller
         return response()->json(['message' => 'Cliente inactivado exitosamente']);
     }
 
+    // Bloque para generar la vista 360 y cronología histórica del cliente
     public function historial360($id)
     {
         $empresaId = $this->getEmpresaId();
@@ -156,7 +165,7 @@ class ClienteController extends Controller
 
         $cliente = Cliente::where('empresa_id', $empresaId)->findOrFail($id);
 
-        // 1. Obtener Ventas asociadas
+        // Bloque para consultar ventas asociadas al cliente
         $ventas = Venta::with('detalles.producto')
             ->where('empresa_id', $empresaId)
             ->where(function($q) use ($cliente) {
@@ -168,13 +177,13 @@ class ClienteController extends Controller
             ->orderBy('id', 'desc')
             ->get();
 
-        // 2. Obtener Cotizaciones / Pedidos
+        // Bloque para consultar cotizaciones y pedidos del cliente
         $cotizaciones = CotizacionPedido::with('detalles.producto')
             ->where('cliente_id', $cliente->id)
             ->orderBy('id', 'desc')
             ->get();
 
-        // 3. Obtener Tickets de Servicios
+        // Bloque para consultar tickets de servicios del cliente
         $nombreClienteLower = strtolower(trim($cliente->nombre_razon_social ?: "{$cliente->nombres} {$cliente->apellidos}"));
         $tickets = TicketServicio::with(['materiales.producto', 'tecnico.usuario'])
             ->where('empresa_id', $empresaId)
@@ -186,13 +195,13 @@ class ClienteController extends Controller
             ->orderBy('id', 'desc')
             ->get();
 
-        // 4. Calcular Métricas 360
+        // Bloque para calcular métricas acumuladas y calificación promedio
         $totalVentas = $ventas->sum('total');
         $serviciosFinalizados = $tickets->where('estado', 'Finalizado');
         $calificaciones = $serviciosFinalizados->pluck('calificacion_tecnico')->filter();
         $promedioCalif = $calificaciones->count() > 0 ? round($calificaciones->avg(), 1) : 5.0;
 
-        // 5. Construir Línea de Tiempo Cronológica Unificada
+        // Bloque para construir la línea de tiempo unificada del cliente
         $timeline = [];
 
         foreach ($ventas as $v) {
@@ -258,7 +267,6 @@ class ClienteController extends Controller
             ];
         }
 
-        // Ordenar cronológicamente descendente (más reciente primero)
         usort($timeline, function($a, $b) {
             return strcmp($b['fecha'] ?? '', $a['fecha'] ?? '');
         });

@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class SolicitudController extends Controller
 {
-    // Bandeja del usuario: solicitudes que solicitó + las que debe decidir
+    // Bloque para listar solicitudes propias y asignadas al usuario
     public function index(Request $request)
     {
         $user = Auth::user();
@@ -29,7 +29,7 @@ class SolicitudController extends Controller
         return response()->json($misSolicitudes);
     }
 
-    // Bandeja de decisiones: solicitudes pendientes para el Jefe de Área / Gerente
+    // Bloque para listar solicitudes pendientes de decisión gerencial
     public function bandeja(Request $request)
     {
         $user = Auth::user();
@@ -50,7 +50,7 @@ class SolicitudController extends Controller
         return response()->json($solicitudes);
     }
 
-    // El operario crea una solicitud de acción (inactivar/eliminar/cambiar)
+    // Bloque para registrar una solicitud de inactivación o cambio
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -91,7 +91,7 @@ class SolicitudController extends Controller
         return response()->json(['message' => 'Solicitud enviada', 'solicitud' => $solicitud], 201);
     }
 
-    // Réplica: cualquiera de los participantes responde dentro del hilo
+    // Bloque para registrar una nueva réplica en el hilo de conversación
     public function responder(Request $request, $id)
     {
         $user = Auth::user();
@@ -110,7 +110,7 @@ class SolicitudController extends Controller
         $solicitud->estado = 'en_replica';
         $solicitud->save();
 
-        // Notificar al otro participante del hilo
+        // Bloque para notificar a los participantes del hilo
         $destinoId = $user->id === $solicitud->solicitante_id ? $solicitud->decisor_id : $solicitud->solicitante_id;
         if ($destinoId) {
             Notificacion::create([
@@ -124,7 +124,7 @@ class SolicitudController extends Controller
         return response()->json(['message' => 'Respuesta enviada', 'respuesta' => $respuesta]);
     }
 
-    // El Jefe de Área aprueba y ejecuta la acción (p.ej. inactiva la entidad)
+    // Bloque para aprobar la solicitud y ejecutar la acción solicitada
     public function aprobar(Request $request, $id)
     {
         $user = Auth::user();
@@ -166,7 +166,7 @@ class SolicitudController extends Controller
         return response()->json(['message' => 'Solicitud aprobada y ejecutada', 'solicitud' => $solicitud]);
     }
 
-    // El Jefe de Área rechaza con nota
+    // Bloque para rechazar la solicitud con nota explicativa
     public function rechazar(Request $request, $id)
     {
         $user = Auth::user();
@@ -197,7 +197,7 @@ class SolicitudController extends Controller
         return response()->json(['message' => 'Solicitud rechazada', 'solicitud' => $solicitud]);
     }
 
-    // Devuelve el decisor: Jefe de Área activo de la empresa; si no, el Gerente General
+    // Bloque privado para determinar el usuario decisor de la solicitud
     private function obtenerDecisor($empresaId)
     {
         $jefe = User::where('empresa_id', $empresaId)
@@ -219,7 +219,7 @@ class SolicitudController extends Controller
             ->first();
     }
 
-    // Ejecuta la acción sobre la entidad objetivo (borrado lógico)
+    // Bloque privado para ejecutar la inactivación lógica sobre la entidad
     private function ejecutarAccion(Solicitud $solicitud)
     {
         $mapa = [
@@ -245,14 +245,14 @@ class SolicitudController extends Controller
 
         $accion = strtolower($solicitud->accion);
 
-        // Tickets de servicio: la baja equivale a cancelar el ticket
+        // Bloque para cancelar ticket de servicio
         if ($solicitud->entidad === 'tickets') {
             $entidad->estado = 'Cancelado';
             $entidad->save();
             return;
         }
 
-        // Cajas: la baja equivale a cerrar la caja
+        // Bloque para cerrar caja registradora
         if ($solicitud->entidad === 'cajas') {
             $entidad->estado = 'cerrada';
             if (in_array('cerrada_en', $entidad->getFillable() ?? [])) {

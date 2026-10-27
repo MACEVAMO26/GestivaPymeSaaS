@@ -23,8 +23,7 @@ export class GestionHumanaComponent implements OnInit {
   private http = inject(HttpClient);
 
   currentTab: string = 'pendientes';
-
-  // Data arrays
+  // --- VARIABLES DE ESTADO ---
   areas: any[] = [];
   cargos: any[] = [];
   roles: any[] = [];
@@ -42,6 +41,7 @@ export class GestionHumanaComponent implements OnInit {
 
   searchTerm: string = '';
 
+  // Bloque de evento al cambiar el término de búsqueda de empleados
   onSearchTermChange() {
     this.pageActivos = 1;
     this.pageInactivos = 1;
@@ -49,6 +49,7 @@ export class GestionHumanaComponent implements OnInit {
     this.pagePendientes = 1;
   }
 
+  // Bloque para restablecer los filtros de búsqueda
   limpiarBusqueda() {
     this.searchTerm = '';
     this.onSearchTermChange();
@@ -121,13 +122,10 @@ export class GestionHumanaComponent implements OnInit {
   get totalPagesContratos(): number {
     return Math.ceil(this.todosEmpleados.length / this.pageSize) || 1;
   }
-
-  // UI States
   isSubmitting: boolean = false;
   isUploading: boolean = false;
   isConfigSubmitting: boolean = false;
-
-  // Modals
+  // --- MODALES Y FORMULARIOS ---
   isAreaModalOpen: boolean = false;
   areaForm: any = {};
 
@@ -142,16 +140,12 @@ export class GestionHumanaComponent implements OnInit {
   isVacacionesModalOpen: boolean = false;
   vacacionSeleccionada: any = null;
   justificacionVacacion: string = '';
-
-  // Detalle empleado
   empleadoExpandido: any = null;
   nombreDocumento: string = '';
   categoriaDocumento: string = 'Otros';
   archivoSeleccionado: any = null;
   documentosEmpleado: any[] = [];
   categoriasDocumento: string[] = ['Hoja de Vida', 'Contrato', 'Cédula', 'Seguridad Social', 'Estudios', 'Certificaciones', 'Otros'];
-
-  // Novedades y Ausencias
   isNovedadModalOpen: boolean = false;
   novedadForm: any = {
     empleado_id: '',
@@ -161,14 +155,16 @@ export class GestionHumanaComponent implements OnInit {
     fecha_fin: '',
     soporte: ''
   };
-
-  // Configuración
   configuracionRRHH: any = { arl: '', caja_compensacion: '' };
 
+  // Bloque de ciclo de vida OnInit para cargar empleados y configuración inicial
   ngOnInit(): void {
-    this.cargarEmpleados();
-    this.cargarVacaciones();
-    this.cargarConfiguracion();
+    this.// Bloque para consultar el catálogo de empleados desde el backend
+  cargarEmpleados();
+    this.// Bloque para consultar las solicitudes de vacaciones pendientes
+  cargarVacaciones();
+    this.// Bloque para cargar la parametrización de ARL y Caja de Compensación
+  cargarConfiguracion();
   }
 
   cargarEmpleados() {
@@ -210,6 +206,7 @@ export class GestionHumanaComponent implements OnInit {
     });
   }
 
+  // Bloque para cargar la lista de áreas organizacionales
   cargarAreas() {
     this.empleadoService.getAreas().pipe(timeout(15000)).subscribe({
       next: (res) => { this.areas = res;
@@ -222,6 +219,7 @@ export class GestionHumanaComponent implements OnInit {
     });
   }
 
+  // Bloque para cargar la lista de puestos o cargos de la empresa
   cargarCargos() {
     this.empleadoService.getCargos().pipe(timeout(15000)).subscribe({
       next: (res) => { this.cargos = res;
@@ -256,13 +254,15 @@ export class GestionHumanaComponent implements OnInit {
     });
   }
 
+  // Bloque para alternar entre pestañas del módulo de Gestión Humana
   setTab(tab: string) {
     this.currentTab = tab;
   }
 
   
   
-  // --- Header Actions ---
+  // --- ACCIONES DEL ENCABEZADO ---
+  // Bloque para exportar el listado de empleados a formato CSV / Excel
   exportarExcel() {
     this.toast.success('Generando archivo Excel...');
     const headers = { 'Authorization': `Bearer ${sessionStorage.getItem('auth_token')}` };
@@ -280,12 +280,14 @@ export class GestionHumanaComponent implements OnInit {
       error: () => this.toast.error('Error al exportar. Intenta nuevamente.')
     });
   }
+  // Bloque de navegación hacia el submódulo de control de tiempo y turnos
   abrirModuloTiempo() {
     this.setTab('ausentes');
     this.toast.info('Navegando al módulo de control de tiempos y ausencias');
   }
 
-  // --- Empleados Activos ---
+  // --- SECCION EMPLEADOS ACTIVOS ---
+  // Bloque para alternar la visualización del expediente digital del empleado
   verDetalles(emp: any) {
     if (this.empleadoExpandido?.id === emp.id) {
       this.empleadoExpandido = null;
@@ -295,6 +297,7 @@ export class GestionHumanaComponent implements OnInit {
     }
   }
 
+  // Bloque para consultar los documentos anexos al expediente del empleado
   cargarDocumentos(empleadoId: number) {
     this.empleadoService.getDocumentos(empleadoId).pipe(timeout(15000)).subscribe({
       next: (res) => { this.documentosEmpleado = res;
@@ -307,9 +310,11 @@ export class GestionHumanaComponent implements OnInit {
     });
   }
 
+  // Bloque para capturar el archivo digital seleccionado por el usuario
   onFileSelected(event: any) {
     this.archivoSeleccionado = event.target.files[0];
   }
+  // Bloque para cargar y almacenar un nuevo archivo en el expediente digital
   subirDocumento() {
     if (!this.archivoSeleccionado || !this.empleadoExpandido?.id) {
       this.toast.warning('Seleccione un archivo');
@@ -341,7 +346,7 @@ export class GestionHumanaComponent implements OnInit {
     });
   }
 
-  // --- EXPEDIENTE DIGITAL POR CATEGORÍAS ---
+  // --- SECCION EXPEDIENTE DIGITAL ---
   get categoriasConDocumentos(): { categoria: string, docs: any[] }[] {
     const grupos: { [cat: string]: any[] } = {};
     this.documentosEmpleado.forEach((d) => {
@@ -359,11 +364,13 @@ export class GestionHumanaComponent implements OnInit {
       .map((cat) => ({ categoria: cat, docs: grupos[cat] }));
   }
 
+  // Bloque para previsualizar o descargar un documento del expediente
   abrirDocumento(doc: any) {
     if (doc.cloudinary_url) {
       window.open(doc.cloudinary_url, '_blank');
     }
   }
+  // Bloque para eliminar un documento del expediente digital
   eliminarDocumento(id: number) {
     this.empleadoService.deleteDocumento(id).pipe(timeout(15000)).subscribe({
       next: () => {
@@ -381,16 +388,19 @@ export class GestionHumanaComponent implements OnInit {
     });
   }
 
-  // --- Baja ---
+  // --- SECCION BAJA DE EMPLEADOS ---
+  // Bloque para abrir el modal de desvinculación o baja de un empleado
   abrirModalBaja(emp: any) {
     this.empleadoABaja = emp;
     this.motivoBaja = '';
     this.showConfirmDialog = true;
     this.isBajaModalOpen = true;
   }
+  // Bloque para cerrar el diálogo de baja de empleado
   cerrarModalBaja() {
     this.isBajaModalOpen = false;
   }
+  // Bloque para procesar y confirmar la desvinculación laboral
   submitBaja() {
     if (!this.motivoBaja.trim()) {
       this.toast.warning('Describa el motivo de la baja');
@@ -417,15 +427,18 @@ export class GestionHumanaComponent implements OnInit {
     });
   }
 
-  // --- Vacaciones ---
+  // --- SECCION VACACIONES ---
+  // Bloque para abrir el modal de aprobación/rechazo de vacaciones
   abrirModalVacaciones(vac: any) {
     this.vacacionSeleccionada = vac;
     this.justificacionVacacion = '';
     this.isVacacionesModalOpen = true;
   }
+  // Bloque para cerrar el diálogo de gestión de vacaciones
   cerrarModalVacaciones() {
     this.isVacacionesModalOpen = false;
   }
+  // Bloque para emitir la resolución aprobatoria o denegatoria de vacaciones
   responderVacacion(estado: string) {
     if (!this.vacacionSeleccionada?.id) return;
     this.isSubmitting = true;
@@ -449,7 +462,8 @@ export class GestionHumanaComponent implements OnInit {
     });
   }
 
-  // --- Configuracion ---
+  // --- SECCION CONFIGURACION ---
+  // Bloque para persistir la configuración empresarial de ARL y Compensación
   guardarConfiguracionRRHH() {
     const user = JSON.parse(sessionStorage.getItem('current_user') || '{}');
     const empresaId = user?.empresa_id;
@@ -478,7 +492,7 @@ export class GestionHumanaComponent implements OnInit {
     });
   }
 
-  // --- CONTRATOS Y ALERTAS ---
+  // --- SECCION CONTRATOS Y ALERTAS ---
   get todosEmpleados(): any[] {
     return [...this.empleadosActivos, ...this.empleadosInactivos];
   }
@@ -487,6 +501,7 @@ export class GestionHumanaComponent implements OnInit {
     return this.todosEmpleados.filter(e => ['por_vencer', 'vencido'].includes(this.estadoContrato(e))).length;
   }
 
+  // Bloque utilitario para evaluar el estado de vigencia del contrato laboral
   estadoContrato(emp: any): string {
     if (!emp) return 'sin_fin';
     const tipo = (emp.tipo_contrato || '').toLowerCase();
@@ -500,6 +515,7 @@ export class GestionHumanaComponent implements OnInit {
     return 'vigente';
   }
 
+  // Bloque para calcular los días restantes antes del vencimiento del contrato
   diasParaVencimiento(emp: any): number {
     if (!emp?.fecha_fin_contrato) return 0;
     const hoy = new Date(); hoy.setHours(0,0,0,0);
@@ -507,6 +523,7 @@ export class GestionHumanaComponent implements OnInit {
     return Math.ceil((fin.getTime() - hoy.getTime()) / 86400000);
   }
 
+  // Bloque para obtener la etiqueta textual informativa del vencimiento
   etiquetaContrato(emp: any): string {
     const st = this.estadoContrato(emp);
     const mapa: any = {
@@ -519,6 +536,7 @@ export class GestionHumanaComponent implements OnInit {
     return mapa[st];
   }
 
+  // Bloque para asignar la clase cromática de alerta al vencimiento
   claseContrato(emp: any): string {
     const mapa: any = {
       indefinido: 'badge-indefinido',
@@ -530,16 +548,18 @@ export class GestionHumanaComponent implements OnInit {
     return mapa[this.estadoContrato(emp)] || '';
   }
 
+  // Bloque utilitario para concatenar nombres y apellidos del usuario
   nombreCompletoUsuario(u: any): string {
     if (!u) return '—';
     return [u.primer_nombre, u.segundo_nombre, u.primer_apellido, u.segundo_apellido].filter(Boolean).join(' ');
   }
 
-  // --- MODAL EDITAR CONTRATO ---
+  // --- SECCION MODAL EDITAR CONTRATO ---
   isContratoModalOpen: boolean = false;
   contratoForm: any = {};
   empleadoContrato: any = null;
 
+  // Bloque para abrir el modal de edición de datos contractuales
   abrirModalContrato(emp: any) {
     this.empleadoContrato = emp;
     this.contratoForm = {
@@ -550,9 +570,11 @@ export class GestionHumanaComponent implements OnInit {
     };
     this.isContratoModalOpen = true;
   }
+  // Bloque para cerrar el modal de contrato
   cerrarModalContrato() {
     this.isContratoModalOpen = false;
   }
+  // Bloque para actualizar los parámetros contractuales del empleado
   guardarContrato() {
     if (!this.contratoForm.tipo_contrato || !this.contratoForm.fecha_contratacion) {
       this.toast.warning('El tipo de contrato y la fecha de contratación son obligatorios');
@@ -584,7 +606,8 @@ export class GestionHumanaComponent implements OnInit {
     });
   }
 
-  // --- CERTIFICADO LABORAL ---
+  // --- SECCION CERTIFICADO LABORAL ---
+  // Bloque para generar y descargar el certificado laboral del empleado
   descargarCertificado(emp: any) {
     if (!emp?.id) return;
     this.empleadoService.descargarCertificado(emp.id).pipe(timeout(20000)).subscribe({
@@ -608,7 +631,8 @@ export class GestionHumanaComponent implements OnInit {
     });
   }
 
-  // --- NOVEDADES Y GESTIÓN DE AUSENCIAS ---
+  // --- SECCION NOVEDADES Y GESTION DE AUSENCIAS ---
+  // Bloque para abrir la sección de radicación de novedades o ausencias
   abrirModalNovedad(emp?: any) {
     this.novedadForm = {
       empleado_id: emp ? emp.id : (this.empleadosActivos[0]?.id || ''),
@@ -621,6 +645,7 @@ export class GestionHumanaComponent implements OnInit {
     this.isNovedadModalOpen = true;
   }
 
+  // Bloque para cancelar y cerrar el registro de novedad
   cerrarModalNovedad() {
     this.isNovedadModalOpen = false;
   }
@@ -631,12 +656,14 @@ export class GestionHumanaComponent implements OnInit {
     return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
   }
 
+  // Bloque de validación al alterar la fecha de inicio de la novedad
   onNovedadFechaInicioChange() {
     if (this.novedadForm.fecha_fin && this.novedadForm.fecha_fin < this.novedadForm.fecha_inicio) {
       this.novedadForm.fecha_fin = '';
     }
   }
 
+  // Bloque para validar y asentar la novedad laboral en el sistema
   guardarNovedad() {
     if (!this.novedadForm.empleado_id || !this.novedadForm.tipo_novedad) {
       this.toast.warning('Seleccione el empleado y el tipo de novedad');
@@ -667,8 +694,6 @@ export class GestionHumanaComponent implements OnInit {
     if (!emp) return;
 
     this.isSubmitting = true;
-
-    // Si es vacación, también registramos la solicitud en backend
     if (this.novedadForm.tipo_novedad === 'en vacaciones' && emp.usuario_id) {
       this.http.post('/api/vacaciones', {
         usuario_id: emp.usuario_id,
@@ -678,8 +703,6 @@ export class GestionHumanaComponent implements OnInit {
         observaciones: this.novedadForm.motivo
       }).subscribe();
     }
-
-    // Actualizar estado del empleado
     this.http.put(`/api/empleados/${empId}`, {
       sede_id: emp.sede_id || 2,
       area_id: emp.area_id || 17,
@@ -708,6 +731,7 @@ export class GestionHumanaComponent implements OnInit {
     });
   }
 
+  // Bloque para restablecer a un empleado ausente a estado activo
   reincorporarEmpleado(emp: any) {
     if (!emp?.id) return;
     this.isSubmitting = true;
@@ -734,6 +758,7 @@ export class GestionHumanaComponent implements OnInit {
     });
   }
 
+  // Bloque utilitario para obtener la descripción legible del motivo de ausencia
   obtenerMotivoAusencia(emp: any): string {
     if (!emp) return 'Novedad laboral';
     switch (emp.estado) {
@@ -750,6 +775,7 @@ export class GestionHumanaComponent implements OnInit {
     }
   }
 
+  // Bloque para determinar el icono representativo de la ausencia
   obtenerIconoAusencia(emp: any): string {
     if (!emp) return 'fas fa-user-clock';
     switch (emp.estado) {
@@ -761,6 +787,7 @@ export class GestionHumanaComponent implements OnInit {
     }
   }
 
+  // Bloque para asignar la clase visual correspondiente al estado de ausencia
   obtenerClaseAusencia(emp: any): string {
     if (!emp) return 'badge-pendiente';
     switch (emp.estado) {

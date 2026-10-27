@@ -8,7 +8,7 @@ use App\Models\Proveedor;
 
 class CuentaPorPagarController extends Controller
 {
-    // Lista las cuentas por pagar de la empresa autenticada (con datos del proveedor)
+    // Bloque para listar las cuentas por pagar de la empresa autenticada
     public function index()
     {
         $empresaId = request()->header('X-Empresa-Id') ?? (auth()->user()?->empresa_id ?? null);
@@ -25,9 +25,10 @@ class CuentaPorPagarController extends Controller
         return response()->json($cuentas);
     }
 
-    // Crea una nueva cuenta por pagar
+    // Bloque para registrar una nueva cuenta por pagar a proveedores
     public function store(Request $request)
     {
+        // Bloque de reglas de validación
         $validatedData = $request->validate([
             'proveedor_id' => 'required|exists:proveedores,id',
             'factura_numero' => 'required|string|max:255',
@@ -39,6 +40,7 @@ class CuentaPorPagarController extends Controller
             'estado' => 'nullable|in:Pendiente,Parcial,Pagada,Vencida',
         ]);
 
+        // Bloque de guardado en BD
         $cuenta = CuentaPorPagar::create([
             'proveedor_id' => $validatedData['proveedor_id'],
             'factura_numero' => $validatedData['factura_numero'],
@@ -53,7 +55,7 @@ class CuentaPorPagarController extends Controller
         return response()->json(['message' => 'Cuenta por pagar registrada', 'cuenta' => $cuenta], 201);
     }
 
-    // Registra un abono: reduce el saldo pendiente y recalcula el estado
+    // Bloque para registrar un abono a la cuenta por pagar y recalcular saldos
     public function registrarAbono(Request $request, $id)
     {
         $request->validate([
@@ -81,7 +83,7 @@ class CuentaPorPagarController extends Controller
         return response()->json(['message' => 'Abono registrado correctamente.', 'cuenta' => $cuenta]);
     }
 
-    // Elimina una cuenta por pagar (uso administrativo)
+    // Bloque para eliminar una cuenta por pagar
     public function destroy($id)
     {
         $cuenta = CuentaPorPagar::findOrFail($id);

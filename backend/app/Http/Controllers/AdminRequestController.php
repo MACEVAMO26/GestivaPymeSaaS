@@ -19,12 +19,13 @@ use Illuminate\Support\Facades\Auth;
 
 class AdminRequestController extends Controller
 {
-    // --- GESTIÓN DE SOLICITUDES ADMINISTRATIVAS ---
+    // Bloque para listar todas las solicitudes administrativas registradas en el sistema
     public function index()
     {
         return response()->json(AdminRequest::with('empresa')->get());
     }
 
+    // Bloque para registrar una nueva solicitud administrativa con comprobantes o datos
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -79,6 +80,7 @@ class AdminRequestController extends Controller
         return response()->json($req, 201);
     }
 
+    // Bloque para procesar y aprobar o rechazar una solicitud administrativa aplicando cambios
     public function process(Request $request, $id)
     {
         $req = AdminRequest::findOrFail($id);
@@ -94,12 +96,12 @@ class AdminRequestController extends Controller
         
         $approvedFields = $validated['approved_fields'] ?? null;
 
-        // Aplica automáticamente los cambios solicitados a la empresa si la solicitud es aprobada
+        // Bloque de aplicación automática de cambios aprobados en la empresa
         $datos = $req->datos_nuevos ? json_decode($req->datos_nuevos, true) : [];
         $empresa = $req->empresa_id ? \App\Models\Empresa::find($req->empresa_id) : null;
 
         if ($req->estado === 'aprobado' && $empresa) {
-            // Si no se envían approved_fields (comportamiento antiguo), asumimos todos los campos
+            // Bloque de selección de campos autorizados para actualizar
             $fieldsToProcess = $approvedFields !== null ? $approvedFields : array_keys($datos);
 
             if ($req->tipo === 'cambio_datos') {
@@ -111,7 +113,7 @@ class AdminRequestController extends Controller
                 if (in_array('color_primario', $fieldsToProcess) && isset($datos['color_primario'])) $empresa->color_primario = $datos['color_primario'];
             }
 
-            // Procesar Logo si fue aprobado (cambio_datos o cambio_logo)
+            // Bloque de actualización de logotipo corporativo si fue aprobado
             if (in_array('temp_logo', $fieldsToProcess) && isset($datos['temp_logo']) && str_starts_with($datos['temp_logo'], 'http')) {
                 $empresa->logo_url = $datos['temp_logo'];
             }
@@ -124,6 +126,7 @@ class AdminRequestController extends Controller
         return response()->json($req);
     }
 
+    // Bloque para consultar las solicitudes administrativas de la empresa autenticada
     public function misSolicitudes()
     {
         $user = Auth::user();
@@ -136,7 +139,7 @@ class AdminRequestController extends Controller
         return response()->json($requests, 200);
     }
 
-    // --- MIGRACIÓN DE DATOS (Onboarding) ---
+    // Bloque para descargar el archivo adjunto a una solicitud administrativa
     public function descargarArchivo($id)
     {
         $req = AdminRequest::findOrFail($id);
@@ -152,6 +155,7 @@ class AdminRequestController extends Controller
         return response()->download($path, basename($req->comprobante_path));
     }
 
+    // Bloque para procesar e importar la migración masiva de datos desde archivo Excel
     public function importar(Request $request, $id)
     {
         $req = AdminRequest::findOrFail($id);
@@ -178,7 +182,7 @@ class AdminRequestController extends Controller
         ]);
     }
 
-    // Para aprobar e importar directamente el archivo que ya subió la empresa, sin re-subirlo
+    // Bloque para aprobar e importar directamente el archivo original de migración sin re-subida
     public function aprobarEImportar($id)
     {
         $req = AdminRequest::findOrFail($id);
@@ -201,7 +205,7 @@ class AdminRequestController extends Controller
             return response()->json(['error' => 'La solicitud no tiene una empresa asociada.'], 400);
         }
 
-        // Leer el archivo ya almacenado y procesarlo directamente
+        // Bloque para leer y procesar el archivo Excel almacenado directamente
         $data = Excel::toCollection(new MasterDataImport, $path);
         $resultado = $this->procesarHojas($data, $empresaId);
 
@@ -398,7 +402,6 @@ class AdminRequestController extends Controller
         return true;
     }
 
-    // --- HELPERS ---
     private function normalizar($row)
     {
         return collect($row)->mapWithKeys(fn ($valor, $clave) => [

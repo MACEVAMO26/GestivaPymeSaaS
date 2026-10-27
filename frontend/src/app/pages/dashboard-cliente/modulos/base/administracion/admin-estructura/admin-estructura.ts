@@ -17,12 +17,14 @@ import { ToastService } from '../../../../../../services/toast.service';
   styleUrl: './admin-estructura.scss'
 })
 export class AdminEstructura implements OnInit {
+  // --- INYECCION DE DEPENDENCIAS Y SERVICIOS ---
   private estructuraService = inject(EstructuraService);
   private rolesService = inject(RolesService);
   private modulosService = inject(ModulosService);
   private toast = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
 
+  // --- VARIABLES DE ESTADO Y PESTAÑAS ---
   activeTab: 'sedes' | 'areas' | 'cargos' = 'sedes';
   
   sedes: any[] = [];
@@ -35,13 +37,15 @@ export class AdminEstructura implements OnInit {
   isLoading = true;
   isSaving = false;
 
-  // Modales
+  // --- MODALES ---
   isModalSedeOpen = false;
   isModalAreaOpen = false;
   isModalCargoOpen = false;
   editandoSedeId: number | null = null;
+  editandoAreaId: number | null = null;
+  editandoCargoId: number | null = null;
 
-  // Formularios
+  // --- FORMULARIOS ---
   nuevaSede = { nombre: '', direccion: '', telefono: '', estado: 'activa' };
   nuevaArea = { nombre: '', descripcion: '', modulos: [] as string[] };
   nuevoCargo = { nombre: '', descripcion: '', funciones: '', rol_id: '', area_id: '' };
@@ -50,49 +54,96 @@ export class AdminEstructura implements OnInit {
   pageSedes = 1;
   pageAreas = 1;
 
+  UI_TO_DB_MAP: Record<string, string[]> = {
+    rrhh: ['r_tur', 'r_vac', 'r_aus'],
+    v_prov: ['v_prov'],
+    v_rep: ['v_rep'],
+    v_inv: ['v_inv'],
+    v_pos: ['v_pos'],
+    v_cxc: ['v_cxc'],
+    s_age: ['s_age'],
+    s_cat: ['s_cat'],
+    finanzas: ['f_caja']
+  };
+
+  // Bloque para obtener las sedes paginadas
   get paginatedSedes(): any[] {
     const start = (this.pageSedes - 1) * this.pageSize;
     return this.sedes.slice(start, start + this.pageSize);
   }
+
+  // Bloque para calcular el total de paginas de sedes
   get totalPagesSedes(): number {
     return Math.ceil(this.sedes.length / this.pageSize) || 1;
   }
 
+  // Bloque para obtener las areas paginadas
   get paginatedAreas(): any[] {
     const start = (this.pageAreas - 1) * this.pageSize;
     return this.areas.slice(start, start + this.pageSize);
   }
+
+  // Bloque para calcular el total de paginas de areas
   get totalPagesAreas(): number {
     return Math.ceil(this.areas.length / this.pageSize) || 1;
   }
 
+  // Bloque para obtener los modulos disponibles para el area seleccionada
+  get modulosDisponiblesParaAreaSeleccionada() {
+    let modulosAsignadosAOtros = new Set<string>();
+    
+    const areaActual = this.areas.find(a => a.id === this.editandoAreaId);
+    if (areaActual && areaActual.nombre.toLowerCase() === 'gerencia') {
+      return this.modulosDisponibles;
+    }
+
+    this.areas.forEach(area => {
+      if (this.editandoAreaId && area.id === this.editandoAreaId) return;
+      if (area.nombre.toLowerCase() === 'gerencia') return;
+
+      if (area.modulos) {
+        area.modulos.forEach((m: any) => {
+          modulosAsignadosAOtros.add(m.id.toString());
+        });
+      }
+    });
+    
+    return this.modulosDisponibles.filter(m => {
+      const uiId = m.id.toString();
+      const dbIds = this.UI_TO_DB_MAP[uiId] || [uiId];
+      return !dbIds.some(dbId => modulosAsignadosAOtros.has(dbId));
+    });
+  }
+
+  // Bloque de ciclo de vida para inicializar datos
   ngOnInit() {
     this.cargarDatos();
   }
 
+  // Bloque para cambiar entre pestañas de estructura (sedes, areas, cargos)
   setTab(tab: 'sedes' | 'areas' | 'cargos') {
     this.activeTab = tab;
   }
 
+  // Bloque para cargar en paralelo sedes, areas, cargos, modulos y roles
   cargarDatos() {
     this.isLoading = true;
     
-    // Cargar todo en paralelo
     forkJoin({
       sedes: this.estructuraService.getSedes(),
       areas: this.estructuraService.getAreas(),
       cargos: this.estructuraService.getCargos(),
-        modulos: this.modulosService.getMisModulos(),
+      modulos: this.modulosService.getMisModulos(),
       roles: this.rolesService.getRoles()
     }).subscribe({
       next: (data) => {
         this.sedes = data.sedes;
         this.areas = data.areas;
         this.cargos = data.cargos;
-          if (data.modulos && data.modulos.modulos) {
-            this.paquetesModulos = data.modulos.modulos;
-          }
-          this.construirModulosSidebar();
+        if (data.modulos && data.modulos.modulos) {
+          this.paquetesModulos = data.modulos.modulos;
+        }
+        this.construirModulosSidebar();
         this.roles = data.roles;
         this.isLoading = false;
         this.cdr.detectChanges();
@@ -106,6 +157,7 @@ export class AdminEstructura implements OnInit {
     });
   }
 
+  // Bloque para construir el listado de modulos disponibles segun catalogo y suscripcion
   construirModulosSidebar() {
     const modulosSidebarCatalogo: any[] = [
       { id: 'rrhh', nombre: 'Gestión Humana' },
@@ -122,7 +174,6 @@ export class AdminEstructura implements OnInit {
     const modulosEmpresa = this.paquetesModulos || {};
 
     this.modulosDisponibles = modulosSidebarCatalogo.filter(mod => {
-
       if (['rrhh', 'finanzas'].includes(mod.id)) {
         const subs = modulosEmpresa[mod.id] || [];
         return subs.some((s: any) => s.activo);
@@ -138,94 +189,70 @@ export class AdminEstructura implements OnInit {
     });
   }
 
+  // Bloque para obtener el nombre legible de un rol a partir de su ID
   getRoleName(rolId: number): string {
     const rol = this.roles.find(r => r.id === rolId);
     return rol ? rol.nombre : 'Sin Rol';
   }
 
+  // Bloque para filtrar los cargos pertenecientes a un rol dado
   getCargosByRol(rolId: number): any[] {
     return this.cargos.filter(c => c.rol_id === rolId);
   }
 
-  // --- MÓDULOS DEL ÁREA ---
+  // Bloque para cerrar todos los modales de la estructura organizacional
   cerrarModales() {
     this.isModalSedeOpen = false;
     this.isModalAreaOpen = false;
     this.isModalCargoOpen = false;
     this.editandoSedeId = null;
+    this.editandoAreaId = null;
+    this.editandoCargoId = null;
   }
 
+  // Bloque para abrir el modal de creacion de nueva sede
   abrirModalSede() {
     this.nuevaSede = { nombre: '', direccion: '', telefono: '', estado: 'activa' };
     this.editandoSedeId = null;
     this.isModalSedeOpen = true;
   }
 
+  // Bloque para abrir el modal de edicion de una sede existente
   abrirEdicionSede(sede: any) {
     this.nuevaSede = { ...sede };
     this.editandoSedeId = sede.id;
     this.isModalSedeOpen = true;
   }
 
-  editandoAreaId: number | null = null;
-
+  // Bloque para abrir el modal de creacion de nueva area
   abrirModalArea() {
     this.nuevaArea = { nombre: '', descripcion: '', modulos: [] };
     this.editandoAreaId = null;
     this.isModalAreaOpen = true;
   }
 
+  // Bloque para abrir el modal de edicion de un area existente
   abrirEdicionArea(area: any) {
     this.nuevaArea = { ...area, modulos: area.modulos ? area.modulos.map((m: any) => m.id) : [] };
     this.editandoAreaId = area.id;
     this.isModalAreaOpen = true;
   }
 
-  get modulosDisponiblesParaAreaSeleccionada() {
-    let modulosAsignadosAOtros = new Set<string>();
-    
-    // Si el área actual es Gerencia, no filtramos nada, tiene acceso a todos.
-    const areaActual = this.areas.find(a => a.id === this.editandoAreaId);
-    if (areaActual && areaActual.nombre.toLowerCase() === 'gerencia') {
-      return this.modulosDisponibles;
-    }
-
-    this.areas.forEach(area => {
-      if (this.editandoAreaId && area.id === this.editandoAreaId) return;
-      
-      // Los módulos de Gerencia no bloquean a las demás áreas
-      if (area.nombre.toLowerCase() === 'gerencia') return;
-
-      if (area.modulos) {
-        area.modulos.forEach((m: any) => {
-          modulosAsignadosAOtros.add(m.id.toString());
-        });
-      }
-    });
-    
-    return this.modulosDisponibles.filter(m => {
-      const uiId = m.id.toString();
-      const dbIds = this.UI_TO_DB_MAP[uiId] || [uiId];
-      // Si algun id de bd correspondiente a este uiId ya está asignado, ocultamos el paquete
-      return !dbIds.some(dbId => modulosAsignadosAOtros.has(dbId));
-    });
-  }
-
-  editandoCargoId: number | null = null;
-
+  // Bloque para abrir el modal de creacion de nuevo cargo
   abrirModalCargo() {
     this.nuevoCargo = { nombre: '', descripcion: '', funciones: '', rol_id: '', area_id: '' };
     this.editandoCargoId = null;
     this.isModalCargoOpen = true;
   }
 
+  // Bloque para abrir el modal de edicion de un cargo existente
   abrirEdicionCargo(cargo: any) {
     this.nuevoCargo = { ...cargo };
     this.editandoCargoId = cargo.id;
     this.isModalCargoOpen = true;
   }
 
-  // --- GUARDAR ---
+  // Bloque para guardar o actualizar una sede
   guardarSede() {
     if (!this.nuevaSede.nombre) {
       this.toast.warning('El nombre de la sede es obligatorio');
@@ -240,15 +267,15 @@ export class AdminEstructura implements OnInit {
           this.isSaving = false;
           this.cerrarModales();
           this.cargarDatos();
-        this.cdr.detectChanges();
+          this.cdr.detectChanges();
         },
         error: (err: any) => {
-        if (err?.name === 'TimeoutError') {
-          this.toast.error('Tiempo de espera agotado');
-        }
+          if (err?.name === 'TimeoutError') {
+            this.toast.error('Tiempo de espera agotado');
+          }
           this.isSaving = false;
           this.toast.error(err.error?.message || 'Error al actualizar sede');
-        this.cdr.detectChanges();
+          this.cdr.detectChanges();
         }
       });
     } else {
@@ -258,38 +285,27 @@ export class AdminEstructura implements OnInit {
           this.isSaving = false;
           this.cerrarModales();
           this.cargarDatos();
-        this.cdr.detectChanges();
+          this.cdr.detectChanges();
         },
         error: (err: any) => {
-        if (err?.name === 'TimeoutError') {
-          this.toast.error('Tiempo de espera agotado');
-        }
+          if (err?.name === 'TimeoutError') {
+            this.toast.error('Tiempo de espera agotado');
+          }
           this.isSaving = false;
           this.toast.error(err.error?.message || 'Error al crear sede');
-        this.cdr.detectChanges();
+          this.cdr.detectChanges();
         }
       });
     }
   }
 
-  
-  UI_TO_DB_MAP: Record<string, string[]> = {
-    rrhh: ['r_tur', 'r_vac', 'r_aus'],
-    v_prov: ['v_prov'],
-    v_rep: ['v_rep'],
-    v_inv: ['v_inv'],
-    v_pos: ['v_pos'],
-    v_cxc: ['v_cxc'],
-    s_age: ['s_age'],
-    s_cat: ['s_cat'],
-    finanzas: ['f_caja']
-  };
-
+  // Bloque para comprobar si un modulo de UI esta seleccionado para el area
   isModuloUiSeleccionado(uiId: string): boolean {
     const dbIds = this.UI_TO_DB_MAP[uiId] || [uiId];
     return dbIds.some(dbId => this.nuevaArea.modulos.includes(dbId));
   }
 
+  // Bloque para alternar la seleccion de un modulo en el area
   toggleModuloArea(uiId: string) {
     const dbIds = this.UI_TO_DB_MAP[uiId] || [uiId];
     const estaSeleccionado = this.isModuloUiSeleccionado(uiId);
@@ -305,6 +321,7 @@ export class AdminEstructura implements OnInit {
     }
   }
 
+  // Bloque para guardar o actualizar un area con sus modulos asociados
   guardarArea() {
     if (!this.nuevaArea.nombre) {
       this.toast.warning('El nombre del área es obligatorio');
@@ -352,6 +369,7 @@ export class AdminEstructura implements OnInit {
     }
   }
 
+  // Bloque para guardar o actualizar un cargo
   guardarCargo() {
     if (!this.nuevoCargo.nombre || !this.nuevoCargo.rol_id || !this.nuevoCargo.area_id) {
       this.toast.warning('El nombre, el rol y el área son obligatorios');
@@ -393,7 +411,7 @@ export class AdminEstructura implements OnInit {
     }
   }
 
-  // --- ESTADOS ---
+  // Bloque para alternar el estado activo o inactivo de un area
   cambiarEstadoArea(area: any) {
     this.estructuraService.changeAreaStatus(area.id).subscribe({
       next: (res) => {
@@ -411,6 +429,7 @@ export class AdminEstructura implements OnInit {
     });
   }
 
+  // Bloque para alternar el estado activo o inactivo de un cargo
   cambiarEstadoCargo(cargo: any) {
     if (cargo.nombre === 'Jefe de Recursos Humanos') {
       this.toast.warning('El Cargo de Recursos Humanos Base no se puede desactivar.');

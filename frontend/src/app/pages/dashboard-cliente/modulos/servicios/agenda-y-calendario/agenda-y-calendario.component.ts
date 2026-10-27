@@ -15,20 +15,30 @@ import { timeout } from 'rxjs';
   styleUrl: './agenda-y-calendario.component.scss'
 })
 export class AgendaYCalendarioComponent implements OnInit {
+  // --- SERVICIOS INYECTADOS ---
   private agendaService = inject(AgendaService);
   private toast = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
   private authService = inject(AuthService);
-  esOperativo: boolean = false;
 
+  // --- VARIABLES DE ESTADO ---
+  esOperativo = false;
   eventos: EventoCalendario[] = [];
   cargando = false;
   guardando = false;
-
-  busqueda: string = '';
+  busqueda = '';
   pageSize = 8;
   pageEventos = 1;
 
+  nuevoEvento: EventoCalendario = {
+    titulo: '',
+    descripcion: '',
+    fecha_inicio: '',
+    fecha_fin: '',
+    color_etiqueta: '#45a1ae'
+  };
+
+  // --- GETTERS Y PROPIEDADES CALCULADAS ---
   get fechaMinimaActual(): string {
     const now = new Date();
     const pad = (n: number) => String(n).padStart(2, '0');
@@ -49,18 +59,12 @@ export class AgendaYCalendarioComponent implements OnInit {
     const start = (this.pageEventos - 1) * this.pageSize;
     return this.eventosFiltrados.slice(start, start + this.pageSize);
   }
+
   get totalPagesEventos(): number {
     return Math.ceil(this.eventosFiltrados.length / this.pageSize) || 1;
   }
 
-  nuevoEvento: EventoCalendario = {
-    titulo: '',
-    descripcion: '',
-    fecha_inicio: '',
-    fecha_fin: '',
-    color_etiqueta: '#45a1ae'
-  };
-
+  // Bloque de ciclo de vida OnInit para cargar rol y eventos
   ngOnInit() {
     const user = this.authService.getUser();
     if (user && user.rol && user.rol.nombre) {
@@ -69,6 +73,7 @@ export class AgendaYCalendarioComponent implements OnInit {
     this.cargarEventos();
   }
 
+  // Bloque para cargar la lista de eventos desde la API
   cargarEventos() {
     this.cargando = true;
     this.agendaService.getEventos().pipe(timeout(15000)).subscribe({
@@ -90,6 +95,7 @@ export class AgendaYCalendarioComponent implements OnInit {
     });
   }
 
+  // Bloque para validar y guardar un nuevo evento en el calendario
   guardarEvento() {
     if (!this.nuevoEvento.titulo || !this.nuevoEvento.fecha_inicio || !this.nuevoEvento.fecha_fin) {
       return this.toast.warning('Título, fecha de inicio y fin son obligatorios');
@@ -97,7 +103,7 @@ export class AgendaYCalendarioComponent implements OnInit {
 
     const fechaInicio = new Date(this.nuevoEvento.fecha_inicio).getTime();
     const fechaFin = new Date(this.nuevoEvento.fecha_fin).getTime();
-    const margenTolerancia = Date.now() - (2 * 60 * 1000); // 2 minutos de tolerancia por llenado
+    const margenTolerancia = Date.now() - (2 * 60 * 1000);
 
     if (fechaInicio < margenTolerancia) {
       return this.toast.warning('No es posible agendar eventos en fechas u horas pasadas');
@@ -130,4 +136,3 @@ export class AgendaYCalendarioComponent implements OnInit {
     });
   }
 }
-

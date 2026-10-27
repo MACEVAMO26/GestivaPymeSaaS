@@ -29,12 +29,11 @@ export class CatalogoDeServiciosComponent implements OnInit {
   private toast = inject(ToastService);
   private authService = inject(AuthService);
 
+  // --- VARIABLES DE ESTADO ---
   activeTab: string = 'recepcion';
   guardando: boolean = false;
   cargando: boolean = false;
   filtroEstado: string = 'TODOS';
-
-  // Recepción
   tipoServicio: 'DOMICILIO' | 'TALLER' = 'DOMICILIO';
   formTicket: any = { 
     cliente: '', 
@@ -52,17 +51,11 @@ export class CatalogoDeServiciosComponent implements OnInit {
   catalogo: Servicio[] = [];
   tickets: ServicioTicket[] = [];
   ticketsPendientes: ServicioTicket[] = [];
-
-  // Rendimiento Técnico
   tecnicos: any[] = [];
   tecnicoDashboard: any = null;
-
-  // Asignación / Despacho
   modalAsignacion: boolean = false;
   ticketSeleccionado: ServicioTicket | null = null;
   tecnicoSeleccionado: string = '';
-
-  // Ejecución / Mini-Inventario
   modalEjecucion: boolean = false;
   inventario: Inventario[] = [];
   materialSeleccionado: string = '';
@@ -71,8 +64,6 @@ export class CatalogoDeServiciosComponent implements OnInit {
   notasEjecucion: string = '';
   tiempoEjecucion: number = 60;
   costoManoObra: number = 0;
-
-  // Calificación del Servicio
   modalCalificacion: boolean = false;
   ticketParaCalificar: ServicioTicket | null = null;
   calificacionTecnico: number = 5;
@@ -80,11 +71,16 @@ export class CatalogoDeServiciosComponent implements OnInit {
   calificacionCliente: number = 5;
   feedbackCliente: string = '';
 
+  // Bloque de inicialización del componente y carga de datos iniciales
   ngOnInit() {
-    this.cargarCatalogo();
-    this.cargarTickets();
-    this.cargarInventario();
-    this.cargarTecnicos();
+    this.// Bloque para consultar el catálogo de servicios desde el backend
+  cargarCatalogo();
+    this.// Bloque para consultar la lista de tickets de servicio
+  cargarTickets();
+    this.// Bloque para cargar el inventario de materiales y repuestos disponibles
+  cargarInventario();
+    this.// Bloque para cargar el listado de técnicos operativos de la empresa
+  cargarTecnicos();
   }
 
   cargarCatalogo() {
@@ -108,7 +104,8 @@ export class CatalogoDeServiciosComponent implements OnInit {
     this.ticketsService.getTickets().pipe(timeout(15000)).subscribe({
       next: (res) => {
         this.tickets = res;
-        this.filtrarTicketsPendientes();
+        this.// Bloque para filtrar tickets en estado pendiente o recibido
+  filtrarTicketsPendientes();
         if (this.tecnicos.length > 0 && this.tecnicoDashboard) {
           const tec = this.tecnicos.find(t => t.id === this.tecnicoDashboard.id);
           if (tec) this.seleccionarTecnicoRender(tec);
@@ -197,6 +194,7 @@ export class CatalogoDeServiciosComponent implements OnInit {
     });
   }
 
+  // Bloque para alternar entre pestañas del módulo de servicios
   switchTab(tab: string) {
     this.activeTab = tab;
     if (tab === 'recepcion' || tab === 'agenda' || tab === 'ejecucion' || tab === 'rendimiento') {
@@ -205,15 +203,18 @@ export class CatalogoDeServiciosComponent implements OnInit {
     if (tab === 'catalogo') this.cargarCatalogo();
   }
 
+  // Bloque para obtener el nombre legible de un técnico por su ID
   nombreTecnico(id?: number): string {
     const tec = this.tecnicos.find(t => t.id === id);
     return tec?.nombre || 'Sin Asignar';
   }
 
+  // Bloque para formatear el código visual de un servicio
   codigoServicio(id?: number): string {
     return `SERV-${String(id).padStart(3, '0')}`;
   }
 
+  // Bloque para autocompletar la tarifa al seleccionar un servicio
   onServicioSeleccionado() {
     const s = this.catalogo.find(c => c.nombre === this.formTicket.servicio);
     if (s && s.tarifa) {
@@ -221,6 +222,7 @@ export class CatalogoDeServiciosComponent implements OnInit {
     }
   }
 
+  // Bloque para validar y registrar un nuevo ticket de servicio
   crearTicket() {
     if (!this.formTicket.cliente || !this.formTicket.servicio) {
       this.toast.warning('Complete cliente y servicio');
@@ -273,8 +275,10 @@ export class CatalogoDeServiciosComponent implements OnInit {
   pageAgenda = 1;
   pageCatalogo = 1;
 
+  // --- GETTERS Y PAGINACION ---
   get paginatedTickets(): ServicioTicket[] {
-    const list = this.getTicketsFiltrados();
+    const list = this.// Bloque para obtener los tickets filtrados por estado
+  getTicketsFiltrados();
     const start = (this.pageTickets - 1) * this.pageSize;
     return list.slice(start, start + this.pageSize);
   }
@@ -295,10 +299,12 @@ export class CatalogoDeServiciosComponent implements OnInit {
 
   searchTermCatalogo: string = '';
 
+  // Bloque de evento al escribir en el buscador de servicios
   onSearchTermCatalogoChange() {
     this.pageCatalogo = 1;
   }
 
+  // Bloque para restablecer el filtro de búsqueda del catálogo
   limpiarBusquedaCatalogo() {
     this.searchTermCatalogo = '';
     this.pageCatalogo = 1;
@@ -328,6 +334,7 @@ export class CatalogoDeServiciosComponent implements OnInit {
     return this.tickets.filter(t => t.estado === this.filtroEstado);
   }
 
+  // Bloque para determinar la clase visual del badge según el estado
   getBadgeEstado(estado: string): string {
     switch (estado) {
       case 'Finalizado': return 'badge-success';
@@ -341,6 +348,7 @@ export class CatalogoDeServiciosComponent implements OnInit {
     }
   }
 
+  // Bloque para determinar el icono representativo del estado del ticket
   getIconoEstado(estado: string): string {
     switch (estado) {
       case 'Finalizado': return 'fas fa-check-circle';
@@ -354,6 +362,7 @@ export class CatalogoDeServiciosComponent implements OnInit {
     }
   }
 
+  // Bloque de verificación de permisos administrativos para despachar técnicos
   puedeAsignarOperarios(): boolean {
     const user = this.authService.getUser();
     if (!user) return false;
@@ -372,7 +381,8 @@ export class CatalogoDeServiciosComponent implements OnInit {
     );
   }
 
-  // --- ASIGNACION & DESPACHO ---
+  // --- SECCION ASIGNACION Y DESPACHO ---
+  // Bloque para abrir el modal de asignación de técnico a un ticket
   abrirAsignacion(tk: ServicioTicket) {
     if (!this.puedeAsignarOperarios()) {
       this.toast.warning('Solo el Jefe de Servicios y el Coordinador de Operativos pueden asignar o mover operarios.');
@@ -383,11 +393,13 @@ export class CatalogoDeServiciosComponent implements OnInit {
     this.modalAsignacion = true;
   }
 
+  // Bloque para cerrar el modal de asignación
   cerrarAsignacion() {
     this.modalAsignacion = false;
     this.ticketSeleccionado = null;
   }
 
+  // Bloque para persistir la asignación de técnico en el servicio
   guardarAsignacion(nuevoEstado: string = 'Asignado') {
     if (!this.puedeAsignarOperarios()) {
       this.toast.warning('Solo el Jefe de Servicios y el Coordinador de Operativos pueden asignar o mover operarios.');
@@ -418,6 +430,7 @@ export class CatalogoDeServiciosComponent implements OnInit {
     });
   }
 
+  // Bloque para actualizar directamente el estado operativo de un ticket
   cambiarEstadoDirecto(tk: ServicioTicket, nuevoEstado: string) {
     if (!tk.id) return;
     this.guardando = true;
@@ -436,7 +449,8 @@ export class CatalogoDeServiciosComponent implements OnInit {
     });
   }
 
-  // --- EJECUCIÓN & MINI-INVENTARIO ---
+  // --- SECCION EJECUCION Y MINI INVENTARIO ---
+  // Bloque para abrir el modal de ejecución y mini-inventario
   abrirEjecucion(tk: ServicioTicket) {
     this.ticketSeleccionado = tk;
     this.materialSeleccionado = '';
@@ -452,26 +466,31 @@ export class CatalogoDeServiciosComponent implements OnInit {
     this.modalEjecucion = true;
   }
 
+  // Bloque para cerrar el modal de ejecución
   cerrarEjecucion() {
     this.modalEjecucion = false;
     this.ticketSeleccionado = null;
   }
 
+  // Bloque para obtener el nombre de un repuesto según su ID
   nombreProducto(id: number): string {
     const inv = this.inventario.find(i => i.producto_id === id);
     return inv?.producto?.nombre || `Producto #${id}`;
   }
 
+  // Bloque para consultar el stock disponible de un repuesto
   stockProducto(id: number): number {
     const inv = this.inventario.find(i => i.producto_id === id);
     return inv?.stock_actual || 0;
   }
 
+  // Bloque para consultar el precio unitario de un repuesto
   precioProducto(id: number): number {
     const inv = this.inventario.find(i => i.producto_id === id);
     return Number(inv?.producto?.precio || 0);
   }
 
+  // Bloque para descontar y asignar un material/repuesto al servicio
   agregarMaterial() {
     if (!this.ticketSeleccionado?.id) return;
     if (!this.materialSeleccionado || this.cantidadMaterial <= 0) {
@@ -508,6 +527,7 @@ export class CatalogoDeServiciosComponent implements OnInit {
     });
   }
 
+  // Bloque para remover un material asignado al servicio
   eliminarMaterial(mat: ServicioMaterial, index: number) {
     if (!this.ticketSeleccionado?.id || !mat.id) {
       this.materialesUsados.splice(index, 1);
@@ -526,14 +546,17 @@ export class CatalogoDeServiciosComponent implements OnInit {
     });
   }
 
+  // Bloque para calcular la sumatoria de costos de materiales usados
   getTotalMateriales(): number {
     return this.materialesUsados.reduce((acc, m) => acc + (m.subtotal || (m.cantidad * (m.precio_unitario || 0))), 0);
   }
 
+  // Bloque para calcular el costo total sumando mano de obra y materiales
   getCostoTotalCalculado(): number {
     return (Number(this.costoManoObra) || 0) + this.getTotalMateriales();
   }
 
+  // Bloque para liquidar, finalizar y registrar calificaciones de un servicio
   finalizarServicio() {
     if (!this.ticketSeleccionado?.id) return;
     this.guardando = true;
@@ -568,7 +591,8 @@ export class CatalogoDeServiciosComponent implements OnInit {
       });
   }
 
-  // --- CALIFICACIÓN MUTUA (MODAL INDEPENDIENTE) ---
+  // --- SECCION CALIFICACION MUTUA ---
+  // Bloque para abrir el diálogo de calificación mutua
   abrirModalCalificacion(tk: ServicioTicket) {
     this.ticketParaCalificar = tk;
     this.calificacionTecnico = tk.calificacion_tecnico || 5;
@@ -578,19 +602,23 @@ export class CatalogoDeServiciosComponent implements OnInit {
     this.modalCalificacion = true;
   }
 
+  // Bloque para cerrar el modal de calificación
   cerrarModalCalificacion() {
     this.modalCalificacion = false;
     this.ticketParaCalificar = null;
   }
 
+  // Bloque para fijar las estrellas otorgadas al técnico
   setStarsTecnico(n: number) {
     this.calificacionTecnico = n;
   }
 
+  // Bloque para fijar las estrellas otorgadas al cliente
   setStarsCliente(n: number) {
     this.calificacionCliente = n;
   }
 
+  // Bloque para enviar la calificación al servidor
   guardarCalificacion() {
     if (!this.ticketParaCalificar?.id) return;
     this.guardando = true;
@@ -616,15 +644,14 @@ export class CatalogoDeServiciosComponent implements OnInit {
     });
   }
 
-  // --- RENDIMIENTO TÉCNICO ---
+  // --- SECCION RENDIMIENTO TECNICO ---
+  // Bloque para calcular y proyectar métricas de desempeño del técnico
   seleccionarTecnicoRender(tec: any) {
     const ticketsTec = this.tickets.filter(t => t.tecnico_id === tec.id);
     const finalizados = ticketsTec.filter(t => t.estado === 'Finalizado');
     const enCamino = ticketsTec.filter(t => t.estado === 'En Camino').length;
     const enSitio = ticketsTec.filter(t => t.estado === 'En Sitio').length;
     const asignados = ticketsTec.filter(t => t.estado === 'Asignado').length;
-
-    // Calcular promedio de calificación del técnico
     const conCalificacion = finalizados.filter(t => t.calificacion_tecnico && t.calificacion_tecnico > 0);
     const sumaCalif = conCalificacion.reduce((acc, t) => acc + (t.calificacion_tecnico || 0), 0);
     const promedioEstrellas = conCalificacion.length > 0 ? (sumaCalif / conCalificacion.length) : 5.0;
@@ -660,11 +687,13 @@ export class CatalogoDeServiciosComponent implements OnInit {
     };
   }
 
+  // Bloque utilitario para calcular porcentajes de cumplimiento
   getPorcentaje(valor: number, total: number = 100): number {
     if (total <= 0) return 0;
     return Math.min(Math.round((valor / total) * 100), 100);
   }
 
+  // Bloque utilitario para generar arreglo de estrellas numéricas
   getStarArray(n: number = 5): number[] {
     return Array.from({ length: Math.round(n) }, (_, i) => i + 1);
   }

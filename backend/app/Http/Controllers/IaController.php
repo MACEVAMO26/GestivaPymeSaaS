@@ -20,7 +20,7 @@ class IaController extends Controller
         
         $sugerencias = [];
 
-        // Lógica para plan básico: sugerencias estáticas según rol y área
+        // Bloque para procesar sugerencias según rol y área
         if (in_array($rol, ['Gerente General', 'Jefe de Área'])) {
             if ($area === 'ventas') {
                 $sugerencias = [
@@ -39,7 +39,7 @@ class IaController extends Controller
                 ];
             }
         } else {
-            // Asistente, Operativo, Vendedor
+            
             if ($area === 'ventas') {
                 $sugerencias = [
                     '¡Llega a tu meta de ventas de hoy!',
@@ -58,8 +58,8 @@ class IaController extends Controller
             }
         }
 
-        // --- FETCH CUSTOM SUGGESTIONS (Directrices IA del Gerente) ---
-        // Audiencia: 'Todos', 'Gerencia', 'Ventas', 'RRHH', 'Operativos'
+        // Bloque para consultar directrices personalizadas del gerente
+        
         $audiencias = ['Todos'];
         $rolNombre = strtolower($rol);
         $cargoNombre = strtolower($user->empleado->cargo->nombre ?? ($user->cargo->nombre ?? ''));
@@ -97,13 +97,13 @@ class IaController extends Controller
             ->pluck('mensaje')
             ->toArray();
 
-        // Mezclamos las estáticas con las directrices del gerente (Damos prioridad a las directrices personalizadas)
+        // Bloque para fusionar directrices personalizadas con sugerencias base
         $sugerencias = array_merge($directrices, $sugerencias);
 
-        // Limitar a máximo 4 para no saturar la UI
+        // Bloque para acotar resultados a máximo cuatro sugerencias
         $sugerencias = array_slice($sugerencias, 0, 4);
 
-        // Registrar la interacción de que la IA sugirió algo (Plan Básico)
+        // Bloque para registrar auditoría de interacción con el asistente de IA
         DB::table('ia_chat_history')->insert([
             'empresa_id' => $user->empresa_id,
             'rol' => 'assistant',
@@ -121,9 +121,7 @@ class IaController extends Controller
         ]);
     }
 
-    /**
-     * Devuelve las estadísticas en tiempo real del módulo solicitado
-     */
+    // Bloque para consultar estadísticas en tiempo real del módulo solicitado
     public function getEstadisticasModulo(Request $request, $modulo = 'general')
     {
         $user = Auth::user();
@@ -145,9 +143,7 @@ class IaController extends Controller
         ]);
     }
 
-    /**
-     * Genera y descarga el archivo oficial de Word (.doc / MIME Word) con estadísticas reales
-     */
+    // Bloque para generar y descargar informe ejecutivo en Word
     public function generarInformeWord(Request $request, $modulo = 'general')
     {
         $user = Auth::user();
@@ -175,9 +171,7 @@ class IaController extends Controller
         ]);
     }
 
-    /**
-     * Calcula métricas y estadísticas reales de la BD para la empresa
-     */
+    // Bloque privado para calcular métricas de base de datos por módulo
     private function calcularEstadisticas($empresaId, $modulo)
     {
         $modulo = strtolower(trim($modulo));
@@ -316,7 +310,7 @@ class IaController extends Controller
             ];
         }
 
-        // General / Consolidado
+        // Bloque para calcular estadísticas consolidadas generales
         $ventasTot = \App\Models\Venta::where('empresa_id', $empresaId)->sum('total') ?: 0;
         $ventasCount = \App\Models\Venta::where('empresa_id', $empresaId)->count();
         $empTot = \App\Models\Empleado::where('empresa_id', $empresaId)->count();
@@ -345,9 +339,7 @@ class IaController extends Controller
         ];
     }
 
-    /**
-     * Construye el documento HTML con formato y estilos nativos para Microsoft Word
-     */
+    // Bloque privado para estructurar documento HTML compatible con Microsoft Word
     private function construirHtmlWord($modulo, $empresa, $nit, $stats)
     {
         $fecha = date('d/m/Y H:i:s');

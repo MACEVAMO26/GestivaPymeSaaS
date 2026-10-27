@@ -1,0 +1,34 @@
+@if (sessionTimeout.showWarning$ | async) {
+  <div class="session-modal-overlay">
+    <div class="session-modal-container">
+      <div class="session-modal-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+
+      <h3 class="session-modal-title">¿Sigues ahí?</h3>
+
+      <p class="session-modal-text">
+        No se ha detectado actividad en tus pestañas. Por tu seguridad, tu sesión se cerrará automáticamente en:
+      </p>
+
+      <div class="session-timer-badge">
+        <span class="timer-digits">{{ formatTime(sessionTimeout.secondsRemaining$ | async) }}</span>
+        <span class="timer-label">minutos restantes</span>
+      </div>
+
+      <div class="session-modal-actions">
+        <button type="button" class="btn-keep-session" (click)="keepSession()">
+          <svg xmlns="http://www.w3.org/2000/svg" class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          Mantener sesión activa
+        </button>
+        <button type="button" class="btn-logout" (click)="logout()">
+          Cerrar sesión ahora
+        </button>
+      </div>
+    </div>
+  </div>
+}

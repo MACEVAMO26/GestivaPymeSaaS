@@ -7,8 +7,7 @@ use Illuminate\Http\Request;
 
 class LogAuditoriaController extends Controller
 {
-    // --- LOG DE AUDITORÍA ---
-    // Obtiene los últimos 500 registros de auditoría ordenados por fecha
+    // Bloque para obtener los últimos 500 registros de auditoría ordenados por fecha
     public function index()
     {
         return LogAuditoria::with('usuario')
@@ -17,11 +16,11 @@ class LogAuditoriaController extends Controller
                            ->get();
     }
 
-    // Retorna los detalles de un registro específico de auditoría
+    // Bloque para retornar los detalles de un registro específico de auditoría
     public function show($id)
     {
         return LogAuditoria::with('usuario')->findOrFail($id);
     }
 
-    // Nota: Este controlador es de solo lectura por motivos de seguridad
+    // Bloque de nota informativa de seguridad: controlador de solo lectura
 }

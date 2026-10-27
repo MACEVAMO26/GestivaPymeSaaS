@@ -10,14 +10,14 @@ export const routes: Routes = [
     { path: 'saas-admin', redirectTo: 'saas-admin/dashboard', pathMatch: 'full' },
     { path: 'saas-admin/:vista', loadComponent: () => import('./pages/saas-admin/saas-admin.component').then(m => m.SaasAdminComponent), canActivate: [authGuard] },
     
-    // Módulo Cliente Unificado
+    // --- MODULO CLIENTE UNIFICADO ---
     { 
         path: ':entorno', 
         loadComponent: () => import('./pages/dashboard-cliente/dashboard-cliente.component').then(m => m.DashboardClienteComponent), 
         canActivate: [authGuard],
         children: [
             { path: '', redirectTo: 'inicio', pathMatch: 'full' },
-            // Módulos Base
+            // --- MODULOS BASE ---
             { path: 'inicio', loadComponent: () => import('./pages/dashboard-cliente/modulos/base/inicio/inicio.component').then(m => m.InicioComponent) },
             { 
                 path: 'administracion', 
@@ -38,7 +38,7 @@ export const routes: Routes = [
             { path: 'gestiva-ia', loadComponent: () => import('./pages/dashboard-cliente/modulos/base/gestiva-ia/gestiva-ia.component').then(m => m.GestivaIaComponent) },
             { path: 'autogestion', loadComponent: () => import('./pages/dashboard-cliente/modulos/base/autogestion/autogestion.component').then(m => m.AutogestionComponent) },
             
-            // Módulos de Ventas
+            // --- MODULOS DE VENTAS ---
             { path: 'ventas', loadComponent: () => import('./pages/dashboard-cliente/modulos/ventas/ventas/ventas.component').then(m => m.VentasComponent) },
             { path: 'prefacturacion', loadComponent: () => import('./pages/dashboard-cliente/modulos/ventas/prefacturacion/prefacturacion.component').then(m => m.PrefacturacionComponent) },
             { path: 'inventario', loadComponent: () => import('./pages/dashboard-cliente/modulos/ventas/inventario/inventario.component').then(m => m.InventarioComponent) },
@@ -47,14 +47,14 @@ export const routes: Routes = [
             { path: 'proveedores', loadComponent: () => import('./pages/dashboard-cliente/modulos/ventas/proveedores/proveedores.component').then(m => m.ProveedoresComponent) },
             { path: 'caja', loadComponent: () => import('./pages/dashboard-cliente/modulos/ventas/caja/caja.component').then(m => m.CajaComponent) },
             
-            // Módulos de Servicios
+            // --- MODULOS DE SERVICIOS ---
             { path: 'agenda', loadComponent: () => import('./pages/dashboard-cliente/modulos/servicios/agenda-y-calendario/agenda-y-calendario.component').then(m => m.AgendaYCalendarioComponent) },
             { path: 'gestion-de-clientes', loadComponent: () => import('./pages/dashboard-cliente/modulos/servicios/crm-gestion-de-clientes/crm-gestion-de-clientes.component').then(m => m.CrmGestionDeClientesComponent) },
             { path: 'servicios', loadComponent: () => import('./pages/dashboard-cliente/modulos/servicios/catalogo-de-servicios/catalogo-de-servicios.component').then(m => m.CatalogoDeServiciosComponent) },
             { path: 'gestion-de-operarios', loadComponent: () => import('./pages/dashboard-cliente/modulos/servicios/gestion-de-operarios/gestion-de-operarios.component').then(m => m.GestionDeOperariosComponent) },
             { path: 'reportes', loadComponent: () => import('./pages/dashboard-cliente/modulos/servicios/reportes-de-servicios/reportes-de-servicios.component').then(m => m.ReportesDeServiciosComponent) },
             
-            // Módulos Transversales
+            // --- MODULOS TRANSVERSALES ---
             { path: 'gestion-humana', loadComponent: () => import('./pages/dashboard-cliente/modulos/transversales/gestion-humana/gestion-humana.component').then(m => m.GestionHumanaComponent) },
             { path: 'finanzas', loadComponent: () => import('./pages/dashboard-cliente/modulos/transversales/finanzas/finanzas.component').then(m => m.FinanzasComponent) },
             { path: 'addons', loadComponent: () => import('./pages/dashboard-cliente/modulos/transversales/addons/addons.component').then(m => m.AddonsComponent) },

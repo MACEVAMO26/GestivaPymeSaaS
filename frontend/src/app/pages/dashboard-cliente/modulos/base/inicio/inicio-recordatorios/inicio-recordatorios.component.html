@@ -1,8 +1,11 @@
+<!-- HTML PANEL CONTENIDO RECORDATORIOS -->
 <div class="panel-contenido">
+  <!-- HTML ENCABEZADO PANEL RECORDATORIOS -->
   <div class="panel-header">
     <h3 class="panel-title">Mis Recordatorios</h3>
   </div>
 
+  <!-- HTML FORMULARIO AGREGAR RECORDATORIO -->
   <form (ngSubmit)="agregar()">
     <div class="add-recordatorio">
       <input type="text" class="neu-input" name="titulo" [(ngModel)]="nuevoTitulo" placeholder="Título" required>
@@ -13,6 +16,7 @@
     <input type="text" class="neu-input" name="descripcion" [(ngModel)]="nuevaDescripcion" placeholder="Descripción (Opcional)">
   </form>
 
+  <!-- HTML LISTADO DE RECORDATORIOS -->
   <div class="panel-body">
     <div class="recordatorio-item" *ngFor="let r of recordatorios">
       <label class="neu-checkbox-container">
@@ -26,6 +30,7 @@
       </button>
     </div>
 
+    <!-- HTML ESTADO VACIO RECORDATORIOS -->
     <div class="recordatorio-item" *ngIf="recordatorios.length === 0">
       <span class="recordatorio-text">No tienes recordatorios.</span>
     </div>

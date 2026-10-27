@@ -1,6 +1,7 @@
 @use 'sass:color';
 
-/* --- 1. VARIABLES GLOBALES DE COLOR --- */
+/* --- 0. BACKGROUND PRINCIPAL DEL MÓDULO AUDITORÍA ---
+   --- 1. VARIABLES GLOBALES DE COLOR --- */
 $bg-color: #f5f5dc;
 $shadow-light: #ffffff;
 $shadow-dark: #d1d1bc;
@@ -25,7 +26,7 @@ $btn-gen-6: #A38B6D;
 }
 
 /* --- 3. TIPOGRAFIA (Jerarquia estricta) --- */
-/* Titulo principal: 16px, centrado, mayusculas, negrita */
+
 .module-header h1, h1.titulo-principal, .header-section h1 {
   font-size: 16px;
   font-weight: bold;
@@ -36,7 +37,7 @@ $btn-gen-6: #A38B6D;
   color: $text-dark;
 }
 
-/* Subtitulo: 13px, izquierda, mayusculas, sin negrita */
+
 .subtitulo, h2.subtitulo, h3.subtitulo {
   font-size: 14px;
   font-weight: normal;
@@ -46,7 +47,7 @@ $btn-gen-6: #A38B6D;
   margin-bottom: 0.5rem;
 }
 
-/* Descripciones y Notas: 10px, centradas, mayusculas */
+
 .module-header p, .descripcion, .descripcion-general, .subtitle, .header-section p, .nota, .text-muted-small, .badge-small {
   font-size: 14px;
   font-weight: normal;
@@ -59,7 +60,7 @@ $btn-gen-6: #A38B6D;
   line-height: 1.4;
 }
 
-/* Texto general: 12px */
+
 .form-label, p, td, th, li, label, .text-general {
   font-size: 14px;
   font-weight: normal;
@@ -189,7 +190,7 @@ $btn-gen-6: #A38B6D;
   text-decoration: none;
 }
 
-/* Titulos de panel interno */
+
 .panel-title, h3.panel-title {
   font-family: 'Montserrat', sans-serif;
   font-size: 16px;
@@ -200,13 +201,11 @@ $btn-gen-6: #A38B6D;
   margin: 0 0 0.5rem 0;
 }
 
-/* ========================================= */
-/* FIN BASE NEUMORFICA - INICIO DE LOCALES   */
-/* ========================================= */
 
 
 
-/* ESTILOS NEUMÓRFICOS LOCALES PARA ADMIN USUARIOS */
+
+/* --- 8. ESTILOS NEUMÓRFICOS LOCALES --- */
 
 .panel-contenido {
   display: flex;
@@ -234,7 +233,7 @@ $btn-gen-6: #A38B6D;
   box-shadow: inset 4px 4px 8px #d0d0bb, inset -4px -4px 8px #ffffff;
 }
 
-/* TABLA NEUMÓRFICA */
+/* --- 9. TABLA NEUMÓRFICA DE AUDITORÍA --- */
 .neu-table-container {
   border-radius: 12px;
   overflow: hidden;
@@ -288,7 +287,7 @@ $btn-gen-6: #A38B6D;
   }
 }
 
-/* BADGES */
+/* --- 10. BADGES Y ESTADOS --- */
 .badge {
   padding: 0.3rem 0.8rem;
   border-radius: 50px;
@@ -308,7 +307,7 @@ $btn-gen-6: #A38B6D;
   }
 }
 
-/* MODAL NEUMÓRFICO */
+/* --- 11. MODAL NEUMÓRFICO --- */
 .inline-form-container { width: 100%; display: block; }
 
 .modal-card {
@@ -338,7 +337,7 @@ $btn-gen-6: #A38B6D;
   }
 }
 
-/* FORMULARIO */
+/* --- 12. FORMULARIOS E INPUTS --- */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -394,7 +393,7 @@ $btn-gen-6: #A38B6D;
   color: #de3737;
 }
 
-/* BOTONES */
+/* --- 13. BOTONES Y ACCIONES --- */
 .btn-primary {
   background: #45a1ae;
   color: #000;
@@ -478,7 +477,7 @@ $btn-gen-6: #A38B6D;
   gap: 15px;
 }
 
-/* SPINNERS */
+/* --- 14. SPINNERS E INDICADORES DE CARGA --- */
 .loading-overlay {
   display: flex;
   flex-direction: column;
@@ -542,4 +541,12 @@ $btn-gen-6: #A38B6D;
 
 .tabs-nav-wrapper a, .tabs-nav-wrapper button, .tabs-nav-wrapper span {
   font-weight: bold !important;
+}
+
+.cell-nowrap {
+  white-space: nowrap;
+}
+.cell-detalles {
+  max-width: 400px;
+  overflow-wrap: break-word;
 }

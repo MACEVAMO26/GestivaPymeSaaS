@@ -77,7 +77,7 @@ export class GestionDeTareasComponent implements OnInit {
     return Math.ceil(this.tareasEntregadas.length / this.pageSize) || 1;
   }
 
-  // Formulario
+  // --- FORMULARIO ---
   nuevaTarea: Tarea = {
     titulo: '',
     descripcion: '',
@@ -86,12 +86,14 @@ export class GestionDeTareasComponent implements OnInit {
     area_id: undefined
   };
 
+  // Bloque de ciclo de vida para inicializar tareas, empleados y areas
   ngOnInit(): void {
     this.cargarTareas();
     this.cargarEmpleados();
     this.cargarAreas();
   }
 
+  // Bloque para cargar la lista de tareas del usuario autenticado
   cargarTareas() {
     this.cargando = true;
     this.tareaService.getTareas().pipe(timeout(15000)).subscribe({
@@ -111,6 +113,7 @@ export class GestionDeTareasComponent implements OnInit {
     });
   }
 
+  // Bloque para cargar los empleados disponibles para asignacion
   cargarEmpleados() {
     this.empleadoService.getEmpleados().pipe(timeout(15000)).subscribe({
       next: (res) => {
@@ -127,6 +130,7 @@ export class GestionDeTareasComponent implements OnInit {
     });
   }
 
+  // Bloque para cargar las areas de la empresa para tareas cooperativas
   cargarAreas() {
     this.empleadoService.getAreas().pipe(timeout(15000)).subscribe({
       next: (res) => {
@@ -143,13 +147,15 @@ export class GestionDeTareasComponent implements OnInit {
     });
   }
 
+  // Bloque para alternar entre tipo de tarea individual o cooperativa
   setTipo(tipo: string) {
     this.nuevaTarea.tipo = tipo as 'individual' | 'cooperativa';
   }
 
+  // Bloque para registrar una nueva tarea en la base de datos
   crearTarea() {
     if (this.esOperativo) {
-      // El operario solo puede asignarse tareas a sí mismo (individual)
+      
       this.nuevaTarea.tipo = 'individual';
       this.nuevaTarea.asignado_id = this.user?.id;
     }
@@ -183,6 +189,7 @@ export class GestionDeTareasComponent implements OnInit {
     });
   }
 
+  // Bloque para actualizar el estado del ciclo de vida de la tarea
   actualizarEstado(id: number | undefined, nuevoEstado: string) {
     if (!id || !nuevoEstado) return;
     this.tareaService.actualizarEstado(id, nuevoEstado).pipe(timeout(10000)).subscribe({
@@ -202,15 +209,18 @@ export class GestionDeTareasComponent implements OnInit {
   }
 
   // --- AYUDAS DE RENDERIZADO ---
+  // Bloque para formatear el nombre completo del usuario
   nombreUsuario(u: any): string {
     if (!u) return '--';
     return [u.primer_nombre, u.segundo_nombre, u.primer_apellido, u.segundo_apellido].filter(Boolean).join(' ');
   }
 
+  // Bloque para obtener el nombre del area asignada a la tarea
   nombreArea(t: Tarea): string {
     return (t as any)?.area?.nombre || '--';
   }
 
+  // Bloque para obtener la etiqueta legible de un estado de tarea
   etiquetaEstado(estado?: string): string {
     const mapa: any = {
       notificada: 'Notificada',
@@ -222,6 +232,7 @@ export class GestionDeTareasComponent implements OnInit {
     return mapa[estado || ''] || estado || '--';
   }
 
+  // Bloque para obtener la clase CSS correspondiente al estado de la tarea
   claseEstado(estado?: string): string {
     const mapa: any = {
       notificada: 'badge-notificada',
@@ -233,11 +244,13 @@ export class GestionDeTareasComponent implements OnInit {
     return mapa[estado || ''] || '';
   }
 
+  // Bloque para validar si el usuario autenticado tiene permisos de editar el estado
   puedeEditarEstado(t: Tarea): boolean {
     if (!this.user) return false;
     return t.asignado_id === this.user.id || t.asignador_id === this.user.id;
   }
 
+  // Bloque para comprobar si una tarea es de tipo cooperativa
   esCooperativa(t: Tarea): boolean {
     return t.tipo === 'cooperativa';
   }

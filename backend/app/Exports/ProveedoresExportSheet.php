@@ -19,7 +19,7 @@ class ProveedoresExportSheet implements FromCollection, WithHeadings, WithTitle,
         $this->isTemplate = $isTemplate;
     }
 
-    public function collection()
+    public function collection(): \Illuminate\Support\Collection
     {
         if ($this->isTemplate || !$this->empresaId) {
             return collect([]);

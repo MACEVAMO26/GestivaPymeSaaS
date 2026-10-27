@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 class SedeController extends Controller
 {
+    // Bloque para listar las sedes de la empresa autenticada
     public function index()
     {
         $user = auth()->user();
@@ -13,6 +14,7 @@ class SedeController extends Controller
         return response()->json($sedes);
     }
 
+    // Bloque para registrar una nueva sede validando duplicados y registrando auditoría
     public function store(Request $request)
     {
         $user = auth()->user();
@@ -24,7 +26,7 @@ class SedeController extends Controller
             'estado' => 'nullable|in:activa,inactiva'
         ]);
 
-        // Verificar duplicados en la misma empresa
+        // Bloque de verificación de duplicados de sede en la empresa
         $existe = \App\Models\Sede::where('empresa_id', $user->empresa_id)
                                   ->where('nombre', $request->nombre)
                                   ->exists();
@@ -52,6 +54,7 @@ class SedeController extends Controller
         return response()->json(['message' => 'Sede creada con éxito', 'sede' => $sede], 201);
     }
 
+    // Bloque para actualizar los datos de una sede existente
     public function update(Request $request, $id)
     {
         $user = auth()->user();
@@ -64,7 +67,7 @@ class SedeController extends Controller
             'estado' => 'in:activa,inactiva'
         ]);
 
-        // Verificar duplicado si cambia el nombre
+        // Bloque de verificación de duplicado si cambia el nombre
         if ($request->nombre !== $sede->nombre) {
             $existe = \App\Models\Sede::where('empresa_id', $user->empresa_id)
                                       ->where('nombre', $request->nombre)
@@ -87,6 +90,7 @@ class SedeController extends Controller
         return response()->json(['message' => 'Sede actualizada con éxito', 'sede' => $sede]);
     }
 
+    // Bloque para eliminar una sede de la empresa autenticada
     public function destroy($id)
     {
         $user = auth()->user();

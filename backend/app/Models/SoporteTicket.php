@@ -10,6 +10,8 @@ class SoporteTicket extends Model
         'empresa_id',
         'usuario_id',
         'asunto',
+        'tipo',
+        'prioridad',
         'mensaje',
         'estado',
         'tecnico_id',

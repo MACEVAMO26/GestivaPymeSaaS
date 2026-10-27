@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 export class EstructuraService {
   private http = inject(HttpClient);
 
-  // Los headers de autenticación los inyecta automáticamente el authInterceptor
+  
 
   // --- SEDES ---
   getSedes(): Observable<any[]> {
@@ -23,7 +23,7 @@ export class EstructuraService {
     return this.http.put<any>(`/api/sedes/${id}`, data);
   }
 
-  // --- ÁREAS ---
+  // --- AREAS ---
   getAreas(): Observable<any[]> {
     return this.http.get<any[]>('/api/areas');
   }

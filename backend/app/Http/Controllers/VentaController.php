@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use App\Models\Venta;
 use App\Models\VentaDetalle;
 use App\Models\Inventario;
@@ -15,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 
 class VentaController extends Controller
 {
+    // Bloque para listar el histórico de ventas filtrado por empresa
     public function index()
     {
         $empresaId = auth()->user()?->empresa_id ?? null;
@@ -25,8 +25,10 @@ class VentaController extends Controller
         return response()->json($ventas);
     }
 
+    // Bloque para registrar una nueva venta en el sistema POS con control de inventario y notificación
     public function store(Request $request)
     {
+        // Bloque de reglas de validación
         $request->validate([
             'cliente_id' => 'required|exists:clientes,id',
             'metodo_pago' => 'required|string',
@@ -39,13 +41,14 @@ class VentaController extends Controller
         try {
             $empresaId = request()->header('X-Empresa-Id') ?? (auth()->user()?->empresa_id ?? null);
 
+            // Bloque de transacción para registrar venta y descontar existencias en BD
             $venta = DB::transaction(function () use ($request, $empresaId) {
                 $subtotal = 0;
                 foreach ($request->productos as $p) {
                     $subtotal += $p['cantidad'] * $p['precio_unitario'];
                 }
 
-                // Siguiente consecutivo de factura por empresa formateado (e.g. FAC-001)
+                // Bloque para generar consecutivo de factura por empresa
                 $lastVenta = Venta::where('empresa_id', $empresaId)->orderBy('id', 'desc')->first();
                 $nextNum = 1;
                 if ($lastVenta && !empty($lastVenta->factura_consecutivo)) {
@@ -55,6 +58,7 @@ class VentaController extends Controller
                 }
                 $consecutivo = 'FAC-' . str_pad($nextNum, 3, '0', STR_PAD_LEFT);
 
+                // Bloque de guardado en BD
                 $v = Venta::create([
                     'factura_consecutivo' => $consecutivo,
                     'cliente_id' => $request->cliente_id,
@@ -72,7 +76,7 @@ class VentaController extends Controller
                 foreach ($request->productos as $p) {
                     $cantSolicitada = (int)$p['cantidad'];
 
-                    // 1. Verificación atómica con bloqueo pesimista (lockForUpdate) para prevenir condiciones de carrera (Race Condition)
+                    // Bloque para verificar existencias con bloqueo pesimista
                     $inventario = DB::table('inventario')
                         ->where('producto_id', $p['id'])
                         ->lockForUpdate()
@@ -90,6 +94,7 @@ class VentaController extends Controller
                         throw new \Exception($mensaje, 422);
                     }
 
+                    // Bloque para registrar detalles de la venta en BD
                     VentaDetalle::create([
                         'venta_id' => $v->id,
                         'producto_id' => $p['id'],
@@ -98,14 +103,14 @@ class VentaController extends Controller
                         'subtotal' => $cantSolicitada * $p['precio_unitario']
                     ]);
 
-                    // Descontar inventario de forma atómica y consistente
+                    // Bloque para descontar inventario de forma atómica
                     $nuevoStock = $stockActual - $cantSolicitada;
                     DB::table('inventario')->where('producto_id', $p['id'])->update([
                         'stock_actual' => $nuevoStock,
                         'updated_at' => now()
                     ]);
 
-                    // Registrar movimiento de salida en inventario
+                    // Bloque para registrar movimiento de salida en inventario
                     \App\Models\MovimientoInventario::create([
                         'producto_id' => $p['id'],
                         'usuario_id' => Auth::id() ?? 1,
@@ -115,7 +120,7 @@ class VentaController extends Controller
                         'fecha_hora' => now()->toDateTimeString(),
                     ]);
 
-                    // Notificación de stock bajo (umbral = stock_minimo)
+                    // Bloque para registrar alerta de stock bajo si aplica
                     if ($inventario && $nuevoStock <= $inventario->stock_minimo) {
                         \App\Models\Notificacion::create([
                             'usuario_id' => Auth::id() ?? 1,
@@ -130,7 +135,7 @@ class VentaController extends Controller
                 return $v;
             });
 
-            // Enviar correo al cliente
+            // Bloque para enviar recibo de venta por correo electrónico al cliente
             $cliente = Cliente::find($request->cliente_id);
             if ($cliente && $cliente->email && !empty(config('mail.mailers.smtp.username'))) {
                 try {
@@ -154,17 +159,21 @@ class VentaController extends Controller
         }
     }
 
+    // Bloque para actualizar el estado logístico del paquete de una venta
     public function updateEstadoPaquete(Request $request, $id)
     {
+        // Bloque de reglas de validación
         $request->validate([
             'estado_paquete' => 'required|in:Preparando,En camino,Entregado',
-            'cliente_id' => 'required|exists:clientes,id' // para saber a quien notificar
+            'cliente_id' => 'required|exists:clientes,id'
         ]);
 
+        // Bloque de guardado en BD
         $venta = Venta::findOrFail($id);
         $venta->estado_paquete = $request->estado_paquete;
         $venta->save();
 
+        // Bloque para notificar actualización de entrega por correo electrónico
         $cliente = Cliente::find($request->cliente_id);
         if ($cliente && $cliente->email && !empty(config('mail.mailers.smtp.username'))) {
             try {
@@ -177,7 +186,7 @@ class VentaController extends Controller
         return response()->json(['message' => 'Estado del paquete actualizado', 'venta' => $venta]);
     }
 
-    // Anula una venta: restaura el inventario descontado y marca la venta como Anulada
+    // Bloque para anular una venta restituyendo las existencias al inventario
     public function anularVenta($id)
     {
         $venta = Venta::findOrFail($id);
@@ -187,8 +196,8 @@ class VentaController extends Controller
         }
 
         try {
+            // Bloque de transacción para restaurar existencias y actualizar estado en BD
             $ventaActualizada = DB::transaction(function () use ($venta) {
-                // Restaurar el inventario de cada detalle
                 $detalles = VentaDetalle::where('venta_id', $venta->id)->get();
                 foreach ($detalles as $detalle) {
                     $prodId = (int)$detalle->producto_id;
@@ -199,7 +208,7 @@ class VentaController extends Controller
                         'updated_at' => now()
                     ]);
 
-                    // Registrar movimiento de retorno al inventario por anulación
+                    // Bloque para registrar movimiento de retorno al inventario por anulación
                     \App\Models\MovimientoInventario::create([
                         'producto_id' => $prodId,
                         'usuario_id' => Auth::id() ?? 1,

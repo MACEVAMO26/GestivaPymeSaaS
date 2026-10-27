@@ -15,12 +15,16 @@ import { timeout } from 'rxjs';
   styleUrl: './crm-gestion-de-clientes.component.scss'
 })
 export class CrmGestionDeClientesComponent implements OnInit {
+  // --- PROPIEDADES DE ENTRADA ---
   @Input() isEmbedded: boolean = false;
   @Input() clienteInicial: any = null;
+
+  // --- SERVICIOS INYECTADOS ---
   private cdr = inject(ChangeDetectorRef);
   private clienteService = inject(ClienteService);
   private toast = inject(ToastService);
 
+  // --- VARIABLES DE ESTADO ---
   clientes: Cliente[] = [];
   resultados: Cliente[] = [];
   busqueda: string = '';
@@ -34,18 +38,22 @@ export class CrmGestionDeClientesComponent implements OnInit {
   pageSize = 8;
   pageResultados = 1;
 
+  // --- GETTERS Y PAGINACION ---
   get paginatedResultados(): Cliente[] {
     const start = (this.pageResultados - 1) * this.pageSize;
     return this.resultados.slice(start, start + this.pageSize);
   }
+
   get totalPagesResultados(): number {
     return Math.ceil(this.resultados.length / this.pageSize) || 1;
   }
 
+  // Bloque de ciclo de vida OnInit para cargar clientes
   ngOnInit() {
     this.cargarClientes();
   }
 
+  // Bloque para cargar el listado de clientes desde la API
   cargarClientes() {
     this.clienteService.getClientes().pipe(timeout(15000)).subscribe({
       next: (res) => {
@@ -78,6 +86,7 @@ export class CrmGestionDeClientesComponent implements OnInit {
     });
   }
 
+  // Bloque para realizar la búsqueda en tiempo real de clientes
   buscar() {
     this.buscando = true;
     this.pageResultados = 1;
@@ -96,11 +105,13 @@ export class CrmGestionDeClientesComponent implements OnInit {
     this.buscando = false;
   }
 
+  // Bloque para seleccionar un cliente y cargar su ficha 360
   seleccionarCliente(cliente: Cliente) {
     this.clienteSeleccionado = cliente;
     this.cargarHistorial360(cliente);
   }
 
+  // Bloque para consultar el historial unificado 360 del cliente
   cargarHistorial360(cliente: Cliente) {
     if (!cliente.id) return;
     this.cargando360 = true;
@@ -119,6 +130,7 @@ export class CrmGestionDeClientesComponent implements OnInit {
     });
   }
 
+  // Bloque utilitario para obtener el nombre legible del cliente
   nombreCliente(cliente: Cliente): string {
     if (!cliente) return '--';
     if (cliente.nombre_razon_social && cliente.nombre_razon_social.trim()) {
@@ -129,6 +141,7 @@ export class CrmGestionDeClientesComponent implements OnInit {
     return cliente.email || '--';
   }
 
+  // Bloque utilitario para formatear el número de documento con su prefijo
   getDocumentoFormateado(c: any): string {
     if (!c || !c.documento) return '--';
     const doc = c.documento.trim();
@@ -140,6 +153,7 @@ export class CrmGestionDeClientesComponent implements OnInit {
     return `${prefix} ${doc}`;
   }
 
+  // Bloque para mapear el estado a una clase visual de badge
   getBadgeEstado(estado: string): string {
     switch (estado) {
       case 'Finalizado':
@@ -164,10 +178,12 @@ export class CrmGestionDeClientesComponent implements OnInit {
     }
   }
 
+  // Bloque utilitario para generar estrellas de calificación
   getStarArray(n: number = 5): number[] {
     return Array.from({ length: Math.round(n) }, (_, i) => i + 1);
   }
 
+  // Bloque para orientar al usuario en la creación de visitas técnicas
   nuevaVisita() {
     this.toast.info('Para programar una visita, crea un ticket de servicio en el módulo de Servicios.');
   }

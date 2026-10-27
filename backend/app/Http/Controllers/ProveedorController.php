@@ -7,7 +7,8 @@ use App\Models\Proveedor;
 
 class ProveedorController extends Controller
 {
-public function index()
+    // Bloque para listar los proveedores activos de la empresa autenticada
+    public function index()
     {
         $empresaId = request()->header('X-Empresa-Id') ?? (auth()->user()?->empresa_id ?? null);
         if (!$empresaId) {
@@ -22,13 +23,15 @@ public function index()
         return response()->json($proveedores);
     }
 
-public function store(Request $request)
+    // Bloque para registrar un nuevo proveedor comercial en el sistema
+    public function store(Request $request)
     {
         $empresaId = request()->header('X-Empresa-Id') ?? (auth()->user()?->empresa_id ?? null);
         if (!$empresaId) {
             return response()->json(['error' => 'Empresa no especificada'], 400);
         }
 
+        // Bloque de reglas de validación
         $validated = $request->validate([
             'razon_social' => 'required|string|max:255',
             'nit' => 'required|string|max:50',
@@ -42,7 +45,7 @@ public function store(Request $request)
             'estado_evaluacion' => 'nullable|string|max:50',
         ]);
 
-        // Verificar si el NIT ya existe para esta empresa
+        // Bloque de verificación de unicidad de NIT por empresa
         $exists = Proveedor::where('empresa_id', $empresaId)->where('nit', $validated['nit'])->first();
         if ($exists) {
             return response()->json(['message' => 'El NIT/Documento ya ha sido registrado para esta empresa.'], 422);
@@ -51,12 +54,13 @@ public function store(Request $request)
         $validated['empresa_id'] = $empresaId;
         $validated['activo'] = 1;
 
+        // Bloque de guardado en BD
         $proveedor = Proveedor::create($validated);
 
         return response()->json($proveedor, 201);
     }
 
-    // Actualiza la información de un proveedor o su evaluación de desempeño
+    // Bloque para actualizar la información comercial y evaluación del proveedor
     public function update(Request $request, $id)
     {
         $empresaId = request()->header('X-Empresa-Id') ?? (auth()->user()?->empresa_id ?? null);
@@ -66,6 +70,7 @@ public function store(Request $request)
 
         $proveedor = Proveedor::where('empresa_id', $empresaId)->findOrFail($id);
 
+        // Bloque de reglas de validación
         $validated = $request->validate([
             'razon_social' => 'sometimes|required|string|max:255',
             'nit' => 'sometimes|required|string|max:50',
@@ -79,7 +84,7 @@ public function store(Request $request)
             'estado_evaluacion' => 'nullable|string|max:50',
         ]);
 
-        // Verificar si el nuevo NIT ya existe para esta misma empresa
+        // Bloque de verificación de unicidad de NIT en actualización
         if (isset($validated['nit']) && $validated['nit'] !== $proveedor->nit) {
             $exists = Proveedor::where('empresa_id', $empresaId)->where('nit', $validated['nit'])->first();
             if ($exists) {
@@ -87,12 +92,13 @@ public function store(Request $request)
             }
         }
 
+        // Bloque de guardado en BD
         $proveedor->update($validated);
 
         return response()->json($proveedor);
     }
 
-    // Inactiva lógicamente un proveedor
+    // Bloque para inactivar lógicamente un proveedor del sistema
     public function destroy(Request $request, $id)
     {
         $empresaId = request()->header('X-Empresa-Id') ?? (auth()->user()?->empresa_id ?? null);
@@ -101,9 +107,9 @@ public function store(Request $request)
         }
 
         $proveedor = Proveedor::where('empresa_id', $empresaId)->findOrFail($id);
-        // Borrado lógico
         $proveedor->activo = 0;
         $proveedor->inactive_at = now();
+        // Bloque de guardado en BD
         $proveedor->save();
 
         return response()->json(['message' => 'Proveedor eliminado logicamente']);

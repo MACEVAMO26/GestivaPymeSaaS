@@ -16,43 +16,25 @@ import { AuthService } from '../../../../../../services/auth.service';
   styleUrl: './admin-usuarios.scss'
 })
 export class AdminUsuarios implements OnInit {
+  // --- INYECCION DE DEPENDENCIAS Y SERVICIOS ---
   private usuariosService = inject(UsuariosService);
   private toast = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
   private authService = inject(AuthService);
 
+  // --- VARIABLES DE ESTADO Y FORMULARIO ---
   usuarios: any[] = [];
   isLoading = true;
   showModal = false;
   isSubmitting = false;
   errorMessage = '';
-
-  // LEY: El Gerente General es el primer cargo de la empresa y el único autorizado
-  // para inactivar al Jefe de Recursos Humanos (los datos se conservan por ley colombiana).
-  esGerente(): boolean {
-    const rol = this.authService.getUser()?.rol?.nombre;
-    return rol === 'Gerente General' || rol === 'Gerente';
-  }
-
-  esJefeRRHH(usuario: any): boolean {
-    return usuario?.rol?.nombre === 'Jefe de Área';
-  }
-
-  esGerenteGeneral(usuario: any): boolean {
-    return usuario?.rol?.nombre === 'Gerente General' || usuario?.rol?.nombre === 'Gerente';
-  }
-
-  esAuditor(usuario: any): boolean {
-    return usuario?.rol?.nombre === 'Auditor';
-  }
-
-  // Un empleado regular siempre puede inactivarse desde aquí;
-  // el Jefe de RRHH SOLO puede inactivarlo el gerente; el gerente nunca.
-  puedeInactivar(usuario: any): boolean {
-    if (this.esGerenteGeneral(usuario) || this.esAuditor(usuario)) return false;
-    if (this.esJefeRRHH(usuario)) return this.esGerente();
-    return true;
-  }
+  isEditMode = false;
+  editingUserId: number | null = null;
+  isApprovingBaja = false;
+  tempPasswordGenerated = '';
+  emailGenerado = '';
+  nuevoUsuarioNombre = '';
+  searchTerm: string = '';
 
   formData: any = {
     primer_nombre: '',
@@ -66,15 +48,72 @@ export class AdminUsuarios implements OnInit {
     direccion: ''
   };
 
-  isApprovingBaja = false;
-  tempPasswordGenerated = '';
-  emailGenerado = '';
-  nuevoUsuarioNombre = '';
+  private readonly ORDEN_ROLES = [
+    'Gerente General',
+    'Gerente',
+    'Jefe de Área',
+    'Coordinador de Área',
+    'Operativo',
+  ];
 
+  // Bloque para verificar si el usuario logueado es Gerente General o Gerente
+  esGerente(): boolean {
+    const rol = this.authService.getUser()?.rol?.nombre;
+    return rol === 'Gerente General' || rol === 'Gerente';
+  }
+
+  // Bloque para verificar si un usuario tiene el cargo de Jefe de Área
+  esJefeRRHH(usuario: any): boolean {
+    return usuario?.rol?.nombre === 'Jefe de Área';
+  }
+
+  // Bloque para verificar si un usuario es Gerente General
+  esGerenteGeneral(usuario: any): boolean {
+    return usuario?.rol?.nombre === 'Gerente General' || usuario?.rol?.nombre === 'Gerente';
+  }
+
+  // Bloque para verificar si un usuario es Auditor
+  esAuditor(usuario: any): boolean {
+    return usuario?.rol?.nombre === 'Auditor';
+  }
+
+  // Bloque para verificar si el usuario logueado tiene permisos de inactivar a otro
+  puedeInactivar(usuario: any): boolean {
+    if (this.esGerenteGeneral(usuario) || this.esAuditor(usuario)) return false;
+    if (this.esJefeRRHH(usuario)) return this.esGerente();
+    return true;
+  }
+
+  // Bloque para obtener usuarios filtrados segun termino de busqueda
+  get usuariosFiltrados(): any[] {
+    if (!this.searchTerm || !this.searchTerm.trim()) {
+      return this.usuarios;
+    }
+    const term = this.searchTerm.trim().toLowerCase();
+    return this.usuarios.filter(u => {
+      const nombreCompleto = `${u.primer_nombre || ''} ${u.segundo_nombre || ''} ${u.primer_apellido || ''} ${u.segundo_apellido || ''}`.toLowerCase();
+      const doc = (u.documento || '').toLowerCase();
+      const email = (u.email || '').toLowerCase();
+      const area = (u.empleado?.cargo?.area?.nombre || u.area?.nombre || '').toLowerCase();
+      const rol = this.obtenerNombreRol(u).toLowerCase();
+      return nombreCompleto.includes(term) || doc.includes(term) || email.includes(term) || area.includes(term) || rol.includes(term);
+    });
+  }
+
+  // Bloque para obtener la lista ordenada de roles presentes en la lista de usuarios
+  get rolesPresentes(): string[] {
+    const roles = new Set<string>(this.usuariosFiltrados.map(u => this.obtenerNombreRol(u)));
+    const ordenados = this.ORDEN_ROLES.filter(r => roles.has(r));
+    roles.forEach(r => { if (!this.ORDEN_ROLES.includes(r)) ordenados.push(r); });
+    return ordenados;
+  }
+
+  // Bloque de ciclo de vida para inicializar el componente y cargar usuarios
   ngOnInit() {
     this.cargarUsuarios();
   }
 
+  // Bloque para cargar el listado completo de usuarios de la empresa
   cargarUsuarios() {
     this.isLoading = true;
     this.errorMessage = '';
@@ -84,7 +123,8 @@ export class AdminUsuarios implements OnInit {
         this.isLoading = false;
         this.cdr.detectChanges();
       },
-      error: (err) => { console.error('Error en cargarUsuarios:', err);
+      error: (err) => {
+        console.error('Error en cargarUsuarios:', err);
         this.toast.error('No se pudieron cargar los usuarios');
         this.errorMessage = 'No se pudieron cargar los usuarios.';
         this.isLoading = false;
@@ -93,9 +133,7 @@ export class AdminUsuarios implements OnInit {
     });
   }
 
-  isEditMode = false;
-  editingUserId: number | null = null;
-
+  // Bloque para abrir el modal de creacion de usuario
   abrirModal() { 
     this.isEditMode = false;
     this.editingUserId = null;
@@ -109,6 +147,7 @@ export class AdminUsuarios implements OnInit {
     this.showModal = true; 
   }
 
+  // Bloque para abrir el modal en modo edicion con los datos del usuario
   abrirModalEditar(usuario: any) {
     this.isEditMode = true;
     this.editingUserId = usuario.id;
@@ -129,6 +168,7 @@ export class AdminUsuarios implements OnInit {
     this.showModal = true;
   }
   
+  // Bloque para cerrar el modal de usuario
   cerrarModal() { 
     this.showModal = false;
     this.isEditMode = false;
@@ -136,6 +176,7 @@ export class AdminUsuarios implements OnInit {
     this.tempPasswordGenerated = ''; 
   }
 
+  // Bloque para decidir si guardar mediante creacion o actualizacion
   guardarUsuario() {
     if (this.isEditMode) {
       this.actualizarUsuario();
@@ -144,6 +185,7 @@ export class AdminUsuarios implements OnInit {
     }
   }
 
+  // Bloque para actualizar los datos de un usuario existente
   actualizarUsuario() {
     if (!this.formData.primer_nombre || !this.formData.primer_apellido || !this.formData.documento) {
       this.toast.warning('Por favor llena todos los campos obligatorios');
@@ -169,6 +211,7 @@ export class AdminUsuarios implements OnInit {
     });
   }
 
+  // Bloque para crear un nuevo usuario y generar credenciales de acceso
   crearUsuario() {
     if (!this.formData.primer_nombre || !this.formData.primer_apellido || !this.formData.segundo_apellido || !this.formData.documento || !this.formData.email_personal) {
       this.toast.warning('Por favor llena todos los campos obligatorios');
@@ -185,21 +228,20 @@ export class AdminUsuarios implements OnInit {
       next: (res) => {
         this.toast.success('Usuario creado exitosamente');
         this.isSubmitting = false;
-        
-        // Vista de éxito
         this.nuevoUsuarioNombre = this.formData.primer_nombre + ' ' + this.formData.primer_apellido;
         this.emailGenerado = res.email || this.formData.email_personal;
         this.tempPasswordGenerated = res.password || 'T3mp0r4l123*';
-        
         this.cargarUsuarios();
       },
-      error: (err) => { console.error('Error en crearUsuario:', err);
+      error: (err) => {
+        console.error('Error en crearUsuario:', err);
         this.isSubmitting = false;
         this.toast.error(err.error?.message || 'Error al crear el usuario');
       }
     });
   }
 
+  // Bloque para eliminar permanentemente un usuario
   eliminarUsuario(usuario: any) {
     if (!this.puedeInactivar(usuario)) {
       this.toast.error('No tienes permisos para eliminar este usuario.');
@@ -221,6 +263,7 @@ export class AdminUsuarios implements OnInit {
     });
   }
 
+  // Bloque para alternar el estado activo/inactivo de un usuario
   cambiarEstado(usuario: any) {
     if (!this.puedeInactivar(usuario)) {
       if (this.esGerenteGeneral(usuario)) {
@@ -240,12 +283,14 @@ export class AdminUsuarios implements OnInit {
         usuario.activo = !usuario.activo;
         this.toast.success(res.message || 'Estado actualizado');
       },
-      error: (err) => { console.error('Error en cambiarEstado:', err);
+      error: (err) => {
+        console.error('Error en cambiarEstado:', err);
         this.toast.error(err.error?.error || 'Error al cambiar el estado del usuario');
       }
     });
   }
 
+  // Bloque para aprobar la baja de un usuario solicitada por el area correspondiente
   aprobarBaja(usuario: any) {
     this.isApprovingBaja = true;
     setTimeout(() => {
@@ -258,55 +303,19 @@ export class AdminUsuarios implements OnInit {
     }, 1000);
   }
 
-  // --- AGRUPACIÓN DE USUARIOS POR ROL ---
-  // Orden jerárquico de roles para mostrar los bloques en la tabla
-  private readonly ORDEN_ROLES = [
-    'Gerente General',
-    'Gerente',
-    'Jefe de Área',
-    'Coordinador de Área',
-    'Operativo',
-  ];
-
-  // Obtiene el nombre de rol de un usuario buscando en su empleado primero, luego en el usuario
+  // Bloque para obtener el nombre del rol a partir del cargo o asignacion directa
   private obtenerNombreRol(u: any): string {
     return u?.empleado?.cargo?.rol?.nombre
       || u?.rol?.nombre
       || 'Pendiente RRHH';
   }
 
-  searchTerm: string = '';
-
-  get usuariosFiltrados(): any[] {
-    if (!this.searchTerm || !this.searchTerm.trim()) {
-      return this.usuarios;
-    }
-    const term = this.searchTerm.trim().toLowerCase();
-    return this.usuarios.filter(u => {
-      const nombreCompleto = `${u.primer_nombre || ''} ${u.segundo_nombre || ''} ${u.primer_apellido || ''} ${u.segundo_apellido || ''}`.toLowerCase();
-      const doc = (u.documento || '').toLowerCase();
-      const email = (u.email || '').toLowerCase();
-      const area = (u.empleado?.cargo?.area?.nombre || u.area?.nombre || '').toLowerCase();
-      const rol = this.obtenerNombreRol(u).toLowerCase();
-      return nombreCompleto.includes(term) || doc.includes(term) || email.includes(term) || area.includes(term) || rol.includes(term);
-    });
-  }
-
+  // Bloque para limpiar el termino de busqueda de usuarios
   limpiarBusqueda() {
     this.searchTerm = '';
   }
 
-  // Devuelve la lista de nombres de rol únicos presentes en los usuarios,
-  // ordenados según la jerarquía definida en ORDEN_ROLES
-  get rolesPresentes(): string[] {
-    const roles = new Set<string>(this.usuariosFiltrados.map(u => this.obtenerNombreRol(u)));
-    const ordenados = this.ORDEN_ROLES.filter(r => roles.has(r));
-    // Agrega roles que no están en ORDEN_ROLES al final
-    roles.forEach(r => { if (!this.ORDEN_ROLES.includes(r)) ordenados.push(r); });
-    return ordenados;
-  }
-
-  // Filtra los usuarios que pertenecen a un Rol dado
+  // Bloque para filtrar los usuarios pertenecientes a un rol especifico
   getUsuariosPorRol(nombreRol: string): any[] {
     return this.usuariosFiltrados.filter(u => this.obtenerNombreRol(u) === nombreRol);
   }

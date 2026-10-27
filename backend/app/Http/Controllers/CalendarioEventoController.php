@@ -8,6 +8,7 @@ use App\Models\CalendarioEvento;
 
 class CalendarioEventoController extends Controller
 {
+    // Bloque para consultar los eventos de calendario del usuario autenticado
     public function index()
     {
         $user = Auth::user();
@@ -22,6 +23,7 @@ class CalendarioEventoController extends Controller
         return response()->json($eventos);
     }
 
+    // Bloque para registrar un nuevo evento en el calendario del usuario
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -61,6 +63,7 @@ class CalendarioEventoController extends Controller
         return response()->json($evento, 201);
     }
 
+    // Bloque para actualizar los datos de un evento de calendario existente
     public function update(Request $request, $id)
     {
         $user = Auth::user();
@@ -93,6 +96,7 @@ class CalendarioEventoController extends Controller
         return response()->json($evento);
     }
 
+    // Bloque para eliminar un evento de calendario del usuario
     public function destroy($id)
     {
         $user = Auth::user();

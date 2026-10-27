@@ -18,4 +18,6 @@ import { InicioCalendarioComponent } from './inicio-calendario/inicio-calendario
   templateUrl: './inicio.component.html',
   styleUrl: './inicio.component.scss'
 })
-export class InicioComponent {}
+export class InicioComponent {
+  // --- COMPONENTE CONTENEDOR DEL DASHBOARD DE INICIO ---
+}

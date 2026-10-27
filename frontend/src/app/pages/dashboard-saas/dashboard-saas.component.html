@@ -1,8 +1,8 @@
 <!-- HTML LAYOUT PRINCIPAL -->
 <div class="saas-layout">
-  <!-- HTML COLUMNA IZQUIERDA: METRICAS -->
+  <!-- HTML COLUMNA IZQUIERDA METRICAS -->
   <div class="saas-left-col">
-    <!-- PANEL METRICAS -->
+    <!-- HTML PANEL METRICAS -->
     <div class="metrics-grid">
       <div class="metric-card metric-card-styled">
         <div class="metric-card-header">
@@ -11,7 +11,7 @@
             <span class="value">{{ empresas.length }}</span>
           </div>
         </div>
-        <!-- Mini Gráfica CSS -->
+        <!-- HTML MINI GRAFICA CSS -->
         <div class="chart-container">
           <div class="chart-bar-1"></div>
           <div class="chart-bar-2"></div>
@@ -43,7 +43,7 @@
       </div>
     </div>
 
-    <!-- PANEL RESUMEN DEL SISTEMA -->
+    <!-- HTML PANEL RESUMEN DEL SISTEMA -->
     <div class="glass-panel dashboard-welcome">
       <h3 class="welcome-title">
         <svg
@@ -120,10 +120,10 @@
     </div>
   </div>
 
-  <!-- HTML COLUMNA DERECHA: TAREAS Y RECORDATORIOS -->
+  <!-- HTML COLUMNA DERECHA TAREAS Y RECORDATORIOS -->
   <div class="saas-right-col">
     <div class="glass-panel-action">
-      <!-- HTML ENCABEZADO -->
+      <!-- HTML ENCABEZADO ACCION URGENTE -->
       <div class="action-header">
         <h3 class="action-title">
           <svg
@@ -144,9 +144,9 @@
         <span class="action-badge">Hoy</span>
       </div>
 
-      <!-- HTML CONTENIDO ALERTAS -->
+      <!-- HTML CONTENEDOR ALERTAS -->
       <div class="action-content-scroll custom-scrollbar">
-        <!-- Alerta de Mora -->
+        <!-- HTML ALERTA EMPRESAS EN MORA -->
         @if (empresasEnMora > 0) {
           <div class="alert-box alert-red">
             <div class="alert-header">
@@ -171,7 +171,7 @@
           </div>
         }
 
-        <!-- Alerta de Solicitudes -->
+        <!-- HTML ALERTA SOLICITUDES PENDIENTES -->
         @if (solicitudesPendientes > 0) {
           <div class="alert-box alert-blue">
             <div class="alert-header">
@@ -195,7 +195,7 @@
           </div>
         }
 
-        <!-- Tarea por defecto -->
+        <!-- HTML ALERTA ESTADO BAJO CONTROL -->
         @if (empresasEnMora === 0 && solicitudesPendientes === 0) {
           <div class="alert-box alert-green">
             <div class="alert-header">
@@ -216,7 +216,7 @@
           </div>
         }
 
-        <!-- HTML INPUT RECORDATORIO -->
+        <!-- HTML FORMULARIO NUEVO RECORDATORIO -->
         <div class="reminders-wrapper">
           <input
             type="text"
@@ -232,7 +232,7 @@
           </button>
         </div>
 
-        <!-- HTML LISTA RECORDATORIOS -->
+        <!-- HTML LISTADO DE RECORDATORIOS -->
         <div class="reminders-list custom-scrollbar">
           @if (recordatorios.length === 0) {
             <div class="empty-state">

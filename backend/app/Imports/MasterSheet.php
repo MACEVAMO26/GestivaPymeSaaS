@@ -16,7 +16,7 @@ class MasterSheet implements ToCollection, WithHeadingRow, WithTitle
         $this->title = $title;
     }
 
-    public function collection(Collection $rows)
+    public function collection(Collection $rows): void
     {
         // Las filas se procesan en AdminRequestController::importar
     }

@@ -1,16 +1,16 @@
 <div class="ia-tutorial-overlay" *ngIf="mostrar">
   <div class="ia-tutorial-modal" (click)="$event.stopPropagation()">
-    <!-- Botón Cerrar Guía -->
+    <!-- HTML BOTON CERRAR GUIA -->
     <button class="btn-skip" (click)="cerrarTutorial()" title="Cerrar Guía">&times; Cerrar</button>
 
     <div class="ia-tutorial-content">
-      <!-- Imagen de Mascota -->
+      <!-- HTML IMAGEN DE MASCOTA -->
       <div class="ia-mascot">
         <img src="assets/images/GestivaIA/IA_Gestiva.png" alt="Gestiva IA Mascot">
         <span class="mascot-badge">Asistente Gestiva</span>
       </div>
 
-      <!-- Globo de Diálogo Explicativo -->
+      <!-- HTML GLOBO DE DIALOGO EXPLICATIVO -->
       <div class="ia-dialogue">
         <div class="step-header">
           <span class="step-counter">Paso {{ pasoActual + 1 }} de {{ pasos.length }}</span>
@@ -18,7 +18,7 @@
         </div>
         <p *ngIf="pasos.length > 0" class="step-desc">{{ pasos[pasoActual].description }}</p>
 
-        <!-- Navegación y Botones Funcionales -->
+        <!-- HTML NAVEGACION Y BOTONES FUNCIONALES -->
         <div class="actions">
           <button
             type="button"
@@ -48,7 +48,7 @@
           </button>
         </div>
         
-        <!-- Indicadores de Paso Clickeables -->
+        <!-- HTML INDICADORES DE PASO CLICKEABLES -->
         <div class="step-indicators">
           <button
             *ngFor="let p of pasos; let i = index"

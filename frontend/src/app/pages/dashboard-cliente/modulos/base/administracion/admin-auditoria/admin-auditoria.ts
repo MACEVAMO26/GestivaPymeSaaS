@@ -40,7 +40,7 @@ export class AdminAuditoria implements OnInit {
     this.isLoading = true;
     this.auditoriaService.getLogs().pipe(timeout(5000)).subscribe({
       next: (data) => {
-        // Ordenar del más reciente al más antiguo
+        
         this.logs = data.sort((a, b) => new Date(b.fecha_hora || b.created_at).getTime() - new Date(a.fecha_hora || a.created_at).getTime());
         this.isLoading = false;
         this.cdr.detectChanges();

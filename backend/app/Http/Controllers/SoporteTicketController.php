@@ -11,7 +11,7 @@ use App\Mail\TicketSoporteMail;
 
 class SoporteTicketController extends Controller
 {
-    // Obtener tickets de la empresa actual (Dashboard Empresa)
+    // Bloque para obtener los tickets de soporte de la empresa actual
     public function index()
     {
         $user = Auth::user();
@@ -28,12 +28,14 @@ class SoporteTicketController extends Controller
         return response()->json($tickets);
     }
 
-    // Crear un nuevo ticket desde la empresa
+    // Bloque para crear un nuevo ticket de soporte desde la empresa
     public function store(Request $request)
     {
         $request->validate([
             'asunto' => 'required|string|max:255',
             'mensaje' => 'required|string',
+            'tipo' => 'nullable|string|max:100',
+            'prioridad' => 'nullable|in:Alta,Media,Baja',
         ]);
 
         $user = Auth::user();
@@ -42,18 +44,17 @@ class SoporteTicketController extends Controller
             'empresa_id' => $user->empresa_id,
             'usuario_id' => $user->id,
             'asunto' => $request->asunto,
+            'tipo' => $request->tipo ?? 'Técnico',
+            'prioridad' => $request->prioridad ?? 'Media',
             'mensaje' => $request->mensaje,
             'estado' => 'Abierto',
             'activo' => true
         ]);
 
-        // Enviar correo de notificación al SaaS Admin (o a un correo genérico de soporte)
+        // Bloque para notificar al administrador de soporte por correo
         try {
-            // Asumiendo que el SaaS Admin recibe estos correos en un email configurado
-            // O podríamos buscar a los usuarios del sistema maestro
             Mail::to('soporte@gestivapyme.com')->send(new TicketSoporteMail($ticket, 'Nuevo Ticket Creado'));
         } catch (\Exception $e) {
-            // Log the error but don't fail the request
             \Log::error('No se pudo enviar correo de soporte: ' . $e->getMessage());
         }
 
@@ -63,10 +64,9 @@ class SoporteTicketController extends Controller
         ], 201);
     }
 
-    // Funciones exclusivas para el SaaS Admin
-    // ----------------------------------------
+    // Bloque de métodos administrativos para el SaaS Admin
     
-    // Listar todos los tickets agrupados por cliente
+    // Bloque para listar todos los tickets de clientes en el SaaS
     public function saasIndex()
     {
         $tickets = SoporteTicket::with(['empresa', 'usuario', 'tecnico'])
@@ -78,13 +78,15 @@ class SoporteTicketController extends Controller
         return response()->json($tickets);
     }
 
-    // Actualizar ticket (Asignar, cambiar estado, notas)
+    // Bloque para actualizar el ticket de soporte (asignar técnico, cambiar estado y notas)
     public function update(Request $request, $id)
     {
         $request->validate([
             'estado' => 'sometimes|in:Abierto,En progreso,Resuelto,Cerrado',
             'notas_resolucion' => 'nullable|string',
-            'tecnico_id' => 'nullable|exists:usuarios,id'
+            'tecnico_id' => 'nullable|exists:usuarios,id',
+            'prioridad' => 'nullable|in:Alta,Media,Baja',
+            'tipo' => 'nullable|string|max:100'
         ]);
 
         $ticket = SoporteTicket::findOrFail($id);
@@ -92,10 +94,12 @@ class SoporteTicketController extends Controller
         if ($request->has('estado')) $ticket->estado = $request->estado;
         if ($request->has('notas_resolucion')) $ticket->notas_resolucion = $request->notas_resolucion;
         if ($request->has('tecnico_id')) $ticket->tecnico_id = $request->tecnico_id;
+        if ($request->has('prioridad')) $ticket->prioridad = $request->prioridad;
+        if ($request->has('tipo')) $ticket->tipo = $request->tipo;
         
         $ticket->save();
 
-        // Si se resolvió o cerró, notificar al usuario
+        // Bloque para notificar al usuario sobre la resolución del ticket
         if (in_array($request->estado, ['Resuelto', 'Cerrado'])) {
             try {
                 $usuario = $ticket->usuario;

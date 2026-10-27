@@ -9,14 +9,14 @@ use App\Models\Notificacion;
 
 class SaasContratoController extends Controller
 {
-    // Obtener historial de contratos
+    // Bloque para consultar el historial de versiones del contrato SaaS
     public function index()
     {
         $contratos = SaasContrato::orderBy('created_at', 'desc')->get();
         return response()->json($contratos);
     }
 
-    // Obtener contrato activo
+    // Bloque para consultar la versión vigente del contrato SaaS
     public function activo()
     {
         $contrato = SaasContrato::where('es_activo', true)->first();
@@ -26,7 +26,7 @@ class SaasContratoController extends Controller
         return response()->json($contrato);
     }
 
-    // Crear nueva versión
+    // Bloque para registrar una nueva versión del contrato SaaS y notificar a los clientes
     public function store(Request $request)
     {
         $request->validate([
@@ -34,27 +34,22 @@ class SaasContratoController extends Controller
             'version' => 'required|string',
         ]);
 
-        // Desactivar el actual
+        // Bloque para desactivar la versión anterior del contrato
         SaasContrato::where('es_activo', true)->update(['es_activo' => false]);
 
-        // Crear el nuevo
+        // Bloque para crear y persistir la nueva versión del contrato
         $nuevoContrato = SaasContrato::create([
             'contenido' => $request->contenido,
             'version' => $request->version,
             'es_activo' => true
         ]);
 
-        // NOTIFICACIONES: Notificar a todos los gerentes de empresas activas
+        // Bloque para notificar a los gerentes de empresas activas sobre la nueva versión
         $empresas = Empresa::where('activo', 1)->get();
         $notificacionesCreadas = 0;
 
         foreach ($empresas as $empresa) {
-            // Asumiendo que tenemos el gerente_id o sabemos que es el usuario creador. 
-            // Según la regla 23 y estructura, el primer usuario es el RH/Gerente.
-            // Para simplicidad, podemos usar el ID del gerente o notificar a todos los admins de la empresa.
-            // Necesitamos buscar el usuario gerente de la empresa.
-            // Buscamos usuarios asociados a esta empresa con rol Gerente (o simplemente los de la empresa).
-            // Para GestivaPyme, usaremos una notificación genérica o buscaremos los usuarios:
+            // Bloque para consultar los usuarios con rol de Gerente de la empresa
             $gerentes = \App\Models\User::where('empresa_id', $empresa->id)
                 ->whereHas('rol', function($q) {
                     $q->where('nombre', 'like', '%Gerente%');
@@ -77,7 +72,7 @@ class SaasContratoController extends Controller
             'notificaciones_enviadas' => $notificacionesCreadas
         ]);
     }
-    // Firmar contrato por el gerente
+    // Bloque para registrar la firma digital del contrato por parte del gerente
     public function firmar(Request $request)
     {
         $request->validate([
@@ -95,7 +90,7 @@ class SaasContratoController extends Controller
             return response()->json(['message' => 'Empresa no encontrada'], 404);
         }
 
-        // Guardamos el base64 en firma_gerente_url y sincronizamos los campos de auditoría del contrato
+        // Bloque de persistencia de firma digital y datos de auditoría
         $empresa->contrato_id = $request->contrato_id;
         $empresa->fecha_firma = now();
         $empresa->firma_gerente_url = $request->firma_base64; 

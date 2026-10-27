@@ -1,70 +1,72 @@
 @use 'sass:color';
 
-/* --- 0. BACKGROUND PRINCIPAL DEL MÓDULO CRM CLIENTES --- */
+/* --- 0. BACKGROUND PRINCIPAL DEL MÓDULO CRM GESTIÓN DE CLIENTES --- */
 .module-container {
   padding: 1.5rem;
   background: #f5f5dc;
   font-family: 'Montserrat', sans-serif;
-  color: #333333;
-  min-height: 100%;
+  color: #1a1a1a;
+  min-height: 100vh;
 }
 
-/* --- 1. VARIABLES GLOBALES --- */
-$bg-color:    #f5f5dc;
-$shadow-light:#ffffff;
+/* --- 1. VARIABLES GLOBALES DE COLOR --- */
+$bg-color: #f5f5dc;
+$shadow-light: #ffffff;
 $shadow-dark: #d1d1bc;
 $text-dark: #1a1a1a;
 $text-muted: #2d3748;
-$btn-add:     #45a1ae;
-$btn-volver:  #de3737;
-$btn-save:    #066810;
-$btn-gen-1:   #6B8F71;
+$btn-add: #45a1ae;
+$btn-volver: #de3737;
+$btn-save: #066810;
+$btn-gen-1: #6B8F71;
+$btn-gen-2: #7C6FA6;
+$btn-gen-3: #C9A227;
 
-/* --- 2. TIPOGRAFÍA GLOBAL (jerarquía estricta) --- */
+/* --- 2. TIPOGRAFIA Y JERARQUIA --- */
 .module-header h1, h1.titulo-principal {
   font-size: 16px;
   font-weight: bold;
   text-transform: uppercase;
   text-align: center;
-  margin: 0 0 0.25rem;
+  margin-top: 0;
+  margin-bottom: 0.35rem;
   color: $text-dark;
 }
 
-.subtitulo, h2.subtitulo {
+.subtitulo, h2.subtitulo, h3.subtitulo {
   font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: left;
   color: $text-dark;
-  margin: 0 0 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
-.module-header p, .descripcion-general {
+.module-header p, .descripcion-general, .subtitulo-desc {
   font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: center;
   color: $text-muted;
-  margin: 0 0 1rem;
+  margin-top: 0.2rem;
+  margin-bottom: 1.25rem;
   letter-spacing: 0.3px;
+  line-height: 1.4;
 }
 
-.cliente-seleccionado-info {
+.form-label, p, td, th, li, label, .text-general {
   font-size: 14px;
-  color: $text-muted;
-  margin-top: 0.35rem;
-  margin-bottom: 0;
+  font-weight: normal;
 }
 
-p, td, th, li, label, select, input { font-size: 14px; }
-
-/* --- 3. PANELES NEUMÓRFICOS --- */
+/* --- 3. PANELES Y TARJETAS NEUMORFICAS --- */
 .neumorphic-panel {
   background: $bg-color;
   border-radius: 16px;
   box-shadow: 8px 8px 16px $shadow-dark, -8px -8px 16px $shadow-light;
-  padding: 1.5rem;
-  margin-bottom: 1rem;
+  padding: 1.2rem;
+  border: none;
+  margin-bottom: 0;
 }
 
 .neumorphic-panel-inner {
@@ -72,45 +74,21 @@ p, td, th, li, label, select, input { font-size: 14px; }
   border-radius: 12px;
   box-shadow: inset 4px 4px 8px $shadow-dark, inset -4px -4px 8px $shadow-light;
   padding: 1.5rem;
+  border: none;
 }
 
-/* --- 4. BARRA DE BÚSQUEDA Y FILTROS --- */
-.search-filter-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
+.neu-card {
+  background: $bg-color;
+  border-radius: 14px;
+  box-shadow: 6px 6px 12px $shadow-dark, -6px -6px 12px $shadow-light;
+  padding: 1.5rem;
+  border: none;
 }
 
-.search-group {
-  position: relative;
-  flex: 1 1 320px;
-  display: flex;
-  align-items: center;
-}
-
-.search-group .search-icon {
-  position: absolute;
-  left: 1rem;
-  color: $text-muted;
-  font-size: 14px;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.search-group input.input-neumorphic {
-  padding-left: 2.5rem;
-}
-
-.filter-group-btn {
-  flex: 0 0 auto;
-}
-
-/* --- 5. INPUTS NEUMÓRFICOS --- */
+/* --- 4. FORMULARIOS E INPUTS --- */
 .input-neumorphic {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.85rem 1rem;
   border: none;
   border-radius: 10px;
   background: $bg-color;
@@ -126,309 +104,275 @@ p, td, th, li, label, select, input { font-size: 14px; }
   }
 }
 
-/* --- 6. TABLA DE CLIENTES Y SERVICIOS --- */
-.table-container {
-  overflow-x: auto;
+.search-input-wrapper {
+  position: relative;
   width: 100%;
+  max-width: 480px;
 }
 
-.data-table,
-.neumorphic-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: 'Montserrat', sans-serif;
+.search-icon-left {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
   font-size: 14px;
-  color: $text-dark;
-
-  thead tr {
-    border-bottom: 2px solid rgba(0, 0, 0, 0.06);
-  }
-
-  th {
-    font-size: 14px;
-    font-weight: bold;
-    text-transform: uppercase;
-    color: $text-muted;
-    padding: 0.85rem 1.25rem;
-    white-space: nowrap;
-    text-align: left;
-  }
-
-  td {
-    padding: 1.1rem 1.25rem;
-    vertical-align: middle;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-    line-height: 1.5;
-  }
-
-  tbody tr:hover {
-    background-color: rgba(0, 0, 0, 0.018);
-    transition: background-color 0.15s ease;
-  }
-
-  tr.fila-seleccionada {
-    background-color: rgba(69, 161, 174, 0.08);
-  }
-
-  td strong {
-    font-size: 14px;
-    font-weight: 600;
-    color: $text-dark;
-  }
 }
 
-/* Columna CONTACTO apilada */
-.contact-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-
-  .contact-phone {
-    font-size: 14px;
-    color: $text-dark;
-  }
-
-  .contact-email {
-    font-size: 14px;
-    color: $text-muted;
-  }
+.search-input-pad {
+  padding-left: 38px !important;
+  padding-right: 36px !important;
 }
 
-/* Columna ACCIÓN centrada */
-th.col-accion, td.col-accion {
-  text-align: center;
-  padding-right: 1.5rem;
-}
-
-/* --- 7. CELDA DE ACCIONES --- */
-.actions-cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
-  white-space: nowrap;
-}
-
-/* Botones Redondos Pequeños de Acción (Sin Texto) */
-.btn-action-circle {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  min-height: 36px;
-  max-width: 36px;
-  max-height: 36px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.search-clear-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #94a3b8;
   cursor: pointer;
-  border: none;
-  transition: all 0.2s ease;
-  box-shadow: 2px 2px 5px $shadow-dark, -2px -2px 5px $shadow-light;
-
-  i {
-    font-size: 18px;
-    line-height: 1;
-  }
-
-  &:hover {
-    transform: translateY(-1px) scale(1.08);
-    box-shadow: 3px 3px 6px $shadow-dark, -2px -2px 5px $shadow-light;
-  }
-
-  &:active {
-    box-shadow: inset 2px 2px 4px rgba(0,0,0,0.2);
-  }
-}
-
-.btn-circle-360 {
-  background: #3aa0ac;
-  color: #ffffff;
-  border: 1px solid #2e8b96;
-  &:hover { background: #2e8b96; }
-}
-
-/* Botón Ver 360° clásico */
-.btn-action-360 {
-  background: #3aa0ac;
-  color: #ffffff;
-  border: none;
-  border-radius: 20px;
-  padding: 5px 14px;
   font-size: 14px;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  box-shadow: 3px 3px 6px $shadow-dark, -2px -2px 5px $shadow-light;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-
-  i { font-size: 14px; }
-
-  &:hover {
-    background: #2e8b96;
-    transform: translateY(-1px);
-  }
 }
 
-/* Badges */
-.badge {
-  padding: 0.35rem 0.85rem;
-  border-radius: 9999px;
+/* --- 5. BOTONES Y ACCIONES --- */
+.btn-pill {
+  padding: 0.75rem 1.75rem;
+  border-radius: 50px;
+  border: none;
+  font-family: 'Montserrat', sans-serif;
   font-size: 14px;
   font-weight: bold;
-  text-transform: uppercase;
-  background: $bg-color;
-  box-shadow: inset 2px 2px 4px $shadow-dark, inset -2px -2px 4px $shadow-light;
-  display: inline-block;
-  white-space: nowrap;
-}
-
-.badge-primary   { color: #45a1ae; }
-.badge-success   { color: #066810; }
-.badge-warning   { color: #C9A227; }
-.badge-info      { color: #7C6FA6; }
-.badge-secondary { color: #2d3748; }
-
-/* --- 8. BOTONES TIPO PÍLDORA --- */
-.btn-neumorphic {
-  padding: 0.65rem 1.5rem;
-  border-radius: 9999px;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 4px 4px 8px $shadow-dark, -4px -4px 8px $shadow-light;
+  box-shadow: 6px 6px 12px $shadow-dark, -6px -6px 12px $shadow-light;
+  transition: all 0.2s ease;
+  color: #ffffff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
 
-  &:active {
-    box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.1), inset -4px -4px 8px rgba(255, 255, 255, 0.5);
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 8px 8px 16px $shadow-dark, -8px -8px 16px $shadow-light;
   }
-}
 
-.btn-general-1 {
-  @extend .btn-neumorphic;
-  background-color: $btn-gen-1;
-  border: 2px solid color.adjust($btn-gen-1, $lightness: -10%);
-  color: #ffffff;
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }
 
 .btn-volver {
-  @extend .btn-neumorphic;
-  background-color: $btn-volver;
-  border: 2px solid color.adjust($btn-volver, $lightness: -10%);
-  color: #ffffff;
+  background: $btn-volver;
+}
+
+.btn-add {
+  background: $btn-add;
 }
 
 .btn-save {
-  @extend .btn-neumorphic;
-  background-color: $btn-save;
-  border: 2px solid color.adjust($btn-save, $lightness: -10%);
-  color: #ffffff;
-  box-shadow: none;
+  background: $btn-save;
 }
 
-.btn-pill { border-radius: 9999px; }
-
-.volver-wrapper {
-  margin-bottom: 1.25rem;
-  display: flex;
-  justify-content: flex-start;
-}
-
-.panel-header-flex {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-/* --- 9. ESTADOS VACÍO Y CARGA --- */
-.empty-state {
-  text-align: center;
-  padding: 2rem;
-  color: $text-muted;
-  font-style: italic;
-}
-
-.text-center { text-align: center; }
-.py-8 { padding-top: 2rem; padding-bottom: 2rem; }
-.text-gray-500 { color: $text-muted; font-style: italic; font-size: 14px; }
-
-/* --- 10. ANIMACIONES --- */
-.fade-in {
-  animation: fadeIn 0.25s ease-in;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* SUBTABS 360 */
-.btn-subtab {
-  padding: 0.5rem 1rem;
-  border-radius: 9999px;
-  border: 1px solid $shadow-dark;
-  background: $bg-color;
-  color: $text-muted;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 2px 2px 4px $shadow-dark, -2px -2px 4px $shadow-light;
-  transition: all 0.2s ease;
+.btn-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  box-shadow: 3px 3px 6px $shadow-dark, -3px -3px 6px $shadow-light;
+  transition: all 0.2s ease;
+  color: #ffffff;
 
   &:hover {
+    transform: scale(1.08);
+  }
+
+  &.btn-sm-primary { background: $btn-add; }
+  &.btn-sm-success { background: $btn-save; }
+  &.btn-sm-danger { background: $btn-volver; }
+}
+
+/* --- 6. TABLAS Y COMPONENTES DE DATOS --- */
+.table-responsive {
+  overflow-x: auto;
+  border-radius: 12px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+
+  th, td {
+    padding: 0.85rem 1rem;
+    text-align: left;
+  }
+
+  th {
+    background: rgba(0, 0, 0, 0.04);
+    font-weight: bold;
+    color: $text-dark;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+  }
+
+  td {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     color: $text-dark;
   }
 
-  &.btn-subtab-active {
-    background: $btn-add;
-    color: #000;
-    font-weight: bold;
-    box-shadow: inset 2px 2px 4px rgba(0,0,0,0.2);
-    border-color: color.adjust($btn-add, $lightness: -10%);
+  tr:hover td {
+    background: rgba(0, 0, 0, 0.02);
   }
 }
 
-.stars-gold {
-  color: #f59e0b;
-}
-
-.text-positivo {
-  color: $btn-save;
+/* --- 7. BADGES Y ESTADOS --- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 50px;
+  font-size: 12px;
   font-weight: bold;
 }
 
-.text-azul {
-  color: #2e8b96;
-  font-weight: 600;
+.badge-success { background: rgba(6, 104, 16, 0.12); color: #066810; }
+.badge-warning { background: rgba(201, 162, 39, 0.15); color: #8f6e06; }
+.badge-info { background: rgba(69, 161, 174, 0.15); color: #226b77; }
+.badge-primary { background: rgba(124, 111, 166, 0.15); color: #524479; }
+.badge-secondary { background: rgba(0, 0, 0, 0.08); color: #555; }
+
+/* --- 8. SUB-TABS Y PESTAÑAS 360 --- */
+.subtabs-360-container {
+  display: flex;
+  gap: 0.5rem;
+  background: $bg-color;
+  padding: 0.35rem;
+  border-radius: 12px;
+  box-shadow: inset 4px 4px 8px $shadow-dark, inset -4px -4px 8px $shadow-light;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
 }
 
-.text-sm {
-  font-size: 14px;
+.subtab-360-btn {
+  flex: 1;
+  min-width: 140px;
+  padding: 0.65rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  color: $text-muted;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  &.active {
+    background: $bg-color;
+    color: $btn-add;
+    box-shadow: 4px 4px 8px $shadow-dark, -4px -4px 8px $shadow-light;
+  }
 }
 
-.text-lg {
-  font-size: 16px;
+/* --- 9. CARDS Y TIMELINE 360 --- */
+.kpi-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.kpi-card {
+  background: $bg-color;
+  border-radius: 12px;
+  box-shadow: 4px 4px 8px $shadow-dark, -4px -4px 8px $shadow-light;
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.kpi-number {
+  font-size: 18px;
+  font-weight: bold;
+  color: $text-dark;
+  margin-top: 0.25rem;
+}
+
+.timeline-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .timeline-item {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1rem;
+  background: $bg-color;
   border-radius: 10px;
-  transition: transform 0.2s ease;
-
-  &:hover {
-    transform: translateX(4px);
-  }
+  box-shadow: 3px 3px 6px $shadow-dark, -3px -3px 6px $shadow-light;
 }
+
+.timeline-icon-bubble {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 14px;
+  flex-shrink: 0;
+
+  &.bubble-venta { background: $btn-save; }
+  &.bubble-cotizacion { background: $btn-gen-3; }
+  &.bubble-servicio { background: $btn-add; }
+}
+
+.timeline-content {
+  flex: 1;
+}
+
+/* --- 10. ESTADOS DE CARGA Y VACIO --- */
+.loading-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2.5rem;
+  color: $text-muted;
+}
+
+.empty-state-box {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: $text-muted;
+}
+
+/* --- 11. CLASES AUXILIARES Y RESPONSIVE --- */
+.text-center { text-align: center !important; }
+.justify-center { justify-content: center !important; }
+.volver-wrapper { margin-bottom: 1.5rem; }
+.mb-4 { margin-bottom: 1rem !important; }
+.mt-4 { margin-top: 1rem !important; }
+.m-0 { margin: 0 !important; }
+.flex-1 { flex: 1; }
+.cursor-pointer { cursor: pointer; }
+.font-bold { font-weight: bold; }

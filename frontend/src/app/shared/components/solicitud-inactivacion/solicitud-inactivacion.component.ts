@@ -30,13 +30,14 @@ export class SolicitudInactivacionComponent implements OnInit {
   esOperativo = false;
 
   isOpen = false;
+  // --- VARIABLES DE ESTADO ---
   cargando = false;
   isSubmitting = false;
 
   solicitudes: Solicitud[] = [];
   motivo = '';
 
-  // Hilo
+  // --- HILO DE REPLICAS ---
   solicitudAbierta: Solicitud | null = null;
   mensajeReplica = '';
   notaFinal = '';
@@ -51,11 +52,13 @@ export class SolicitudInactivacionComponent implements OnInit {
 
   ngOnInit(): void {}
 
+  // Bloque para abrir el modal de solicitud de inactivación
   abrir() {
     this.isOpen = true;
     this.cargar();
   }
 
+  // Bloque para cerrar el modal de solicitud
   cerrar() {
     this.isOpen = false;
     this.solicitudAbierta = null;
@@ -93,6 +96,7 @@ export class SolicitudInactivacionComponent implements OnInit {
     });
   }
 
+  // Bloque para registrar una nueva solicitud de inactivación
   crearSolicitud() {
     if (!this.motivo.trim()) {
       this.toast.warning('Describa el motivo de la solicitud');

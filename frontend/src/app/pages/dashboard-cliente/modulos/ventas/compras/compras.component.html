@@ -5,7 +5,7 @@
       <p>Administración integral de órdenes de compra, recepciones de inventario y pedidos a proveedores.</p>
     </div>
 
-    <!-- HTML TABS NAVEGACION -->
+    <!-- HTML NAVEGACION DE PESTAÑAS -->
     <div class="tabs-nav-wrapper">
       <button class="tab-neu-inactive" 
               [class.tab-neu-active]="activeTab === 'ordenes'" 
@@ -21,14 +21,14 @@
 
     <!-- HTML CONTENIDO PRINCIPAL -->
     <div class="tab-content neumorphic-panel-inner p-4">
-      <!-- Botón Volver -->
+      <!-- HTML BOTON VOLVER -->
       <div class="volver-wrapper">
         <button class="btn-volver btn-pill" appVolver>
           <i class="fas fa-arrow-left"></i> Volver
         </button>
       </div>
       
-      <!-- TAB ORDENES DE COMPRA -->
+      <!-- HTML PESTAÑA ORDENES DE COMPRA -->
       @if(activeTab === 'ordenes') {
         <div class="neumorphic-panel fade-in">
           <div class="action-bar">
@@ -52,13 +52,13 @@
                   <th>FECHA EMISIÓN</th>
                   <th>TOTAL</th>
                   <th>ESTADO</th>
-                  <th style="text-align: center;">ACCIONES</th>
+                  <th class="text-center">ACCIONES</th>
                 </tr>
               </thead>
               <tbody>
                 @if(ordenesFiltradas.length === 0) {
                   <tr>
-                    <td colspan="6" style="padding: 2rem; text-align: center;">
+                    <td colspan="6" class="table-empty-state">
                       <div class="empty-state">
                         No hay órdenes de compra registradas.
                       </div>
@@ -73,14 +73,14 @@
                         <span class="text-muted text-xs">NIT: {{orden.proveedor?.nit || 'N/A'}}</span>
                       </td>
                       <td>{{(orden.created_at || orden.fecha_requerida) | date:'mediumDate'}}</td>
-                      <td style="font-weight: bold;">{{orden.total | currency:'COP':'symbol':'1.0-0'}}</td>
+                      <td class="font-bold">{{orden.total | currency:'COP':'symbol':'1.0-0'}}</td>
                       <td>
                         <span class="badge" [ngClass]="getBadgeClass(estadoOrden(orden))">
                           {{estadoOrden(orden)}}
                         </span>
                       </td>
-                      <td style="text-align: center;">
-                        <div class="acciones-fila" style="justify-content: center;">
+                      <td class="text-center">
+                        <div class="acciones-fila justify-center">
                           <button class="btn-icon" (click)="verDetalle(orden)" title="Ver Detalle Completo">
                             <i class="fas fa-eye"></i>
                           </button>
@@ -102,7 +102,7 @@
             </table>
           </div>
 
-          <!-- Paginación Órdenes de Compra (8 por página) -->
+          <!-- HTML PAGINACION ORDENES DE COMPRA -->
           @if (totalPagesOrdenes > 1) {
             <div class="neu-pagination-bar">
               <div class="pagination-info">
@@ -134,13 +134,13 @@
         </div>
       }
 
-      <!-- TAB RECEPCION MERCANCIA -->
+      <!-- HTML PESTAÑA RECEPCION MERCANCIA -->
       @if(activeTab === 'recepcion') {
         <div class="neumorphic-panel fade-in">
           <div class="neumorphic-panel recepcion-panel mb-4">
             <h2 class="subtitulo">Registrar Ingreso a Bodega</h2>
             <div class="recepcion-fila">
-              <div class="form-group" style="flex: 2; min-width: 200px;">
+              <div class="form-group flex-2-min200">
                 <label>Seleccionar Orden de Compra Pendiente *</label>
                 <select class="input-neumorphic" [(ngModel)]="ordenSeleccionadaRecepcion">
                   <option [value]="null" disabled selected>Buscar orden de compra...</option>
@@ -175,7 +175,7 @@
               <tbody>
                 @if(recepciones.length === 0) {
                   <tr>
-                    <td colspan="5" style="padding: 2rem; text-align: center;">
+                    <td colspan="5" class="table-empty-state">
                       <div class="empty-state">
                         No hay recepciones de mercancía registradas.
                       </div>
@@ -200,7 +200,7 @@
             </table>
           </div>
 
-          <!-- Paginación Recepciones (8 por página) -->
+          <!-- HTML PAGINACION RECEPCIONES -->
           @if (totalPagesRecepciones > 1) {
             <div class="neu-pagination-bar">
               <div class="pagination-info">
@@ -237,14 +237,14 @@
   <!-- HTML MODAL NUEVA ORDEN DE COMPRA -->
   @if(showModalOrden) {
     <div class="view-switch-panel fade-in">
-      <div class="neu-card" style="max-width: 850px; margin: 0 auto;">
+      <div class="neu-card neu-card-center-850">
         <div class="panel-header mb-4">
           <h1>Nueva Orden de Compra</h1>
           <button class="btn-close" (click)="cerrarModalOrden()">&times;</button>
         </div>
         <div class="panel-body">
           <div class="form-fila">
-            <div class="form-group" style="flex: 2; min-width: 200px;">
+            <div class="form-group flex-2-min200">
               <label>Proveedor *</label>
               <select class="input-neumorphic" [(ngModel)]="formOrden.proveedor">
                 <option value="" disabled selected>Seleccione un proveedor</option>
@@ -253,32 +253,32 @@
                 }
               </select>
             </div>
-            <div class="form-group" style="flex: 1; min-width: 150px;">
+            <div class="form-group flex-1-min150">
               <label>Fecha Requerida de Entrega</label>
               <input type="date" class="input-neumorphic" [(ngModel)]="formOrden.fechaEsperada">
             </div>
           </div>
           
-          <!-- Detalle interactivo de productos -->
+          <!-- HTML DETALLE INTERACTIVO DE PRODUCTOS -->
           <div class="product-box neumorphic-panel p-3 mb-3">
-            <h4 style="margin-bottom: 0.8rem; font-size: 0.95rem; font-weight: bold;">Agregar Productos al Pedido</h4>
+            <h4 class="subtitulo-pedido">Agregar Productos al Pedido</h4>
             <div class="producto-fila d-flex gap-2">
-              <select class="input-neumorphic" style="flex: 3;" [(ngModel)]="productoActualCompra" (change)="alCambiarProducto()">
+              <select class="input-neumorphic flex-3" [(ngModel)]="productoActualCompra" (change)="alCambiarProducto()">
                 <option value="" disabled selected>Seleccionar producto del catálogo...</option>
                 @for(prod of productosDisponibles; track prod.id) {
                   <option [value]="prod.id">{{prod.nombre}} (Precio Ref: {{prod.precio_compra | currency:'COP':'symbol':'1.0-0'}})</option>
                 }
               </select>
-              <input type="number" class="input-neumorphic" placeholder="Cant." style="flex: 1; min-width: 70px;" [(ngModel)]="cantidadActualCompra" min="1">
-              <input type="number" class="input-neumorphic" placeholder="Costo Unit ($)" style="flex: 2; min-width: 110px;" [(ngModel)]="precioActualCompra">
-              <button class="btn-add btn-pill btn-agregar" style="white-space: nowrap;" (click)="agregarAlCarrito()">
+              <input type="number" class="input-neumorphic flex-1-min70" [(ngModel)]="cantidadActualCompra" min="1">
+              <input type="number" class="input-neumorphic flex-2-min110" [(ngModel)]="precioActualCompra">
+              <button class="btn-add btn-pill btn-agregar whitespace-nowrap" (click)="agregarAlCarrito()">
                 <i class="fas fa-cart-plus"></i> Agregar
               </button>
             </div>
             
             <div class="producto-lista mt-3">
               @for(item of carritoCompras; track item.id; let idx = $index) {
-                <div class="cart-item d-flex justify-content-between align-items-center p-2 mb-2" style="border-bottom: 1px solid rgba(0,0,0,0.05);">
+                <div class="cart-item d-flex justify-content-between align-items-center p-2 mb-2 border-bottom-soft">
                   <span>
                     <strong>{{item.nombre}}</strong> — {{item.cantidad}} un. x {{item.precio_compra | currency:'COP':'symbol':'1.0-0'}} = <strong>{{item.subtotal | currency:'COP':'symbol':'1.0-0'}}</strong>
                   </span>
@@ -295,11 +295,11 @@
           </div>
 
           <div class="form-fila">
-            <div class="form-group" style="flex: 1;">
+            <div class="form-group flex-1">
               <label>Monto Total Liquidado ($)</label>
-              <input type="text" class="input-neumorphic" [value]="formOrden.total | currency:'COP':'symbol':'1.0-0'" readonly style="font-weight: bold; font-size: 1.1rem; color: #45a1ae;">
+              <input type="text" class="input-neumorphic input-total-resaltado" [value]="formOrden.total | currency:'COP':'symbol':'1.0-0'" readonly>
             </div>
-            <div class="form-group" style="flex: 2;">
+            <div class="form-group flex-2">
               <label>Condiciones / Observaciones</label>
               <input type="text" class="input-neumorphic" [(ngModel)]="formOrden.observaciones" placeholder="Ej. Facturación a 30 días, entrega en sede principal">
             </div>
@@ -323,13 +323,13 @@
   <!-- HTML MODAL RECEPCION -->
   @if(showModalRecepcion) {
     <div class="view-switch-panel fade-in">
-      <div class="neu-card" style="max-width: 500px; margin: 0 auto; text-align: center;">
+      <div class="neu-card neu-card-modal-500">
         <div class="modal-header modal-header-center">
           <i class="fas fa-box-open icon-success"></i>
         </div>
         <div class="panel-body">
           <h1 class="modal-title">¿Confirmar Ingreso a Bodega?</h1>
-          <p class="text-muted" style="margin-bottom: 1.5rem;">
+          <p class="text-muted mb-1-5rem">
             Al confirmar la recepción, las cantidades de los productos en la orden ingresarán automáticamente al <strong>stock disponible</strong> de tu inventario.
           </p>
           
@@ -351,20 +351,20 @@
   <!-- HTML MODAL VER DETALLE ORDEN -->
   @if(showModalDetalleOrden && ordenSeleccionadaDetalle) {
     <div class="view-switch-panel fade-in">
-      <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+      <div class="neu-card neu-card-center">
         <div class="panel-header mb-4">
           <h1>Detalle de Orden: {{numeroOrden(ordenSeleccionadaDetalle)}}</h1>
           <button class="btn-close" (click)="cerrarModalDetalle()">&times;</button>
         </div>
         <div class="panel-body">
           <div class="form-fila mb-3">
-            <div style="flex: 1;">
+            <div class="flex-1">
               <span class="text-muted text-xs">PROVEEDOR:</span><br>
               <strong>{{nombreProveedor(ordenSeleccionadaDetalle)}}</strong><br>
               <span class="text-xs">NIT: {{ordenSeleccionadaDetalle.proveedor?.nit || 'N/A'}}</span><br>
               <span class="text-xs">Email: {{ordenSeleccionadaDetalle.proveedor?.email || 'N/A'}}</span>
             </div>
-            <div style="flex: 1; text-align: right;">
+            <div class="flex-1 text-right">
               <span class="text-muted text-xs">ESTADO:</span><br>
               <span class="badge" [ngClass]="getBadgeClass(estadoOrden(ordenSeleccionadaDetalle))">
                 {{estadoOrden(ordenSeleccionadaDetalle)}}
@@ -378,25 +378,25 @@
               <thead>
                 <tr>
                   <th>PRODUCTO</th>
-                  <th style="text-align: center;">CANTIDAD</th>
-                  <th style="text-align: right;">COSTO UNIT.</th>
-                  <th style="text-align: right;">SUBTOTAL</th>
+                  <th class="text-center">CANTIDAD</th>
+                  <th class="text-right">COSTO UNIT.</th>
+                  <th class="text-right">SUBTOTAL</th>
                 </tr>
               </thead>
               <tbody>
                 @for(det of (ordenSeleccionadaDetalle.detalles || []); track det.id) {
                   <tr>
                     <td><strong>{{det.producto?.nombre || 'Producto #' + det.producto_id}}</strong></td>
-                    <td style="text-align: center;">{{det.cantidad}}</td>
-                    <td style="text-align: right;">{{det.precio_unitario | currency:'COP':'symbol':'1.0-0'}}</td>
-                    <td style="text-align: right; font-weight: bold;">{{(det.subtotal || (det.cantidad * det.precio_unitario)) | currency:'COP':'symbol':'1.0-0'}}</td>
+                    <td class="text-center">{{det.cantidad}}</td>
+                    <td class="text-right">{{det.precio_unitario | currency:'COP':'symbol':'1.0-0'}}</td>
+                    <td class="text-right font-bold">{{(det.subtotal || (det.cantidad * det.precio_unitario)) | currency:'COP':'symbol':'1.0-0'}}</td>
                   </tr>
                 }
               </tbody>
               <tfoot>
                 <tr>
-                  <td colspan="3" style="text-align: right; font-weight: bold;">TOTAL ORDEN:</td>
-                  <td style="text-align: right; font-weight: bold; color: #45a1ae; font-size: 1.1rem;">
+                  <td colspan="3" class="text-right font-bold">TOTAL ORDEN:</td>
+                  <td class="text-right font-bold text-total-orden">
                     {{ordenSeleccionadaDetalle.total | currency:'COP':'symbol':'1.0-0'}}
                   </td>
                 </tr>

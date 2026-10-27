@@ -1,6 +1,7 @@
 @use 'sass:color';
 
-/* --- 1. VARIABLES GLOBALES DE COLOR --- */
+/* --- 0. BACKGROUND PRINCIPAL DEL MÓDULO ADMINISTRACIÓN ---
+   --- 1. VARIABLES GLOBALES DE COLOR --- */
 $bg-color: #f5f5dc;
 $shadow-light: #ffffff;
 $shadow-dark: #d1d1bc;
@@ -25,7 +26,7 @@ $btn-gen-6: #A38B6D;
 }
 
 /* --- 3. TIPOGRAFIA (Jerarquia estricta) --- */
-/* Titulo principal: 16px, centrado, mayusculas, negrita */
+
 .module-header h1, h1.titulo-principal, .header-section h1 {
   font-size: 16px;
   font-weight: bold;
@@ -36,7 +37,7 @@ $btn-gen-6: #A38B6D;
   color: $text-dark;
 }
 
-/* Subtitulo: 13px, izquierda, mayusculas, sin negrita */
+
 .subtitulo, h2.subtitulo, h3.subtitulo {
   font-size: 14px;
   font-weight: normal;
@@ -46,7 +47,7 @@ $btn-gen-6: #A38B6D;
   margin-bottom: 0.5rem;
 }
 
-/* Descripciones y Notas: 10px, centradas, mayusculas */
+
 .module-header p, .descripcion, .descripcion-general, .subtitle, .header-section p, .nota, .text-muted-small, .badge-small {
   font-size: 14px;
   font-weight: normal;
@@ -59,7 +60,7 @@ $btn-gen-6: #A38B6D;
   line-height: 1.4;
 }
 
-/* Texto general: 12px */
+
 .form-label, p, td, th, li, label, .text-general {
   font-size: 14px;
   font-weight: normal;
@@ -189,7 +190,7 @@ $btn-gen-6: #A38B6D;
   text-decoration: none;
 }
 
-/* Titulos de panel interno */
+
 .panel-title, h3.panel-title {
   font-family: 'Montserrat', sans-serif;
   font-size: 16px;
@@ -200,19 +201,17 @@ $btn-gen-6: #A38B6D;
   margin: 0 0 0.5rem 0;
 }
 
-/* ========================================= */
-/* FIN BASE NEUMORFICA - INICIO DE LOCALES   */
-/* ========================================= */
 
 
 
-/* --- 1. VARIABLES GLOBALES DE ADMINISTRACIÓN --- */
+
+/* --- 8. VARIABLES LOCALES DE ADMINISTRACIÓN --- */
 $bg-color: #f5f5dc;
 $text-dark: #1a1a1a;
 $text-muted: #2d3748;
 $accent-color: #45a1ae; /* Color activo por defecto */
 
-/* --- 2. LAYOUT PRINCIPAL --- */
+/* --- 9. LAYOUT PRINCIPAL DE ADMINISTRACIÓN --- */
 .admin-container {
   display: flex;
   flex-direction: column;
@@ -221,7 +220,7 @@ $accent-color: #45a1ae; /* Color activo por defecto */
   gap: 1.5rem;
 }
 
-/* --- 3. NAVEGACIÓN NEUMÓRFICA (TABS SUPERIORES) --- */
+/* --- 10. NAVEGACIÓN NEUMÓRFICA SUPERIOR --- */
 .neu-nav {
   display: flex;
   gap: 1rem;
@@ -249,19 +248,19 @@ $accent-color: #45a1ae; /* Color activo por defecto */
   white-space: nowrap;
 }
 
-/* Estado normal (ligero relieve o plano) */
+
 .nav-item:hover {
   box-shadow: 2px 2px 5px #d6d6c0, -2px -2px 5px #ffffff;
 }
 
-/* Estado Activo (Hundido neumórfico) */
+
 .nav-item.active {
   box-shadow: inset 4px 4px 8px #d6d6c0, inset -4px -4px 8px #ffffff;
   color: $accent-color;
   font-weight: bold;
 }
 
-/* --- 4. CONTENIDO (OUTLET) --- */
+/* --- 11. CONTENIDO Y OUTLET --- */
 .admin-content {
   flex: 1;
   background: $bg-color;

@@ -9,6 +9,7 @@ use App\Models\CajaMovimiento;
 
 class CajaMovimientoController extends Controller
 {
+    // Bloque para listar los movimientos de una caja específica
     public function index($cajaId)
     {
         $user = Auth::user();
@@ -35,6 +36,7 @@ class CajaMovimientoController extends Controller
         return response()->json($movimientos);
     }
 
+    // Bloque para registrar un nuevo movimiento de ingreso o egreso en caja
     public function store(Request $request, $cajaId)
     {
         $user = Auth::user();
@@ -44,6 +46,7 @@ class CajaMovimientoController extends Controller
 
         $caja = Caja::where('empresa_id', $user->empresa_id)->findOrFail($cajaId);
 
+        // Bloque de reglas de validación
         $validated = $request->validate([
             'tipo' => 'required|in:apertura,ingreso,egreso,cierre',
             'monto' => 'required|numeric|min:0',
@@ -51,6 +54,7 @@ class CajaMovimientoController extends Controller
             'comprobante_url' => 'nullable|string|max:500',
         ]);
 
+        // Bloque de guardado en BD
         $movimiento = CajaMovimiento::create([
             'caja_id' => $cajaId,
             'tipo' => $validated['tipo'],

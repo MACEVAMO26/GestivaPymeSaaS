@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
+// Bloque para interceptar peticiones HTTP e inyectar cabeceras de autorización
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
@@ -26,7 +27,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(clonedReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      // Si el servidor responde que no estamos autorizados (token inválido/vencido o DB reiniciada)
+      
       if (error.status === 401 && !req.url.includes('/logout') && !req.url.includes('/login')) {
         authService.clearSessionStorage();
         router.navigate(['/login'], { queryParams: { motivo: 'sesion_remota' }, replaceUrl: true });

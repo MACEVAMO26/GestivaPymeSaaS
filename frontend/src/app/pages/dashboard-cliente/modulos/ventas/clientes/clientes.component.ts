@@ -19,18 +19,12 @@ export class ClientesComponent implements OnInit {
   private clienteService = inject(ClienteService);
   private toast = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
-
-  // Tabs
   tabActiva: 'directorio' | 'crm' = 'directorio';
-
-  // State (Directorio)
   clientesOriginales: any[] = [];
   clientes: any[] = [];
   searchTerm: string = '';
   tipoFiltro: string = '';
   clienteSeleccionado360: any = null;
-
-  // UI State
   cargando = false;
   showModal = false;
   isEditMode = false;
@@ -40,6 +34,7 @@ export class ClientesComponent implements OnInit {
   pageSize = 8;
   pageClientes = 1;
 
+  // --- GETTERS Y PAGINACION ---
   get paginatedClientes(): any[] {
     const start = (this.pageClientes - 1) * this.pageSize;
     return this.clientes.slice(start, start + this.pageSize);
@@ -49,6 +44,7 @@ export class ClientesComponent implements OnInit {
     return Math.ceil(this.clientes.length / this.pageSize) || 1;
   }
 
+  // Bloque utilitario para resolver el nombre o razón social del cliente
   getNombreCliente(c: any): string {
     if (!c) return '--';
     if (c.nombre_razon_social && c.nombre_razon_social.trim()) {
@@ -61,6 +57,7 @@ export class ClientesComponent implements OnInit {
     return c.email || '--';
   }
 
+  // Bloque utilitario para formatear el tipo y número de documento
   getDocumentoFormateado(c: any): string {
     if (!c || !c.documento) return '--';
     const doc = c.documento.trim();
@@ -72,6 +69,7 @@ export class ClientesComponent implements OnInit {
     return `${prefix} ${doc}`;
   }
 
+  // Bloque para proyectar la vista integral 360 del cliente
   ver360(c: any) {
     this.clienteSeleccionado360 = c;
     this.tabActiva = 'crm';
@@ -79,14 +77,17 @@ export class ClientesComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
+  // Bloque para iniciar la solicitud de inactivación del cliente
   solicitarInactivacion(c: any) {
     if (confirm(`¿Enviar solicitud de inactivación para el cliente ${this.getNombreCliente(c)}?`)) {
       this.toast.success(`Solicitud de inactivación enviada exitosamente.`);
     }
   }
 
+  // Bloque de ciclo de vida OnInit para cargar el directorio de clientes
   ngOnInit() {
-    this.cargarClientes();
+    this.// Bloque para consultar el catálogo de clientes desde la API
+  cargarClientes();
   }
 
   cargarClientes() {
@@ -110,6 +111,7 @@ export class ClientesComponent implements OnInit {
     });
   }
 
+  // Bloque para filtrar clientes por término de búsqueda y tipo
   filtrarClientes() {
     this.pageClientes = 1;
     let result = this.clientesOriginales;
@@ -128,8 +130,9 @@ export class ClientesComponent implements OnInit {
     this.clientes = result;
   }
 
-  // --- LOGICA DIRECTORIO ---
+  // --- SECCION LOGICA DIRECTORIO ---
 
+  // Bloque para preparar y abrir el formulario de creación de cliente
   abrirModalNuevo() {
     this.isEditMode = false;
     this.clienteActual = {
@@ -147,6 +150,7 @@ export class ClientesComponent implements OnInit {
     this.showModal = true;
   }
 
+  // Bloque para cargar los datos del cliente y abrir el formulario de edición
   abrirModalEditar(c: any) {
     this.isEditMode = true;
     this.clienteActual = { ...c };
@@ -156,11 +160,13 @@ export class ClientesComponent implements OnInit {
     this.showModal = true;
   }
 
+  // Bloque para cerrar el modal de formulario de cliente
   cerrarModal() {
     this.showModal = false;
     this.clienteActual = {};
   }
 
+  // Bloque para validar y persistir los datos del cliente en el backend
   guardarCliente() {
     const esJuridico = this.clienteActual.tipo_cliente === 'Juridico';
     const nombreValido = esJuridico ? this.clienteActual.nombre_razon_social : this.clienteActual.nombres;

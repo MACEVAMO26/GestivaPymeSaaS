@@ -7,8 +7,7 @@ use Illuminate\Http\Request;
 
 class InventarioController extends Controller
 {
-    // --- GESTIÓN DE INVENTARIO ---
-    // Obtiene la lista de inventario incluyendo los detalles del producto asociado
+    // Bloque para listar las existencias de inventario con datos del producto asociado
     public function index()
     {
         $empresaId = request()->header('X-Empresa-Id') ?? (auth()->user()?->empresa_id ?? null);
@@ -21,9 +20,10 @@ class InventarioController extends Controller
             ->get();
     }
 
-    // Registra una nueva entrada en el inventario inicializando cantidades
+    // Bloque para registrar un nuevo registro de inventario y ubicación
     public function store(Request $request)
     {
+        // Bloque de reglas de validación
         $validatedData = $request->validate([
             'producto_id' => 'required|integer|exists:productos,id',
             'stock_actual' => 'required|integer|min:0',
@@ -33,21 +33,23 @@ class InventarioController extends Controller
             'posicion' => 'nullable|string|max:255',
         ]);
 
+        // Bloque de guardado en BD
         $inventario = Inventario::create($validatedData);
         return response()->json($inventario, 201);
     }
 
-    // Retorna los detalles de un registro específico de inventario
+    // Bloque para consultar el detalle de un registro específico de inventario
     public function show($id)
     {
         return Inventario::with('producto')->findOrFail($id);
     }
 
-    // Actualiza las cantidades y datos de ubicación de un registro de inventario
+    // Bloque para actualizar existencias y ubicación de un registro de inventario
     public function update(Request $request, $id)
     {
         $inventario = Inventario::findOrFail($id);
 
+        // Bloque de reglas de validación
         $validatedData = $request->validate([
             'producto_id' => 'required|integer|exists:productos,id',
             'stock_actual' => 'required|integer|min:0',
@@ -57,11 +59,12 @@ class InventarioController extends Controller
             'posicion' => 'nullable|string|max:255',
         ]);
 
+        // Bloque de guardado en BD
         $inventario->update($validatedData);
         return response()->json($inventario);
     }
 
-    // Elimina permanentemente un registro de inventario del sistema
+    // Bloque para eliminar un registro de inventario del sistema
     public function destroy($id)
     {
         $inventario = Inventario::findOrFail($id);

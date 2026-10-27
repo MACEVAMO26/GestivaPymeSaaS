@@ -24,6 +24,7 @@ export class ComprasComponent implements OnInit {
   private toast = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
 
+  // --- VARIABLES DE ESTADO ---
   activeTab: string = 'ordenes';
   cargando = false;
   guardando = false;
@@ -35,30 +36,24 @@ export class ComprasComponent implements OnInit {
   proveedoresDisponibles: Proveedor[] = [];
   productosDisponibles: Producto[] = [];
   recepciones: any[] = [];
-
-  // Variables Detalle Orden
   showModalDetalleOrden: boolean = false;
   ordenSeleccionadaDetalle: any = null;
   anulandoId: number | null = null;
-
-  // Variables Recepcion
   ordenSeleccionadaRecepcion: any = null;
   showModalRecepcion: boolean = false;
-
-  // Variables Orden de Compra
   showModalOrden: boolean = false;
-  formOrden: any = this.resetFormOrden();
+  formOrden: any = this.// Bloque para restablecer los valores del formulario de compras
+  resetFormOrden();
   productoActualCompra: any = '';
   cantidadActualCompra: number = 1;
   precioActualCompra: number = 0;
   carritoCompras: any[] = [];
-
-  // Paginación (8 entradas por página)
   pageSize: number = 8;
   pageOrdenes: number = 1;
   pageRecepcion: number = 1;
   Math = Math;
 
+  // --- GETTERS Y PAGINACION ---
   get paginatedOrdenes(): any[] {
     const start = (this.pageOrdenes - 1) * this.pageSize;
     return this.ordenesFiltradas.slice(start, start + this.pageSize);
@@ -75,8 +70,10 @@ export class ComprasComponent implements OnInit {
     return Math.ceil(this.recepciones.length / this.pageSize) || 1;
   }
 
+  // Bloque de ciclo de vida OnInit para cargar el catálogo inicial de compras
   ngOnInit() {
-    this.cargarDatos();
+    this.// Bloque para consultar órdenes de compra, productos y proveedores desde la API
+  cargarDatos();
   }
 
   cargarDatos() {
@@ -94,7 +91,8 @@ export class ComprasComponent implements OnInit {
     this.compraService.getOrdenes().pipe(timeout(15000)).subscribe({
       next: (res) => {
         this.ordenes = res;
-        this.filtrarOrdenes();
+        this.// Bloque para filtrar órdenes de compra por término de búsqueda
+  filtrarOrdenes();
         this.cdr.detectChanges();
       },
       error: () => {
@@ -111,14 +109,17 @@ export class ComprasComponent implements OnInit {
     });
   }
 
+  // Bloque utilitario para formatear el consecutivo de la orden de compra
   numeroOrden(orden: any): string {
     return 'OC-' + String(orden.id ?? '').padStart(4, '0');
   }
 
+  // Bloque utilitario para resolver el nombre del proveedor asociado
   nombreProveedor(orden: any): string {
     return orden.proveedor?.razon_social || orden.proveedor?.nombre || '-';
   }
 
+  // Bloque utilitario para determinar el estado de la orden
   estadoOrden(orden: any): string {
     const e = orden.estado || '';
     if (e === 'recibida' || e === 'recibida_total' || e === 'Recibido') return 'Recibido';
@@ -128,6 +129,7 @@ export class ComprasComponent implements OnInit {
     return 'Pendiente';
   }
 
+  // Bloque para asignar la clase cromática del badge según el estado
   getBadgeClass(estado: string): string {
     if (estado === 'Recibido' || estado === 'Aprobado') return 'badge-aprobada';
     if (estado === 'Recibido Parcial') return 'badge-secundario';
@@ -135,6 +137,7 @@ export class ComprasComponent implements OnInit {
     return 'badge-pendiente';
   }
 
+  // Bloque para alternar entre pestañas de compras
   switchTab(tab: string) {
     this.activeTab = tab;
   }
@@ -153,7 +156,8 @@ export class ComprasComponent implements OnInit {
     this.pageOrdenes = 1;
   }
 
-  // --- LOGICA MODAL ORDEN ---
+  // --- SECCION MODAL ORDEN ---
+  // Bloque para abrir el formulario de nueva orden de compra
   abrirModalOrden() {
     this.formOrden = this.resetFormOrden();
     this.carritoCompras = [];
@@ -163,6 +167,7 @@ export class ComprasComponent implements OnInit {
     this.showModalOrden = true;
   }
 
+  // Bloque para cerrar el modal de orden de compra
   cerrarModalOrden() {
     this.showModalOrden = false;
   }
@@ -176,6 +181,7 @@ export class ComprasComponent implements OnInit {
     };
   }
 
+  // Bloque para anexar un producto con cantidad y costo al pedido de compra
   agregarAlCarrito() {
     if (!this.productoActualCompra || this.cantidadActualCompra <= 0 || this.precioActualCompra <= 0) {
       this.toast.warning('Debe seleccionar producto, cantidad y precio');
@@ -202,12 +208,14 @@ export class ComprasComponent implements OnInit {
     this.precioActualCompra = 0;
   }
 
+  // Bloque para eliminar un ítem del listado preliminar de compra
   removerDelCarrito(idx: number) {
     const item = this.carritoCompras[idx];
     this.formOrden.total -= item.subtotal;
     this.carritoCompras.splice(idx, 1);
   }
 
+  // Bloque para validar y registrar la orden de compra en el sistema
   guardarOrden() {
     if (!this.formOrden.proveedor || this.carritoCompras.length === 0) {
       this.toast.warning('Debe seleccionar proveedor y agregar productos');
@@ -246,7 +254,8 @@ export class ComprasComponent implements OnInit {
     });
   }
 
-  // --- LOGICA RECEPCION ---
+  // --- SECCION RECEPCION ---
+  // Bloque para abrir el modal de recepción de mercancía
   abrirModalRecepcion() {
     if (!this.ordenSeleccionadaRecepcion || this.ordenSeleccionadaRecepcion === 'null') {
       this.toast.warning('Debe seleccionar una orden pendiente');
@@ -255,10 +264,12 @@ export class ComprasComponent implements OnInit {
     this.showModalRecepcion = true;
   }
 
+  // Bloque para cerrar el diálogo de recepción
   cerrarModalRecepcion() {
     this.showModalRecepcion = false;
   }
 
+  // Bloque para confirmar la recepción de mercancía e incrementar el stock
   recibirOrden() {
     const orden = this.ordenes.find(o => o.id == this.ordenSeleccionadaRecepcion);
     if (!orden) {
@@ -302,6 +313,7 @@ export class ComprasComponent implements OnInit {
     });
   }
 
+  // Bloque para autocompletar el costo de compra al seleccionar un producto
   alCambiarProducto() {
     const prod = this.productosDisponibles.find(p => p.id == this.productoActualCompra);
     if (prod && prod.precio_compra) {
@@ -309,16 +321,19 @@ export class ComprasComponent implements OnInit {
     }
   }
 
+  // Bloque para consultar y proyectar el detalle de ítems de una orden
   verDetalle(orden: any) {
     this.ordenSeleccionadaDetalle = orden;
     this.showModalDetalleOrden = true;
   }
 
+  // Bloque para cerrar el modal de detalle de orden
   cerrarModalDetalle() {
     this.showModalDetalleOrden = false;
     this.ordenSeleccionadaDetalle = null;
   }
 
+  // Bloque para solicitar o ejecutar la anulación de una orden de compra
   anularOrden(orden: any) {
     if (!orden?.id) return;
     this.anulandoId = orden.id;

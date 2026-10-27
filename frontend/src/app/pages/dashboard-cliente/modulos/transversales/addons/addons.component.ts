@@ -1,6 +1,7 @@
 import { VolverDirective } from '../../../../../shared/directives/volver.directive';
 import { Component } from '@angular/core';
 
+// --- COMPONENTE DE INTEGRACIONES Y ADDONS ---
 @Component({
   selector: 'app-addons',
   standalone: true,
@@ -8,4 +9,6 @@ import { Component } from '@angular/core';
   templateUrl: './addons.component.html',
   styleUrl: './addons.component.scss'
 })
-export class AddonsComponent {}
+export class AddonsComponent {
+  // --- VARIABLES DE ESTADO ---
+}

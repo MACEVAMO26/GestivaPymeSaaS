@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB; // Permite manejar transacciones en la base d
 
 class RecepcionController extends Controller
 {
-    // Devuelve todas las recepciones con su información relacionada filtradas por empresa
+    // Bloque para listar las recepciones de mercancía con sus órdenes y proveedores
     public function index()
     {
         $empresaId = request()->header('X-Empresa-Id') ?? (auth()->user()?->empresa_id ?? null);
@@ -26,7 +26,7 @@ class RecepcionController extends Controller
         return response()->json($recepciones);
     }
 
-    // Registra una nueva recepción, actualiza el estado de la orden de compra y el stock de productos
+    // Bloque para registrar recepción de mercancía y actualizar existencias
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -60,12 +60,12 @@ class RecepcionController extends Controller
                         'cantidad_recibida' => $detalle['cantidad_recibida'],
                     ]);
 
-                    // Actualizar stock en la tabla inventario
+                    // Bloque para actualizar stock en inventario
                     $inv = \App\Models\Inventario::firstOrNew(['producto_id' => $detalle['producto_id']]);
                     $inv->stock_actual = ($inv->stock_actual ?? 0) + (int)$detalle['cantidad_recibida'];
                     $inv->save();
 
-                    // Registrar movimiento de inventario
+                    // Bloque para registrar movimiento de entrada en inventario
                     \App\Models\MovimientoInventario::create([
                         'producto_id' => $detalle['producto_id'],
                         'usuario_id' => $usuarioId,
@@ -76,7 +76,7 @@ class RecepcionController extends Controller
                     ]);
                 }
 
-                // Marcar orden de compra como recibida (recibida_total o recibida_parcial)
+                // Bloque para actualizar estado de la orden de compra
                 $nuevoEstado = $tipoRecepcion === 'parcial' ? 'recibida_parcial' : 'recibida_total';
                 \App\Models\OrdenCompra::where('id', $validatedData['orden_compra_id'])->update([
                     'estado' => $nuevoEstado
@@ -92,7 +92,7 @@ class RecepcionController extends Controller
         }
     }
 
-    // Muestra los detalles de una recepcion en particular
+    // Bloque para consultar el detalle de una recepción específica
     public function show($id)
     {
         return Recepcion::with(['usuario', 'ordenCompra.proveedor', 'detalles.producto'])->findOrFail($id);

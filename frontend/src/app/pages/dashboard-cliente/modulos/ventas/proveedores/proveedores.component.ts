@@ -43,6 +43,7 @@ export class ProveedoresComponent implements OnInit {
   nuevaCalificacion: number = 5;
   nuevoComentario: string = '';
 
+  // --- VARIABLES DE ESTADO ---
   activeTab: string = 'directorio';
 
   cuentasPorPagar: any[] = [];
@@ -81,10 +82,14 @@ export class ProveedoresComponent implements OnInit {
     return Math.ceil(this.contratos.length / this.pageSize) || 1;
   }
 
+  // Bloque de ciclo de vida OnInit para cargar el directorio de proveedores
   ngOnInit() {
-    this.cargarProveedores();
-    this.cargarCuentasPorPagar();
-    this.cargarEvaluaciones();
+    this.// Bloque para consultar el catálogo de proveedores desde el backend
+  cargarProveedores();
+    this.// Bloque para consultar las cuentas por pagar a proveedores
+  cargarCuentasPorPagar();
+    this.// Bloque para cargar el historial de evaluaciones de proveedores
+  cargarEvaluaciones();
   }
 
   cargarProveedores() {
@@ -133,10 +138,12 @@ export class ProveedoresComponent implements OnInit {
     }));
   }
 
+  // Bloque utilitario para resolver el nombre del proveedor en la cuenta
   nombreProveedorCuenta(cuenta: any): string {
     return cuenta.proveedor?.razon_social || cuenta.proveedor?.nombre || '-';
   }
 
+  // Bloque para filtrar el directorio de proveedores por búsqueda o categoría
   filtrarProveedores() {
     this.pageDirectorio = 1;
     const term = this.searchTerm.toLowerCase();
@@ -146,10 +153,12 @@ export class ProveedoresComponent implements OnInit {
     );
   }
 
+  // Bloque para alternar entre pestañas del módulo de proveedores
   switchTab(tab: string) {
     this.activeTab = tab;
   }
 
+  // Bloque para exportar el directorio de proveedores a formato Excel
   exportarExcel() {
     this.toast.success('Generando archivo Excel...');
     const headers = { 'Authorization': `Bearer ${sessionStorage.getItem('auth_token')}` };
@@ -167,6 +176,7 @@ export class ProveedoresComponent implements OnInit {
     });
   }
 
+  // Bloque utilitario para crear un objeto proveedor con estructura vacía
   proveedorVacio(): Proveedor {
     return {
       razon_social: '',
@@ -183,23 +193,27 @@ export class ProveedoresComponent implements OnInit {
     };
   }
 
+  // Bloque utilitario para formatear el identificador visual del proveedor
   formatearId(id: number | undefined): string {
     if (!id) return '000';
     return id.toString().padStart(3, '0');
   }
 
+  // Bloque para asignar la clase de badge según el estado de evaluación
   getBadgeEval(estado: string | undefined): string {
     if (estado === 'Aprobado' || estado === 'Excelente' || estado === 'Evaluado') return 'badge-aprobada';
     if (estado === 'Pendiente' || estado === 'En revisión') return 'badge-pendiente';
     return 'badge-rechazada';
   }
 
+  // Bloque para asignar la clase cromática del badge de cuentas por pagar
   getBadgeCuentas(estado: string): string {
     if (estado === 'Pagada') return 'badge-aprobada';
     if (estado === 'Vencida') return 'badge-rechazada';
     return 'badge-pendiente';
   }
 
+  // Bloque para abrir el modal de creación o edición de proveedor
   abrirModal(proveedor?: Proveedor) {
     if (proveedor) {
       this.isEditMode = true;
@@ -211,10 +225,12 @@ export class ProveedoresComponent implements OnInit {
     this.showModal = true;
   }
 
+  // Bloque para cerrar el modal de proveedor
   cerrarModal() {
     this.showModal = false;
   }
 
+  // Bloque para validar y persistir los datos del proveedor
   guardarProveedor() {
     if (!this.proveedorActual.razon_social || !this.proveedorActual.nit) {
       this.toast.warning('Razón social y NIT son obligatorios');
@@ -263,6 +279,7 @@ export class ProveedoresComponent implements OnInit {
     }
   }
 
+  // Bloque para solicitar la inactivación de un proveedor
   eliminarProveedor(id: number | undefined) {
     if (!id) return;
     this.deletingId = id;
@@ -285,16 +302,19 @@ export class ProveedoresComponent implements OnInit {
     });
   }
 
+  // Bloque para abrir el modal de registro de abono o pago a proveedor
   abrirPago(cuenta: any) {
     this.cuentaSeleccionada = cuenta;
     this.showModalPago = true;
   }
 
+  // Bloque para cerrar el modal de abono a cuenta por pagar
   cerrarPago() {
     this.showModalPago = false;
     this.cuentaSeleccionada = null;
   }
 
+  // Bloque para registrar el abono monetario y actualizar el saldo de la deuda
   confirmarPago() {
     if (!this.cuentaSeleccionada?.id) {
       this.toast.error('Cuenta no válida');
@@ -327,6 +347,7 @@ export class ProveedoresComponent implements OnInit {
     });
   }
 
+  // Bloque para abrir el modal de calificación y evaluación de desempeño
   abrirEvaluar(evaluacion: any) {
     this.evaluacionSeleccionada = evaluacion;
     this.nuevaCalificacion = evaluacion.calificacion || 5;
@@ -334,11 +355,13 @@ export class ProveedoresComponent implements OnInit {
     this.showModalEvaluacion = true;
   }
 
+  // Bloque para cerrar el diálogo de evaluación
   cerrarEvaluar() {
     this.showModalEvaluacion = false;
     this.evaluacionSeleccionada = null;
   }
 
+  // Bloque para validar y guardar la calificación otorgada al proveedor
   guardarEvaluacion() {
     if (!this.evaluacionSeleccionada?.id) {
       this.toast.error('Proveedor no válido');

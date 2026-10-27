@@ -1,8 +1,11 @@
+<!-- HTML PANEL CONTENIDO NOTIFICACIONES -->
 <div class="panel-contenido">
+  <!-- HTML ENCABEZADO PANEL NOTIFICACIONES -->
   <div class="panel-header">
     <h3 class="panel-title">Mis Notificaciones</h3>
   </div>
 
+  <!-- HTML LISTADO DE NOTIFICACIONES -->
   <div class="panel-body" *ngIf="!cargando">
     <div class="notificacion-item" [class.border-warning]="!n.leida" *ngFor="let n of notificaciones">
       <span class="noti-icon" [ngClass]="n.leida ? 'bg-success' : 'bg-info'">
@@ -20,6 +23,7 @@
       </button>
     </div>
 
+    <!-- HTML ESTADO VACIO NOTIFICACIONES -->
     <div class="notificacion-item" *ngIf="notificaciones.length === 0">
       <span class="noti-icon bg-warning">
         <i class="fas fa-inbox"></i>
@@ -30,6 +34,7 @@
     </div>
   </div>
 
+  <!-- HTML ESTADO DE CARGA NOTIFICACIONES -->
   <div class="notificacion-item" *ngIf="cargando">
     <div class="noti-content">
       <span class="noti-text">Cargando...</span>

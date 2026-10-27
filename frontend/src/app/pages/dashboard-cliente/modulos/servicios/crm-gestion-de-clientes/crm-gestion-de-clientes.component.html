@@ -16,7 +16,7 @@
       </div>
     }
 
-    <!-- BUSCADOR DE CLIENTES -->
+    <!-- HTML BUSCADOR DE CLIENTES -->
     <div class="neumorphic-panel fade-in">
       <h2 class="subtitulo">Directorio de Clientes</h2>
       <div class="search-filter-bar mb-4">
@@ -32,12 +32,12 @@
       </div>
 
       @if(clientes.length === 0) {
-        <div class="empty-state" style="margin-top: 1.5rem;">
-          <i class="fas fa-users mb-2" style="font-size: 16px; opacity: 0.5;"></i>
-          <p style="font-size: 14px; margin: 0;">Aún no hay clientes registrados.</p>
+        <div class="empty-state empty-state-mt">
+          <i class="fas fa-users mb-2 empty-icon"></i>
+          <p class="empty-text">Aún no hay clientes registrados.</p>
         </div>
       } @else {
-        <div class="table-container" style="margin-top: 1.5rem;">
+        <div class="table-container">
           <table class="data-table neumorphic-table">
             <thead>
               <tr>
@@ -51,7 +51,7 @@
             </thead>
             <tbody>
               @for(cli of paginatedResultados; track cli.id) {
-                <tr [class.fila-seleccionada]="clienteSeleccionado?.id === cli.id" (click)="seleccionarCliente(cli)" style="cursor: pointer;">
+                <tr [class.fila-seleccionada]="clienteSeleccionado?.id === cli.id" (click)="seleccionarCliente(cli)">
                   <td>
                     <strong>{{nombreCliente(cli)}}</strong>
                     <div class="text-xs text-muted">{{cli.tipo_cliente || 'Natural'}}</div>
@@ -106,14 +106,14 @@
       }
     </div>
 
-    <!-- FICHA Y VISTA 360° DEL CLIENTE SELECCIONADO -->
+    <!-- HTML FICHA 360 DEL CLIENTE SELECCIONADO -->
     @if(clienteSeleccionado) {
       <div class="neumorphic-panel fade-in mt-4">
         
-        <!-- HEADER 360 PERFIL -->
-        <div class="panel-header-flex mb-3 pb-3" style="border-bottom: 2px solid rgba(0,0,0,0.05);">
+        <!-- HTML HEADER 360 PERFIL -->
+        <div class="panel-header-flex mb-3 pb-3 panel-header-360">
           <div>
-            <h2 class="subtitulo" style="margin: 0; font-size: 15px; font-weight: bold;">
+            <h2 class="subtitulo subtitulo-360">
               <i class="fas fa-id-card text-azul"></i> Vista 360°: {{nombreCliente(clienteSeleccionado)}}
             </h2>
             <p class="cliente-seleccionado-info">
@@ -123,7 +123,7 @@
               ✉️ {{clienteSeleccionado.email || 'Sin email'}}
             </p>
           </div>
-          <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <div class="header-badges-group">
             <span class="badge" [ngClass]="getBadgeEstado(clienteSeleccionado.estado_financiero || 'Al día')">
               Financiero: {{clienteSeleccionado.estado_financiero || 'Al día'}}
             </span>
@@ -140,8 +140,8 @@
           </div>
         } @else if(historial360) {
           
-          <!-- KPI METRIC CARDS 360 -->
-          <div class="kpi-grid-360 mb-4" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem;">
+          <!-- HTML METRICAS KPI 360 -->
+          <div class="kpi-grid-360 mb-4">
             
             <div class="neumorphic-panel-inner text-center p-3">
               <span class="text-xs text-muted font-bold d-block">Total Facturado</span>
@@ -173,22 +173,22 @@
 
             <div class="neumorphic-panel-inner text-center p-3">
               <span class="text-xs text-muted font-bold d-block">Satisfacción Servicio</span>
-              <strong class="text-warning text-lg d-block mt-1" style="color: #f59e0b;">
+              <strong class="text-warning text-lg d-block mt-1 metric-warning">
                 ⭐ {{historial360.metricas.calificacion_promedio}} / 5.0
               </strong>
             </div>
 
             <div class="neumorphic-panel-inner text-center p-3">
               <span class="text-xs text-muted font-bold d-block">Pedidos Activos</span>
-              <strong class="text-info text-lg d-block mt-1" style="color: #45a1ae;">
+              <strong class="text-info text-lg d-block mt-1 metric-info">
                 {{historial360.metricas.pedidos_activos}}
               </strong>
             </div>
 
           </div>
 
-          <!-- SUB-TABS 360 -->
-          <div class="subtabs-360-nav mb-3" style="display: flex; gap: 0.5rem; border-bottom: 2px solid rgba(0,0,0,0.05); padding-bottom: 0.5rem; flex-wrap: wrap;">
+          <!-- HTML PESTAÑAS SUBTABS 360 -->
+          <div class="subtabs-360-nav mb-3">
             <button type="button" class="btn-subtab" [class.btn-subtab-active]="subTab360 === 'timeline'" (click)="subTab360 = 'timeline'">
               <i class="fas fa-stream"></i> Línea de Tiempo Cronológica ({{historial360.timeline.length}})
             </button>
@@ -203,13 +203,13 @@
             </button>
           </div>
 
-          <!-- PESTAÑA 1: LÍNEA DE TIEMPO CRONOLÓGICA UNIFICADA -->
+          <!-- HTML PESTAÑA LINEA DE TIEMPO CRONOLOGICA -->
           @if(subTab360 === 'timeline') {
             <div class="timeline-container fade-in mt-3">
               @for(item of historial360.timeline; track $index) {
-                <div class="timeline-item p-3 mb-3 neumorphic-panel-inner" style="border-left: 4px solid;" [style.border-left-color]="item.color">
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; flex-wrap: wrap; gap: 0.5rem;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <div class="timeline-item p-3 mb-3 neumorphic-panel-inner" [style.border-left-color]="item.color">
+                  <div class="timeline-header">
+                    <div class="timeline-badges">
                       <span class="badge" [ngClass]="getBadgeEstado(item.estado)">
                         <i [class]="item.icono"></i> {{item.tipo}}
                       </span>
@@ -220,7 +220,7 @@
                     </span>
                   </div>
 
-                  <p class="text-xs text-muted" style="margin: 0.25rem 0;">{{item.descripcion}}</p>
+                  <p class="text-xs text-muted timeline-desc">{{item.descripcion}}</p>
 
                   @if(item.calificacion_tecnico) {
                     <div class="stars-gold text-xs mt-1">
@@ -250,7 +250,7 @@
             </div>
           }
 
-          <!-- PESTAÑA 2: VENTAS & FACTURAS -->
+          <!-- HTML PESTAÑA VENTAS Y FACTURAS -->
           @if(subTab360 === 'ventas') {
             <div class="table-container fade-in mt-3">
               <table class="data-table neumorphic-table">
@@ -283,7 +283,7 @@
             </div>
           }
 
-          <!-- PESTAÑA 3: COTIZACIONES & PEDIDOS -->
+          <!-- HTML PESTAÑA COTIZACIONES Y PEDIDOS -->
           @if(subTab360 === 'cotizaciones') {
             <div class="table-container fade-in mt-3">
               <table class="data-table neumorphic-table">
@@ -312,7 +312,7 @@
             </div>
           }
 
-          <!-- PESTAÑA 4: SERVICIOS & SOPORTE -->
+          <!-- HTML PESTAÑA SERVICIOS Y SOPORTE -->
           @if(subTab360 === 'servicios') {
             <div class="table-container fade-in mt-3">
               <table class="data-table neumorphic-table">

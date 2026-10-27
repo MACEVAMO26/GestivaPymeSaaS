@@ -56,11 +56,11 @@ export class SaasAdminComponent implements OnInit {
   // --- VARIABLES PARA EL CONTROL DE IA ---
   iaConfigSeleccionada = {
     empresaId: null as number | null,
-    fuente: 'gestivapyme' as 'gestivapyme' | 'propia', // gestivapyme = IA del plan, propia = BYOK
-    proveedor: 'gemini', // gemini, openai, claude, personalizada
+    fuente: 'gestivapyme' as 'gestivapyme' | 'propia',
+    proveedor: 'gemini',
     apiKey: '',
-    tieneLlave: false, // indica si ya hay una llave guardada en DB (para mostrar indicador)
-    modo: 'apagado', // apagado, simple, avanzado
+    tieneLlave: false,
+    modo: 'apagado',
     tareas: {
       resumir: false,
       redactar: false,
@@ -157,6 +157,8 @@ export class SaasAdminComponent implements OnInit {
   Math = Math;
 
   busquedaEmpresas: string = '';
+  // Bloque getter para filtrar la lista de empresas según el término de búsqueda
+
 
   get empresasFiltradas(): any[] {
     if (!this.busquedaEmpresas || !this.busquedaEmpresas.trim()) {
@@ -180,56 +182,129 @@ export class SaasAdminComponent implements OnInit {
              estadoPago.includes(term);
     });
   }
+  // Bloque para reiniciar la paginación al cambiar el término de búsqueda de empresas
+
 
   onBusquedaEmpresasChange() {
     this.pageEmpresas = 1;
   }
+  // Bloque para limpiar el término de búsqueda y restablecer la paginación de empresas
+
 
   limpiarBusquedaEmpresas() {
     this.busquedaEmpresas = '';
     this.pageEmpresas = 1;
   }
+  // Bloque getter para obtener el segmento paginado de la lista de empresas
+
 
   get paginatedEmpresas(): any[] {
     const filtradas = this.empresasFiltradas;
     const start = (this.pageEmpresas - 1) * this.pageSize;
     return filtradas.slice(start, start + this.pageSize);
   }
+  // Bloque getter para calcular el número total de páginas de empresas
+
   get totalPagesEmpresas(): number {
     return Math.ceil(this.empresasFiltradas.length / this.pageSize) || 1;
   }
+  // Bloque getter para obtener el segmento paginado de suscripciones
+
 
   get paginatedSuscripciones(): any[] {
     const start = (this.pageSuscripciones - 1) * this.pageSize;
     return this.suscripcionesList.slice(start, start + this.pageSize);
   }
+  // Bloque getter para calcular el número total de páginas de suscripciones
+
   get totalPagesSuscripciones(): number {
     return Math.ceil(this.suscripcionesList.length / this.pageSize) || 1;
   }
+  // Bloque getter para obtener el segmento paginado de clientes potenciales
+
 
   get paginatedLeads(): any[] {
     const start = (this.pageLeads - 1) * this.pageSize;
     return this.leads.slice(start, start + this.pageSize);
   }
+  // Bloque getter para calcular el número total de páginas de clientes potenciales
+
   get totalPagesLeads(): number {
     return Math.ceil(this.leads.length / this.pageSize) || 1;
   }
+  // Bloque getter para extraer los tipos de soporte únicos disponibles
+  get tiposSoporteDisponibles(): string[] {
+    const tipos = new Set<string>();
+    for (const t of this.ticketsSoporte) {
+      if (t.tipo) tipos.add(t.tipo);
+    }
+    return Array.from(tipos);
+  }
 
+  // Bloque getter para filtrar la lista de tickets de soporte
+  get ticketsSoporteFiltrados(): any[] {
+    return this.ticketsSoporte.filter((ticket: any) => {
+      // Filtro por empresa (nombre, razón social o NIT)
+      if (this.filtroEmpresaTicket.trim()) {
+        const query = this.filtroEmpresaTicket.toLowerCase().trim();
+        const razon = (ticket.empresa?.razon_social || '').toLowerCase();
+        const nit = (ticket.empresa?.nit || '').toLowerCase();
+        if (!razon.includes(query) && !nit.includes(query)) {
+          return false;
+        }
+      }
+
+      // Filtro por tipo de soporte
+      if (this.filtroTipoTicket) {
+        const tipoTicket = (ticket.tipo || '').toLowerCase();
+        if (tipoTicket !== this.filtroTipoTicket.toLowerCase()) {
+          return false;
+        }
+      }
+
+      // Filtro por estado
+      if (this.filtroEstadoTicket) {
+        if ((ticket.estado || '').toLowerCase() !== this.filtroEstadoTicket.toLowerCase()) {
+          return false;
+        }
+      }
+
+      // Filtro por fecha (YYYY-MM-DD)
+      if (this.filtroFechaTicket) {
+        const fechaTicket = (ticket.created_at || '').substring(0, 10);
+        if (fechaTicket !== this.filtroFechaTicket) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }
+
+  // Bloque getter para obtener el segmento paginado de tickets de soporte
   get paginatedTickets(): any[] {
     const start = (this.pageTickets - 1) * this.pageSize;
-    return this.ticketsSoporte.slice(start, start + this.pageSize);
+    return this.ticketsSoporteFiltrados.slice(start, start + this.pageSize);
   }
+
+  // Bloque getter para calcular el número total de páginas de tickets de soporte
   get totalPagesTickets(): number {
-    return Math.ceil(this.ticketsSoporte.length / this.pageSize) || 1;
+    return Math.ceil(this.ticketsSoporteFiltrados.length / this.pageSize) || 1;
   }
+  // Bloque getter para obtener el segmento paginado de solicitudes administrativas
+
 
   get paginatedSolicitudes(): any[] {
     const start = (this.pageSolicitudes - 1) * this.pageSize;
     return this.solicitudesFiltradas.slice(start, start + this.pageSize);
   }
+  // Bloque getter para calcular el número total de páginas de solicitudes administrativas
+
   get totalPagesSolicitudes(): number {
     return Math.ceil(this.solicitudesFiltradas.length / this.pageSize) || 1;
   }
+  // Bloque getter para filtrar solicitudes administrativas por empresa y fecha
+
 
   get solicitudesFiltradas() {
     return this.solicitudes.filter(s => {
@@ -239,6 +314,8 @@ export class SaasAdminComponent implements OnInit {
       return matchEmpresa && matchFecha;
     });
   }
+  // Bloque para obtener los encabezados de autorización HTTP para peticiones al backend
+
 
   getHeaders() {
     return { 
@@ -250,6 +327,8 @@ export class SaasAdminComponent implements OnInit {
 
 
   // --- MÉTODOS DEL CARRITO DE SUSCRIPCIÓN ---
+  // Bloque para consultar el catálogo de tarifas y paquetes disponibles desde el backend
+
   cargarCatalogoTarifas() {
     this.tarifaService.getCatalogo().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res) => {
@@ -261,6 +340,7 @@ export class SaasAdminComponent implements OnInit {
     });
   }
 
+  // Bloque para inicializar y abrir el carrito de suscripción para una empresa seleccionada
   abrirCarritoSuscripcion(suscripcion: SuscripcionEmpresa) {
     this.suscripcionEnEdicion = suscripcion;
     this.selectedTipoEmpresa = suscripcion.tipoEmpresa || 'Ventas';
@@ -271,7 +351,7 @@ export class SaasAdminComponent implements OnInit {
     this.iaByokKeyExists = suscripcion.iaByokKeyExists || false;
     this.activeTabCarrito = 'plan_base';
     
-    // Inicializar selección del catálogo
+    // Bloque para inicializar la selección del catálogo
     this.cartItemsSelect = {};
     for (let item of this.catalogoTarifas) {
       const activeItem = (suscripcion.cartItems || []).find((c: any) => c.id === item.id);
@@ -281,8 +361,8 @@ export class SaasAdminComponent implements OnInit {
       };
     }
 
-    // Auto-seleccionar el plan que la empresa contrató (Tipo de Plan) si aún no tiene plan en el carrito.
-    // Así el precio se carga según el plan elegido en el formulario de Empresa.
+    // Bloque de auto-selección del plan contratado en el carrito de compras
+    
     const hayPlanActivo = this.catalogoTarifas.some(
       (i: any) => i.tipo === 'plan' && this.cartItemsSelect[i.id]?.active
     );
@@ -298,14 +378,16 @@ export class SaasAdminComponent implements OnInit {
     
     this.editandoSuscripcion = true;
   }
+  // Bloque para cerrar la vista del configurador de suscripción y volver al listado
+
 
   cerrarCarritoSuscripcion() {
     this.suscripcionEnEdicion = null;
     this.editandoSuscripcion = false;
   }
 
-  // Desde la tabla de Empresas: navega a Suscripciones y abre el carrito con el plan
-  // que la empresa contrató, cargando el precio correspondiente.
+  
+  
     auditarEmpresa(empresa: any) {
     if (confirm("Desea ingresar al dashboard como Auditor de la empresa " + empresa.razon_social + "?")) {
       this.http.post<any>("/api/empresas/" + empresa.id + "/impersonate-auditor", {}, { headers: this.getHeaders() })
@@ -334,6 +416,8 @@ export class SaasAdminComponent implements OnInit {
         });
     }
   }
+  // Bloque para navegar desde la tabla de empresas y abrir el carrito con el plan contratado
+
 
   abrirSuscripcionDeEmpresa(empresa: any) {
     const sus = this.suscripcionesList.find((s: any) => s.empresaId === empresa.id);
@@ -345,6 +429,8 @@ export class SaasAdminComponent implements OnInit {
     localStorage.setItem('saas_current_view', 'suscripciones');
     this.abrirCarritoSuscripcion(sus);
   }
+  // Bloque getter para calcular el subtotal monetario de los ítems en el carrito de compras
+
 
   get subtotalSuscripcion(): number {
     let sub = 0;
@@ -362,7 +448,8 @@ export class SaasAdminComponent implements OnInit {
     return sub;
   }
 
-  // Porcentaje de descuento definido en el módulo Empresas (Referido 10%, Mes gratis...)
+  // Bloque getter para calcular el porcentaje total de descuentos aplicados a la empresa
+
   get descuentoEmpresaPct(): number {
     if (!this.suscripcionEnEdicion?.descuentos || this.suscripcionEnEdicion.descuentos === 'Ninguno') return 0;
     let pct = 0;
@@ -373,33 +460,39 @@ export class SaasAdminComponent implements OnInit {
     }
     return pct;
   }
+  // Bloque getter para calcular el valor monetario del descuento sobre la suscripción
+
 
   get descuentoSuscripcion(): number {
     return this.subtotalSuscripcion * (this.descuentoEmpresaPct / 100);
   }
+  // Bloque getter para calcular el gran total mensual recurrente a pagar
+
 
   get totalSuscripcion(): number {
     return Math.max(0, this.subtotalSuscripcion - this.descuentoSuscripcion);
   }
 
   guardandoSuscripcion = false;
+  // Bloque para guardar y sincronizar la suscripción y módulos de la empresa en el backend
+
 
   guardarCarritoSuscripcion() {
     if (!this.suscripcionEnEdicion) return;
 
-    // Regla de Negocio: Validar que si tiene módulos especiales, el tipo de negocio base esté seleccionado
+    // Bloque de validación de negocio para módulos especiales y paquete base
     const hasBasePackage = ['Ventas', 'Servicios', 'Ventas y Servicios'].includes(this.selectedTipoEmpresa);
     
     const itemsPayload = [];
     for (let item of this.catalogoTarifas) {
       const cartItem = this.cartItemsSelect[item.id];
       
-      // Auto-seleccionar addon de BYOK si está activo
+      // Bloque para auto-seleccionar el addon de BYOK si está activo
       if (item.id === 'addon_byok_ia') {
         cartItem.active = this.iaByokActivo;
       }
       
-      // Apagar cobros de IA Simple/Avanzado si usa BYOK
+      // Bloque para desactivar cobro de IA SaaS si el cliente usa su propia API
       if (this.iaByokActivo && (item.id === 'ia_simple' || item.id === 'ia_avanzada')) {
         cartItem.active = false;
       }
@@ -492,12 +585,18 @@ export class SaasAdminComponent implements OnInit {
   archivoMigracionCorregido: File | null = null;
   importandoMigracion = false;
 
-  // Soporte tickets variables
+  // --- VARIABLES DE TICKETS DE SOPORTE Y FILTROS ---
   isModalTicketOpen = false;
   ticketSeleccionado: any = null;
   respuestaTicket: string = '';
   isRespondiendoTicket = false;
+  filtroEmpresaTicket: string = '';
+  filtroFechaTicket: string = '';
+  filtroTipoTicket: string = '';
+  filtroEstadoTicket: string = '';
+  estadoNuevoTicket: string = 'Resuelto';
 
+  // --- INYECCIÓN DE DEPENDENCIAS Y SERVICIOS ---
   public accessibilityService = inject(AccessibilityService);
   public toastService = inject(ToastService);
   private empresaService = inject(EmpresaService);
@@ -514,16 +613,20 @@ export class SaasAdminComponent implements OnInit {
   ) {}
 
   @HostListener('window:pageshow')
+  // Bloque de verificación de autenticación al mostrarse la página en el navegador
+
   onPageShow(): void {
     if (!this.authService.getToken()) {
       this.router.navigate(['/login'], { replaceUrl: true });
     }
   }
+  // Bloque del ciclo de vida ngOnInit para inicializar datos de usuario, vistas y suscripciones
+
 
   ngOnInit(): void {
     this.user = this.authService.getUser();
     
-    // Inicializar datos del perfil
+    // Bloque para inicializar los datos del perfil de usuario
     if (this.user) {
       this.userName = this.user.nombres || 'Usuario';
       this.userEmail = this.user.email || '';
@@ -571,7 +674,7 @@ export class SaasAdminComponent implements OnInit {
       this.cargarDatosPorVista(this.currentView);
     });
 
-    // Heartbeat de sesión activa: detecta si la sesión fue cerrada remotamente desde otro dispositivo
+    // Bloque de verificación heartbeat para detectar cierre de sesión remoto
     if (typeof window !== 'undefined') {
       const sessionInterval = setInterval(() => {
         if (this.authService.getToken()) {
@@ -608,25 +711,30 @@ export class SaasAdminComponent implements OnInit {
     }
   }
 
-  // Muestra el modal para gestionar las notas del cliente interesado
+  // Bloque para abrir el modal de notas y seguimiento del cliente potencial
+
   abrirModalNotas(lead: any) {
     this.leadSeleccionadoParaNotas = lead;
     if (!this.leadSeleccionadoParaNotas.notas) {
       this.leadSeleccionadoParaNotas.notas = [];
     }
-    // Filtrar notas caducadas (más de 90 días)
+    // Bloque para filtrar notas con más de 90 días de antigüedad
     const tresMesesAtras = new Date();
     tresMesesAtras.setDate(tresMesesAtras.getDate() - 90);
     this.leadSeleccionadoParaNotas.notas = this.leadSeleccionadoParaNotas.notas.filter((n: any) => new Date(n.fecha) > tresMesesAtras);
     
     this.showNotasModal = true;
   }
+  // Bloque para cerrar el modal de notas del cliente potencial
+
 
   cerrarModalNotas() {
     this.showNotasModal = false;
     this.leadSeleccionadoParaNotas = null;
     this.nuevaNotaTexto = '';
   }
+  // Bloque para añadir una nueva nota al historial del cliente potencial
+
 
   agregarNota() {
     if (!this.nuevaNotaTexto.trim()) return;
@@ -642,11 +750,13 @@ export class SaasAdminComponent implements OnInit {
     this.guardarNotasEnBackend();
   }
 
+  // Bloque para eliminar una nota del historial del cliente potencial
   eliminarNota(notaId: string) {
     this.leadSeleccionadoParaNotas.notas = this.leadSeleccionadoParaNotas.notas.filter((n: any) => n.id !== notaId);
     this.guardarNotasEnBackend();
   }
 
+  // Bloque para sincronizar las notas del cliente potencial con la base de datos
   guardarNotasEnBackend() {
     const token = sessionStorage.getItem('auth_token');
     const headers = { Authorization: `Bearer ${token}` };
@@ -657,10 +767,14 @@ export class SaasAdminComponent implements OnInit {
         error: () => this.toastService.error('Error al guardar la nota.')
       });
   }
+  // Bloque para alternar el estado colapsado o expandido de la barra lateral
+
 
   toggleSidebar() {
     this.isSidebarCollapsed = !this.isSidebarCollapsed;
   }
+  // Bloque para cambiar la vista activa del panel de administración SaaS
+
 
   cambiarVista(vista: string) {
     if (typeof window !== 'undefined' && window.innerWidth <= 768) {
@@ -670,6 +784,8 @@ export class SaasAdminComponent implements OnInit {
   }
 
   // --- MÉTODOS PARA CONTRATOS SAAS ---
+  // Bloque para consultar el historial de versiones del contrato SaaS
+
   cargarContratos() {
     this.http.get('/api/saas/contratos', { headers: this.getHeaders() }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res: any) => {
@@ -678,6 +794,8 @@ export class SaasAdminComponent implements OnInit {
       error: (err) => console.error('Error cargando contratos', err)
     });
   }
+  // Bloque para registrar y publicar una nueva versión del contrato SaaS
+
 
   guardarNuevoContrato() {
     if (!this.nuevoContrato.contenido || !this.nuevoContrato.version) {
@@ -703,11 +821,13 @@ export class SaasAdminComponent implements OnInit {
   }
 
   // --- MÉTODOS PARA CONTROL DE IA ---
+  // Bloque para gestionar el cambio de empresa seleccionada en el panel de IA
   onEmpresaIAChange(id: any) {
     this.iaConfigSeleccionada.empresaId = id ? +id : null;
     this.cargarConfiguracionIA();
   }
 
+  // Bloque para cargar la configuración de inteligencia artificial de la empresa seleccionada
   cargarConfiguracionIA() {
     if (!this.iaConfigSeleccionada.empresaId) {
       this.iaConfigSeleccionada.fuente     = 'gestivapyme';
@@ -745,6 +865,8 @@ export class SaasAdminComponent implements OnInit {
       }
     });
   }
+  // Bloque para guardar y aplicar la configuración de inteligencia artificial en la base de datos
+
 
   guardarConfiguracionIA() {
     if (!this.iaConfigSeleccionada.empresaId) {
@@ -790,9 +912,12 @@ export class SaasAdminComponent implements OnInit {
     });
   }
 
+  // Bloque para alternar entre las subpestañas del módulo comercial de leads
   setComercialTab(tab: 'interesados' | 'correos') {
     this.comercialTab = tab;
   }
+  // Bloque para consultar el listado de prospectos y leads comerciales registrados
+
 
 
   cargarLeads() {
@@ -820,6 +945,8 @@ export class SaasAdminComponent implements OnInit {
       },
     });
   }
+  // Bloque para capturar el archivo adjunto para campañas masivas de correo
+
 
   onFileSelected(event: any) {
     const file = event.target.files[0];
@@ -829,6 +956,8 @@ export class SaasAdminComponent implements OnInit {
   }
 
   // --- MÉTODOS DE PERFIL Y SEGURIDAD ---
+  // Bloque para actualizar los datos personales y correo del administrador del SaaS
+
   actualizarPerfil() {
     this.isUpdatingProfile = true;
     this.http.put('/api/profile', this.profileForm, { headers: this.getHeaders() }).subscribe({
@@ -837,7 +966,7 @@ export class SaasAdminComponent implements OnInit {
           this.userEmail = res.user.email;
           this.userInitials = this.userName.substring(0, 2).toUpperCase();
           
-          // Actualizar sessionStorage
+          // Bloque para actualizar datos en sessionStorage
           const currentUser = this.authService.getUser();
           if (currentUser) {
             currentUser.nombres = this.userName;
@@ -855,6 +984,8 @@ export class SaasAdminComponent implements OnInit {
         }
       });
   }
+  // Bloque para ejecutar el cambio obligatorio de contraseña del administrador
+
 
   forzarCambioClave() {
     this.confirmModalTitle = 'Forzar Cambio de Clave';
@@ -876,11 +1007,12 @@ export class SaasAdminComponent implements OnInit {
     this.confirmModalVisible = true;
   }
 
-  // Sube y actualiza el avatar del usuario
+  // Bloque para procesar, comprimir y subir la nueva imagen de avatar del usuario
+
   subirAvatar(event: any) {
     const file = event.target.files[0];
     if (file) {
-      // Comprimir la imagen antes de subirla
+      // Bloque de compresión de imagen antes de la subida
       const reader = new FileReader();
       reader.onload = (e: any) => {
         const img = new Image();
@@ -890,7 +1022,7 @@ export class SaasAdminComponent implements OnInit {
           let width = img.width;
           let height = img.height;
           
-          // Calcular nuevas dimensiones manteniendo el ratio (máximo 500px)
+          // Bloque de cálculo de dimensiones preservando proporción
           const MAX_SIZE = 500;
           if (width > height) {
             if (width > MAX_SIZE) {
@@ -909,7 +1041,7 @@ export class SaasAdminComponent implements OnInit {
           const ctx = canvas.getContext('2d');
           if (ctx) {
             ctx.drawImage(img, 0, 0, width, height);
-            // Convertir de vuelta a archivo (calidad 0.8)
+            // Bloque de conversión de canvas a archivo de imagen
             canvas.toBlob((blob) => {
               if (blob) {
                 const compressedFile = new File([blob], file.name, {
@@ -926,7 +1058,7 @@ export class SaasAdminComponent implements OnInit {
                   next: (res: any) => {
                     this.userAvatar = res.avatar_url;
                     
-                    // Actualizar sessionStorage
+                    // Bloque para actualizar datos en sessionStorage
                     const currentUser = this.authService.getUser();
                     if (currentUser) {
                       currentUser.avatar_url = this.userAvatar;
@@ -953,7 +1085,9 @@ export class SaasAdminComponent implements OnInit {
     }
   }
 
-  // --- MÉTODOS DE MODALES (Suscripciones / Tarifas) ---
+  // --- MÉTODOS DE COMUNICACIÓN Y CORREO MASIVO ---
+  // Bloque para enviar campañas masivas de marketing por correo mediante la API de Brevo
+
 
   enviarCampanaBrevo() {
     if (!this.asuntoBrevo.trim() || !this.mensajeBrevo.trim()) {
@@ -995,6 +1129,7 @@ export class SaasAdminComponent implements OnInit {
     });
   }
 
+  // Bloque para actualizar el estado del ciclo de vida del prospecto comercial
   cambiarEstadoLead(id: number, nuevoEstado: string) {
     const token = sessionStorage.getItem('auth_token');
     const headers = { Authorization: `Bearer ${token}` };
@@ -1008,6 +1143,7 @@ export class SaasAdminComponent implements OnInit {
       });
   }
 
+  // Bloque para eliminar un prospecto comercial del sistema tras confirmación
   eliminarLead(id: number) {
     this.abrirConfirmacion('Confirmar Acción', '¿Estás seguro de que deseas eliminar este lead? Esta acción no se puede deshacer.', () => {
       const token = sessionStorage.getItem('auth_token');
@@ -1020,6 +1156,8 @@ export class SaasAdminComponent implements OnInit {
       });
     });
   }
+  // Bloque para consultar el listado de solicitudes de cambios administrativos
+
 
   cargarSolicitudes() {
     const token = sessionStorage.getItem('auth_token');
@@ -1033,6 +1171,8 @@ export class SaasAdminComponent implements OnInit {
       error: (err) => console.error('Error al cargar solicitudes', err),
     });
   }
+  // Bloque para consultar los tickets de soporte técnico reportados por empresas
+
 
   cargarTicketsSoporte() {
     const token = sessionStorage.getItem('auth_token');
@@ -1046,19 +1186,36 @@ export class SaasAdminComponent implements OnInit {
       error: (err) => console.error('Error al cargar tickets de soporte', err)
     });
   }
+  // Bloque para resetear la paginación al cambiar filtros de tickets
+  onFiltroTicketChange() {
+    this.pageTickets = 1;
+  }
 
+  // Bloque para limpiar todos los filtros del módulo de soporte
+  limpiarFiltrosTicket() {
+    this.filtroEmpresaTicket = '';
+    this.filtroFechaTicket = '';
+    this.filtroTipoTicket = '';
+    this.filtroEstadoTicket = '';
+    this.pageTickets = 1;
+  }
+
+  // Bloque para abrir el detalle y formulario de respuesta de un ticket de soporte
   abrirTicket(ticket: any) {
     this.ticketSeleccionado = ticket;
     this.isModalTicketOpen = true;
-    this.respuestaTicket = '';
+    this.respuestaTicket = ticket.notas_resolucion || '';
+    this.estadoNuevoTicket = (ticket.estado === 'Cerrado' || ticket.estado === 'Resuelto') ? ticket.estado : 'Resuelto';
   }
 
+  // Bloque para cerrar la vista de atención del ticket de soporte
   cerrarModalTicket() {
     this.isModalTicketOpen = false;
     this.ticketSeleccionado = null;
     this.respuestaTicket = '';
   }
 
+  // Bloque para enviar la respuesta técnica y actualizar el estado del ticket
   responderTicket() {
     if (!this.respuestaTicket.trim() || !this.ticketSeleccionado) {
       this.toastService.warning('La respuesta no puede estar vacía.');
@@ -1070,11 +1227,15 @@ export class SaasAdminComponent implements OnInit {
     const headers = { Authorization: `Bearer ${token}` };
     
     this.http.put(`/api/saas/soporte/${this.ticketSeleccionado.id}`, 
-      { notas_resolucion: this.respuestaTicket, estado: 'Resuelto' }, 
+      { 
+        notas_resolucion: this.respuestaTicket, 
+        estado: this.estadoNuevoTicket || 'Resuelto',
+        tecnico_id: this.user?.id || 1
+      }, 
       { headers }
     ).subscribe({
       next: () => {
-        this.toastService.success('Ticket respondido correctamente.');
+        this.toastService.success('Ticket actualizado y guardado correctamente.');
         this.isRespondiendoTicket = false;
         this.cerrarModalTicket();
         this.cargarTicketsSoporte();
@@ -1088,10 +1249,11 @@ export class SaasAdminComponent implements OnInit {
   }
 
 
+  // Bloque para abrir el visor detallado de una solicitud administrativa
   abrirSolicitud(req: any) {
     this.solicitudSeleccionada = req;
     
-    // Parsear datos nuevos si vienen en formato JSON string
+    // Bloque de parseo de datos en formato JSON
     if (this.solicitudSeleccionada.datos_nuevos && typeof this.solicitudSeleccionada.datos_nuevos === 'string') {
       try {
         this.solicitudSeleccionada.datosPropuestos = JSON.parse(this.solicitudSeleccionada.datos_nuevos);
@@ -1104,7 +1266,7 @@ export class SaasAdminComponent implements OnInit {
 
     this.mensajeRespuesta = '';
     
-    // Inicializar todos los campos propuestos como "aprobados" por defecto (excepto temp_doc)
+    // Bloque de inicialización de campos aprobados por defecto
     this.camposAprobados = {};
     if (this.solicitudSeleccionada.datosPropuestos) {
       Object.keys(this.solicitudSeleccionada.datosPropuestos).forEach(key => {
@@ -1117,6 +1279,7 @@ export class SaasAdminComponent implements OnInit {
     this.isModalSolicitudOpen = true;
   }
 
+  // Bloque para construir la URL de descarga de archivos adjuntos de solicitudes
   getArchivoUrl(path: string, forceDownload: boolean = false): string {
     if (!path) return '';
     if (path.startsWith('http')) {
@@ -1127,6 +1290,8 @@ export class SaasAdminComponent implements OnInit {
     }
     return `http://localhost:8000/storage/${path}`;
   }
+  // Bloque para cerrar el visor de la solicitud administrativa
+
 
   cerrarModalSolicitud() {
     this.isModalSolicitudOpen = false;
@@ -1134,6 +1299,7 @@ export class SaasAdminComponent implements OnInit {
     this.archivoMigracionCorregido = null;
   }
 
+  // Bloque para descargar la plantilla o archivo de migración de datos adjunto
   descargarArchivoMigracion() {
     if (!this.solicitudSeleccionada) return;
     const token = sessionStorage.getItem('auth_token');
@@ -1154,12 +1320,14 @@ export class SaasAdminComponent implements OnInit {
     });
   }
 
+  // Bloque para capturar el archivo de corrección para la migración de datos
   onArchivoMigracionSeleccionado(event: Event) {
     const input = event.target as HTMLInputElement;
     this.archivoMigracionCorregido = input.files?.[0] ?? null;
   }
 
-  // Para aprobar e importar el archivo original que ya subió la empresa, sin re-subirlo
+  // Bloque para aprobar e importar directamente los datos del archivo provisto por la empresa
+
   aprobarEImportar() {
     if (!this.solicitudSeleccionada) return;
     this.importandoMigracion = true;
@@ -1185,6 +1353,8 @@ export class SaasAdminComponent implements OnInit {
       }
     });
   }
+  // Bloque para ejecutar la importación de datos masivos desde un archivo Excel corregido
+
 
   importarMigracion() {
     if (!this.solicitudSeleccionada) return;
@@ -1224,6 +1394,7 @@ export class SaasAdminComponent implements OnInit {
     });
   }
 
+  // Bloque para procesar, aprobar o rechazar una solicitud de cambio administrativo
   procesarSolicitud(accion: string) {
     if (accion === 'rechazado' && !this.mensajeRespuesta) {
       this.toastService.warning('Debes ingresar un motivo en caso de rechazo.');
@@ -1237,7 +1408,7 @@ export class SaasAdminComponent implements OnInit {
     const token = sessionStorage.getItem('auth_token');
     const headers = { Authorization: `Bearer ${token}` };
     
-    // Solo enviar los campos que fueron checkeados si se está aprobando
+    // Bloque de filtrado de campos aprobados para el envío
     const approvedFields = accion === 'aprobado' 
       ? Object.keys(this.camposAprobados).filter(k => this.camposAprobados[k]) 
       : [];
@@ -1274,6 +1445,8 @@ export class SaasAdminComponent implements OnInit {
         error: () => this.toastService.error('Error al procesar solicitud.'),
       });
   }
+  // Bloque para marcar una solicitud como resuelta rápidamente desde la bandeja
+
 
   marcarComoResueltaRapido(solicitud: any) {
     const token = sessionStorage.getItem('auth_token');
@@ -1296,6 +1469,8 @@ export class SaasAdminComponent implements OnInit {
         error: () => this.toastService.error('Error al procesar solicitud.'),
       });
   }
+  // Bloque para consultar la lista de todas las empresas clientes registradas
+
 
   cargarEmpresas() {
     this.isLoadingEmpresas = true;
@@ -1313,6 +1488,7 @@ export class SaasAdminComponent implements OnInit {
     });
   }
 
+  // Bloque para registrar la renovación de suscripción mensual de una empresa
   renovarSuscripcion(id: number) {
     if (confirm('¿Estás seguro de registrar una nueva renovación? Se sumará 1 al contador y se adelantará el próximo pago 30 días.')) {
       this.empresaService.renovarSuscripcion(id).subscribe({
@@ -1324,6 +1500,7 @@ export class SaasAdminComponent implements OnInit {
     }
   }
 
+  // Bloque para registrar la no renovación de suscripción y desactivar servicios
   noRenovarSuscripcion(id: number) {
     if (confirm('¿Estás seguro de NO renovar esta suscripción? El cliente pasará a Inactivo.')) {
       this.empresaService.noRenovarSuscripcion(id).subscribe({
@@ -1344,6 +1521,8 @@ export class SaasAdminComponent implements OnInit {
     this.confirmActionCallback = accion;
     this.confirmModalVisible = true;
   }
+  // Bloque para ejecutar la acción pendiente confirmada por el usuario en el modal
+
 
   ejecutarConfirmacion() {
     if (this.confirmActionCallback) {
@@ -1351,6 +1530,8 @@ export class SaasAdminComponent implements OnInit {
     }
     this.cerrarConfirmacion();
   }
+  // Bloque para cancelar y cerrar el modal de confirmación global
+
 
   cerrarConfirmacion() {
     this.confirmModalVisible = false;
@@ -1358,14 +1539,20 @@ export class SaasAdminComponent implements OnInit {
   }
 
   modalTarifasGlobalesVisible = false;
+  // Bloque para abrir el catálogo maestro de tarifas globales para su edición
+
 
   abrirModalTarifasGlobales() {
     this.modalTarifasGlobalesVisible = true;
   }
+  // Bloque para cerrar la vista del catálogo de tarifas globales
+
 
   cerrarModalTarifasGlobales() {
     this.modalTarifasGlobalesVisible = false;
   }
+  // Bloque para persistir las actualizaciones de precios y planes en el catálogo global
+
 
   guardarTarifasCatalogo() {
     const items = this.catalogoTarifas.map((t: any) => ({ id: t.id, valor: Number(t.valor) }));
@@ -1379,6 +1566,8 @@ export class SaasAdminComponent implements OnInit {
       error: (err) => console.error('Error guardando catálogo de tarifas', err)
     });
   }
+  // Bloque getter para agrupar las tarifas del catálogo según su categoría comercial
+
 
   get gruposTarifas() {
     const orden: { titulo: string; tipo: string }[] = [
@@ -1392,6 +1581,8 @@ export class SaasAdminComponent implements OnInit {
       .map(g => ({ titulo: g.titulo, items: this.catalogoTarifas.filter((t: any) => t.tipo === g.tipo) }))
       .filter(g => g.items.length > 0);
   }
+  // Bloque para consultar las estadísticas generales y listado de suscripciones SaaS
+
 
   cargarSuscripciones() {
     this.empresaService.getSuscripcionesStats().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
@@ -1403,6 +1594,8 @@ export class SaasAdminComponent implements OnInit {
       error: (err) => console.error('Error al cargar suscripciones:', err),
     });
   }
+  // Bloque para consultar métricas operativas y tiempo de actividad del sistema
+
 
   cargarSystemStats() {
     this.empresaService.getSystemStats().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
@@ -1413,6 +1606,8 @@ export class SaasAdminComponent implements OnInit {
       error: (err) => console.error('Error al cargar system stats:', err),
     });
   }
+  // Bloque para obtener la fecha actual en formato legible ISO para el sistema
+
 
   getFechaActualSistema(): string {
     const d = new Date();
@@ -1421,6 +1616,8 @@ export class SaasAdminComponent implements OnInit {
     const day = String(d.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
+  // Bloque para inicializar el formulario de creación de una nueva empresa cliente
+
 
   abrirModalCrearEmpresa() {
     this.isEditMode = false;
@@ -1439,45 +1636,47 @@ export class SaasAdminComponent implements OnInit {
     };
     this.showModal = true;
   }
+  // Bloque para generar sugerencias automáticas de subdominio según la razón social
+
 
   generarDominio() {
     if (!this.nuevaEmpresa.razon_social) return;
 
     if (this.opcionesDominio.length === 0 || this.nuevaEmpresa.razon_social !== this.lastRazonSocialGenerada) {
-      // Limpiar y preparar texto base
+      // Bloque de normalización y limpieza de texto base
       let cleanText = this.nuevaEmpresa.razon_social.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9\s]/g, '').trim();
       let tokens = cleanText.split(/\s+/);
       
-      // Remover sufijos corporativos comunes
+      // Bloque de remoción de sufijos corporativos
       const suffixes = ['sa', 'sas', 'ltda', 'cia', 'inc', 'llc', 'srl', 'solutions', 'group'];
       const tokensNoSuffix = tokens.filter((t: string) => !suffixes.includes(t));
       
       let opciones = new Set<string>();
       
-      // 1. Completo sin sufijos (techventasolutions -> techventa si aplicara, sino todo)
+      // Bloque de construcción de variantes de subdominio
       if (tokensNoSuffix.length > 0) opciones.add(tokensNoSuffix.join(''));
       
-      // 2. Solo primera palabra
+      
       opciones.add(tokens[0]);
       
-      // 3. Dos primeras palabras
+      
       if (tokens.length > 1) opciones.add(tokens[0] + tokens[1]);
       if (tokensNoSuffix.length > 1) opciones.add(tokensNoSuffix[0] + tokensNoSuffix[1]);
       
-      // 4. Siglas (tssa)
+      
       if (tokens.length > 1) opciones.add(tokens.map((t: string) => t.charAt(0)).join(''));
       
-      // 5. Original todo junto (techventasolutionssa)
+      
       opciones.add(tokens.join(''));
 
-      // 6. Con sufijo numerico corto
+      
       if (tokensNoSuffix.length > 0) opciones.add(tokensNoSuffix.join('') + Math.floor(Math.random() * 100));
 
       this.opcionesDominio = Array.from(opciones).filter(o => o.length >= 3);
       this.dominioIndex = 0;
       this.lastRazonSocialGenerada = this.nuevaEmpresa.razon_social;
     } else {
-      // Ciclar al siguiente
+      // Bloque para ciclar a la siguiente sugerencia
       this.dominioIndex = (this.dominioIndex + 1) % this.opcionesDominio.length;
     }
 
@@ -1485,6 +1684,8 @@ export class SaasAdminComponent implements OnInit {
       this.nuevaEmpresa.dominio = this.opcionesDominio[this.dominioIndex];
     }
   }
+  // Bloque para abrir el modal o vista de gestión de empresa
+
 
   abrirModal() {
     this.isEditMode = false;
@@ -1510,6 +1711,8 @@ export class SaasAdminComponent implements OnInit {
     };
     this.showModal = true;
   }
+  // Bloque para precargar los datos de una empresa existente para su edición
+
 
   editarEmpresa(empresa: any) {
     this.isEditMode = true;
@@ -1542,24 +1745,32 @@ export class SaasAdminComponent implements OnInit {
     this.showModal = true;
   }
 
+  // Bloque para añadir un concepto de descuento en el formulario de empresa
   agregarDescuentoEmpresaForm() {
     this.listaDescuentosEmpresa.push('N/A');
   }
+  // Bloque para remover un descuento asignado a la empresa en el formulario
+
 
   eliminarDescuentoEmpresaForm(index: number) {
     this.listaDescuentosEmpresa.splice(index, 1);
   }
 
+  // Bloque para abrir el modal de adición de un nuevo conector o add-on personalizado
   agregarConector() {
     this.nombreNuevoAddon = '';
     this.showAddonModal = true;
   }
+  // Bloque para cerrar el modal de gestión de conectores o add-ons
+
 
   cerrarAddonModal() {
     this.showAddonModal = false;
     this.nombreNuevoAddon = '';
     this.editingAddonId = null;
   }
+  // Bloque para cargar un conector existente en el formulario para editar su nombre
+
 
   abrirEditAddon(addon: any) {
     this.editingAddonId = addon.id;
@@ -1567,6 +1778,7 @@ export class SaasAdminComponent implements OnInit {
     this.showAddonModal = true;
   }
 
+  // Bloque para eliminar un conector o add-on personalizado del catálogo
   eliminarAddon(id: string) {
     if (confirm('¿Estás seguro de que deseas eliminar este conector permanentemente del sistema?')) {
       this.modulosService.eliminarModuloGlobal(id).subscribe({
@@ -1585,6 +1797,8 @@ export class SaasAdminComponent implements OnInit {
       });
     }
   }
+  // Bloque para registrar o actualizar un conector o add-on personalizado
+
 
   guardarNuevoAddon() {
     if (!this.nombreNuevoAddon.trim()) {
@@ -1634,6 +1848,7 @@ export class SaasAdminComponent implements OnInit {
     }
   }
 
+  // Bloque para alternar la activación de un submódulo individual para una empresa
   toggleModulo(paqueteId: string, moduloId: string) {
     if (!this.empresaSeleccionadaId) {
       this.toastService.warning('Por favor selecciona una empresa primero.');
@@ -1649,6 +1864,7 @@ export class SaasAdminComponent implements OnInit {
     }
   }
 
+  // Bloque para activar o desactivar todos los submódulos de un paquete comercial
   togglePaqueteCompleto(paqueteId: string, activar: boolean) {
     if (!this.empresaSeleccionadaId) {
       this.toastService.warning('Por favor selecciona una empresa primero.');
@@ -1665,14 +1881,17 @@ export class SaasAdminComponent implements OnInit {
     }
   }
 
+  // Bloque para alternar el acordeón desplegable de un paquete de módulos
   togglePaqueteExpanded(paqueteId: string) {
     this.paquetesExpandidos[paqueteId] = !this.paquetesExpandidos[paqueteId];
   }
 
+  // Bloque para asociar un add-on o conector a un paquete específico de la empresa
   anexarAddon() {
     this.toastService.info('Funcionalidad en desarrollo: Aquí se desplegará el catálogo de conectores externos (Ej. APIs, Software Contable, etc.) de los cuales GestivaPyme ofrece integración.');
   }
 
+  // Bloque para guardar la asignación de módulos y paquetes de la empresa en base de datos
   guardarPaquete(paqueteId: string) {
     if (!this.empresaSeleccionadaId) {
       this.toastService.warning('Por favor selecciona una empresa primero.');
@@ -1692,7 +1911,7 @@ export class SaasAdminComponent implements OnInit {
           console.log(`Paquete ${paquete.nombre} actualizado masivamente`, res);
           this.guardandoPaqueteId = null;
           this.toastService.success(`¡Los cambios al paquete ${paquete.nombre} se han guardado correctamente!`);
-          // Refresca desde el servidor para que el panel siempre muestre el estado real
+          // Bloque de recarga desde el servidor para sincronizar estado real
           this.cargarModulosDeEmpresa(empresaId);
         },
         error: (err) => {
@@ -1704,6 +1923,7 @@ export class SaasAdminComponent implements OnInit {
     }
   }
 
+  // Bloque para cargar la configuración modular de una empresa seleccionada
   seleccionarEmpresaModulos(event: any) {
     this.empresaSeleccionadaId = event.target.value;
     console.log('Empresa seleccionada para módulos:', this.empresaSeleccionadaId);
@@ -1715,7 +1935,7 @@ export class SaasAdminComponent implements OnInit {
     }
 
     if (this.empresaSeleccionadaId) {
-      // Limpiar el estado UI antes de cargar la nueva empresa para evitar cruce de datos
+      // Bloque de limpieza del estado UI previo a cargar nueva empresa
       this.paquetesModulos.forEach(p => {
         p.activo = false;
         p.modulos.forEach((s: any) => s.activo = false);
@@ -1724,6 +1944,7 @@ export class SaasAdminComponent implements OnInit {
     }
   }
 
+  // Bloque para consultar los módulos habilitados de una empresa desde el backend
   cargarModulosDeEmpresa(empresaId: string) {
     this.modulosService.getModulosPorEmpresa(empresaId).subscribe({
       next: (res) => {
@@ -1736,6 +1957,7 @@ export class SaasAdminComponent implements OnInit {
     });
   }
 
+  // Bloque para sincronizar la estructura visual de módulos según los datos cargados
   actualizarUIModulos(modulosBD: any) {
     Object.keys(modulosBD).forEach((paqueteClave) => {
       const paqueteUI = this.paquetesModulos.find(
@@ -1766,6 +1988,8 @@ export class SaasAdminComponent implements OnInit {
     });
     this.cdr.detectChanges();
   }
+  // Bloque para cerrar la vista o modal de creación y edición de empresa
+
 
   cerrarModal() {
     this.showModal = false;
@@ -1774,15 +1998,19 @@ export class SaasAdminComponent implements OnInit {
     this.listaDescuentosEmpresa = [];
     this.nuevaEmpresa = { razon_social: '', dominio: '', nit: '', email: '', plan_suscripcion: 'Emprendedor', fecha_inscripcion: this.getFechaActualSistema(), periodo: 'Mensual', descuento: 'N/A', nombre_gerente: '', apellido_gerente: '', documento_gerente: '' };
   }
+  // Bloque para cerrar el modal de éxito con las credenciales generadas
+
 
 
   cerrarSuccessModal() {
     this.showSuccessModal = false;
   }
+  // Bloque para registrar una nueva empresa o guardar cambios en una existente
+
 
   guardarEmpresa() {
     this.isSubmitting = true;
-    // Preparar el campo descuento uniendo el array
+    // Bloque de preparación del campo descuento para envío
     this.nuevaEmpresa.descuento = this.listaDescuentosEmpresa.filter(d => d !== 'N/A').length > 0 
       ? this.listaDescuentosEmpresa.filter(d => d !== 'N/A').join(', ') 
       : 'N/A';
@@ -1848,7 +2076,8 @@ export class SaasAdminComponent implements OnInit {
     }
   }
 
-  // Para reenviar las credenciales de acceso al correo de la empresa
+  // Bloque para reenviar las credenciales de acceso al correo del gerente de la empresa
+
   reenviarCredenciales(empresa: any) {
     if (!confirm(`¿Reenviar credenciales de acceso a ${empresa.razon_social}? Se generará una nueva contraseña temporal.`)) return;
     
@@ -1865,6 +2094,7 @@ export class SaasAdminComponent implements OnInit {
     });
   }
 
+  // Bloque para alternar el estado operativo de una empresa cliente
   cambiarEstadoEmpresa(empresa: any, accion: string) {
     let msg = '';
     if (accion === 'mora') msg = 'inactivar parcialmente (Mora)';
@@ -1881,19 +2111,27 @@ export class SaasAdminComponent implements OnInit {
       });
     }
   }
+  // Bloque para abrir o cerrar el menú de opciones de accesibilidad visual
+
 
   toggleAccessibilityMenu() {
     this.isAccessibilityMenuOpen = !this.isAccessibilityMenuOpen;
   }
+  // Bloque para configurar el modo de daltonismo en la interfaz del sistema
+
 
   setDaltonismMode(mode: DaltonismMode) {
     this.accessibilityService.setMode(mode);
     this.isAccessibilityMenuOpen = false;
   }
+  // Bloque para cerrar la sesión activa del usuario y redirigir al login
+
 
   logout(): void {
     this.authService.logout();
   }
+  // Bloque para formatear el tipo de negocio en una etiqueta legible para el usuario
+
 
   formatTipo(tipo: string): string {
     if (!tipo) return '';

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ReunionController extends Controller
 {
-    // Para traer la lista de reuniones filtradas
+    // Bloque para obtener la lista de reuniones filtradas por audiencia y empresa
     public function index(Request $request)
     {
         $user = Auth::user();
@@ -50,7 +50,7 @@ class ReunionController extends Controller
         return response()->json($reuniones);
     }
 
-    // Para guardar una nueva reunion
+    // Bloque para registrar una nueva reunión y notificar a los participantes
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -76,7 +76,7 @@ class ReunionController extends Controller
 
         $reunion = Reunion::create($data);
 
-        // Notificar a la audiencia
+        // Bloque para notificar a los usuarios destinatarios según la audiencia
         $query = \App\Models\User::where('empresa_id', $user->empresa_id)
             ->where('id', '!=', $user->id); // Opcional: no notificar al que la crea
 
@@ -92,7 +92,7 @@ class ReunionController extends Controller
                     $q->where('area_id', $area_id);
                 });
             } else {
-                // Si el organizador no tiene área, no se envía a nadie más (o solo a él)
+                // Bloque de exclusión si el organizador carece de área asignada
                 $query->where('id', -1); // Falla intencional para no traer a nadie
             }
         }

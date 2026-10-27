@@ -6,25 +6,26 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class SoporteService {
+  // --- INYECCIÓN DE DEPENDENCIAS Y SERVICIOS ---
   private http = inject(HttpClient);
   private apiUrl = '/api/soporte';
 
-  // Obtener tickets del usuario/empresa
+  // Bloque para obtener los tickets de soporte del usuario o empresa autenticada
   getTickets(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl);
   }
 
-  // Crear un nuevo ticket
+  // Bloque para registrar un nuevo ticket de soporte en la base de datos
   createTicket(data: any): Observable<any> {
     return this.http.post<any>(this.apiUrl, data);
   }
 
-  // Obtener solicitudes administrativas (AdminRequests)
+  // Bloque para consultar las solicitudes administrativas asociadas a la empresa
   getAdminRequests(): Observable<any[]> {
     return this.http.get<any[]>('/api/admin-requests/my-requests');
   }
 
-  // Crear una solicitud administrativa (AdminRequest con archivos)
+  // Bloque para crear una nueva solicitud administrativa con archivos adjuntos
   createAdminRequest(formData: FormData): Observable<any> {
     return this.http.post<any>('/api/admin-requests', formData);
   }

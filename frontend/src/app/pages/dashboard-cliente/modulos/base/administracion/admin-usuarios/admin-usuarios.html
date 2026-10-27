@@ -1,6 +1,6 @@
 <div class="usuarios-module fade-in">
   <div class="main-view fade-in" *ngIf="!showModal && !tempPasswordGenerated">
-  <!-- Botón Volver Inyectado -->
+  <!-- HTML BOTON VOLVER -->
   <div class="volver-wrapper">
     <button class="btn-volver btn-pill" appVolver>
       <i class="fas fa-arrow-left"></i> VOLVER
@@ -18,14 +18,14 @@
     </div>
   </div>
 
-  <!-- BARRA DE BÚSQUEDA EN TIEMPO REAL -->
-  <div class="search-filter-bar mb-4" *ngIf="!isLoading && usuarios.length > 0" style="display: flex; gap: 1rem; align-items: center; max-width: 520px; margin: 0 auto 1.5rem auto;">
-    <div style="position: relative; width: 100%;">
-      <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #2d3748; font-size: 14px;"></i>
+  <!-- HTML BARRA DE BUSQUEDA EN TIEMPO REAL -->
+  <div class="search-filter-bar mb-4" *ngIf="!isLoading && usuarios.length > 0" class="search-bar-usuarios">
+    <div class="search-input-wrapper">
+      <i class="fas fa-search" class="search-icon"></i>
       <input
         type="text"
         class="input-neumorphic"
-        style="padding-left: 36px; padding-right: 36px;"
+        class="input-neumorphic search-input-pad"
         placeholder="Buscar usuario por nombre, documento, email o rol..."
         [(ngModel)]="searchTerm"
       />
@@ -33,7 +33,7 @@
         *ngIf="searchTerm"
         type="button"
         (click)="limpiarBusqueda()"
-        style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #2d3748; cursor: pointer; font-size: 14px;"
+        class="search-clear-btn"
         title="Limpiar búsqueda"
       >
         <i class="fas fa-times"></i>
@@ -44,39 +44,38 @@
   <!-- HTML TABLA USUARIOS AGRUPADA POR ROL -->
   <div class="fade-in">
 
-    <!-- Estado de carga -->
+    <!-- HTML ESTADO DE CARGA -->
     <div *ngIf="isLoading" class="text-center-py-8">
       <app-loading-spinner message="Cargando usuarios..."></app-loading-spinner>
     </div>
 
-    <!-- Error -->
+    <!-- HTML ESTADO DE ERROR -->
     <div *ngIf="errorMessage && !isLoading" class="empty-state error-msg">
       Error: {{ errorMessage }}
     </div>
 
-    <!-- Sin usuarios -->
+    <!-- HTML ESTADO SIN USUARIOS -->
     <div *ngIf="!isLoading && !errorMessage && usuarios.length === 0" class="empty-state">
       No hay usuarios registrados aún.
     </div>
 
-    <!-- Búsqueda sin resultados -->
+    <!-- HTML BUSQUEDA SIN RESULTADOS -->
     <div *ngIf="!isLoading && !errorMessage && usuarios.length > 0 && usuariosFiltrados.length === 0" class="empty-state text-center py-6">
-      <p style="font-weight: 600; color: #333; margin-bottom: 0.5rem;">No se encontraron usuarios con "{{ searchTerm }}"</p>
-      <button class="btn-pill" (click)="limpiarBusqueda()" style="background: #45a1ae; color: white; padding: 6px 16px; font-size: 14px; border: none; border-radius: 9999px; cursor: pointer;">
+      <p class="search-no-results-text">No se encontraron usuarios con "{{ searchTerm }}"</p>
+      <button class="btn-pill" (click)="limpiarBusqueda()" class="btn-pill btn-clear-search">
         Limpiar búsqueda
       </button>
     </div>
 
-    <!-- Bloques por Rol -->
+    <!-- HTML BLOQUES POR ROL -->
     @for (rol of rolesPresentes; track rol) {
       <h3 class="panel-title text-left mt-4 mb-2"
-          style="color: #6B8F71; font-size: 14px; text-transform: uppercase;
-                 border-bottom: 1px solid #d1d1bc; padding-bottom: 4px; font-weight: bold;">
+          class="panel-title text-left mt-4 mb-2 rol-heading">
         {{ rol }}
       </h3>
 
       <div class="table-container mb-4"
-           style="box-shadow: none; border: 1px solid rgba(0,0,0,0.05); background: transparent;">
+           class="table-container mb-4 table-transparent-wrap">
         <table class="data-table">
           <thead>
             <tr>
@@ -98,7 +97,7 @@
                 <td>{{ u.apellidos }}</td>
                 <td>{{ u.email }}</td>
                 <td>
-                  <span style="font-size: 14px; color: #2d3748;">
+                  <span class="area-cell-text">
                     {{ u.empleado?.area?.nombre || 'Sin Área' }}
                   </span>
                 </td>
@@ -116,7 +115,7 @@
                 </td>
                 <td class="acciones-cell">
                   <div class="acciones-iconos">
-                    <!-- Editar -->
+                    <!-- HTML ACCION EDITAR -->
                     <button
                       type="button"
                       class="btn-icon-action btn-icon-edit"
@@ -125,7 +124,7 @@
                       <i class="fas fa-pen"></i>
                     </button>
 
-                    <!-- Inactivar / Activar -->
+                    <!-- HTML ACCION INACTIVAR O ACTIVAR -->
                     <button
                       type="button"
                       class="btn-icon-action"
@@ -136,7 +135,7 @@
                       <i class="fas" [ngClass]="u.activo ? 'fa-user-slash' : 'fa-user-check'"></i>
                     </button>
 
-                    <!-- Eliminar -->
+                    <!-- HTML ACCION ELIMINAR -->
                     <button
                       type="button"
                       class="btn-icon-action btn-icon-delete"
@@ -146,7 +145,7 @@
                       <i class="fas fa-trash-alt"></i>
                     </button>
 
-                    <!-- Baja pendiente -->
+                    <!-- HTML ACCION BAJA PENDIENTE -->
                     <button class="btn-save btn-pill btn-sm btn-reject"
                       *ngIf="u.empleado?.baja_solicitada"
                       (click)="aprobarBaja(u)"
@@ -182,7 +181,7 @@
 
   <!-- HTML MODAL CREACION / EDICION USUARIO -->
   <div *ngIf="showModal && !tempPasswordGenerated" class="view-switch-panel fade-in">
-    <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+    <div class="neu-card neu-card-centered">
       <div class="panel-header mb-4">
         <h3>{{ isEditMode ? 'Editar Usuario' : 'Crear Nuevo Usuario' }}</h3>
         <button class="btn-close" (click)="cerrarModal()">
@@ -274,7 +273,7 @@
 
   <!-- HTML MODAL ALERTA CONTRASEÑA -->
   <div *ngIf="tempPasswordGenerated" class="view-switch-panel fade-in">
-    <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+    <div class="neu-card neu-card-centered">
       <div class="success-icon-container">
         <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-xl text-green">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

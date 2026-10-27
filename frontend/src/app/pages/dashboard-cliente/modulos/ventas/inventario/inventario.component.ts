@@ -22,6 +22,7 @@ export class InventarioComponent implements OnInit {
   private http = inject(HttpClient);
   private cdr = inject(ChangeDetectorRef);
 
+  // --- VARIABLES DE ESTADO ---
   activeTab: string = 'catalogo';
 
   categorias: Categoria[] = [];
@@ -35,24 +36,17 @@ export class InventarioComponent implements OnInit {
   guardando = false;
 
   showModal: boolean = false;
-  formProducto: any = this.resetFormProducto();
-
-  // Formulario movimiento
+  formProducto: any = this.// Bloque para restablecer los valores del formulario de producto
+  resetFormProducto();
   formMovimiento: any = { tipo: 'entrada', producto_id: '', cantidad: 1, observaciones: '' };
-  // Formulario ajuste
   formAjuste: any = { producto_id: '', cantidad: 1, observaciones: '' };
-  // Kardex
   productoKardex: any = '';
   kardexFilas: any[] = [];
-
-  // --- CATEGORÍAS ---
   showModalCategoria: boolean = false;
   editandoCategoria: boolean = false;
   categoriaEditandoId: number | null = null;
   formCategoria: any = { nombre: '', descripcion: '', tipo: 'ventas' };
   guardandoCategoria = false;
-
-  // --- SISTEMA DE PAGINACIÓN (8 POR PÁGINA) ---
   pageSize: number = 8;
   pageCatalogo: number = 1;
   pageMovimientos: number = 1;
@@ -60,6 +54,7 @@ export class InventarioComponent implements OnInit {
   pageKardex: number = 1;
   Math = Math;
 
+  // --- GETTERS Y PAGINACION ---
   get paginatedProductos(): any[] {
     const start = (this.pageCatalogo - 1) * this.pageSize;
     return this.productosFiltrados.slice(start, start + this.pageSize);
@@ -92,8 +87,10 @@ export class InventarioComponent implements OnInit {
     return Math.ceil(this.kardexFilas.length / this.pageSize) || 1;
   }
 
+  // Bloque de ciclo de vida OnInit para cargar el inventario y categorías iniciales
   ngOnInit() {
-    this.cargarDatos();
+    this.// Bloque para consultar productos, movimientos, categorías y stock desde la API
+  cargarDatos();
   }
 
   cargarDatos() {
@@ -103,7 +100,8 @@ export class InventarioComponent implements OnInit {
     this.productoService.getProductos().pipe(timeout(15000)).subscribe({
       next: (res) => {
         this.productosOriginales = res;
-        this.filtrarProductos();
+        this.// Bloque para filtrar el catálogo de productos por término de búsqueda
+  filtrarProductos();
         this.cdr.detectChanges();
       },
       error: () => {
@@ -125,19 +123,23 @@ export class InventarioComponent implements OnInit {
     });
   }
 
+  // Bloque para alternar entre pestañas del módulo de inventario
   switchTab(tab: string) {
     this.activeTab = tab;
     if (tab === 'kardex' && !this.kardexFilas.length && this.productosOriginales.length) {
       this.productoKardex = this.productosOriginales[0]?.id || '';
-      this.generarKardex();
+      this.// Bloque para computar y estructurar el Kardex físico y valorizado
+  generarKardex();
     }
   }
 
+  // Bloque para abrir el modal de creación de nuevo producto
   abrirModal() {
     this.formProducto = this.resetFormProducto();
     this.showModal = true;
   }
 
+  // Bloque para cerrar el modal de producto
   cerrarModal() {
     this.showModal = false;
   }
@@ -154,10 +156,11 @@ export class InventarioComponent implements OnInit {
     };
   }
 
+  // Bloque para capturar la imagen del producto seleccionada
   onFileSelected(event: any) {
-    // Manejo de archivo (pendiente subida a Cloudinary)
   }
 
+  // Bloque para validar y registrar un producto en el inventario
   guardarProducto() {
     if (!this.formProducto.nombre || !this.formProducto.categoria_id) {
       this.toast.warning('Nombre y categoría son obligatorios');
@@ -177,7 +180,6 @@ export class InventarioComponent implements OnInit {
 
     this.productoService.crearProducto(payload).pipe(timeout(10000)).subscribe({
       next: (prod) => {
-        // Crear registro de inventario asociado
         if (prod.id) {
           this.inventarioService.getInventario().pipe(timeout(5000)).subscribe(() => {});
         }
@@ -199,6 +201,7 @@ export class InventarioComponent implements OnInit {
     });
   }
 
+  // Bloque para determinar la clase cromática del stock según el nivel de alerta
   getBadgeClass(stock: number | undefined, stockMinimo: number | undefined): string {
     const s = stock ?? 0;
     const m = stockMinimo ?? 0;
@@ -207,6 +210,7 @@ export class InventarioComponent implements OnInit {
     return 'badge-success';
   }
 
+  // Bloque para exportar el inventario de productos a formato Excel / CSV
   exportarExcel() {
     this.toast.success('Generando archivo Excel...');
     const headers = { 'Authorization': `Bearer ${sessionStorage.getItem('auth_token')}` };
@@ -237,32 +241,36 @@ export class InventarioComponent implements OnInit {
     );
     this.pageCatalogo = 1;
   }
-
-  // Helpers de vista: resolver categoría y stock del producto real
+  // Bloque utilitario para resolver el nombre de la categoría del producto
   nombreCategoria(producto: any): string {
     const c = this.categorias.find(cat => cat.id === producto.categoria_id);
     return c?.nombre || 'Sin categoría';
   }
 
+  // Bloque utilitario para formatear el código SKU del producto
   codigoProducto(producto: any): string {
     return producto.descripcion || 'PRD-' + String(producto.id).padStart(3, '0');
   }
 
+  // Bloque utilitario para consultar las existencias actuales del producto
   stockProducto(producto: any): number {
     const inv = this.inventario.find(i => i.producto_id === producto.id);
     return inv?.stock_actual ?? 0;
   }
 
+  // Bloque utilitario para consultar el umbral de stock mínimo permitido
   stockMinimoProducto(producto: any): number {
     const inv = this.inventario.find(i => i.producto_id === producto.id);
     return inv?.stock_minimo ?? 0;
   }
 
+  // Bloque para contar cuántos productos pertenecen a una categoría
   productosPorCategoria(categoriaId: number | undefined): number {
     return this.productosOriginales.filter(p => p.categoria_id === categoriaId).length;
   }
 
-  // --- MOVIMIENTOS (entradas/salidas) ---
+  // --- SECCION MOVIMIENTOS ---
+  // Bloque para asentar un movimiento manual de entrada o salida de inventario
   registrarMovimiento() {
     if (!this.formMovimiento.producto_id || this.formMovimiento.cantidad <= 0) {
       this.toast.warning('Seleccione producto y cantidad válida');
@@ -295,20 +303,24 @@ export class InventarioComponent implements OnInit {
     });
   }
 
+  // Bloque utilitario para obtener el nombre del producto en el movimiento
   nombreMovimientoProducto(m: any): string {
     const p = this.productosOriginales.find(prod => prod.id === m.inventario_id || prod.id === m.producto_id);
     return p?.nombre || 'Producto #' + (m.inventario_id ?? m.producto_id);
   }
 
+  // Bloque utilitario para obtener la marca temporal del movimiento
   fechaMovimiento(m: any): string {
     return m.fecha_hora ? new Date(m.fecha_hora).toLocaleDateString() : '-';
   }
 
-  // --- AJUSTES (merma/daño) ---
+  // --- SECCION AJUSTES ---
+  // Bloque para filtrar exclusivamente los movimientos clasificados como ajustes
   ajustesRegistrados(): any[] {
     return this.movimientos.filter(m => m.tipo_movimiento === 'ajuste' || m.tipo === 'ajuste');
   }
 
+  // Bloque para registrar un ajuste de inventario por merma o auditoría
   aplicarAjuste() {
     if (!this.formAjuste.producto_id || this.formAjuste.cantidad <= 0) {
       this.toast.warning('Seleccione producto y cantidad válida');
@@ -341,7 +353,7 @@ export class InventarioComponent implements OnInit {
     });
   }
 
-  // --- KARDEX ---
+  // --- SECCION KARDEX ---
   generarKardex() {
     if (!this.productoKardex) return;
     const id = Number(this.productoKardex);
@@ -351,7 +363,6 @@ export class InventarioComponent implements OnInit {
     this.kardexFilas = [
       { fecha: 'Inicio', concepto: 'Saldo Inicial', entrada: 0, salida: 0, saldo: inv?.stock_actual ?? 0 }
     ];
-    // Se reconstruye la secuencia aproximada desde los movimientos existentes
     saldo = inv?.stock_actual ?? 0;
     movs.forEach(m => {
       const entrada = m.tipo_movimiento === 'entrada' || (m.tipo === 'entrada') ? Math.abs(m.cantidad) : 0;
@@ -368,12 +379,14 @@ export class InventarioComponent implements OnInit {
     }
   }
 
+  // Bloque utilitario para obtener el nombre del producto en el reporte Kardex
   nombreKardexProducto(id: number): string {
     const p = this.productosOriginales.find(prod => prod.id === id);
     return p?.nombre || 'Producto #' + id;
   }
 
-  // --- CATEGORÍAS (CRUD) ---
+  // --- SECCION CATEGORIAS ---
+  // Bloque para abrir el modal de creación de categoría
   abrirModalCategoria() {
     this.editandoCategoria = false;
     this.categoriaEditandoId = null;
@@ -381,6 +394,7 @@ export class InventarioComponent implements OnInit {
     this.showModalCategoria = true;
   }
 
+  // Bloque para abrir el modal de edición de una categoría existente
   abrirModalEditarCategoria(cat: any) {
     this.editandoCategoria = true;
     this.categoriaEditandoId = cat.id;
@@ -392,10 +406,12 @@ export class InventarioComponent implements OnInit {
     this.showModalCategoria = true;
   }
 
+  // Bloque para cerrar el modal de categoría
   cerrarModalCategoria() {
     this.showModalCategoria = false;
   }
 
+  // Bloque para validar y persistir una categoría en el backend
   guardarCategoria() {
     if (!this.formCategoria.nombre) {
       this.toast.warning('El nombre de la categoría es obligatorio');
@@ -450,6 +466,7 @@ export class InventarioComponent implements OnInit {
     }
   }
 
+  // Bloque para solicitar la eliminación o inactivación de una categoría
   eliminarCategoria(cat: any) {
     if (!confirm(`¿Desea eliminar la categoría "${cat.nombre}"? Los productos asociados quedarán sin categoría.`)) {
       return;
@@ -478,6 +495,7 @@ export class InventarioComponent implements OnInit {
     });
   }
 
+  // Bloque utilitario para resolver la descripción del tipo de categoría
   tipoCategoria(cat: any): string {
     const t = cat.tipo || 'ventas';
     if (t === 'servicios') return 'Servicios';

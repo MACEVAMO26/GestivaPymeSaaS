@@ -8,6 +8,7 @@ use App\Models\Servicio;
 
 class ServicioController extends Controller
 {
+    // Bloque para listar los servicios activos de la empresa autenticada
     public function index()
     {
         $user = Auth::user();
@@ -25,6 +26,7 @@ class ServicioController extends Controller
         return response()->json($servicios);
     }
 
+    // Bloque para registrar un nuevo servicio en el catálogo empresarial
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -33,6 +35,7 @@ class ServicioController extends Controller
             return response()->json(['error' => 'Empresa no especificada'], 400);
         }
 
+        // Bloque de reglas de validación
         $validated = $request->validate([
             'categoria_id' => 'nullable|exists:categorias,id',
             'nombre' => 'required|string|max:255',
@@ -41,6 +44,7 @@ class ServicioController extends Controller
             'tiempo_estimado' => 'nullable|string|max:100',
         ]);
 
+        // Bloque de guardado en BD
         $servicio = Servicio::create([
             'empresa_id' => $empresaId,
             'categoria_id' => $validated['categoria_id'] ?? null,
@@ -54,6 +58,7 @@ class ServicioController extends Controller
         return response()->json($servicio, 201);
     }
 
+    // Bloque para consultar el detalle de un servicio específico
     public function show($id)
     {
         $user = Auth::user();
@@ -68,6 +73,7 @@ class ServicioController extends Controller
         return response()->json($servicio);
     }
 
+    // Bloque para actualizar los datos o tarifa de un servicio existente
     public function update(Request $request, $id)
     {
         $user = Auth::user();
@@ -91,6 +97,7 @@ class ServicioController extends Controller
         return response()->json($servicio);
     }
 
+    // Bloque para inactivar lógicamente un servicio del catálogo
     public function destroy(Request $request, $id)
     {
         $user = Auth::user();

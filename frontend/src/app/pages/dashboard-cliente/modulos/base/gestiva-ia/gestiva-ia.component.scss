@@ -1,11 +1,19 @@
 @use 'sass:color';
 
+/* --- 0. BACKGROUND PRINCIPAL DEL MÓDULO GESTIVA IA --- */
+.module-container {
+  padding: 1.5rem;
+  background: #f5f5dc;
+  font-family: 'Montserrat', sans-serif;
+  color: #1a1a1a;
+}
+
 /* --- 1. VARIABLES GLOBALES DE COLOR --- */
 $bg-color: #f5f5dc;
 $shadow-light: #ffffff;
 $shadow-dark: #d1d1bc;
-$text-dark: #333333;
-$text-muted: #666666;
+$text-dark: #1a1a1a;
+$text-muted: #2d3748;
 $btn-add: #45a1ae;
 $btn-volver: #de3737;
 $btn-save: #066810;
@@ -17,15 +25,14 @@ $btn-gen-5: #B5654A;
 $btn-gen-6: #A38B6D;
 
 /* --- 2. FONDOS Y LAYOUT PRINCIPAL --- */
-.module-container {
+.neu-card {
+  background: #f5f5dc;
+  border-radius: 12px;
   padding: 1.5rem;
-  background: $bg-color;
-  font-family: 'Montserrat', sans-serif;
-  color: $text-dark;
+  box-shadow: 6px 6px 12px #d0d0bb, -6px -6px 12px #ffffff;
 }
 
-/* --- 3. TIPOGRAFIA (Jerarquia estricta) --- */
-/* Titulo principal: 16px, centrado, mayusculas, negrita */
+/* --- 3. TIPOGRAFIA Y JERARQUIA --- */
 .module-header h1, h1.titulo-principal, .header-section h1 {
   font-size: 16px;
   font-weight: bold;
@@ -36,9 +43,8 @@ $btn-gen-6: #A38B6D;
   color: $text-dark;
 }
 
-/* Subtitulo: 13px, izquierda, mayusculas, sin negrita */
 .subtitulo, h2.subtitulo, h3.subtitulo {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: left;
@@ -46,9 +52,8 @@ $btn-gen-6: #A38B6D;
   margin-bottom: 0.5rem;
 }
 
-/* Descripciones y Notas: 10px, centradas, mayusculas */
 .module-header p, .descripcion, .descripcion-general, .subtitle, .header-section p, .nota, .text-muted-small, .badge-small {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: normal;
   text-transform: uppercase;
   text-align: center;
@@ -59,9 +64,8 @@ $btn-gen-6: #A38B6D;
   line-height: 1.4;
 }
 
-/* Texto general: 12px */
 .form-label, p, td, th, li, label, .text-general {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: normal;
 }
 
@@ -92,7 +96,7 @@ $btn-gen-6: #A38B6D;
   background: $bg-color;
   box-shadow: inset 6px 6px 10px $shadow-dark, inset -6px -6px 10px $shadow-light;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   color: $text-dark;
   outline: none;
   transition: all 0.2s ease;
@@ -102,14 +106,36 @@ $btn-gen-6: #A38B6D;
   }
 }
 
-/* --- 6. BOTONES (DISENO PILDORA) --- */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  
+  label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4a4a4a;
+    margin-bottom: 1.25rem;
+  }
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+/* --- 6. BOTONES Y ACCIONES --- */
 .btn-neumorphic {
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
-  
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 4px 4px 8px $shadow-dark, -1px -1px 2px rgba(255, 255, 255, 0.2);
@@ -135,7 +161,21 @@ $btn-gen-6: #A38B6D;
 .btn-general-5 { @extend .btn-neumorphic; background-color: $btn-gen-5; border: 2px solid color.adjust($btn-gen-5, $lightness: -10%); color: #ffffff; }
 .btn-general-6 { @extend .btn-neumorphic; background-color: $btn-gen-6; border: 2px solid color.adjust($btn-gen-6, $lightness: -10%); color: #ffffff; }
 
-/* --- 7. NAVEGACION TABS CON CONTENEDOR HUNDIDO (DOBLE BORDE RECTÁNGULO PÍLDORA) --- */
+.volver-wrapper {
+  margin-bottom: 1.5rem;
+}
+
+.flex-end-mb-15 {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 15px;
+}
+
+.table-empty-pad-20 {
+  padding: 20px !important;
+}
+
+/* --- 7. NAVEGACION TABS Y CONTENEDOR HUNDIDO --- */
 .tabs-nav-wrapper {
   background: $bg-color;
   border-radius: 9999px;
@@ -153,7 +193,7 @@ $btn-gen-6: #A38B6D;
   padding: 0.6rem 1rem;
   border-radius: 9999px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold !important;
   text-transform: uppercase;
   cursor: pointer;
@@ -173,7 +213,7 @@ $btn-gen-6: #A38B6D;
   padding: 0.6rem 1rem;
   border-radius: 9999px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold !important;
   text-transform: uppercase;
   cursor: pointer;
@@ -189,148 +229,46 @@ $btn-gen-6: #A38B6D;
   text-decoration: none;
 }
 
-/* Titulos de panel interno */
-.panel-title, h3.panel-title {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 16px;
-  font-weight: bold;
-  text-transform: uppercase;
-  text-align: center;
-  color: $text-dark;
-  margin: 0 0 0.5rem 0;
+.tabs-nav-wrapper a, .tabs-nav-wrapper button, .tabs-nav-wrapper span {
+  font-weight: bold !important;
 }
 
-/* ========================================= */
-/* FIN BASE NEUMORFICA - INICIO DE LOCALES   */
-/* ========================================= */
-
-
-
-
-/* ESTILOS ESPECÍFICOS DE GESTIVA IA */
-.volver-wrapper {
-  margin-bottom: 2rem;
-}
-
-.btn-estado {
-  font-size: 12px;
-  font-weight: normal;
-  padding: 0.4rem 0.9rem;
-  border-radius: 9999px;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: bold;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-estado-activa {
-  background-color: $btn-add;
-  border: 2px solid color.adjust($btn-add, $lightness: -10%);
-  color: #000000;
-  box-shadow: 3px 3px 6px $shadow-dark, -3px -3px 6px $shadow-light;
-}
-
-.btn-estado-inactiva {
-  background-color: $bg-color;
-  border: 2px solid $shadow-dark;
-  color: $text-muted;
-  box-shadow: inset 2px 2px 4px $shadow-dark, inset -2px -2px 4px $shadow-light;
-}
-
-.text-danger {
-  color: $btn-volver;
-}
-
-.form-actions {
-  margin-top: 1.5rem;
-  gap: 15px;
-}
-
-.btn-icon {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 5px;
-  margin: 0 5px;
-  font-size: 12px;
-  font-weight: normal;
-  color: #333;
-  transition: color 0.2s ease;
-
-  &:hover {
-    color: #45a1ae;
-  }
-  
-  &.text-danger:hover {
-    color: #de3737;
-  }
-}
-
-.table-container {
-  overflow-x: auto;
-  border-radius: 12px;
-  box-shadow: inset 4px 4px 8px #d1d1bc, inset -4px -4px 8px #ffffff;
-  padding: 1.5rem;
-}
-
+/* --- 8. TABLAS DE DIRECTRICES Y FORMULARIOS --- */
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
   font-weight: normal;
   text-align: left;
-
-  th {
-    padding: 12px 15px;
-    font-weight: 600;
-    color: #666;
-    border-bottom: 2px solid rgba(0,0,0,0.05);
-  }
-
-  td {
-    padding: 12px 15px;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
-  }
-
-  tbody tr:hover {
-    background-color: rgba(0,0,0,0.02);
-  }
+  color: $text-dark;
 }
 
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
+.data-table th, .data-table td {
+  padding: 1rem;
+  vertical-align: middle;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-
-  margin-bottom: 1.25rem;
-}
-
-.full-width {
-  grid-column: 1 / -1;
-}
-
-.spinner-small {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-top: 2px solid white;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.tabs-nav-wrapper a, .tabs-nav-wrapper button, .tabs-nav-wrapper span {
+.data-table th {
   font-weight: bold !important;
+  text-transform: uppercase;
+  font-size: 14px;
+  border-bottom: 2px solid rgba(0,0,0,0.05);
+}
+
+.data-table tr {
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.data-table tr:hover {
+  background-color: rgba(0,0,0,0.02);
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

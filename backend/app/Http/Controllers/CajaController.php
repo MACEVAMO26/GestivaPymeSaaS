@@ -9,6 +9,7 @@ use App\Models\CajaMovimiento;
 
 class CajaController extends Controller
 {
+    // Bloque para listar las cajas de la empresa autenticada
     public function index()
     {
         $user = Auth::user();
@@ -26,6 +27,7 @@ class CajaController extends Controller
         return response()->json($cajas);
     }
 
+    // Bloque para crear e iniciar la apertura de una nueva caja registradora
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -33,11 +35,13 @@ class CajaController extends Controller
             return response()->json(['error' => 'No autorizado'], 401);
         }
 
+        // Bloque de reglas de validación
         $validated = $request->validate([
             'base_inicial' => 'required|numeric|min:0',
             'observaciones' => 'nullable|string',
         ]);
 
+        // Bloque de guardado en BD
         $caja = Caja::create([
             'empresa_id' => $user->empresa_id,
             'usuario_apertura' => $user->id,
@@ -56,6 +60,7 @@ class CajaController extends Controller
         return response()->json($this->mapCaja($caja), 201);
     }
 
+    // Bloque para reabrir una caja existente con nuevo saldo base
     public function abrir(Request $request, $id)
     {
         $user = Auth::user();
@@ -86,6 +91,7 @@ class CajaController extends Controller
         return response()->json($this->mapCaja($caja));
     }
 
+    // Bloque para realizar el arqueo y registrar el cierre definitivo de caja
     public function cerrar(Request $request, $id)
     {
         $user = Auth::user();
@@ -116,6 +122,7 @@ class CajaController extends Controller
         return response()->json($this->mapCaja($caja));
     }
 
+    // Bloque utilitario para transformar la entidad de caja a formato compatible con el frontend
     private function mapCaja($caja)
     {
         return [

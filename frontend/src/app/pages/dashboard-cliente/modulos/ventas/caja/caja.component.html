@@ -6,7 +6,7 @@
     <p class="descripcion-general">Control de caja diaria a $0, verificación de comprobantes por finanzas y resumen semanal.</p>
   </div>
 
-  <!-- NAVEGACIÓN SUB-PESTAÑAS NEUMÓRFICAS (EVITA HACINAMIENTO) -->
+  <!-- HTML NAVEGACION DE SUBPESTAÑAS -->
   <div class="tabs-nav-wrapper mb-4">
     <button class="tab-neu-inactive" [class.tab-neu-active]="subTabActiva === 'operacion'" (click)="switchSubTab('operacion')">
       <span class="icon">💵</span> Operación Diaria
@@ -29,14 +29,14 @@
       </button>
     </div>
 
-    <!-- SUB-PESTAÑA 1: OPERACIÓN DIARIA -->
+    <!-- HTML SUBPESTAÑA OPERACION DIARIA -->
     @if (subTabActiva === 'operacion') {
       <div class="fade-in">
         
-        <!-- SELECCIÓN O APERTURA DE CAJA -->
+        <!-- HTML SELECCION O APERTURA DE CAJA -->
         <div class="neumorphic-panel mb-4">
           <div class="header-section flex-between">
-            <h2 class="subtitulo" style="margin: 0;">ESTADO DE CAJA: 
+            <h2 class="subtitulo m-0">ESTADO DE CAJA: 
               <strong [ngClass]="cajaActiva?.estado === 'abierta' ? 'text-ingreso' : 'text-egreso'">
                 {{ (cajaActiva?.estado || 'cerrada') | uppercase }}
               </strong>
@@ -64,35 +64,35 @@
         </div>
 
         @if (cajaActiva?.estado === 'abierta') {
-          <!-- KPIS DE BALANCE DE CAJA Y FORMAS DE PAGO -->
+          <!-- HTML METRICAS KPI BALANCE DE CAJA -->
           <div class="resumen-grid mb-4">
             <div class="kpi-card">
-              <div class="kpi-value" style="color: #066810;">$ {{ totalIngresosEfectivo | number:'1.0-0' }}</div>
+              <div class="kpi-value kpi-efectivo">$ {{ totalIngresosEfectivo | number:'1.0-0' }}</div>
               <div class="kpi-label">Ingresos Efectivo (Caja)</div>
             </div>
             <div class="kpi-card">
-              <div class="kpi-value" style="color: #45a1ae;">$ {{ totalIngresosBanco | number:'1.0-0' }}</div>
+              <div class="kpi-value kpi-banco">$ {{ totalIngresosBanco | number:'1.0-0' }}</div>
               <div class="kpi-label">Transferencia Bancaria</div>
             </div>
             <div class="kpi-card">
-              <div class="kpi-value" style="color: #C9A227;">$ {{ totalIngresosTarjeta | number:'1.0-0' }}</div>
+              <div class="kpi-value kpi-tarjeta">$ {{ totalIngresosTarjeta | number:'1.0-0' }}</div>
               <div class="kpi-label">Tarjeta Crédito / Débito</div>
             </div>
             <div class="kpi-card">
-              <div class="kpi-value" style="color: #8E5B75;">$ {{ totalIngresosCredito | number:'1.0-0' }}</div>
+              <div class="kpi-value kpi-credito">$ {{ totalIngresosCredito | number:'1.0-0' }}</div>
               <div class="kpi-label">Crédito / Cuotas</div>
             </div>
             <div class="kpi-card">
-              <div class="kpi-value" style="color: #de3737;">$ {{ totalEgresos | number:'1.0-0' }}</div>
+              <div class="kpi-value kpi-egresos">$ {{ totalEgresos | number:'1.0-0' }}</div>
               <div class="kpi-label">Egresos / Gastos</div>
             </div>
             <div class="kpi-card">
-              <div class="kpi-value" style="color: #7C6FA6;">$ {{ saldoNetoCaja | number:'1.0-0' }}</div>
+              <div class="kpi-value kpi-saldo">$ {{ saldoNetoCaja | number:'1.0-0' }}</div>
               <div class="kpi-label">Saldo Neto en Caja</div>
             </div>
           </div>
 
-          <!-- REGISTRO DE MOVIMIENTO CON MEDIO DE PAGO Y COMPROBANTE -->
+          <!-- HTML REGISTRO DE MOVIMIENTOS -->
           <div class="neumorphic-panel mb-4">
             <h2 class="subtitulo">Registrar Movimiento / Cobro</h2>
             <form (ngSubmit)="registrarMovimiento()">
@@ -125,7 +125,7 @@
                 </div>
               </div>
 
-              <!-- SECCIÓN CARGA DE COMPROBANTE (SI NO ES EFECTIVO) -->
+              <!-- HTML SECCION CARGA DE COMPROBANTE -->
               @if (nuevoMovimiento.medio_pago !== 'Efectivo') {
                 <div class="mt-3 p-3 neumorphic-panel-inner bg-cream">
                   <label class="form-label text-azul">
@@ -143,7 +143,7 @@
                       </span>
                     }
                   </div>
-                  <small class="descripcion-general text-left mt-1" style="display: block;">* El pago entrará en estado PENDIENTE hasta ser auditado por el Jefe de Finanzas.</small>
+                  <small class="descripcion-general text-left mt-1 d-block">* El pago entrará en estado PENDIENTE hasta ser auditado por el Jefe de Finanzas.</small>
                 </div>
               }
 
@@ -155,18 +155,18 @@
             </form>
           </div>
 
-          <!-- HISTORIAL DE MOVIMIENTOS DEL DÍA -->
+          <!-- HTML HISTORIAL DE MOVIMIENTOS DEL DIA -->
           <div class="neumorphic-panel mb-4">
             <h2 class="subtitulo">Movimientos Registrados Hoy</h2>
 
-            <!-- BARRA DE BÚSQUEDA DE MOVIMIENTOS -->
-            <div class="search-filter-bar mb-4" *ngIf="movimientos.length > 0" style="display: flex; gap: 1rem; align-items: center; max-width: 500px; margin: 0 0 1rem 0;">
-              <div style="position: relative; width: 100%;">
-                <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #2d3748; font-size: 14px;"></i>
+            <!-- HTML BARRA DE BUSQUEDA DE MOVIMIENTOS -->
+            <div class="search-filter-bar mb-4 search-caja-bar" *ngIf="movimientos.length > 0">
+              <div class="search-input-wrapper">
+                <i class="fas fa-search search-icon-left"></i>
                 <input
                   type="text"
                   class="input-neumorphic"
-                  style="padding-left: 36px; padding-right: 36px;"
+                  class="input-search-padded input-neumorphic"
                   placeholder="Buscar movimiento por concepto, tipo, monto o medio..."
                   [(ngModel)]="searchTermMovimientos"
                   (ngModelChange)="onSearchTermMovimientosChange()"
@@ -175,7 +175,7 @@
                   *ngIf="searchTermMovimientos"
                   type="button"
                   (click)="limpiarBusquedaMovimientos()"
-                  style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #2d3748; cursor: pointer; font-size: 14px;"
+                  class="btn-clear-search"
                   title="Limpiar búsqueda"
                 >
                   <i class="fas fa-times"></i>
@@ -219,10 +219,10 @@
                   }
                   @if (movimientos.length > 0 && movimientosFiltrados.length === 0) {
                     <tr>
-                      <td colspan="6" class="text-center" style="padding: 2rem;">
+                      <td colspan="6" class="text-center table-empty-state">
                         No se encontraron movimientos con "{{ searchTermMovimientos }}".
                         <br>
-                        <button class="btn-pill mt-2" (click)="limpiarBusquedaMovimientos()" style="background: #45a1ae; color: white; padding: 4px 12px; font-size: 14px; border: none; border-radius: 9999px; cursor: pointer;">
+                        <button class="btn-pill mt-2 btn-reset-search" (click)="limpiarBusquedaMovimientos()">
                           Limpiar búsqueda
                         </button>
                       </td>
@@ -248,7 +248,7 @@
             }
           </div>
 
-          <!-- CIERRE DE CAJA DIARIO -->
+          <!-- HTML CIERRE DE CAJA DIARIO -->
           <div class="neumorphic-panel">
             <h2 class="subtitulo">Realizar Cierre de Caja (Arqueo Final)</h2>
             <div class="form-grid form-grid-end">
@@ -272,12 +272,12 @@
       </div>
     }
 
-    <!-- SUB-PESTAÑA 2: AUDITORÍA DE PAGOS (JEFE DE FINANZAS) -->
+    <!-- HTML SUBPESTAÑA AUDITORIA DE PAGOS -->
     @if (subTabActiva === 'auditoria') {
       <div class="fade-in">
         <div class="neumorphic-panel mb-4">
           <h2 class="subtitulo">Panel de Auditoría de Comprobantes (Exclusivo Jefe de Finanzas)</h2>
-          <p class="descripcion-general" style="text-align: left; margin-bottom: 1.5rem;">
+          <p class="descripcion-general text-left mb-1-5rem">
             Verifique la veracidad de los comprobantes bancarios y digitales. Al rechazar una transacción, se cancela automáticamente el servicio o venta asociada.
           </p>
 
@@ -308,7 +308,7 @@
                       </button>
                     </td>
                     <td class="text-center">
-                      <div class="acciones-fila" style="justify-content: center;">
+                      <div class="acciones-fila justify-center">
                         <button class="btn-action-circle" (click)="aprobarTransaccion(m)" title="Aprobar Transacción">
                           <i class="fas fa-check text-success"></i>
                         </button>
@@ -322,7 +322,7 @@
                 @if (movimientosPendientes.length === 0) {
                   <tr>
                     <td colspan="7" class="text-center py-6">
-                      <i class="fas fa-check-circle text-emerald-500 fa-2x mb-2" style="display: block; opacity: 0.5;"></i>
+                      <i class="fas fa-check-circle text-emerald-500 fa-2x mb-2 icon-dimmed-block"></i>
                       <span class="text-muted">No hay comprobantes pendientes de auditoría.</span>
                     </td>
                   </tr>
@@ -349,15 +349,15 @@
       </div>
     }
 
-    <!-- SUB-PESTAÑA 3: RESUMEN SEMANAL -->
+    <!-- HTML SUBPESTAÑA RESUMEN SEMANAL -->
     @if (subTabActiva === 'semanal') {
       <div class="fade-in">
         <div class="neumorphic-panel mb-4">
           <div class="flex-between">
-            <h2 class="subtitulo" style="margin: 0;">Resumen y Conteo de Cajas Semanal (Lunes a Domingo)</h2>
+            <h2 class="subtitulo m-0">Resumen y Conteo de Cajas Semanal (Lunes a Domingo)</h2>
             <div class="badge badge-primary font-bold text-sm">Gran Total Semanal: $ {{ granTotalSemanal | number:'1.0-0' }}</div>
           </div>
-          <p class="descripcion-general" style="text-align: left; margin-top: 0.5rem; margin-bottom: 1.5rem;">
+          <p class="descripcion-general text-left mt-0-5rem mb-1-5rem">
             Desglose acumulado por jornada diaria de apertura a $0, efectivo recaudado vs. bancos y transacciones auditadas.
           </p>
 
@@ -384,7 +384,7 @@
                   <td class="text-azul">$ {{ r.banco | number:'1.0-0' }}</td>
                   <td><span class="badge badge-success">{{ r.aprobados }}</span></td>
                   <td><span class="badge badge-danger">{{ r.rechazados }}</span></td>
-                  <td><strong style="font-size: 14px;">$ {{ r.total | number:'1.0-0' }}</strong></td>
+                  <td><strong class="text-sm">$ {{ r.total | number:'1.0-0' }}</strong></td>
                 </tr>
               </tbody>
             </table>
@@ -396,10 +396,10 @@
     </div>
   </div>
 
-  <!-- VISOR COMPROBANTE DE AUDITORÍA (SUB-PÁGINA DEDICADA) -->
+  <!-- HTML VISOR COMPROBANTE AUDITORIA -->
   @if (modalAuditoria && movimientoAuditoria) {
     <div class="view-switch-panel fade-in">
-      <div class="neu-card" style="max-width: 650px; margin: 0 auto;">
+      <div class="neu-card neu-card-center-650">
         <div class="panel-header mb-4">
           <h1>AUDITAR COMPROBANTE DE PAGO</h1>
           <button class="btn-close" (click)="cerrarAuditoriaModal()">&times;</button>
@@ -407,13 +407,13 @@
         <div class="panel-body text-center">
           <p class="descripcion-general mb-2">Transacción #{{ movimientoAuditoria.id }} - {{ movimientoAuditoria.cliente }}</p>
           <div class="mb-3">
-            <strong class="text-azul" style="font-size: 16px;">$ {{ movimientoAuditoria.monto | number:'1.0-0' }}</strong>
+            <strong class="text-azul text-16px">$ {{ movimientoAuditoria.monto | number:'1.0-0' }}</strong>
             <div class="text-muted text-xs">{{ movimientoAuditoria.medio_pago }} - {{ movimientoAuditoria.concepto }}</div>
           </div>
 
           <div class="comprobante-preview-box p-3 neumorphic-panel-inner mb-4">
             <p class="text-xs font-semibold mb-2">Comprobante de Pago Subido:</p>
-            <img [src]="movimientoAuditoria.comprobante_url" alt="Soporte de Pago" style="max-width: 100%; max-height: 250px; border-radius: 8px; object-fit: contain;">
+            <img [src]="movimientoAuditoria.comprobante_url" alt="Soporte de Pago" class="comprobante-preview-img">
           </div>
 
           <div class="flex justify-center gap-3">

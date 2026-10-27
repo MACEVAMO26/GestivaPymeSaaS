@@ -14,17 +14,22 @@ import { timeout } from 'rxjs';
   styleUrl: './reportes-de-servicios.component.scss'
 })
 export class ReportesDeServiciosComponent implements OnInit {
+  // --- PROPIEDADES DE ENTRADA ---
   @Input() isEmbedded: boolean = false;
+
+  // --- SERVICIOS INYECTADOS ---
   private cdr = inject(ChangeDetectorRef);
   private ticketsService = inject(OperariosTicketsService);
   private empleadoService = inject(EmpleadoService);
 
+  // --- VARIABLES DE ESTADO ---
   desde: string = '';
   hasta: string = '';
   cargando: boolean = false;
   todosTickets: ServicioTicket[] = [];
   tecnicos: any[] = [];
 
+  // --- METRICAS CALCULADAS ---
   totalAtendidos: number = 0;
   totalEnCamino: number = 0;
   totalRecibidos: number = 0;
@@ -35,10 +40,12 @@ export class ReportesDeServiciosComponent implements OnInit {
   promedioSatisfaccion: number = 5.0;
   totalFacturado: number = 0;
 
+  // Bloque de ciclo de vida OnInit para cargar datos iniciales
   ngOnInit() {
     this.cargarDatos();
   }
 
+  // Bloque para cargar tickets y técnicos desde el backend
   cargarDatos() {
     this.cargando = true;
     this.ticketsService.getTickets().pipe(timeout(15000)).subscribe({
@@ -97,6 +104,7 @@ export class ReportesDeServiciosComponent implements OnInit {
     });
   }
 
+  // Bloque para filtrar tickets según el rango de fechas seleccionado
   getTicketsFiltrados(): ServicioTicket[] {
     if (!this.desde && !this.hasta) return this.todosTickets;
     return this.todosTickets.filter(t => {
@@ -107,6 +115,7 @@ export class ReportesDeServiciosComponent implements OnInit {
     });
   }
 
+  // Bloque para computar las métricas de servicio, técnicos y satisfacción
   calcular() {
     const tickets = this.getTicketsFiltrados();
     const finalizados = tickets.filter(t => t.estado === 'Finalizado');
@@ -115,15 +124,12 @@ export class ReportesDeServiciosComponent implements OnInit {
     this.totalRecibidos = tickets.filter(t => t.estado === 'Recibido').length;
     this.totalPendientes = tickets.filter(t => t.estado === 'Pendiente').length;
 
-    // Total Facturado
     this.totalFacturado = finalizados.reduce((acc, t) => acc + (Number(t.costo_total) || 0), 0);
 
-    // Promedio de Satisfacción
     const conCalif = finalizados.filter(t => t.calificacion_tecnico && t.calificacion_tecnico > 0);
     const suma = conCalif.reduce((acc, t) => acc + (t.calificacion_tecnico || 0), 0);
     this.promedioSatisfaccion = conCalif.length > 0 ? Number((suma / conCalif.length).toFixed(1)) : 5.0;
 
-    // Técnico con más servicios
     const porTecnico = new Map<number, number>();
     for (const t of tickets) {
       if (t.tecnico_id) {
@@ -138,7 +144,6 @@ export class ReportesDeServiciosComponent implements OnInit {
     const topTec = this.tecnicos.find(t => t.id === maxId);
     this.tecnicoTop = topTec?.nombre || 'N/A';
 
-    // Servicio más demandado
     const porServicio = new Map<string, number>();
     for (const t of tickets) {
       const key = t.servicio_requerido || 'Sin servicio';
@@ -151,13 +156,13 @@ export class ReportesDeServiciosComponent implements OnInit {
     });
     this.servicioTop = topServicio;
 
-    // Tasa de finalización
     const noCancelados = tickets.filter(t => t.estado !== 'Cancelado');
     this.tasaFinalizacion = noCancelados.length > 0
       ? Math.round((finalizados.length / noCancelados.length) * 100)
       : 0;
   }
 
+  // Bloque de acción para regenerar el reporte con los filtros actuales
   generarReporte() {
     this.calcular();
   }

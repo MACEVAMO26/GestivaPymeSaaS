@@ -59,7 +59,7 @@ export class FormalizacionComponent implements OnInit {
   isFormalizarModalOpen = false;
   isSubmitting = false;
   
-  // Opciones estándar colombianas de Seguridad Social
+  // --- OPCIONES DE SEGURIDAD SOCIAL ---
   listaEPS = ['Sura', 'Sanitas', 'Compensar', 'SaludTotal', 'NuevaEPS', 'Famisanar', 'Aliansalud'];
   listaPensiones = ['Proteccion', 'Porvenir', 'Colfondos', 'Skandia', 'Colpensiones'];
   listaCesantias = ['Proteccion', 'Porvenir', 'Colfondos', 'FNA'];
@@ -118,6 +118,7 @@ export class FormalizacionComponent implements OnInit {
     modulos_permitidos: {}
   };
 
+  // Bloque de ciclo de vida para inicializar datos de formalización
   ngOnInit(): void {
     this.cargarPendientes();
     this.cargarSedes();
@@ -127,6 +128,7 @@ export class FormalizacionComponent implements OnInit {
       this.cargarRoles();
   }
 
+  // Bloque para cargar la lista de sedes de la empresa
   cargarSedes() {
     this.http.get<any[]>('/api/sedes').pipe(timeout(15000)).subscribe({
       next: (res) => { this.sedes = res; },
@@ -134,10 +136,12 @@ export class FormalizacionComponent implements OnInit {
     });
   }
 
+  // Bloque para cambiar entre pestañas de formalización
   setTab(tab: string) {
     this.currentTab = tab;
   }
 
+  // Bloque para cargar los usuarios pendientes de formalización
   cargarPendientes() {
     this.pagePendientes = 1;
     this.empleadoService.getPendientes().pipe(timeout(15000)).subscribe({
@@ -150,6 +154,7 @@ export class FormalizacionComponent implements OnInit {
     });
   }
 
+  // Bloque para cargar los empleados ya formalizados en la empresa
   cargarFormalizados() {
     this.pageFormalizados = 1;
     this.empleadoService.getEmpleados().pipe(timeout(15000)).subscribe({
@@ -162,6 +167,7 @@ export class FormalizacionComponent implements OnInit {
     });
   }
 
+  // Bloque para cargar las áreas de la estructura organizacional
   cargarAreas() {
     this.empleadoService.getAreas().pipe(timeout(15000)).subscribe({
       next: (res) => { this.areas = res; },
@@ -169,6 +175,7 @@ export class FormalizacionComponent implements OnInit {
     });
   }
 
+  // Bloque para cargar los cargos existentes
   cargarCargos() {
     this.empleadoService.getCargos().pipe(timeout(15000)).subscribe({
       next: (res) => { this.cargos = res; },
@@ -176,6 +183,7 @@ export class FormalizacionComponent implements OnInit {
     });
   }
 
+  // Bloque para abrir el formulario de formalización para un usuario
   abrirModalFormalizar(p: any) {
     this.usuarioAFormalizar = p;
     this.formalizarForm = {
@@ -195,16 +203,19 @@ export class FormalizacionComponent implements OnInit {
     this.isFormalizarModalOpen = true;
   }
 
+  // Bloque para cerrar el formulario de formalización
   cerrarModalFormalizar() {
     this.isFormalizarModalOpen = false;
   }
 
+  // Bloque para obtener los cargos pertenecientes a un área específica
   getCargosPorArea(areaId: any) {
     if (!areaId) return [];
-    // Filtrar por area_id, pero también excluir los cargos maestros si no pertenecen estrictamente al área
+    
     return this.cargos.filter(c => c.area_id == areaId && c.nombre !== 'Jefe de Recursos Humanos' && c.nombre !== 'Gerente General');
   }
 
+  // Bloque para registrar la formalización legal del empleado
   submitFormalizar() {
     if (!this.formalizarForm.sede_id || !this.formalizarForm.area_id || !this.formalizarForm.cargo_id || !this.formalizarForm.tipo_contrato || !this.formalizarForm.fecha_contratacion) {
       this.toast.warning('Complete los datos organizacionales y laborales');
@@ -245,12 +256,14 @@ export class FormalizacionComponent implements OnInit {
     });
   }
 
+  // Bloque para obtener el nombre completo formateado de un usuario
   nombreCompleto(u: any): string {
     if (!u) return '';
     return [u.primer_nombre, u.segundo_nombre, u.primer_apellido, u.segundo_apellido].filter(Boolean).join(' ');
   }
 
   // --- MÉTODOS DE EDICIÓN DE PERFIL Y PERMISOS DE MÓDULOS DE EMPLEADO FORMALIZADO ---
+  // Bloque para abrir modal de edición de datos de un empleado formalizado
   abrirModalEditarEmpleado(e: any) {
     this.empleadoAEditar = e;
     const mods = e.modulos_permitidos || {};
@@ -280,19 +293,23 @@ export class FormalizacionComponent implements OnInit {
     this.isEditarEmpleadoModalOpen = true;
   }
 
+  // Bloque para cerrar modal de edición de empleado
   cerrarModalEditarEmpleado() {
     this.isEditarEmpleadoModalOpen = false;
     this.empleadoAEditar = null;
   }
 
+  // Bloque para verificar si un módulo está permitido para el empleado
   isModuloPermitido(modId: string): boolean {
     return !!this.editarEmpleadoForm.modulos_permitidos[modId];
   }
 
+  // Bloque para alternar el permiso de un módulo para el empleado
   toggleModuloPermitido(modId: string) {
     this.editarEmpleadoForm.modulos_permitidos[modId] = !this.editarEmpleadoForm.modulos_permitidos[modId];
   }
 
+  // Bloque para guardar los cambios y permisos del empleado formalizado
   submitEditarEmpleado() {
     if (!this.editarEmpleadoForm.id) return;
     this.isSubmitting = true;
@@ -317,26 +334,32 @@ export class FormalizacionComponent implements OnInit {
     });
   }
 
+  // Bloque para obtener el nombre del cargo asignado a un empleado
   cargoNombre(e: any): string {
     return e?.cargo?.nombre || '—';
   }
 
+  // Bloque para obtener el nombre del área asignada a un empleado
   areaNombre(e: any): string {
     return e?.area?.nombre || '—';
   }
 
+  // Bloque para cargar la lista de roles del sistema
   cargarRoles() {
     this.http.get('/api/roles').subscribe((res: any) => this.roles = res);
   }
 
 // --- Areas ---
+  // Bloque para abrir modal de creación o edición de área
   abrirModalArea(area?: any) {
     this.areaForm = area ? { ...area } : { nombre: '', descripcion: '' };
     this.isAreaModalOpen = true;
   }
+  // Bloque para cerrar modal de área
   cerrarModalArea() {
     this.isAreaModalOpen = false;
   }
+  // Bloque para guardar o actualizar un área organizacional
   guardarArea() {
     if (!this.areaForm.nombre) {
       this.toast.warning('El nombre del área es obligatorio');
@@ -367,13 +390,16 @@ export class FormalizacionComponent implements OnInit {
 
 
 // --- Cargos ---
+  // Bloque para abrir modal de creación o edición de cargo
   abrirModalCargo(cargo?: any) {
     this.cargoForm = cargo ? { ...cargo } : { nombre: '', rol_id: '', descripcion: '' };
     this.isCargoModalOpen = true;
   }
+  // Bloque para cerrar modal de cargo
   cerrarModalCargo() {
     this.isCargoModalOpen = false;
   }
+  // Bloque para guardar o actualizar un cargo organizacional
   guardarCargo() {
     if (!this.cargoForm.nombre || !this.cargoForm.rol_id) {
       this.toast.warning('El nombre y el rol son obligatorios');

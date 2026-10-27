@@ -32,7 +32,7 @@
 
   <!-- HTML CONTENIDO DE TABS -->
   <div class="tab-content neumorphic-panel-inner p-4">
-  <!-- Botón Volver Inyectado -->
+  <!-- HTML BOTON VOLVER -->
   <div class="volver-wrapper">
     <button class="btn-volver btn-pill" appVolver>
       <i class="fas fa-arrow-left"></i> Volver
@@ -95,7 +95,7 @@
               }
               @if(productosFiltrados.length === 0) {
                 <tr>
-                  <td colspan="8" style="padding: 0;">
+                  <td colspan="8" class="p-0">
                     <div class="empty-state">
                       No hay productos registrados.
                     </div>
@@ -106,7 +106,7 @@
           </table>
         </div>
 
-        <!-- Paginación Catálogo (8 por página) -->
+        <!-- HTML PAGINACION CATALOGO -->
         @if (totalPagesCatalogo > 1) {
           <div class="neu-pagination-bar">
             <div class="pagination-info">
@@ -144,14 +144,14 @@
         <div class="neumorphic-panel panel-seccion">
           <h2 class="subtitulo">Registrar Movimiento</h2>
           <div class="form-fila">
-            <div class="form-group" style="flex: 1; min-width: 200px;">
+            <div class="form-group flex-1-min200">
               <label>Tipo *</label>
               <select class="input-neumorphic" [(ngModel)]="formMovimiento.tipo">
                 <option value="entrada">Entrada (+)</option>
                 <option value="salida">Salida (-)</option>
               </select>
             </div>
-            <div class="form-group" style="flex: 2; min-width: 200px;">
+            <div class="form-group flex-2-min200">
               <label>Producto *</label>
               <select class="input-neumorphic" [(ngModel)]="formMovimiento.producto_id">
                 <option value="" disabled selected>Seleccione el producto...</option>
@@ -160,16 +160,16 @@
                 }
               </select>
             </div>
-            <div class="form-group" style="flex: 1; min-width: 150px;">
+            <div class="form-group flex-1-min150">
               <label>Cantidad *</label>
               <input type="number" class="input-neumorphic" [(ngModel)]="formMovimiento.cantidad" min="1" placeholder="Ej. 10">
             </div>
           </div>
-          <div class="form-group" style="margin-top: 1rem;">
+          <div class="form-group mt-1rem">
             <label>Motivo / Observaciones</label>
             <input type="text" class="input-neumorphic" [(ngModel)]="formMovimiento.observaciones" placeholder="Ej. Compra a proveedor #1040">
           </div>
-          <div style="text-align: right; margin-top: 1.5rem;">
+          <div class="actions-right-mt">
             <button class="btn-save btn-pill" (click)="registrarMovimiento()" [disabled]="guardando">
               @if(guardando) { <i class="fas fa-spinner fa-spin"></i> Guardando... } @else { Registrar Movimiento }
             </button>
@@ -213,7 +213,7 @@
           </table>
         </div>
 
-        <!-- Paginación Movimientos (8 por página) -->
+        <!-- HTML PAGINACION MOVIMIENTOS -->
         @if (totalPagesMovimientos > 1) {
           <div class="neu-pagination-bar">
             <div class="pagination-info">
@@ -251,7 +251,7 @@
         <div class="neumorphic-panel panel-seccion">
           <h2 class="subtitulo">Nuevo Ajuste (Merma/Daño)</h2>
           <div class="form-fila">
-            <div class="form-group" style="flex: 2; min-width: 200px;">
+            <div class="form-group flex-2-min200">
               <label>Producto *</label>
               <select class="input-neumorphic" [(ngModel)]="formAjuste.producto_id">
                 <option value="" disabled selected>Seleccione el producto...</option>
@@ -260,16 +260,16 @@
                 }
               </select>
             </div>
-            <div class="form-group" style="flex: 1; min-width: 150px;">
+            <div class="form-group flex-1-min150">
               <label>Cantidad a Descontar *</label>
               <input type="number" class="input-neumorphic" [(ngModel)]="formAjuste.cantidad" min="1" placeholder="Ej. 1">
             </div>
           </div>
-          <div class="form-group" style="margin-top: 1rem;">
+          <div class="form-group mt-1rem">
             <label>Justificación del Ajuste *</label>
             <input type="text" class="input-neumorphic" [(ngModel)]="formAjuste.observaciones" placeholder="Ej. Monitor dañado en bodega">
           </div>
-          <div style="text-align: right; margin-top: 1.5rem;">
+          <div class="actions-right-mt">
             <button class="btn-save btn-pill" (click)="aplicarAjuste()" [disabled]="guardando">
               @if(guardando) { <i class="fas fa-spinner fa-spin"></i> Aplicando... } @else { Aplicar Ajuste }
             </button>
@@ -315,7 +315,7 @@
     @if(activeTab === 'kardex') {
       <div class="neumorphic-panel fade-in">
         <div class="action-bar-kardex">
-          <div class="form-group" style="flex: 2; margin: 0;">
+          <div class="form-group flex-2-nomargin">
             <label>Seleccionar Producto para Kardex</label>
             <select class="input-neumorphic" [(ngModel)]="productoKardex">
               <option value="" disabled selected>Buscar producto...</option>
@@ -324,7 +324,7 @@
               }
             </select>
           </div>
-          <div class="form-group" style="flex: 1; margin: 0;">
+          <div class="form-group flex-1-nomargin">
             <label>Mes</label>
             <input type="month" class="input-neumorphic">
           </div>
@@ -363,7 +363,7 @@
           </table>
         </div>
 
-        <!-- Paginación Kardex (8 por página) -->
+        <!-- HTML PAGINACION KARDEX -->
         @if (totalPagesKardex > 1) {
           <div class="neu-pagination-bar">
             <div class="pagination-info">
@@ -399,7 +399,7 @@
     @if(activeTab === 'categorias') {
       <div class="neumorphic-panel fade-in">
         <div class="action-bar">
-          <p class="descripcion-general" style="margin: 0;">Clasifique sus productos y servicios por categorías.</p>
+          <p class="descripcion-general m-0">Clasifique sus productos y servicios por categorías.</p>
           <button class="btn-add btn-pill" (click)="abrirModalCategoria()">
             <i class="fas fa-plus"></i> Nueva Categoría
           </button>
@@ -448,7 +448,7 @@
           </table>
         </div>
 
-        <!-- Paginación Categorías (8 por página) -->
+        <!-- HTML PAGINACION CATEGORIAS -->
         @if (totalPagesCategorias > 1) {
           <div class="neu-pagination-bar">
             <div class="pagination-info">
@@ -487,7 +487,7 @@
 <!-- HTML MODAL NUEVO PRODUCTO -->
 @if(showModal) {
 <div class="view-switch-panel fade-in">
-  <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+  <div class="neu-card neu-card-center">
     <div class="panel-header mb-4">
       <h1 class="titulo-principal">NUEVO PRODUCTO</h1>
       <button class="btn-close" (click)="cerrarModal()">&times;</button>
@@ -514,29 +514,29 @@
           <label>Unidad de Medida *</label>
           <input type="text" class="input-neumorphic" [(ngModel)]="formProducto.unidad_medida" placeholder="Ej. Unidad, Kg, Caja">
         </div>
-        <div style="display: flex; gap: 1rem;">
-          <div class="form-group" style="flex: 1;">
+        <div class="d-flex-gap-1">
+          <div class="form-group flex-1">
             <label>Precio de Venta</label>
             <input type="number" class="input-neumorphic" [(ngModel)]="formProducto.precio_venta">
           </div>
-          <div class="form-group" style="flex: 1;">
+          <div class="form-group flex-1">
             <label>Costo de Compra</label>
             <input type="number" class="input-neumorphic" [(ngModel)]="formProducto.precio_compra">
           </div>
         </div>
-        <div style="display: flex; gap: 1rem;">
-          <div class="form-group" style="flex: 1;">
+        <div class="d-flex-gap-1">
+          <div class="form-group flex-1">
             <label>Stock Inicial</label>
             <input type="number" class="input-neumorphic" [(ngModel)]="formProducto.stock_inicial" placeholder="Ej. 10">
           </div>
-          <div class="form-group" style="flex: 1;">
+          <div class="form-group flex-1">
             <label>Imagen del Producto</label>
             <input type="file" class="input-neumorphic" (change)="onFileSelected($event)" accept="image/*">
           </div>
         </div>
       </div>
     
-<div class="modal-footer" style="margin-top: 2rem;">
+<div class="modal-footer mt-2rem">
       <button class="btn-volver btn-pill" (click)="cerrarModal()">Volver</button>
       <button class="btn-save btn-pill" (click)="guardarProducto()" [disabled]="guardando">
         @if(guardando) {
@@ -553,7 +553,7 @@
 <!-- HTML MODAL CATEGORÍA -->
 @if(showModalCategoria) {
 <div class="view-switch-panel fade-in">
-  <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+  <div class="neu-card neu-card-center">
     <div class="panel-header mb-4">
       <h1 class="titulo-principal">{{ editandoCategoria ? 'EDITAR CATEGORÍA' : 'NUEVA CATEGORÍA' }}</h1>
       <button class="btn-close" (click)="cerrarModalCategoria()">&times;</button>
@@ -576,7 +576,7 @@
         </select>
       </div>
     </div>
-    <div class="modal-footer" style="margin-top: 2rem;">
+    <div class="modal-footer mt-2rem">
       <button class="btn-volver btn-pill" (click)="cerrarModalCategoria()">Volver</button>
       <button class="btn-save btn-pill" (click)="guardarCategoria()" [disabled]="guardandoCategoria">
         @if(guardandoCategoria) {

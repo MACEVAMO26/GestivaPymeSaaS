@@ -9,7 +9,7 @@ export class AuditoriaService {
   private http = inject(HttpClient);
   private apiUrl = '/api/logs';
 
-  // Los headers de autenticación los inyecta automáticamente el authInterceptor
+  
 
   getLogs(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl);

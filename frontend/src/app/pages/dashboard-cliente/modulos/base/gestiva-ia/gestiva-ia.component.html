@@ -1,4 +1,5 @@
 <div class="module-container fade-in">
+  <!-- HTML ENCABEZADO GESTIVA IA -->
   <div class="module-header text-center mb-4 relative">
     <h1>DIRECTRICES IA</h1>
     <p>Configura los recordatorios y sugerencias silenciosas que la IA le dará a tu equipo.</p>
@@ -6,15 +7,16 @@
 
   <div class="tab-content neumorphic-panel-inner p-4">
     
+    <!-- HTML BOTON VOLVER -->
     <div class="volver-wrapper">
       <button class="btn-volver btn-pill" onclick="window.history.back()">
         <i class="fas fa-arrow-left"></i> Volver
       </button>
     </div>
 
-    <!-- LISTADO DE DIRECTRICES -->
+    <!-- HTML LISTADO DE DIRECTRICES -->
     <div *ngIf="!showForm" class="neumorphic-panel fade-in">
-      <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
+      <div class="flex-end-mb-15">
         <button class="btn-add btn-pill" (click)="abrirFormulario()">+ Nueva Directriz</button>
       </div>
 
@@ -55,14 +57,14 @@
                 </td>
               </tr>
               <tr *ngIf="directrices.length === 0">
-                <td colspan="5" class="text-center" style="padding: 20px;">No hay directrices configuradas. ¡Crea la primera!</td>
+                <td colspan="5" class="text-center" class="table-empty-pad-20">No hay directrices configuradas. ¡Crea la primera!</td>
               </tr>
             </tbody>
           </table>
         </div>
     </div>
 
-    <!-- FORMULARIO DE CREACIÓN/EDICIÓN -->
+    <!-- HTML FORMULARIO CREACION Y EDICION -->
     <div *ngIf="showForm" class="neumorphic-panel fade-in">
       <h2 class="subtitulo">{{ modoEdicion ? 'Editar Directriz' : 'Nueva Directriz' }}</h2>
         

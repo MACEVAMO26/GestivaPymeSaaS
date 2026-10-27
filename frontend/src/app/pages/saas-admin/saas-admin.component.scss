@@ -1,4 +1,5 @@
-
+/* --- 0. BACKGROUND PRINCIPAL DEL MÓDULO SAAS ADMIN --- */
+/* --- 1. VARIABLES GLOBALES --- */
 $primary-color: #6366f1;
 $primary-hover: #4f46e5;
 $bg-color: #3b6d77;
@@ -16,7 +17,7 @@ $shadow-lg:
   0 3px 5px -2px rgba(0, 0, 0, 0.2);
 $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-/* --- NEOGLASSMORPHISM: SISTEMA DE BOTONES DE CRISTAL --- */
+/* --- 2. SISTEMA DE BOTONES DE CRISTAL NEOGLASSMORPHISM --- */
 @mixin glass-btn($tint, $tint-hover, $border-color, $text-color: #ffffff) {
   background: $tint;
   color: $text-color;
@@ -59,7 +60,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   filter: contrast(1.2) hue-rotate(40deg) saturate(1.5);
 }
 
-/* --- VARIANTES DE CRISTAL PARA BOTONES TAILWIND --- */
+/* --- 3. VARIANTES DE CRISTAL PARA BOTONES TAILWIND --- */
 .glass-btn-red {
   @include glass-btn(rgba(225, 29, 72, 0.22), rgba(225, 29, 72, 0.45), rgba(225, 29, 72, 0.5));
 }
@@ -87,15 +88,12 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: 'Product Sans', sans-serif;
 }
 
-/* 
-  --- TÍTULOS DE LOS MÓDULOS ---
- 
-*/
+/* --- 4. TÍTULOS Y VARIABLES DE BARRA LATERAL --- */
 
 $sidebar-text: #0f172a;
 $sidebar-text-muted: #0f172a;
 
-/* --- 3. LAYOUT PRINCIPAL --- */
+/* --- 5. LAYOUT PRINCIPAL --- */
 .saas-layout {
   display: flex;
   flex-direction: column;
@@ -113,7 +111,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- 4. CABECERA --- */
+/* --- 6. CABECERA --- */
 .global-header {
   min-height: 58px;
   background-color: #1e293b;
@@ -256,7 +254,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- 5. CUERPO PRINCIPAL --- */
+/* --- 7. CUERPO PRINCIPAL --- */
 .main-body {
   display: flex;
   flex: 1;
@@ -264,7 +262,7 @@ $sidebar-text-muted: #0f172a;
   position: relative;
 }
 
-/* --- 6. BARRA LATERAL --- */
+/* --- 8. BARRA LATERAL --- */
 .sidebar-saas {
   width: 185px;
   min-width: 185px;
@@ -417,7 +415,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- 7. CONTENIDO PRINCIPAL --- */
+/* --- 9. CONTENIDO PRINCIPAL --- */
 .main-content {
   flex: 1;
   display: flex;
@@ -438,7 +436,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- 8. TOPBAR --- */
+/* --- 10. TOPBAR --- */
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -509,7 +507,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- 9. AREA CONTENIDO --- */
+/* --- 11. AREA DE CONTENIDO --- */
 .content-area {
   padding: 0 1rem 1rem 1rem;
   @media (min-width: 768px) {
@@ -802,7 +800,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- 10. MODALS --- */
+/* --- 12. MODALES --- */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -880,7 +878,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- 11. DASHBOARD WELCOME PANEL --- */
+/* --- 13. DASHBOARD WELCOME PANEL --- */
 ::ng-deep .dashboard-welcome {
   margin-top: 2rem;
   h3 {
@@ -891,7 +889,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- 12. STATUS CARDS GRID --- */
+/* --- 14. STATUS CARDS GRID --- */
 ::ng-deep .status-cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(144px, 1fr));
@@ -899,7 +897,7 @@ $sidebar-text-muted: #0f172a;
   margin-bottom: 1.75rem;
 }
 
-/* --- 13. STATUS CARD BASE --- */
+/* --- 15. STATUS CARD BASE --- */
 ::ng-deep .status-card {
   display: flex;
   flex-direction: column;
@@ -937,7 +935,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- 14. ACTIVE CARD --- */
+/* --- 16. ACTIVE CARD --- */
 ::ng-deep .active-card {
   background: rgba(6, 78, 59, 0.55);
   border-color: rgba(52, 211, 153, 0.5);
@@ -952,7 +950,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- 15. MORA CARD --- */
+/* --- 17. MORA CARD --- */
 ::ng-deep .mora-card {
   background: rgba(120, 53, 15, 0.55);
   border-color: rgba(251, 191, 36, 0.5);
@@ -967,7 +965,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- 16. PENDING CARD --- */
+/* --- 18. PENDING CARD --- */
 ::ng-deep .pending-card {
   background: rgba(49, 46, 129, 0.55);
   border-color: rgba(165, 180, 252, 0.5);
@@ -982,7 +980,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- 17. QUICK ACTIONS --- */
+/* --- 19. QUICK ACTIONS --- */
 .quick-actions {
   display: flex;
   align-items: center;
@@ -999,7 +997,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- 18. BTN ACTION BASE --- */
+/* --- 20. BTN ACTION BASE --- */
 .btn-action {
   display: inline-flex;
   align-items: center;
@@ -1022,7 +1020,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- 19. PRIMARY ACTION --- */
+/* --- 21. PRIMARY ACTION --- */
 .primary-action {
   background: #4f46e5;
   color: #ffffff;
@@ -1031,7 +1029,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- 20. SECONDARY ACTION --- */
+/* --- 22. SECONDARY ACTION --- */
 .secondary-action {
   background: rgba(255, 255, 255, 0.85);
   color: #0f172a;
@@ -1043,7 +1041,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- 21. ESTILOS COMPLEMENTARIOS --- */
+/* --- 23. ESTILOS COMPLEMENTARIOS --- */
 .nav-text {
   font-size: 14px;
   font-weight: 600;
@@ -1607,9 +1605,9 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- 22. DISEÑO SOFT UI --- */
+/* --- 24. DISEÑO SOFT UI --- */
 .soft-ui-card {
-  background: #09233a; /* Nivel 3: Ligeramente más oscuro que el panel de vidrio */
+  background: #09233a; 
   border-radius: 20px;
   padding: 1.5rem;
   box-shadow:
@@ -1672,7 +1670,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- 23. BOTONES SOFT UI --- */
+/* --- 25. BOTONES SOFT UI --- */
 .soft-ui-btn {
   @include glass-btn(
     rgba(16, 185, 129, 0.25),
@@ -1798,7 +1796,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- CLASES NEU-DARK RESTAURADAS --- */
+/* --- 26. CLASES NEU-DARK RESTAURADAS --- */
 .neu-dark-panel {
   background: #0d3454;
   border-radius: 20px;
@@ -1843,8 +1841,8 @@ $sidebar-text-muted: #0f172a;
   @extend .soft-ui-input;
 }
 
-/* --- SISTEMA UNIFICADO DE BOTONES DE ACCIÓN (COLUMNA "ACCIONES") --- */
-/* Guarda simetría exacta en todos los módulos (36px x 36px, iconos 20px x 20px, tooltips) */
+/* --- 27. SISTEMA UNIFICADO DE BOTONES DE ACCIÓN --- */
+
 .saas-action-btn {
   width: 36px;
   height: 36px;
@@ -1969,7 +1967,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- SISTEMA UNIFICADO DE BOTONES ESTÁNDAR DE MÓDULOS (40px, Montserrat 14px) --- */
+/* --- 28. SISTEMA UNIFICADO DE BOTONES ESTÁNDAR DE MÓDULOS --- */
 .saas-btn {
   font-family: 'Montserrat', sans-serif;
   font-size: 14px;
@@ -2028,7 +2026,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- PESTAÑAS (TABS) HORIZONTALES UNIFICADAS (40px, Montserrat 14px) --- */
+/* --- 29. PESTAÑAS TABS HORIZONTALES UNIFICADAS --- */
 .saas-tab-btn {
   height: 2.5rem;
   min-height: 2.5rem;
@@ -2061,7 +2059,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- JERARQUÍA TIPOGRÁFICA ACCESIBLE (BASE 16px, MÍNIMO 14px, CONTRASTE >= 3:1) --- */
+/* --- 30. JERARQUÍA TIPOGRÁFICA ACCESIBLE --- */
 :host {
   font-family: 'Montserrat', sans-serif;
   font-size: 16px;
@@ -2099,7 +2097,7 @@ $sidebar-text-muted: #0f172a;
     font-size: 14px;
   }
 
-  /* Contraste mínimo >= 3:1 para textos secundarios sobre fondos oscuros */
+  
   .text-gray-400,
   .text-gray-500,
   .text-slate-400,
@@ -2107,7 +2105,7 @@ $sidebar-text-muted: #0f172a;
     color: #cbd5e1;
   }
 
-  /* MENU COLAPSABLE */
+  
   .nav-item {
     font-family: 'Montserrat', sans-serif;
   }
@@ -2121,7 +2119,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- BOTÓN NUEVO (ESTILO SAAS ADMIN) --- */
+/* --- 31. BOTÓN NUEVO ESTILO SAAS ADMIN --- */
 .btn-new {
   @include glass-btn(
     rgba(16, 185, 129, 0.28),
@@ -2140,7 +2138,7 @@ $sidebar-text-muted: #0f172a;
   gap: 0.5rem;
 }
 
-/* --- CARRITO DE SUSCRIPCIONES & CHECKOUT --- */
+/* --- 32. CARRITO DE SUSCRIPCIONES Y CHECKOUT --- */
 .neu-dark-input {
   background: #0f172a;
   border: 1px solid #475569;
@@ -2158,7 +2156,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- BARRA DE PAGINACIÓN UNIFICADA (8 ENTRADAS POR PÁGINA) --- */
+/* --- 33. BARRA DE PAGINACIÓN UNIFICADA --- */
 .saas-pagination-bar {
   display: flex;
   flex-direction: column;
@@ -2228,7 +2226,7 @@ $sidebar-text-muted: #0f172a;
   }
 }
 
-/* --- SCROLLBAR ESTILIZADO SAAS ADMIN (REEMPLAZA SCROLLBAR CLARO DE WINDOWS) --- */
+/* --- 34. SCROLLBAR ESTILIZADO SAAS ADMIN --- */
 :host,
 .saas-layout,
 div[class*="overflow-"] {

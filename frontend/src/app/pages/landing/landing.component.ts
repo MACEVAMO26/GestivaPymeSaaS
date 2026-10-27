@@ -29,6 +29,7 @@ export class LandingComponent implements OnInit {
     mensaje: ''
   };
 
+  // --- INYECCIÓN DE DEPENDENCIAS Y SERVICIOS ---
   http = inject(HttpClient);
   cdr = inject(ChangeDetectorRef);
   private router = inject(Router);
@@ -36,46 +37,46 @@ export class LandingComponent implements OnInit {
   private titleService = inject(Title);
   private metaService = inject(Meta);
 
-  // Redirige a la vista de inicio de sesion cerrando el menu movil si estaba abierto
+  // Bloque para redirigir a la vista de inicio de sesión cerrando el menú móvil
   goToLogin() {
     this.isMobileMenuOpen = false;
     this.router.navigate(['/login']);
   }
 
-  // Abre o cierra el menu desplegable en pantallas moviles
+  // Bloque para alternar la visibilidad del menú desplegable en pantallas móviles
   toggleMobileMenu() {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
   }
 
-  // Cierra el menu desplegable movil al seleccionar una seccion
+  // Bloque para cerrar el menú móvil al seleccionar una opción de navegación
   closeMobileMenu() {
     this.isMobileMenuOpen = false;
   }
 
-  // Inicializa el componente y despierta al servidor
+  // Bloque del ciclo de vida ngOnInit para inicializar el componente, verificar sesión activa y configurar SEO
   ngOnInit(): void {
-    // Si el usuario ingresa o retrocede al Landing teniendo sesión activa, se cierra de inmediato
+    // Bloque de cierre de sesión previa en caso de que exista un token activo al ingresar al landing
     if (this.authService.getToken()) {
       this.authService.logout(false);
     }
 
     window.scrollTo(0, 0);
 
-    // Configurar SEO dinámico
+    // Bloque para configurar el SEO dinámico y metadatos de la página
     this.titleService.setTitle('GestivaPyme | Software de Gestión, Facturación y ERP para Pymes');
     this.metaService.updateTag({
       name: 'description',
       content: 'GestivaPyme es el software ERP y administrativo en la nube para pymes y emprendedores. Controla inventario, clientes 360, cotizaciones, ventas, compras, servicios técnicos FSM y finanzas.'
     });
 
-    // Ping "Ninja" para despertar a Render de su inactividad gratuita
+    // Bloque de ping ninja para reactivar el servicio del backend en caso de inactividad
     this.http.get('/api/ping').subscribe({
       next: () => console.log('Servidor despertado'),
       error: () => console.log('Error despertando servidor')
     });
   }
 
-  // Alterna la visibilidad del chatbot
+  // Bloque para alternar la visibilidad de la ventana del chatbot
   toggleChatbot() {
     this.isChatbotOpen = !this.isChatbotOpen;
     if (!this.isChatbotOpen) {
@@ -84,25 +85,27 @@ export class LandingComponent implements OnInit {
     }
   }
 
-  // Muestra la vista de contacto telefonico
+  // Bloque para mostrar la vista de contacto telefónico en el bot
   showPhone() {
     this.botView = 'phone';
   }
 
-  // Muestra la vista de formulario de contacto
+  // Bloque para mostrar la vista de formulario de contacto en el bot
   showForm() {
     this.botView = 'form';
   }
 
-  // Vuelve al menu principal del chatbot
+  // Bloque para regresar al menú principal del chatbot
   backToMenu() {
     this.botView = 'menu';
     this.errorMessage = '';
   }
 
-  // Envia el formulario para registro de lead
+  // Bloque para validar y enviar el formulario de registro de prospecto (lead) al backend
   submitLead() {
     this.errorMessage = '';
+
+    // Bloque de validación de campos requeridos del formulario
     if (!this.leadForm.nombre || !this.leadForm.telefono || !this.leadForm.correo || !this.leadForm.horario_llamada) {
       this.errorMessage = 'Por favor completa nombre, teléfono, correo y horario.';
       return;
@@ -110,13 +113,14 @@ export class LandingComponent implements OnInit {
 
     this.isSubmitting = true;
 
+    // Bloque de petición HTTP POST para registrar el prospecto en la base de datos
     this.http.post('/api/leads', this.leadForm)
       .subscribe({
         next: () => {
           this.isSubmitting = false;
           this.botView = 'success';
           
-          // Restablece el formulario a sus valores iniciales
+          // Bloque de reinicio del formulario tras envío exitoso
           this.leadForm = {
             nombre: '',
             telefono: '',
@@ -126,7 +130,7 @@ export class LandingComponent implements OnInit {
           };
           this.cdr.detectChanges();
 
-          // Cierra automáticamente el mensaje de éxito después de 3 segundos
+          // Bloque de temporizador para retornar al menú principal automáticamente tras 3 segundos
           setTimeout(() => {
             if (this.botView === 'success') {
               this.backToMenu();

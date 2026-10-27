@@ -14,9 +14,7 @@ class GestivaIaController extends Controller
         $this->iaService = $iaService;
     }
 
-    /**
-     * Procesa la tarea enviada desde el botón flotante
-     */
+    // Bloque para procesar tareas y consultas mediante el servicio de IA
     public function procesarTarea(Request $request)
     {
         $request->validate([

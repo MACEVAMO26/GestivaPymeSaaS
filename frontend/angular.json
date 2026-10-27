@@ -32,11 +32,17 @@
               "src/assets"
             ],
             "styles": [
+              "src/assets/fontawesome/css/all.min.css",
               "src/styles.scss"
             ]
           },
           "configurations": {
             "production": {
+              "optimization": {
+                "scripts": true,
+                "styles": true,
+                "fonts": false
+              },
               "budgets": [
                 {
                   "type": "initial",
@@ -81,4 +87,3 @@
     }
   }
 }
-

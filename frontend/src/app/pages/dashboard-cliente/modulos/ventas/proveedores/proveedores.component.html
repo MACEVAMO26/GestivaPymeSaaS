@@ -26,14 +26,14 @@
 
     <!-- HTML CONTENIDO DE TABS -->
     <div class="tab-content neumorphic-panel-inner p-4">
-      <!-- Botón Volver -->
+      <!-- HTML BOTON VOLVER -->
       <div class="volver-wrapper">
         <button class="btn-volver btn-pill" appVolver>
           <i class="fas fa-arrow-left"></i> Volver
         </button>
       </div>
       
-      <!-- TAB DIRECTORIO -->
+      <!-- HTML PESTAÑA DIRECTORIO PROVEEDORES -->
       @if(activeTab === 'directorio') {
         <div class="neumorphic-panel fade-in">
           <div class="action-bar">
@@ -62,7 +62,7 @@
               <tbody>
                 @if (proveedoresFiltrados.length === 0) {
                   <tr>
-                    <td colspan="5" style="padding: 2rem; text-align: center;">
+                    <td colspan="5" class="table-empty-state">
                       <div class="empty-state">
                         No hay proveedores registrados.
                       </div>
@@ -89,7 +89,7 @@
                         </span>
                       </td>
                       <td>
-                        <div class="acciones-fila" style="display: flex; gap: 0.4rem; justify-content: center; align-items: center;">
+                        <div class="acciones-fila acciones-fila-center">
                           <button class="btn-action-circle btn-circle-edit" (click)="abrirModal(proveedor)" title="Editar Proveedor">
                             <i class="fas fa-edit"></i>
                           </button>
@@ -128,7 +128,7 @@
         </div>
       }
 
-      <!-- TAB CUENTAS POR PAGAR -->
+      <!-- HTML PESTAÑA CUENTAS POR PAGAR -->
       @if(activeTab === 'cuentas') {
         <div class="neumorphic-panel fade-in">
           <div class="cuentas-resumen">
@@ -152,13 +152,13 @@
                   <th>TOTAL</th>
                   <th>SALDO PENDIENTE</th>
                   <th>ESTADO</th>
-                  <th style="text-align: center;">ACCIÓN</th>
+                  <th class="text-center">ACCIÓN</th>
                 </tr>
               </thead>
               <tbody>
                 @if (cuentasPorPagar.length === 0) {
                   <tr>
-                    <td colspan="8" style="padding: 2rem; text-align: center;">
+                    <td colspan="8" class="table-empty-state">
                       <div class="empty-state">
                         No hay facturas o cuentas por pagar pendientes.
                       </div>
@@ -172,11 +172,11 @@
                       <td>{{cuenta.fecha_emision}}</td>
                       <td>{{cuenta.fecha_vencimiento}}</td>
                       <td>{{cuenta.total | currency:'COP':'symbol':'1.0-0'}}</td>
-                      <td style="font-weight: bold; color: #de3737;">{{cuenta.saldo_pendiente | currency:'COP':'symbol':'1.0-0'}}</td>
+                      <td class="saldo-pendiente-danger">{{cuenta.saldo_pendiente | currency:'COP':'symbol':'1.0-0'}}</td>
                       <td>
                         <span class="badge" [ngClass]="getBadgeCuentas(cuenta.estado)">{{cuenta.estado}}</span>
                       </td>
-                      <td style="text-align: center;">
+                      <td class="text-center">
                         @if(cuenta.estado !== 'Pagada' && cuenta.saldo_pendiente > 0) {
                           <button class="btn-save btn-pill btn-xs" (click)="abrirPago(cuenta)">
                             <i class="fas fa-hand-holding-usd"></i> Registrar Pago
@@ -209,10 +209,10 @@
         </div>
       }
 
-      <!-- TAB EVALUACIONES Y CONTRATOS -->
+      <!-- HTML PESTAÑA EVALUACIONES Y CONTRATOS -->
       @if(activeTab === 'evaluaciones') {
         <div class="neumorphic-panel fade-in">
-          <p class="text-muted" style="margin-bottom: 1.5rem;">Califica el desempeño de tus proveedores y supervisa el estado contractual. Un historial de entregas a tiempo y calidad de suministros impacta directamente en tus indicadores de gestión (SLAs).</p>
+          <p class="text-muted mb-1-5rem">Califica el desempeño de tus proveedores y supervisa el estado contractual. Un historial de entregas a tiempo y calidad de suministros impacta directamente en tus indicadores de gestión (SLAs).</p>
           
           <div class="table-responsive">
             <table class="premium-table data-table">
@@ -223,13 +223,13 @@
                   <th>CALIFICACIÓN</th>
                   <th>DESEMPEÑO</th>
                   <th>OBSERVACIONES / SLAs</th>
-                  <th style="text-align: center;">EVALUAR</th>
+                  <th class="text-center">EVALUAR</th>
                 </tr>
               </thead>
               <tbody>
                 @if (contratos.length === 0) {
                   <tr>
-                    <td colspan="6" style="padding: 2rem; text-align: center;">
+                    <td colspan="6" class="table-empty-state">
                       <div class="empty-state">
                         No hay evaluaciones registradas.
                       </div>
@@ -240,16 +240,16 @@
                     <tr>
                       <td><strong>{{eval.proveedor}}</strong></td>
                       <td><span class="badge badge-aprobada">{{eval.vigencia}}</span></td>
-                      <td class="stars" style="color: #C9A227; font-size: 1.1rem;">
+                      <td class="stars stars-gold">
                         {{ '★'.repeat(eval.calificacion || 0) }}{{ '☆'.repeat(5 - (eval.calificacion || 0)) }}
-                        <span class="text-muted text-xs" style="margin-left: 4px;">({{eval.calificacion || 0}}/5)</span>
+                        <span class="text-muted text-xs ml-4px">({{eval.calificacion || 0}}/5)</span>
                       </td>
                       <td>
                         <span class="badge" [ngClass]="getBadgeEval(eval.nrc)">{{eval.nrc}}</span>
                       </td>
                       <td class="cell-truncate">{{eval.comentarios}}</td>
-                      <td style="text-align: center;">
-                        <button class="btn-general-2 btn-pill" style="padding: 0.4rem 0.8rem;" (click)="abrirEvaluar(eval)">
+                      <td class="text-center">
+                        <button class="btn-general-2 btn-pill btn-evaluar" (click)="abrirEvaluar(eval)">
                           <i class="fas fa-star-half-alt"></i> Calificar
                         </button>
                       </td>
@@ -279,32 +279,32 @@
     </div>
   </div>
 
-  <!-- HTML MODAL DIRECTORIO (NUEVO / EDITAR PROVEEDOR) -->
+  <!-- HTML MODAL PROVEEDOR -->
   @if (showModal) {
     <div class="view-switch-panel fade-in">
-      <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+      <div class="neu-card neu-card-center">
         <div class="panel-header mb-4">
           <h1>{{ isEditMode ? 'EDITAR PROVEEDOR' : 'NUEVO PROVEEDOR' }}</h1>
           <button class="btn-close" (click)="cerrarModal()">&times;</button>
         </div>
         <div class="panel-body">
           <div class="form-fila">
-            <div class="form-group" style="flex: 2; min-width: 200px;">
+            <div class="form-group flex-col-grow-2">
               <label>Razón Social *</label>
               <input type="text" class="input-neumorphic" [(ngModel)]="proveedorActual.razon_social" placeholder="Empresa S.A.S">
             </div>
-            <div class="form-group" style="flex: 1; min-width: 150px;">
+            <div class="form-group flex-col-grow-1">
               <label>NIT / RUT *</label>
               <input type="text" class="input-neumorphic" [(ngModel)]="proveedorActual.nit" placeholder="900.123.456-7">
             </div>
           </div>
 
           <div class="form-fila">
-            <div class="form-group" style="flex: 1;">
+            <div class="form-group flex-1">
               <label>Contacto Principal</label>
               <input type="text" class="input-neumorphic" [(ngModel)]="proveedorActual.contacto" placeholder="Nombre completo">
             </div>
-            <div class="form-group" style="flex: 1;">
+            <div class="form-group flex-1">
               <label>Teléfono</label>
               <input type="text" class="input-neumorphic" [(ngModel)]="proveedorActual.telefono" placeholder="300 000 0000">
             </div>
@@ -337,13 +337,13 @@
   <!-- HTML MODAL REGISTRAR PAGO -->
   @if(showModalPago && cuentaSeleccionada) {
     <div class="view-switch-panel fade-in">
-      <div class="neu-card" style="max-width: 500px; margin: 0 auto; text-align: center;">
+      <div class="neu-card neu-card-modal-500">
         <div class="modal-header modal-header-center">
           <i class="fas fa-money-check-alt icon-success"></i>
         </div>
         <div class="panel-body">
           <h1 class="modal-title">REGISTRAR PAGO A PROVEEDOR</h1>
-          <p class="text-muted" style="margin-bottom: 1rem;">
+          <p class="text-muted mb-1rem">
             ¿Confirmas el pago total de la factura <strong>{{cuentaSeleccionada.factura_numero}}</strong> por valor de <strong>{{cuentaSeleccionada.saldo_pendiente | currency:'COP':'symbol':'1.0-0'}}</strong> al proveedor <strong>{{nombreProveedorCuenta(cuentaSeleccionada)}}</strong>?
           </p>
           
@@ -365,15 +365,15 @@
   <!-- HTML MODAL EVALUACION -->
   @if(showModalEvaluacion && evaluacionSeleccionada) {
     <div class="view-switch-panel fade-in">
-      <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+      <div class="neu-card neu-card-center">
         <div class="panel-header mb-4">
           <h1>EVALUAR PROVEEDOR Y CONTRATO</h1>
           <button class="btn-close" (click)="cerrarEvaluar()">&times;</button>
         </div>
         <div class="panel-body">
-          <p class="text-muted" style="text-align: center; margin-bottom: 1.5rem;">Evaluación para: <strong>{{evaluacionSeleccionada.proveedor}}</strong></p>
+          <p class="text-muted text-center mb-1-5rem">Evaluación para: <strong>{{evaluacionSeleccionada.proveedor}}</strong></p>
           
-          <div class="form-group" style="text-align: center;">
+          <div class="form-group" class="text-center">
             <label>Calificación (1 a 5 Estrellas)</label>
             <input type="number" class="input-neumorphic monto-input" [(ngModel)]="nuevaCalificacion" min="1" max="5">
           </div>

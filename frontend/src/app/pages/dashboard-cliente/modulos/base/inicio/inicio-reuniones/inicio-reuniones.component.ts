@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, inject , ChangeDetectorRef} from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReunionService, Reunion } from '../../../../../../services/reunion.service';
@@ -13,17 +13,21 @@ import { timeout } from 'rxjs';
   styleUrl: './inicio-reuniones.component.scss'
 })
 export class InicioReunionesComponent implements OnInit {
+  // --- INYECCIÓN DE DEPENDENCIAS Y SERVICIOS ---
   private cdr = inject(ChangeDetectorRef);
   private reunionService = inject(ReunionService);
   private toast = inject(ToastService);
 
+  // --- VARIABLES DE ESTADO ---
   reuniones: Reunion[] = [];
   cargando: boolean = false;
 
+  // Bloque del ciclo de vida ngOnInit para inicializar y cargar las reuniones
   ngOnInit() {
     this.cargarReuniones();
   }
 
+  // Bloque para consultar el listado de reuniones programadas del usuario
   cargarReuniones() {
     this.cargando = true;
     this.reunionService.getReuniones().pipe(timeout(15000)).subscribe({
@@ -43,12 +47,14 @@ export class InicioReunionesComponent implements OnInit {
     });
   }
 
+  // Bloque helper para extraer el día numérico de la fecha de reunión
   diaReunion(r: Reunion): string {
     if (!r.fecha_hora) return '--';
     const date = new Date(r.fecha_hora);
     return date.getDate().toString();
   }
 
+  // Bloque helper para extraer el mes abreviado de la fecha de reunión
   mesReunion(r: Reunion): string {
     if (!r.fecha_hora) return '--';
     const date = new Date(r.fecha_hora);
@@ -56,17 +62,15 @@ export class InicioReunionesComponent implements OnInit {
     return meses[date.getMonth()];
   }
 
+  // Bloque helper para formatear la hora de la reunión
   horaReunion(r: Reunion): string {
     if (!r.fecha_hora) return '--:--';
     const date = new Date(r.fecha_hora);
-    let h = date.getHours();
-    let m = date.getMinutes().toString().padStart(2, '0');
-    const ampm = h >= 12 ? 'PM' : 'AM';
-    h = h % 12 || 12;
-    return h + ':' + m + ' ' + ampm;
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 
+  // Bloque helper para obtener el nombre del organizador de la reunión
   organizadorReunion(r: Reunion): string {
-    return r.organizador ? r.organizador.nombres + ' ' + r.organizador.apellidos : 'Gerencia / Jefe de Área';
+    return r.organizador ? `${r.organizador.nombres} ${r.organizador.apellidos || ''}`.trim() : 'Sin asignar';
   }
 }

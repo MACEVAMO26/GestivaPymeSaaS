@@ -9,7 +9,7 @@ export class UsuariosService {
   private http = inject(HttpClient);
   private apiUrl = '/api/usuarios';
 
-  // Los headers de autenticación los inyecta automáticamente el authInterceptor
+  
 
   getUsuarios(empresaId?: number): Observable<any[]> {
     const url = empresaId ? `${this.apiUrl}?empresa_id=${empresaId}` : this.apiUrl;

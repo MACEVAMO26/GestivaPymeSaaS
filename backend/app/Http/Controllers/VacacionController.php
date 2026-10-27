@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class VacacionController extends Controller
 {
-    // Trae la lista de todas las vacaciones registradas
+    // Bloque para consultar las solicitudes de vacaciones de la empresa
     public function index(Request $request)
     {
         $user = \Illuminate\Support\Facades\Auth::user();
@@ -26,10 +26,11 @@ class VacacionController extends Controller
         return $query->get();
     }
 
-    // Registra una nueva solicitud de vacaciones
+    // Bloque para registrar una nueva solicitud de vacaciones
     public function store(Request $request)
     {
         $hoy = now('America/Bogota')->format('Y-m-d');
+        // Bloque de reglas de validación
         $validatedData = $request->validate([
             'usuario_id' => 'required|integer|exists:usuarios,id',
             'fecha_inicio' => "required|date|after_or_equal:{$hoy}",
@@ -42,17 +43,18 @@ class VacacionController extends Controller
         ]);
         $validatedData['estado'] = 'pendiente';
 
+        // Bloque de guardado en BD
         $vacacion = Vacacion::create($validatedData);
         return response()->json($vacacion, 201);
     }
 
-    // Muestra el detalle de una solicitud de vacaciones
+    // Bloque para consultar el detalle de una solicitud de vacaciones
     public function show($id)
     {
         return Vacacion::with('usuario')->findOrFail($id);
     }
 
-    // Modifica una solicitud de vacaciones que sigue pendiente
+    // Bloque para modificar una solicitud de vacaciones en estado pendiente
     public function update(Request $request, $id)
     {
         $vacacion = Vacacion::findOrFail($id);
@@ -76,7 +78,7 @@ class VacacionController extends Controller
         return response()->json($vacacion);
     }
 
-    // Aprueba o rechaza una solicitud de vacaciones
+    // Bloque para aprobar o rechazar una solicitud de vacaciones actualizando el estado del empleado
     public function responderSolicitud(Request $request, $id)
     {
         $vacacion = Vacacion::findOrFail($id);

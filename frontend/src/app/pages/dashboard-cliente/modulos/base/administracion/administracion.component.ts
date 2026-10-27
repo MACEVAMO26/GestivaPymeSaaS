@@ -17,11 +17,15 @@ import { timeout } from 'rxjs';
   styleUrl: './administracion.component.scss'
 })
 export class AdministracionComponent implements OnInit, AfterViewInit {
+  // --- INYECCION DE DEPENDENCIAS Y SERVICIOS ---
   private cdr = inject(ChangeDetectorRef);
+
+  // --- REFERENCIAS AL DOM ---
   @ViewChild('firmaCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
   private ctx!: CanvasRenderingContext2D;
   private isDrawing = false;
 
+  // --- VARIABLES DE ESTADO ---
   isLoading = true;
   isSubmitting = false;
   migrando = false;
@@ -35,6 +39,7 @@ export class AdministracionComponent implements OnInit, AfterViewInit {
     private router: Router
   ) {}
 
+  // Bloque de inicializacion de componente y validacion de rol gerente
   ngOnInit(): void {
     const user = this.authService.getUser();
     const esGerente = user?.rol?.nombre === 'Gerente General' || user?.rol?.nombre === 'Gerente';
@@ -46,7 +51,7 @@ export class AdministracionComponent implements OnInit, AfterViewInit {
         if (user.empresa.dominio) {
           ruta = '/' + user.empresa.dominio + '/inicio';
         } else if (user.empresa.razon_social) {
-          const slug = user.empresa.razon_social.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '');
+          const slug = user.empresa.razon_social.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]/g, '');
           ruta = '/' + slug + '/inicio';
         }
       }
@@ -60,31 +65,34 @@ export class AdministracionComponent implements OnInit, AfterViewInit {
     this.cargarEmpresaYContrato();
   }
 
+  // Bloque para inicializar el canvas despues de que la vista se haya renderizado
   ngAfterViewInit(): void {
     if (this.canvasRef) {
       this.initCanvas();
     }
   }
 
+  // Bloque para configurar el canvas de firma con listeners táctiles y de mouse
   private initCanvas() {
     const canvas = this.canvasRef.nativeElement;
     this.ctx = canvas.getContext('2d')!;
     this.ctx.lineWidth = 3;
     this.ctx.lineCap = 'round';
-    this.ctx.strokeStyle = '#0f172a'; // Tono oscuro
+    this.ctx.strokeStyle = '#0f172a';
 
-    // Eventos Mouse
+    
     canvas.addEventListener('mousedown', this.startDrawing.bind(this));
     canvas.addEventListener('mousemove', this.draw.bind(this));
     canvas.addEventListener('mouseup', this.stopDrawing.bind(this));
     canvas.addEventListener('mouseout', this.stopDrawing.bind(this));
 
-    // Eventos Touch
+    
     canvas.addEventListener('touchstart', this.startDrawingTouch.bind(this));
     canvas.addEventListener('touchmove', this.drawTouch.bind(this));
     canvas.addEventListener('touchend', this.stopDrawing.bind(this));
   }
 
+  // Bloque para obtener los encabezados de autenticacion HTTP
   private getHeaders() {
     return {
       headers: new HttpHeaders({
@@ -94,6 +102,7 @@ export class AdministracionComponent implements OnInit, AfterViewInit {
     };
   }
 
+  // Bloque para cargar la empresa y el contrato activo desde la API
   cargarEmpresaYContrato() {
     this.isLoading = true;
     const user = this.authService.getUser();
@@ -117,13 +126,13 @@ export class AdministracionComponent implements OnInit, AfterViewInit {
     }
   }
 
+  // Bloque para cargar el contrato activo y rearmar el canvas si no esta firmado
   cargarContratoActivo() {
     this.http.get('/api/saas/contratos/activo', this.getHeaders()).subscribe({
       next: (res: any) => {
         this.contratoActivo = res;
         this.isLoading = false;
         
-        // El canvas solo se inicializa si el contrato no ha sido firmado
         setTimeout(() => {
           if (this.canvasRef && this.userEmpresa?.contrato_id !== this.contratoActivo.id) {
             this.initCanvas();
@@ -145,19 +154,21 @@ export class AdministracionComponent implements OnInit, AfterViewInit {
     });
   }
 
-  // Métodos de dibujo en Canvas
+  // Bloque para iniciar trazo con mouse en canvas
   private startDrawing(e: MouseEvent) {
     this.isDrawing = true;
     this.ctx.beginPath();
     this.ctx.moveTo(e.offsetX, e.offsetY);
   }
 
+  // Bloque para dibujar trazo con mouse en canvas
   private draw(e: MouseEvent) {
     if (!this.isDrawing) return;
     this.ctx.lineTo(e.offsetX, e.offsetY);
     this.ctx.stroke();
   }
 
+  // Bloque para iniciar trazo tactil en canvas
   private startDrawingTouch(e: TouchEvent) {
     e.preventDefault();
     const rect = this.canvasRef.nativeElement.getBoundingClientRect();
@@ -167,6 +178,7 @@ export class AdministracionComponent implements OnInit, AfterViewInit {
     this.ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
   }
 
+  // Bloque para dibujar trazo tactil en canvas
   private drawTouch(e: TouchEvent) {
     if (!this.isDrawing) return;
     e.preventDefault();
@@ -176,21 +188,23 @@ export class AdministracionComponent implements OnInit, AfterViewInit {
     this.ctx.stroke();
   }
 
+  // Bloque para detener trazo de dibujo
   private stopDrawing() {
     this.isDrawing = false;
     this.ctx.closePath();
   }
 
+  // Bloque para limpiar la firma dibujada en el canvas
   limpiarFirma() {
     const canvas = this.canvasRef.nativeElement;
     this.ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 
+  // Bloque para firmar y aceptar el contrato SaaS enviando la firma en base64
   firmarContrato() {
     if (!this.contratoActivo) return;
 
     const canvas = this.canvasRef.nativeElement;
-    // Verificar si el canvas está en blanco (de forma rudimentaria chequeando datos de pixeles)
     const blank = document.createElement('canvas');
     blank.width = canvas.width;
     blank.height = canvas.height;
@@ -210,7 +224,6 @@ export class AdministracionComponent implements OnInit, AfterViewInit {
     this.http.post('/api/saas/contratos/firmar', payload, this.getHeaders()).pipe(timeout(10000)).subscribe({
       next: (res: any) => {
         this.toastService.success(res.message || 'Contrato firmado con éxito.');
-        // Actualizar datos del usuario/empresa localmente
         this.userEmpresa.contrato_id = this.contratoActivo.id;
         this.userEmpresa.fecha_firma = res.fecha_firma;
         this.userEmpresa.firma_gerente_url = firmaBase64;
@@ -237,6 +250,7 @@ export class AdministracionComponent implements OnInit, AfterViewInit {
     });
   }
 
+  // Bloque para descargar una copia en PDF del contrato firmado
   descargarCopiaContrato() {
     this.toastService.info('Generando copia PDF de su contrato firmado...');
     this.http.get(`/api/empresas/${this.userEmpresa.id}/descargar-contrato`, {
@@ -264,7 +278,7 @@ export class AdministracionComponent implements OnInit, AfterViewInit {
     });
   }
 
-  // --- Migración de Datos (Onboarding SaaS) ---
+  // Bloque para descargar la plantilla Excel de migracion de datos
   descargarPlantilla() {
     this.toastService.info('Descargando plantilla de migración...');
     this.http.get('/api/migracion/plantilla', { ...this.getHeaders(), responseType: 'blob' as 'json' }).subscribe({
@@ -284,6 +298,7 @@ export class AdministracionComponent implements OnInit, AfterViewInit {
     });
   }
 
+  // Bloque para generar y descargar un respaldo completo del negocio en formato Excel
   descargarBackup() {
     this.toastService.info('Generando respaldo Excel de su negocio...');
     this.http.get('/api/migracion/backup', { ...this.getHeaders(), responseType: 'blob' as 'json' }).subscribe({
@@ -303,6 +318,7 @@ export class AdministracionComponent implements OnInit, AfterViewInit {
     });
   }
 
+  // Bloque para procesar la subida del archivo Excel de migracion
   onArchivoMigracionSeleccionado(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
@@ -340,6 +356,7 @@ export class AdministracionComponent implements OnInit, AfterViewInit {
     });
   }
 
+  // Bloque auxiliar para iniciar la descarga en el navegador a partir de un Blob
   private descargarBlob(data: any, nombreArchivo: string) {
     const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     const url = window.URL.createObjectURL(blob);

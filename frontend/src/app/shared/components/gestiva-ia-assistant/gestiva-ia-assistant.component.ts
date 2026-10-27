@@ -23,17 +23,16 @@ export class GestivaIaAssistantComponent implements OnInit, OnDestroy {
   private routerSub!: Subscription;
   private autoHideTimeout: any;
 
+  // Bloque de inicialización para suscribir eventos de navegación
   ngOnInit() {
-    // Solo nos suscribimos a los cambios de ruta para pedir sugerencias
-    // (Esto incluye el NavigationEnd de la carga inicial)
+    
     this.routerSub = this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
       this.fetchSugerencias();
     });
     
-    // Fallback: si por alguna razón no se disparó NavigationEnd (ej. ya estábamos en la ruta),
-    // lo pedimos manualmente, pero usando un timeout para desenredar el hilo.
+    
     setTimeout(() => {
       if (this.sugerencias.length === 0) {
         this.fetchSugerencias();
@@ -41,8 +40,9 @@ export class GestivaIaAssistantComponent implements OnInit, OnDestroy {
     }, 1000);
   }
 
+  // Bloque para consultar sugerencias contextuales de IA según el área
   fetchSugerencias() {
-    // Determinar area basandose en la URL (muy basico)
+    
     let area = 'general';
     const url = this.router.url;
     
@@ -58,7 +58,7 @@ export class GestivaIaAssistantComponent implements OnInit, OnDestroy {
       next: (res) => {
         if (res.sugerencias && res.sugerencias.length > 0) {
           this.sugerencias = res.sugerencias;
-          // Ya no mostramos el globo automáticamente, solo se mostrará cuando el usuario presione toggleGlobo
+          
         }
       },
       error: (err) => {
@@ -67,6 +67,7 @@ export class GestivaIaAssistantComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Bloque para alternar la visualización del globo de diálogo
   toggleGlobo() {
     this.mostrarGlobo = !this.mostrarGlobo;
     if (this.mostrarGlobo && this.sugerencias.length === 0) {
@@ -74,11 +75,13 @@ export class GestivaIaAssistantComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Bloque para reiniciar y mostrar la guía tutorial de IA
   verTutorialDeNuevo() {
     this.mostrarGlobo = false;
     this.iaStateService.triggerTutorial();
   }
 
+  // Bloque de ciclo de vida para liberar suscripciones activas
   ngOnDestroy() {
     if (this.routerSub) {
       this.routerSub.unsubscribe();

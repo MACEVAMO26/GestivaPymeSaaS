@@ -1,17 +1,17 @@
 <div class="formalizacion-container fade-in">
   <div [hidden]="isFormalizarModalOpen || isEditarEmpleadoModalOpen" class="main-view-wrapper">
 
-  <!-- ENCABEZADO -->
+  <!-- HTML ENCABEZADO -->
   <div class="module-header text-center mb-4">
     <h1 class="titulo-principal">FORMALIZACIÓN DE USUARIOS</h1>
     <p class="descripcion-general">Completa el perfil laboral de los usuarios creados por Gerencia para desbloquear su acceso al sistema.</p>
   </div>
 
-  <!-- NAVEGACIÓN TABS -->
+  <!-- HTML NAVEGACION TABS -->
   <div class="tabs-nav-wrapper">
     <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'pendientes'" (click)="setTab('pendientes')">
       <span class="icon">⏳</span> Pendientes
-      <span class="badge badge-pendiente" *ngIf="pendientes.length > 0" style="margin-left: 5px;">{{pendientes.length}}</span>
+      <span class="badge badge-pendiente" *ngIf="pendientes.length > 0" class="ml-5">{{pendientes.length}}</span>
     </button>
     <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'formalizados'" (click)="setTab('formalizados')">
       <span class="icon">✅</span> Formalizados
@@ -23,14 +23,14 @@
   </div>
 
   <div class="tab-content neumorphic-panel-inner p-4">
-    <!-- Botón Volver -->
+    <!-- HTML BOTON VOLVER -->
     <div class="volver-wrapper">
       <button class="btn-volver btn-pill" appVolver>
         <i class="fas fa-arrow-left"></i> Volver
       </button>
     </div>
 
-    <!-- TAB PENDIENTES -->
+    <!-- HTML TAB PENDIENTES -->
     <div class="neumorphic-panel fade-in" *ngIf="currentTab === 'pendientes'">
       <h2 class="subtitulo">PENDIENTES DE FORMALIZAR</h2>
       <div class="banner banner-aviso">
@@ -58,7 +58,7 @@
                 <td>{{ p.email }}</td>
                 <td>{{ p.created_at | date:'shortDate' }}</td>
                 <td class="text-center">
-                  <div class="acciones-fila" style="justify-content: center;">
+                  <div class="acciones-fila justify-center">
                     <button type="button" class="btn-action-circle" title="Formalizar Empleado" (click)="abrirModalFormalizar(p)">
                       <i class="fas fa-user-check"></i>
                     </button>
@@ -68,7 +68,7 @@
             }
             @if (pendientes.length === 0) {
               <tr>
-                <td colspan="5" class="text-center" style="padding: 2rem;">No hay usuarios pendientes de formalización.</td>
+                <td colspan="5" class="text-center" class="table-empty-pad">No hay usuarios pendientes de formalización.</td>
               </tr>
             }
           </tbody>
@@ -91,7 +91,7 @@
       }
     </div>
 
-    <!-- TAB FORMALIZADOS -->
+    <!-- HTML TAB FORMALIZADOS -->
     <div class="neumorphic-panel fade-in" *ngIf="currentTab === 'formalizados'">
       <h2 class="subtitulo">PERSONAL FORMALIZADO</h2>
       <div class="table-container">
@@ -117,7 +117,7 @@
                 <td>{{ e.tipo_contrato || '—' }}</td>
                 <td>{{ e.fecha_contratacion | date:'shortDate' }}</td>
                 <td class="text-center">
-                  <div class="acciones-fila" style="justify-content: center;">
+                  <div class="acciones-fila justify-center">
                     <button type="button" class="btn-action-circle" title="Editar Permisos y Perfil" (click)="abrirModalEditarEmpleado(e)">
                       <i class="fas fa-user-edit"></i>
                     </button>
@@ -127,7 +127,7 @@
             }
             @if (formalizados.length === 0) {
               <tr>
-                <td colspan="7" class="text-center" style="padding: 2rem;">Aún no hay personal formalizado.</td>
+                <td colspan="7" class="text-center" class="table-empty-pad">Aún no hay personal formalizado.</td>
               </tr>
             }
           </tbody>
@@ -150,7 +150,7 @@
       }
     </div>
 
-    <!-- TAB ESTRUCTURA -->
+    <!-- HTML TAB ESTRUCTURA -->
     <div class="neumorphic-panel fade-in" *ngIf="currentTab === 'estructura'">
       <app-admin-estructura></app-admin-estructura>
     </div>
@@ -158,10 +158,10 @@
   </div>
   </div>
 
-  <!-- SUB-PÁGINA DEDICADA FORMALIZAR -->
+  <!-- HTML SUBPAGINA DEDICADA FORMALIZAR -->
   @if (isFormalizarModalOpen) {
   <div class="view-switch-panel fade-in">
-    <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+    <div class="neu-card" class="neu-card-centered">
       <div class="panel-header mb-4">
         <h1>FORMALIZAR: {{ nombreCompleto(usuarioAFormalizar) }}</h1>
         <button class="btn-close" (click)="cerrarModalFormalizar()">&times;</button>
@@ -215,9 +215,9 @@
           </div>
         </div>
 
-        <!-- SECCIÓN SEGURIDAD SOCIAL (EMPRESA / LEY) -->
+        <!-- HTML SECCION SEGURIDAD SOCIAL -->
         <div class="mt-3 p-3 neumorphic-panel-inner bg-cream">
-          <label class="form-label text-azul" style="font-weight: bold; margin-bottom: 0.5rem; display: block;">
+          <label class="form-label text-azul label-bold-block">
             <i class="fas fa-shield-alt"></i> Seguridad Social y Afiliaciones (Asignada por Empresa)
           </label>
           
@@ -268,10 +268,10 @@
   </div>
   }
 
-  <!-- SUB-PÁGINA DEDICADA EDICIÓN EMPLEADO FORMALIZADO Y MÓDULOS -->
+  <!-- HTML SUBPAGINA DEDICADA EDICION EMPLEADO -->
   @if (isEditarEmpleadoModalOpen) {
   <div class="view-switch-panel fade-in">
-    <div class="neu-card" style="max-width: 800px; margin: 0 auto;">
+    <div class="neu-card" class="neu-card-centered">
       <div class="panel-header mb-4">
         <h1>EDITAR PERFIL, SEGURIDAD SOCIAL Y PERMISOS</h1>
         <button class="btn-close" (click)="cerrarModalEditarEmpleado()">&times;</button>
@@ -333,9 +333,9 @@
           </div>
         </div>
 
-        <!-- SECCIÓN SEGURIDAD SOCIAL -->
+        <!-- HTML SECCION SEGURIDAD SOCIAL EMPLEADO -->
         <div class="mt-3 p-3 neumorphic-panel-inner bg-cream">
-          <label class="form-label text-azul" style="font-weight: bold; margin-bottom: 0.5rem; display: block;">
+          <label class="form-label text-azul label-bold-block">
             <i class="fas fa-shield-alt"></i> Seguridad Social (Sincronizada con Autogestión):
           </label>
 
@@ -376,17 +376,17 @@
           </div>
         </div>
 
-        <!-- PERMISOS DE MÓDULOS DEL NAVEGADOR -->
+        <!-- HTML PERMISOS DE MODULOS -->
         <div class="mt-4 p-3 neumorphic-panel-inner bg-cream">
-          <label class="form-label text-azul" style="font-weight: bold; margin-bottom: 0.5rem; display: block;">
+          <label class="form-label text-azul label-bold-block">
             <i class="fas fa-key"></i> Módulos Habilitados en Menú Lateral para este Empleado:
           </label>
-          <small class="descripcion-general mb-3" style="display: block;">
+          <small class="descripcion-general mb-3" class="d-block">
             * Nota: Inicio y Autogestión son siempre visibles para todos los empleados.
           </small>
 
-          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
-            <label *ngFor="let mod of listaModulosDisponibles" class="checkbox-label cursor-pointer p-2 rounded" style="display: flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.4); font-size: 14px;">
+          <div class="modulos-grid-auto">
+            <label *ngFor="let mod of listaModulosDisponibles" class="checkbox-label cursor-pointer p-2 rounded" class="checkbox-label-flex">
               <input type="checkbox" [checked]="isModuloPermitido(mod.id)" (change)="toggleModuloPermitido(mod.id)">
               <i [class]="mod.icono"></i> {{ mod.nombre }}
             </label>

@@ -1,3 +1,5 @@
+/* --- 0. BACKGROUND PRINCIPAL DEL MÓDULO DASHBOARD CLIENTE --- */
+/* --- 1. VARIABLES GLOBALES --- */
 @use './shared-styles/tema-cliente' as *;
 $shadow-dark: #d1d1bc;
 $shadow-light: #ffffff;
@@ -13,14 +15,14 @@ $primary-color: #45a1ae;
   overflow: hidden;
 }
 
-/* --- 3. HEADER NEUMÓRFICO --- */
+/* --- 3. HEADER NEUMÓRFICO Y PERFIL --- */
 .global-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 15px; /* Más angosto verticalmente para aprovechar espacio */
-  background-color: #efefd3; /* Variante levemente más oscura por regla 18 */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Sombra suave para separar del cuerpo */
+  padding: 6px 15px; 
+  background-color: #efefd3; 
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); 
   z-index: 10;
 
   .header-left {
@@ -32,8 +34,16 @@ $primary-color: #45a1ae;
       align-items: center;
       gap: 15px;
 
+      .logo-link {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+      }
+
       .main-logo-img {
-        height: 28px; /* Reducido un poco para ajustar al nuevo header */
+        max-height: 40px;
+        height: 28px; 
+        object-fit: contain;
       }
 
       .badge-plan {
@@ -53,12 +63,12 @@ $primary-color: #45a1ae;
     align-items: center;
     gap: 15px;
 
-            /* Botón Accesibilidad - SOLO LOCAL (el global manda) */
+            
     .accessibility-btn {
-      /* Se deja vacío porque el estilo viene de styles.scss */
+      
     }
 
-    /* Botón de Notificación - Clon estricto del botón de Accesibilidad global */
+    
     .notification-btn {
       background-color: #DBDB9B !important; 
       border: none !important; 
@@ -90,13 +100,13 @@ $primary-color: #45a1ae;
 
       &.has-notification {
         svg {
-          stroke: #de3737 !important; /* Rojo */
+          stroke: #de3737 !important; 
           transform: rotate(-15deg);
         }
       }
     }
 
-    /* Botón Guía / Tutorial - Accesible y Neumórfico */
+    
     .tutorial-btn {
       background-color: #DBDB9B !important;
       border: 1px solid #eca06e !important;
@@ -134,7 +144,7 @@ $primary-color: #45a1ae;
       }
     }
 
-    /* Perfil Neumórfico */
+    
     .user-profile {
       display: flex;
       align-items: center;
@@ -159,14 +169,18 @@ $primary-color: #45a1ae;
       .user-info {
         display: flex;
         flex-direction: column;
+        line-height: 1.2;
 
         .user-name {
           font-size: 14px;
-          font-weight: 600;
+          font-weight: bold;
         }
 
         .user-role {
           display: block;
+          font-size: 14px;
+          color: #2d3748;
+          margin-top: 2px;
         }
       }
 
@@ -199,19 +213,19 @@ $primary-color: #45a1ae;
   overflow: hidden;
 }
 
-/* --- 5. SIDEBAR NEUMÓRFICO --- */
+/* --- 5. SIDEBAR NEUMÓRFICO Y NAVEGACIÓN --- */
 .sidebar {
-  width: 175px; /* Súper angosto por petición del usuario */
+  width: 175px; 
   background: $bg-base;
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   border-right: 1px solid rgba(0,0,0,0.02);
-  box-shadow: 4px 0 10px rgba(0,0,0,0.02); /* Sutil separación neumórfica */
-  position: relative; /* Para el botón flotante */
+  box-shadow: 4px 0 10px rgba(0,0,0,0.02); 
+  position: relative; 
 
   &.collapsed {
-    width: 55px; /* Súper angosto para modo compacto */
+    width: 55px; 
 
     .nav-label {
       display: none;
@@ -233,18 +247,18 @@ $primary-color: #45a1ae;
 
   .toggle-btn {
     position: absolute;
-    right: -24px; /* Empujado hacia afuera ajustado al nuevo tamaño */
+    right: -24px; 
     top: 20px;
     z-index: 100;
-    background: #dbdb9b; /* Mismo fondo que los botones del menú */
-    border: 1px solid #eca06e; /* Mismo borde que los botones del menú */
+    background: #dbdb9b; 
+    border: 1px solid #eca06e; 
     cursor: pointer;
-    color: #1a1a1a; /* Mismo color de texto/ícono que los botones del menú */
-    width: 24px; /* Tamaño más pequeño */
+    color: #1a1a1a; 
+    width: 24px; 
     height: 24px;
-    padding: 0; /* Quitamos padding para controlar con width/height */
+    padding: 0; 
     border-radius: 50%;
-    box-shadow: 2px 2px 5px #d1d1bc, -2px -2px 5px #ffffff; /* Misma sombra que los botones del menú */
+    box-shadow: 2px 2px 5px #d1d1bc, -2px -2px 5px #ffffff; 
     display: flex;
     align-items: center;
     justify-content: center;
@@ -253,16 +267,16 @@ $primary-color: #45a1ae;
     svg {
       width: 12px;
       height: 12px;
-      stroke: #1a1a1a; /* Mismo color de ícono */
-      stroke-width: 3; /* Poner el símbolo < en negrita (más grueso) */
+      stroke: #1a1a1a; 
+      stroke-width: 3; 
     }
 
     &:hover {
-      color: #45a1ae; /* Hover como los botones del menú */
+      color: #45a1ae; 
       box-shadow: inset 3px 3px 6px #d1d1bc, inset -3px -3px 6px #ffffff;
       
       svg {
-        stroke: #45a1ae; /* Hover del ícono */
+        stroke: #45a1ae; 
       }
     }
   }
@@ -270,13 +284,13 @@ $primary-color: #45a1ae;
     .nav-menu {
     display: flex;
     flex-direction: column;
-    gap: 10px; /* Separación aumentada para que no se vean apiñuscados */
-    padding: 0 6px; /* Reducido */
-    margin-top: 20px; /* Restaurado para que empiece arriba */
+    gap: 10px; 
+    padding: 0 6px; 
+    margin-top: 20px; 
     overflow-y: auto;
     flex: 1;
 
-      /* Ocultar barra de scroll para estética limpia */
+      
       &::-webkit-scrollbar {
         width: 0;
         background: transparent;
@@ -285,20 +299,20 @@ $primary-color: #45a1ae;
       .nav-item {
         display: flex;
         align-items: center;
-        width: 100%; /* Estirar para no desperdiciar espacio a la derecha */
+        width: 100%; 
         box-sizing: border-box;
-        background: #dbdb9b; /* Beige exacto solicitado */
-        border: 1px solid #eca06e; /* Borde exacto solicitado */
-        gap: 8px; /* Menos gap */
-        padding: 4px 10px; /* Más angosto verticalmente, mismo ancho */
-        border-radius: 50px; /* Forma de píldora */
+        background: #dbdb9b; 
+        border: 1px solid #eca06e; 
+        gap: 8px; 
+        padding: 4px 10px; 
+        border-radius: 50px; 
         text-decoration: none;
         color: #1a1a1a;
-        font-size: 8.5px; /* Letra minimizada a petición del usuario */
+        font-size: 8.5px; 
       font-weight: 600;
       transition: all 0.2s ease;
       cursor: pointer;
-      box-shadow: 2px 2px 5px $shadow-dark, -2px -2px 5px $shadow-light; /* Estado inactivo: Elevado */
+      box-shadow: 2px 2px 5px $shadow-dark, -2px -2px 5px $shadow-light; 
 
       .nav-icon {
         display: flex;
@@ -320,7 +334,7 @@ $primary-color: #45a1ae;
       }
 
       &.active {
-        box-shadow: inset 3px 3px 6px $shadow-dark, inset -3px -3px 6px $shadow-light; /* Estado activo: Hundido */
+        box-shadow: inset 3px 3px 6px $shadow-dark, inset -3px -3px 6px $shadow-light; 
         color: $primary-color;
         font-weight: 600;
       }
@@ -328,7 +342,7 @@ $primary-color: #45a1ae;
   }
 }
 
-/* --- 6. ÁREA DE CONTENIDO (ROUTER OUTLET) --- */
+/* --- 6. ÁREA DE CONTENIDO ROUTER OUTLET --- */
 .content-area {
   flex: 1;
   padding: 20px;
@@ -336,9 +350,13 @@ $primary-color: #45a1ae;
   background-color: $bg-base;
   display: flex;
   flex-direction: column;
+
+  .content-outlet-wrapper {
+    flex: 1;
+  }
 }
 
-/* --- 7. FOOTER --- */
+/* --- 7. PIE DE PÁGINA --- */
 .app-footer {
   margin-top: 40px;
   padding-top: 20px;
@@ -350,8 +368,8 @@ $primary-color: #45a1ae;
   gap: 10px;
 
   .footer-logo {
-    height: 1.5rem; /* Más pequeño y discreto */
-    opacity: 0.5; /* Gris casi invisible por defecto */
+    height: 1.5rem; 
+    opacity: 0.5; 
     filter: grayscale(100%);
     transition: all 0.5s ease;
     cursor: default;

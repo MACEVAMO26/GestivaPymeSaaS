@@ -1,3 +1,5 @@
+/* --- 0. BACKGROUND PRINCIPAL DEL CALENDARIO --- */
+/* --- 1. VARIABLES GLOBALES DE COLOR --- */
 @use 'sass:color';
 
 /* --- 1. VARIABLES GLOBALES DE COLOR --- */
@@ -16,7 +18,7 @@ $btn-gen-4: #8E5B75;
 $btn-gen-5: #B5654A;
 $btn-gen-6: #A38B6D;
 
-/* --- 2. FONDOS Y LAYOUT PRINCIPAL --- */
+/* --- 2. LAYOUT PRINCIPAL DEL CALENDARIO --- */
 .module-container {
   padding: 1.5rem;
   background: $bg-color;
@@ -24,8 +26,8 @@ $btn-gen-6: #A38B6D;
   color: $text-dark;
 }
 
-/* --- 3. TIPOGRAFIA (Jerarquia estricta) --- */
-/* Titulo principal: 16px, centrado, mayusculas, negrita */
+/* --- 3. TIPOGRAFÍA Y JERARQUÍA VISUAL --- */
+
 .module-header h1, h1.titulo-principal, .header-section h1 {
   font-size: 16px;
   font-weight: bold;
@@ -36,7 +38,7 @@ $btn-gen-6: #A38B6D;
   color: $text-dark;
 }
 
-/* Subtitulo: 13px, izquierda, mayusculas, sin negrita */
+
 .subtitulo, h2.subtitulo, h3.subtitulo {
   font-size: 14px;
   font-weight: normal;
@@ -46,7 +48,7 @@ $btn-gen-6: #A38B6D;
   margin-bottom: 0.5rem;
 }
 
-/* Descripciones y Notas: 10px, centradas, mayusculas */
+
 .module-header p, .descripcion, .descripcion-general, .subtitle, .header-section p, .nota, .text-muted-small, .badge-small {
   font-size: 14px;
   font-weight: normal;
@@ -59,13 +61,13 @@ $btn-gen-6: #A38B6D;
   line-height: 1.4;
 }
 
-/* Texto general: 12px */
+
 .form-label, p, td, th, li, label, .text-general {
   font-size: 14px;
   font-weight: normal;
 }
 
-/* --- 4. TARJETAS Y PANELES NEUMORFICOS --- */
+/* --- 4. TARJETAS Y PANELES NEUMÓRFICOS --- */
 .neumorphic-panel, .glass-panel {
   background: $bg-color;
   border-radius: 16px;
@@ -102,7 +104,7 @@ $btn-gen-6: #A38B6D;
   }
 }
 
-/* --- 6. BOTONES (DISENO PILDORA) --- */
+/* --- 6. BOTONES ESTILO PÍLDORA --- */
 .btn-neumorphic {
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
@@ -135,7 +137,7 @@ $btn-gen-6: #A38B6D;
 .btn-general-5 { @extend .btn-neumorphic; background-color: $btn-gen-5; border: 2px solid color.adjust($btn-gen-5, $lightness: -10%); color: #ffffff; }
 .btn-general-6 { @extend .btn-neumorphic; background-color: $btn-gen-6; border: 2px solid color.adjust($btn-gen-6, $lightness: -10%); color: #ffffff; }
 
-/* --- 7. NAVEGACION TABS CON CONTENEDOR HUNDIDO (DOBLE BORDE RECTÁNGULO PÍLDORA) --- */
+/* --- 7. NAVEGACIÓN Y PESTAÑAS --- */
 .tabs-nav-wrapper {
   background: $bg-color;
   border-radius: 9999px;
@@ -189,7 +191,7 @@ $btn-gen-6: #A38B6D;
   text-decoration: none;
 }
 
-/* Titulos de panel interno */
+
 .panel-title, h3.panel-title {
   font-family: 'Montserrat', sans-serif;
   font-size: 16px;
@@ -200,33 +202,33 @@ $btn-gen-6: #A38B6D;
   margin: 0 0 0.5rem 0;
 }
 
-/* ========================================= */
-/* FIN BASE NEUMORFICA - INICIO DE LOCALES   */
-/* ========================================= */
 
 
 
-/* --- VARIABLES LOCALES MÓDULO CALENDARIO --- */
+
+
+
+
 $color-hoy: #45a1ae;
 $color-evento: #C9A227;
 $color-festivo: #de3737;
 $color-seleccionado: #dcebea;
 
-/* --- LAYOUT CALENDARIO --- */
+
 .panel-body {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-/* Grilla 7 columnas para el calendario */
+
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 4px;
 }
 
-/* Cabeceras días de semana: 10px, centrado */
+
 .weekday {
   font-family: 'Montserrat', sans-serif;
   font-size: 14px;
@@ -237,7 +239,7 @@ $color-seleccionado: #dcebea;
   padding: 2px 0;
 }
 
-/* Celda de día: texto 12px */
+
 .day-cell {
   font-family: 'Montserrat', sans-serif;
   font-size: 14px;
@@ -287,14 +289,14 @@ $color-seleccionado: #dcebea;
   }
 }
 
-/* Sección agenda del día seleccionado */
+
 .agenda-del-dia {
   border-top: 1px solid #d1d1bc;
   margin-top: 0.75rem;
   padding-top: 0.75rem;
 }
 
-/* Subtítulo agenda: 13px, mayúsculas, izquierda */
+
 .agenda-del-dia h2 {
   font-family: 'Montserrat', sans-serif;
   font-size: 14px;
@@ -305,7 +307,7 @@ $color-seleccionado: #dcebea;
   margin-bottom: 8px;
 }
 
-/* Texto de eventos en agenda: 12px */
+
 .agenda-del-dia p {
   font-size: 14px;
   color: #2d3748;
@@ -314,4 +316,93 @@ $color-seleccionado: #dcebea;
 
 .tabs-nav-wrapper a, .tabs-nav-wrapper button, .tabs-nav-wrapper span {
   font-weight: bold !important;
+}
+
+.calendario-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.calendario-title {
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.month-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 5px;
+}
+
+.btn-nav-mes {
+  width: 24px;
+  height: 24px;
+}
+
+.nombre-mes-label {
+  font-size: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.day-cell.selected {
+  background-color: #dcebea !important;
+}
+
+.agenda-title {
+  font-size: 14px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  color: #333;
+  text-align: left;
+}
+
+.agenda-empty {
+  font-size: 14px;
+  color: #2d3748;
+  text-align: left;
+  padding: 5px 0;
+}
+
+.agenda-eventos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.evento-card {
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.evento-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.evento-color-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.evento-titulo {
+  font-size: 14px;
+  font-weight: normal;
+}
+
+.evento-descripcion {
+  font-size: 14px;
+  color: #2d3748;
+  padding-left: 14px;
 }

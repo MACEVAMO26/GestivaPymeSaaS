@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
-    // Marcar que el usuario vio el tutorial de IA
+    // Bloque para marcar que el usuario autenticado completó el tutorial de IA
     public function marcarTutorialVisto(Request $request)
     {
         $user = Auth::user();
@@ -23,6 +23,7 @@ class UserController extends Controller
         return response()->json(['message' => 'No autorizado'], 401);
     }
 
+    // Bloque para alternar el estado activo o inactivo de un usuario
     public function toggleActivo($id)
     {
         $user = User::findOrFail($id);
@@ -31,12 +32,13 @@ class UserController extends Controller
         return response()->json(['message' => 'Estado del usuario actualizado exitosamente', 'activo' => $user->activo]);
     }
 
+    // Bloque para regenerar y reenviar credenciales de acceso por correo electrónico
     public function reenviarCredenciales($id)
     {
         $user = User::findOrFail($id);
         $empresa = \App\Models\Empresa::find(auth()->user()->empresa_id);
         
-        // Generar nueva contraseña temporal
+        // Bloque para generar contraseña temporal
         $tempPassword = $user->documento;
         $user->update([
             'password_hash' => \Illuminate\Support\Facades\Hash::make($tempPassword),
@@ -46,7 +48,7 @@ class UserController extends Controller
         try {
             \Mail::to($user->email_personal)->send(new \App\Mail\CredencialesUsuarioMail($user, $tempPassword, $empresa->razon_social));
             
-            // Mask the email for security
+            // Bloque para enmascarar dirección de correo
             $email = $user->email_personal;
             $parts = explode('@', $email);
             if (count($parts) == 2) {
@@ -65,26 +67,26 @@ class UserController extends Controller
         }
     }
 
-    // Trae los usuarios de la misma empresa (o de cualquier empresa si es SAAS Admin dando soporte)
+    // Bloque para listar los usuarios de la empresa (o todas si es SaaS Admin)
     public function index(Request $request)
     {
         $user = auth()->user();
         $rol = $user->rol;
 
-        // Modo Dios / Soporte: Si es SAAS Admin y solicita ver otra empresa
+        // Bloque para listar usuarios en modo administrador SaaS
         if ($rol && in_array($rol->nombre, ['SAAS Admin', 'SaaS Admin', 'Super Administrador']) && $request->has('empresa_id')) {
             return User::with(['cargo', 'rol', 'empleado.area', 'empleado.cargo', 'empleado.cargo.rol'])
                 ->where('empresa_id', $request->empresa_id)
                 ->get();
         }
 
-        // Modo Cliente Normal: Encapsulado en su propia empresa
+        // Bloque para listar usuarios de la empresa actual
         return User::with(['cargo', 'rol', 'empleado.area', 'empleado.cargo', 'empleado.cargo.rol'])
             ->where('empresa_id', $user->empresa_id)
             ->get();
     }
 
-    // Registra la "cáscara" de un nuevo usuario (Hecho por el Gerente)
+    // Bloque para registrar un nuevo usuario y formalizar automáticamente al Jefe de RRHH si aplica
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -99,7 +101,7 @@ class UserController extends Controller
             'direccion' => 'nullable|string|max:255',
         ]);
 
-        // 1. Limpiar strings para generar el correo
+        // Bloque para sanear nombres y generar formato de correo institucional
         $cleanString = function($string) {
             if (empty($string)) return "";
             $string = strtolower(trim($string));
@@ -112,7 +114,7 @@ class UserController extends Controller
         $p1 = $cleanString($validatedData["primer_apellido"]);
         $p2 = $cleanString($validatedData["segundo_apellido"] ?? "");
 
-        // Regla: 2 letras primer nombre + 1 letra segundo nombre + 2 letras primer apellido + 3 letras segundo apellido
+        // Bloque de regla para generación de identificador de correo institucional
         $prefixBase = substr($n1, 0, 2) . substr($n2, 0, 1) . substr($p1, 0, 2) . substr($p2, 0, 3);
         
         $empresa = \App\Models\Empresa::find(auth()->user()->empresa_id);
@@ -121,22 +123,21 @@ class UserController extends Controller
         
         $finalEmail = $prefixBase . $domain;
         
-        // Si hay colision, se invierte el orden (Apellidos primero, Nombres despues)
         if (\App\Models\User::where("email", $finalEmail)->exists()) {
-            // Regla invertida: 2 letras primer apellido + 1 letra segundo apellido + 2 letras primer nombre + 3 letras segundo nombre
+            // Bloque de regla invertida en caso de colisión de nombre de usuario
             $prefixInvertido = substr($p1, 0, 2) . substr($p2, 0, 1) . substr($n1, 0, 2) . substr($n2, 0, 3);
             $finalEmail = $prefixInvertido . $domain;
             
-            // Si por un milagro sigue habiendo colision (doble tocayo exacto), solo entonces usamos el documento como contingencia absoluta
+            // Bloque de contingencia con documento en caso de colisión persistente
             if (\App\Models\User::where("email", $finalEmail)->exists()) {
                 $finalEmail = $validatedData["documento"] . $domain;
             }
         }
 
-        // La contrasena es el documento de identidad del empleado
+        // Bloque para asignar documento como contraseña inicial
         $tempPassword = $validatedData["documento"];
 
-        // 2. Crear el Usuario dentro de una transacción
+        // Bloque de transacción para creación del usuario en BD
         $user = DB::transaction(function () use ($validatedData, $finalEmail, $tempPassword) {
             
             $user = User::create([
@@ -156,9 +157,7 @@ class UserController extends Controller
                 'empresa_id' => auth()->user()->empresa_id,
             ]);
 
-            // LEY: El Jefe de RRHH es el primer cargo que crea el gerente. Si no existe un
-            // Jefe de RRHH activo (primer usuario o reemplazo tras despido), este nuevo
-            // usuario asume ese cargo y entra FORMALIZADO de inmediato.
+            // Bloque de formalización automática para el primer Jefe de RRHH
             $roleJefe = \App\Models\Role::firstOrCreate(
                 ['empresa_id' => auth()->user()->empresa_id, 'nombre' => 'Jefe de Area'],
                 ['descripcion' => 'Responsable de su area y formalizacion', 'activo' => true]
@@ -170,7 +169,7 @@ class UserController extends Controller
                 ->exists();
 
             if (!$jefeRRHHActivo) {
-                // Hay que buscar el area de RRHH o crearla
+                // Bloque para localizar o inicializar el área de RRHH
                 $areaRRHH = \App\Models\Area::firstOrCreate(
                     ['empresa_id' => auth()->user()->empresa_id, 'nombre' => 'Recursos Humanos'],
                     ['descripcion' => 'Area encargada de la gestion del talento humano', 'activo' => true]
@@ -181,12 +180,12 @@ class UserController extends Controller
                     ['rol_id' => $roleJefe->id, 'area_id' => $areaRRHH->id, 'descripcion' => 'Responsable de la gestion humana de la empresa', 'activo' => true]
                 );
 
-                // Asignar el rol al usuario
+                // Bloque para asignar el rol correspondiente en BD
                 $user->rol_id = $roleJefe->id;
                 $user->perfil_formalizado = true; // Entra ya formalizado
                 $user->save();
 
-                // Asegurar que el Jefe de RRHH tenga acceso a sus modulos
+                // Bloque para garantizar accesos a módulos de RRHH
                 $modulosRRHH = ['rrhh', 'd_for', 'r_tur', 'r_aus', 'r_vac'];
                 foreach ($modulosRRHH as $modRRHH) {
                     \App\Models\Permiso::firstOrCreate([
@@ -202,7 +201,7 @@ class UserController extends Controller
                     ]);
                 }
 
-                // Formalizar su registro como Empleado
+                // Bloque para formalizar registro de empleado en BD
                 \App\Models\Empleado::create([
                     'usuario_id' => $user->id,
                     'empresa_id' => $user->empresa_id,
@@ -217,13 +216,12 @@ class UserController extends Controller
             return $user;
         });
 
-        // Enviar el correo con las credenciales usando Brevo (SMTP)
+        // Bloque para enviar credenciales de acceso por correo
         try {
             $empresa = \App\Models\Empresa::find(auth()->user()->empresa_id);
             \Mail::to($user->email_personal)->send(new \App\Mail\CredencialesUsuarioMail($user, $tempPassword, $empresa->razon_social));
         } catch (\Exception $e) {
             \Log::error("Error enviando correo a {$user->email_personal}: " . $e->getMessage());
-            // No detenemos la creación del usuario si falla el envío de correo.
         }
 
         $email = $user->email_personal;
@@ -238,13 +236,13 @@ class UserController extends Controller
         ], 201);
     }
 
-    // Trae la informacion de un usuario especifico
+    // Bloque para traer la información de un usuario específico
     public function show($id)
     {
         return User::findOrFail($id);
     }
 
-    // Actualiza la informacion de un usuario
+    // Bloque para actualizar la información de un usuario
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
@@ -269,7 +267,8 @@ class UserController extends Controller
         ]);
     }
 
-    // Elimina un usuario del sistema
+    
+    // Bloque para eliminar un usuario respetando las restricciones legales
     public function destroy($id)
     {
         $user = User::findOrFail($id);
@@ -288,7 +287,8 @@ class UserController extends Controller
         return response()->json(['message' => 'Usuario eliminado correctamente']);
     }
 
-    // Activa o inactiva un usuario en el sistema
+    
+    // Bloque para cambiar el estado activo o inactivo de un usuario
     public function changeStatus($id)
     {
         $user = User::findOrFail($id);
@@ -297,17 +297,14 @@ class UserController extends Controller
         $rolUsuario = $user->rol;
         $rolSolicitante = auth()->user()->rol;
 
-        // LEY: El Gerente General es el primer cargo/usuario, no se puede eliminar.
-        // Tampoco se puede inactivar desde el aplicativo; solo el SAAS admin puede
-        // cambiar sus datos (nombres) cuando la empresa cambia de gerente.
+        // Bloque de validación de restricciones legales para Gerente General
         if ($rolUsuario && $rolUsuario->nombre === 'Gerente General') {
             return response()->json([
                 'error' => 'El Gerente General no puede ser inactivado. Solo el SAAS admin puede cambiar sus datos.'
             ], 422);
         }
 
-        // LEY: El Jefe de RRHH solo puede ser inactivado por el Gerente General
-        // (por despido), y los datos se conservan por normativa colombiana.
+        // Bloque de validación de restricciones legales para Jefe de RRHH
         $esJefeRRHH = $rolUsuario && $rolUsuario->nombre === 'Jefe de Área';
         if ($esJefeRRHH) {
             $esGerente = $rolSolicitante && $rolSolicitante->nombre === 'Gerente General';
@@ -327,7 +324,7 @@ class UserController extends Controller
         return response()->json(['message' => $message]);
     }
 
-    // Sube o actualiza la foto de perfil del usuario
+    // Bloque para subir y actualizar la foto de perfil en Cloudinary
     public function uploadAvatar(Request $request)
     {
         $user = auth()->user();

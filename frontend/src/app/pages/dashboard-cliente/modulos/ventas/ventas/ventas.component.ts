@@ -26,9 +26,8 @@ export class VentasComponent implements OnInit {
   private http = inject(HttpClient);
   private cdr = inject(ChangeDetectorRef);
 
+  // --- VARIABLES DE ESTADO ---
   activeTab: string = 'pos';
-
-  // Variables POS
   clienteSeleccionado: number | '' = '';
   clientesDisponibles: Cliente[] = [];
 
@@ -43,21 +42,16 @@ export class VentasComponent implements OnInit {
   guardando: boolean = false;
   cargando: boolean = false;
   cajas: Caja[] = [];
-
-  // Variables Historial
   searchTerm: string = '';
   ventas: any[] = [];
   ventasFiltradas: any[] = [];
-
-  // Variables Modal Anulación
   showModalAnular: boolean = false;
   ventaSeleccionada: any = null;
-
-  // Paginación 8 items por página
   pageSize: number = 8;
   pageVentas: number = 1;
   Math = Math;
 
+  // --- GETTERS Y PAGINACION ---
   get paginatedVentas(): any[] {
     const start = (this.pageVentas - 1) * this.pageSize;
     return this.ventasFiltradas.slice(start, start + this.pageSize);
@@ -67,9 +61,12 @@ export class VentasComponent implements OnInit {
     return Math.ceil(this.ventasFiltradas.length / this.pageSize) || 1;
   }
 
+  // Bloque de ciclo de vida OnInit para cargar clientes, productos y ventas
   ngOnInit() {
-    this.cargarDatosBase();
-    this.cargarVentas();
+    this.// Bloque para consultar el catálogo de clientes y productos disponibles
+  cargarDatosBase();
+    this.// Bloque para consultar el histórico de ventas realizadas
+  cargarVentas();
   }
 
   cargarDatosBase() {
@@ -105,7 +102,8 @@ export class VentasComponent implements OnInit {
     this.ventaService.getVentas().pipe(timeout(15000)).subscribe({
       next: (res) => {
         this.ventas = res;
-        this.filtrarVentas();
+        this.// Bloque para filtrar el listado de ventas por búsqueda y estado de entrega
+  filtrarVentas();
         this.cdr.detectChanges();
       },
       error: () => {
@@ -127,14 +125,17 @@ export class VentasComponent implements OnInit {
     this.pageVentas = 1;
   }
 
+  // Bloque utilitario para formatear el consecutivo de la factura de venta
   numeroFactura(venta: any): string {
     return 'FAC-' + String(venta.factura_consecutivo ?? venta.id ?? '').padStart(3, '0');
   }
 
+  // Bloque para alternar entre pestañas de punto de venta e historial
   switchTab(tab: string) {
     this.activeTab = tab;
   }
 
+  // Bloque para exportar el histórico de ventas a formato Excel
   exportarExcel() {
     this.toast.success('Generando archivo Excel...');
     const headers = { 'Authorization': `Bearer ${sessionStorage.getItem('auth_token')}` };
@@ -152,6 +153,7 @@ export class VentasComponent implements OnInit {
     });
   }
 
+  // Bloque para verificar existencias y anexar el producto al carrito del POS
   agregarAlCarrito() {
     if (!this.productoActual || this.cantidadActual <= 0) {
       this.toast.warning('Seleccione un producto y cantidad válida');
@@ -160,7 +162,6 @@ export class VentasComponent implements OnInit {
 
     const prod = this.productosDisponibles.find(p => p.id == this.productoActual);
     if (prod) {
-      // Forzar precio a número para evitar error string + int en backend
       const precioUnitario = +prod.precio_venta;
       const cantidad = +this.cantidadActual;
 
@@ -177,12 +178,14 @@ export class VentasComponent implements OnInit {
           subtotal: precioUnitario * cantidad
         });
       }
-      this.calcularTotales();
+      this.// Bloque para calcular el subtotal, impuestos y total a pagar de la venta
+  calcularTotales();
       this.productoActual = '';
       this.cantidadActual = 1;
     }
   }
 
+  // Bloque para remover un producto del carrito de compra
   removerDelCarrito(index: number) {
     this.carrito.splice(index, 1);
     this.calcularTotales();
@@ -192,6 +195,7 @@ export class VentasComponent implements OnInit {
     this.totalCarrito = this.carrito.reduce((acc, item) => acc + item.subtotal, 0);
   }
 
+  // Bloque para validar y registrar la venta en el sistema y descontar stock
   registrarVenta() {
     if (!this.clienteSeleccionado) {
       this.toast.warning('Debe seleccionar un cliente');
@@ -229,7 +233,6 @@ export class VentasComponent implements OnInit {
           this.toast.error('Error de tiempo de espera al registrar la venta.');
         } else if (err.status === 422 || err.error?.error === 'stock_agotado') {
           this.toast.error(err.error?.message || 'El producto ya se encuentra agotado.');
-          // Refresca catálogo de productos en tiempo real para actualizar el stock visible
           this.cargarDatosBase();
         } else {
           this.toast.error(err.error?.message || 'Error al registrar la venta');
@@ -239,12 +242,14 @@ export class VentasComponent implements OnInit {
     });
   }
 
+  // Bloque para asignar la clase cromática del badge según el estado de entrega
   getBadgeClass(estado: string): string {
     if (estado === 'Completada') return 'badge-aprobada';
     if (estado === 'Anulada') return 'badge-rechazada';
     return 'badge-pendiente';
   }
 
+  // Bloque para actualizar el estado logístico del paquete o entrega
   cambiarEstadoPaquete(venta: any, nuevoEstado: string) {
     if (!venta?.id || !venta.cliente_id) return;
     this.ventaService.updateEstadoPaquete(venta.id, nuevoEstado, venta.cliente_id).pipe(timeout(10000)).subscribe({
@@ -264,16 +269,19 @@ export class VentasComponent implements OnInit {
     });
   }
 
+  // Bloque para abrir el modal de confirmación de anulación de factura
   abrirModalAnular(venta: any) {
     this.ventaSeleccionada = venta;
     this.showModalAnular = true;
   }
 
+  // Bloque para cerrar el diálogo de anulación de venta
   cerrarModalAnular() {
     this.showModalAnular = false;
     this.ventaSeleccionada = null;
   }
 
+  // Bloque para anular la venta y restituir los productos al stock de inventario
   confirmarAnulacion() {
     if (!this.ventaSeleccionada?.id) return;
     this.guardando = true;

@@ -16,7 +16,7 @@ class EmpleadosExport implements FromCollection, WithHeadings, WithMapping
         $this->empresa_id = $empresa_id;
     }
 
-    public function collection()
+    public function collection(): \Illuminate\Support\Collection
     {
         return Empleado::with(['usuario', 'area', 'cargo'])->where('empresa_id', $this->empresa_id)->get();
     }

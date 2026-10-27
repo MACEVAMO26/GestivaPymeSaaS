@@ -9,10 +9,10 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    // --- AUTENTICACIÓN Y REGISTRO ---
-    // Registra un nuevo usuario en el sistema y retorna su token de acceso
+    // Bloque para registrar un nuevo usuario en el sistema y retornar su token de acceso
     public function registrar(Request $request)
     {
+        // Bloque de reglas de validación de datos del usuario
         $request->validate([
             'nombres' => 'required|string|max:255',
             'apellidos' => 'required|string|max:255',
@@ -20,6 +20,8 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:usuarios',
             'password' => ['required', 'string', \Illuminate\Validation\Rules\Password::min(8)->mixedCase()],
         ]);
+
+        // Bloque de creación del usuario en la base de datos con contraseña cifrada
         $user = User::create([
             'nombres' => $request->nombres,
             'apellidos' => $request->apellidos,
@@ -27,7 +29,10 @@ class AuthController extends Controller
             'email' => $request->email,
             'password_hash' => Hash::make($request->password) 
         ]);
+
+        // Bloque de generación del token de autenticación Sanctum
         $token = $user->createToken('auth_token')->plainTextToken;
+
         return response()->json([
             'message' => 'Usuario registrado exitosamente!',
             'user' => $user,
@@ -35,26 +40,31 @@ class AuthController extends Controller
         ], 201);
     }
 
-    // Inicia sesión verificando credenciales y retorna los datos del usuario con su token
+    // Bloque para iniciar sesión verificando credenciales y retornar los datos del usuario con su token
     public function login(Request $request)
     {
+        // Bloque de reglas de validación de credenciales
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
+
         $emailLimpio = strtolower(trim($request->email));
-        // Búsqueda directa optimizada por índice, con relaciones necesarias
+
+        // Bloque de búsqueda optimizada del usuario con relaciones necesarias cargadas
         $user = User::with(['empresa', 'cargo', 'rol', 'empleado.area', 'empleado.cargo'])
                     ->where('email', $emailLimpio)
                     ->orWhereRaw('LOWER(email) = ?', [$emailLimpio])
                     ->first();
+
+        // Bloque de verificación del hash de contraseña
         if (!$user || !Hash::check($request->password, $user->password_hash)) {
             throw ValidationException::withMessages([
                 'email' => ['Las credenciales proporcionadas son incorrectas.'],
             ]);
         }
 
-        // Exige el cambio de contraseña si es el primer ingreso del usuario
+        // Bloque de control de cambio de contraseña obligatorio para primer ingreso
         if ($user->debe_cambiar_clave) {
             return response()->json([
                 'requires_password_change' => true,
@@ -63,9 +73,7 @@ class AuthController extends Controller
             ]);
         }
 
-        // Control Inteligente de Sesiones Simultáneas
-        // Permite operar en desarrollo local (localhost) sin colisionar con producción (Vercel / móvil),
-        // pero validando y bloqueando estrictamente sesiones concurrentes dentro del mismo entorno.
+        // Bloque de control inteligente de sesiones simultáneas por entorno (localhost vs producción)
         $origin = $request->header('Origin', '');
         $referer = $request->header('Referer', '');
         $host = $request->getHost();
@@ -76,7 +84,7 @@ class AuthController extends Controller
         $tokenName = $isLocalhost ? 'local_token' : 'auth_token';
         $forzarCierre = $request->boolean('force_logout');
 
-        // Validar si ya existe una sesión activa para este usuario en este entorno
+        // Bloque para validar si ya existe una sesión activa para este usuario en el mismo entorno
         $tieneSesionActiva = $user->tokens()->where('name', $tokenName)->exists();
 
         if ($tieneSesionActiva && !$forzarCierre) {
@@ -86,11 +94,11 @@ class AuthController extends Controller
             ], 409);
         }
 
-        // Cierra de forma inmediata cualquier sesión previa de este entorno y genera el token
+        // Bloque de revocación de sesiones previas en el mismo entorno y generación del nuevo token
         $user->tokens()->where('name', $tokenName)->delete();
         $token = $user->createToken($tokenName)->plainTextToken;
 
-        // Cargar módulos activos para evitar llamadas extras en el frontend
+        // Bloque de carga de módulos activos de la empresa para optimizar peticiones del frontend
         $modulosActivos = [];
         if ($user->empresa_id) {
             $modulos = \Illuminate\Support\Facades\DB::table('empresa_modulo')
@@ -109,9 +117,10 @@ class AuthController extends Controller
         ]);
     }
 
-    // Restablece la contraseña del usuario a la clave genérica universal por defecto usuario12369 y activa el flag de cambio obligatorio
+    // Bloque para restablecer la contraseña a la clave temporal por defecto (usuario12369) y marcar cambio obligatorio
     public function recuperarPassword(Request $request)
     {
+        // Bloque de validación de correo para recuperación
         $request->validate([
             'email' => 'required|email',
         ]);
@@ -124,6 +133,7 @@ class AuthController extends Controller
             ]);
         }
 
+        // Bloque de actualización de contraseña temporal y flag de cambio obligatorio
         $user->password_hash = Hash::make('usuario12369');
         $user->debe_cambiar_clave = true;
         $user->save();
@@ -133,9 +143,10 @@ class AuthController extends Controller
         ]);
     }
 
-    // Actualiza la contraseña temporal del usuario y desactiva el flag de cambio obligatorio
+    // Bloque para actualizar la contraseña temporal del usuario y remover el flag de cambio obligatorio
     public function changeInitialPassword(Request $request)
     {
+        // Bloque de validación de credencial actual y nueva contraseña con requisitos de seguridad
         $request->validate([
             'email' => 'required|email',
             'current_password' => 'required',
@@ -148,6 +159,7 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
+        // Bloque de validación de contraseña temporal vigente
         if (!$user || !Hash::check($request->current_password, $user->password_hash)) {
             throw ValidationException::withMessages([
                 'current_password' => ['La contraseña temporal ingresada no es correcta.'],
@@ -160,6 +172,7 @@ class AuthController extends Controller
             ]);
         }
 
+        // Bloque de guardado de la nueva contraseña cifrada
         $user->password_hash = Hash::make($request->new_password);
         $user->debe_cambiar_clave = false;
         $user->save();
@@ -169,7 +182,7 @@ class AuthController extends Controller
         ]);
     }
 
-    // Revoca el token de acceso actual cerrando la sesión del usuario
+    // Bloque para revocar el token de acceso actual cerrando la sesión del usuario
     public function cerrarSesion(Request $request)
     {
         if ($request->user()) {

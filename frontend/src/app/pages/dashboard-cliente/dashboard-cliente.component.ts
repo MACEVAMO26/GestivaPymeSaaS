@@ -25,7 +25,7 @@ interface ModuloSidebar {
   styleUrl: './dashboard-cliente.component.scss'
 })
 export class DashboardClienteComponent implements OnInit {
-  // --- SERVICIOS ---
+  // --- INYECCIÓN DE DEPENDENCIAS Y SERVICIOS ---
   public accessibilityService = inject(AccessibilityService);
   private authService = inject(AuthService);
   private modulosService = inject(ModulosService);
@@ -35,6 +35,7 @@ export class DashboardClienteComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
 
+  // Bloque para activar el tutorial interactivo de la plataforma
   abrirTutorial() {
     this.iaStateService.triggerTutorial();
   }
@@ -49,16 +50,18 @@ export class DashboardClienteComponent implements OnInit {
 
   constructor() {}
 
+  // Bloque getter para obtener el nombre formateado del usuario autenticado
   get nombreUsuario(): string {
     if (!this.user) return 'Usuario';
     const n = [this.user.nombres, this.user.apellidos].filter(Boolean).join(' ');
     return n || 'Usuario';
   }
 
+  // Bloque getter para construir la descripción jerárquica del cargo y área del usuario
   get cargoUsuario(): string {
     if (!this.user) return '';
     
-    // Buscar el cargo en el empleado, luego en el usuario.cargo, luego en el rol, por defecto Gerente General
+    // Bloque de resolución del cargo y área organizativa del empleado
     let cargoStr = this.user.empleado?.cargo?.nombre || this.user.cargo?.nombre || this.user.rol?.nombre || 'Gerente General';
     let areaStr = this.user.empleado?.area?.nombre || '';
     
@@ -69,11 +72,12 @@ export class DashboardClienteComponent implements OnInit {
     return cargoStr;
   }
 
+  // Bloque del ciclo de vida ngOnInit para inicializar usuario, sidebar y validación de sesión
   ngOnInit(): void {
     this.user = this.authService.getUser();
     this.construirSidebar();
 
-    // Heartbeat de sesión activa: detecta si la sesión fue cerrada remotamente desde otro dispositivo
+    // Bloque de verificación periódica para validar la vigencia de la sesión remota
     if (typeof window !== 'undefined') {
       const sessionInterval = setInterval(() => {
         if (this.authService.getToken()) {
@@ -89,9 +93,9 @@ export class DashboardClienteComponent implements OnInit {
     }
   }
 
-  // --- LÓGICA DEL SIDEBAR (CATÁLOGO REAL DESDE LA BD) ---
+  // Bloque para construir dinámicamente el menú lateral según los módulos contratados
   private construirSidebar() {
-    // Módulos base del producto SIEMPRE visibles (Inicio, Administración, etc.)
+    // Bloque de inicialización de módulos base del sistema siempre disponibles
     const botones: { [key: string]: ModuloSidebar } = {};
     MODULOS_BASE_UI.forEach((mod) => {
       botones[mod.id] = {
@@ -102,7 +106,7 @@ export class DashboardClienteComponent implements OnInit {
       };
     });
 
-    // Plan según el tipo de empresa real del usuario
+    // Bloque de cálculo de plan según tipo de empresa del usuario
     if (this.user?.rol?.nombre === 'Auditor') {
       this.planActual = 'AUDITORIA';
     } else {
@@ -110,13 +114,13 @@ export class DashboardClienteComponent implements OnInit {
       this.planActual = this.calcularPlan(tipoEmpresaUsuario);
     }
 
-    // Consultar los módulos reales asignados al usuario (autenticado)
+    // Bloque de consulta de módulos contratados por la empresa autenticada
     if (this.user?.empresa_id) {
       this.modulosService.getMisModulos().subscribe({
         next: (resp) => {
           const modulosEmpresa = resp.modulos || {};
 
-          // --- RECONSTRUIR BOTONES DESDE CERO CON LA VERDAD DE LA BASE DE DATOS ---
+          // Bloque de reconstrucción de ítems de navegación según respuesta de la base de datos
           const botonesReales: { [key: string]: ModuloSidebar } = {};
           MODULOS_BASE_UI.forEach((mod) => {
             botonesReales[mod.id] = {
@@ -131,7 +135,7 @@ export class DashboardClienteComponent implements OnInit {
             const subs = modulosEmpresa[paqueteId] || [];
 
             if (paqueteId === 'ventas' || paqueteId === 'servicios') {
-              // Desglosar submódulos individuales que estén ACTIVOS en la BD
+              // Bloque de procesamiento de submódulos comerciales activos
               subs.forEach((sub: any) => {
                 if (sub.activo) {
                   botonesReales[sub.id] = {
@@ -143,14 +147,14 @@ export class DashboardClienteComponent implements OnInit {
                 }
               });
             } else if (['rrhh', 'finanzas', 'addons', 'base'].includes(paqueteId)) {
-              // Módulo completo: revisar si tiene algún submódulo ACTIVO en la BD real
+              // Bloque de verificación de módulos con submódulos activos
               const isActivo = subs.some((s: any) => s.activo);
               if (isActivo) {
                 let id = paqueteId;
                 let nombre = paqueteId === 'rrhh' ? 'Gestión Humana' : (paqueteId === 'finanzas' ? 'Finanzas' : (paqueteId === 'addons' ? 'Addons+' : ''));
                 let ruta = this.slugify(nombre);
                 if (paqueteId === 'base') {
-                  // El paquete 'base' de la BD (Recordatorios, Reuniones, etc.) no genera botón propio
+                  // Bloque para omitir generación de botón para el paquete base genérico
                   return;
                 }
                 botonesReales[id] = {
@@ -168,13 +172,13 @@ export class DashboardClienteComponent implements OnInit {
         error: () => this.aplicarOrdenamiento(botones) // Si falla, mantener los módulos base
       });
     } else {
-      // Si no tiene empresa (caso inusual en cliente), mantener módulos base
+      // Bloque de contingencia para mantener módulos base si no hay empresa asignada
       this.aplicarOrdenamiento(botones);
     }
   }
 
 
-  // Plan según el tipo de empresa
+  // Bloque para determinar el nombre del plan comercial según el tipo de empresa
   private calcularPlan(tipoEmpresaUsuario: string): string {
     if (tipoEmpresaUsuario.includes('Ventas y Servicios') || tipoEmpresaUsuario === 'Mixto') return 'Mixto';
     if (tipoEmpresaUsuario === 'Ventas') return 'Ventas';
@@ -182,6 +186,7 @@ export class DashboardClienteComponent implements OnInit {
     return 'Especial';
   }
 
+  // Bloque para parsear y obtener el mapa de permisos modulares específicos del empleado
   private getParsedModsPermitidos(): { [key: string]: boolean } | null {
     const raw = this.user?.empleado?.modulos_permitidos;
     if (!raw) return null;
@@ -203,9 +208,9 @@ export class DashboardClienteComponent implements OnInit {
     return null;
   }
 
+  // Bloque para filtrar y ordenar los ítems de navegación según el rol y área del usuario
   private aplicarOrdenamiento(botones: { [key: string]: ModuloSidebar }) {
-    // Si la empresa tiene Gestión de Clientes (s_crm) pero no Clientes (v_cxc) [Empresas de Servicios],
-    // inyectamos el botón de Clientes para que puedan acceder al CRM unificado.
+    // Bloque de inyección de módulo de clientes para empresas de servicios con CRM
     if (botones['s_crm'] && !botones['v_cxc']) {
       botones['v_cxc'] = {
         id: 'v_cxc',
@@ -215,7 +220,7 @@ export class DashboardClienteComponent implements OnInit {
       };
     }
 
-    // Renombramos 's_cat' a 'Servicios' para unificar los submódulos.
+    // Bloque de unificación de etiqueta para catálogo de servicios
     if (botones['s_cat']) {
       botones['s_cat'].nombre = 'Servicios';
     }
@@ -250,30 +255,29 @@ export class DashboardClienteComponent implements OnInit {
     const esFormalizado = esGerente || esJefeRRHH || this.user?.estado_formalizacion === 'Formalizado' || !!this.user?.empleado || (this.user?.cargo_id && this.user?.cargo_id > 0);
 
     ordenDeseado.forEach(id => {
-      // 1. Inicio ('d_ini') y Autogestión ('d_aut') son Abiertos para TODOS los empleados siempre
+      // Bloque de validación de acceso público a inicio y autogestión
       if (id === 'd_ini' || id === 'd_aut') {
         if (botones[id]) itemsOrdenados.push(botones[id]);
         return;
       }
 
-      // 2. Usuarios recién creados NO formalizados (cáscara): SOLO Inicio ('d_ini') y Autogestión ('d_aut')
+      // Bloque de restricción para usuarios pendientes de formalización laboral
       if (!esFormalizado) {
         return;
       }
 
-      // 3. Gerente General o Auditor: Acceso total a todos los módulos habilitados de la empresa
+      // Bloque de acceso total para roles de Gerencia y Auditoría
       if (esGerente) {
         if (botones[id]) itemsOrdenados.push(botones[id]);
         return;
       }
 
-      // 4. Gestiva IA y Administración: solo Gerente
+      // Bloque de restricción de módulos exclusivos de gerencia
       if (id === 'd_gia' || id === 'd_adm') {
         return;
       }
 
-      // 5. Si el empleado tiene modulos_permitidos personalizados en su perfil:
-      //    MOSTRAR ÚNICAMENTE LOS MÓDULOS ACTIVOS EN modulos_permitidos (ignorar área por defecto)
+      // Bloque de filtrado por permisos modulares personalizados del empleado
       if (parsedMods && Object.keys(parsedMods).length > 0) {
         if (parsedMods[id] && botones[id]) {
           itemsOrdenados.push(botones[id]);
@@ -281,7 +285,7 @@ export class DashboardClienteComponent implements OnInit {
         return;
       }
 
-      // 6. Si es Jefe de RRHH (sin modulos_permitidos personalizados)
+      // Bloque de filtrado de módulos para jefatura de talento humano
       if (esJefeRRHH) {
         if (['rrhh', 'd_for', 'd_tar'].includes(id) && botones[id]) {
           itemsOrdenados.push(botones[id]);
@@ -289,7 +293,7 @@ export class DashboardClienteComponent implements OnInit {
         return;
       }
 
-      // 7. Si NO tiene modulos_permitidos personalizados: Filtrar por Área Organizacional estrictamente
+      // Bloque de filtrado estricto por área organizacional del empleado
       if (areaNombre.includes('inventario') || areaNombre.includes('almacen') || areaNombre.includes('bodega')) {
         if (['v_inv', 'd_tar'].includes(id) && botones[id]) {
           itemsOrdenados.push(botones[id]);
@@ -330,6 +334,7 @@ export class DashboardClienteComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
+  // Bloque helper para verificar si un módulo específico está habilitado en los permisos personalizados
   private checkModuloCustom(modsPermitidos: any, modId: string): boolean {
     if (!modsPermitidos) return false;
     if (Array.isArray(modsPermitidos)) return modsPermitidos.includes(modId);
@@ -338,6 +343,7 @@ export class DashboardClienteComponent implements OnInit {
   }
 
 
+  // Bloque helper para transformar nombres de módulos en segmentos de ruta URL limpios
   private slugify(text: string): string {
     if (!text) return '';
     return text.toString().toLowerCase()
@@ -350,14 +356,17 @@ export class DashboardClienteComponent implements OnInit {
       .replace(/-+$/, '');               // trim - from end of text
   }
 
+  // Bloque para alternar el estado colapsado o expandido de la barra lateral
   toggleSidebar() {
     this.isSidebarCollapsed = !this.isSidebarCollapsed;
   }
 
+  // Bloque para alternar el indicador de notificaciones del sistema
   toggleNotification() {
     this.hasNotification = !this.hasNotification;
   }
 
+  // Bloque para alternar cíclicamente los modos de accesibilidad visual para daltonismo
   toggleDaltonism(): void {
     const current = this.accessibilityService.currentMode();
     const modes: ('normal' | 'protanopia' | 'deuteranopia' | 'tritanopia')[] = ['normal', 'protanopia', 'deuteranopia', 'tritanopia'];
@@ -366,6 +375,7 @@ export class DashboardClienteComponent implements OnInit {
     this.accessibilityService.setMode(modes[nextIndex]);
   }
 
+  // Bloque para construir la ruta URL de inicio institucional basada en el subdominio de la empresa
   getInicioRoute(): string {
     if (this.user && this.user.empresa) {
       if (this.user.empresa.dominio) {
@@ -378,6 +388,7 @@ export class DashboardClienteComponent implements OnInit {
     return '/inicio';
   }
 
+  // Bloque para cerrar la sesión activa del usuario y redirigir al login
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);

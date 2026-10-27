@@ -38,14 +38,15 @@ export class GestivaIaComponent implements OnInit {
     activo: true
   };
 
+  // Bloque de ciclo de vida para inicializar y cargar directrices de IA
   ngOnInit() {
-    // Retraso de 500ms para evitar que la petición concurrente con el Asistente IA 
-    // bloquee el servidor local de PHP (php artisan serve) en Windows.
+    
     setTimeout(() => {
       this.cargarDirectrices();
     }, 500);
   }
 
+  // Bloque para cargar la lista de directrices personalizadas de IA
   cargarDirectrices() {
     this.cargando = true;
     this.http.get<Directriz[]>('/api/ia/directrices').subscribe({
@@ -63,6 +64,7 @@ export class GestivaIaComponent implements OnInit {
     });
   }
 
+  // Bloque para abrir el formulario de creacion o edicion de directriz
   abrirFormulario(directriz?: Directriz) {
     this.showForm = true;
     if (directriz) {
@@ -78,11 +80,13 @@ export class GestivaIaComponent implements OnInit {
     }
   }
 
+  // Bloque para cerrar el formulario de directriz
   cerrarFormulario() {
     this.showForm = false;
     this.form = {};
   }
 
+  // Bloque para guardar o actualizar una directriz de comportamiento de IA
   guardarDirectriz() {
     if (!this.form.mensaje || !this.form.audiencia) {
       this.toastService.warning('Por favor completa los campos requeridos.');
@@ -126,6 +130,7 @@ export class GestivaIaComponent implements OnInit {
     }
   }
 
+  // Bloque para alternar el estado activo/inactivo de una directriz
   toggleActivo(directriz: Directriz) {
     directriz.activo = !directriz.activo;
     this.http.put(`/api/ia/directrices/${directriz.id}`, { activo: directriz.activo }).subscribe({
@@ -137,6 +142,7 @@ export class GestivaIaComponent implements OnInit {
     });
   }
 
+  // Bloque para eliminar una directriz personalizada de IA
   eliminarDirectriz(id: number) {
     if (confirm('¿Estás seguro de eliminar esta directriz?')) {
       this.http.delete(`/api/ia/directrices/${id}`).subscribe({

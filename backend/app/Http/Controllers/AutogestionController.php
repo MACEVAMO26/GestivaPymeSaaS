@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class AutogestionController extends Controller
 {
-    // --- ESTADÍSTICAS DE AUTOGESTIÓN DEL USUARIO ---
+    // Bloque para obtener las estadísticas generales de autogestión del usuario
     public function getStats(Request $request)
     {
         $user = $request->user();
@@ -21,19 +21,18 @@ class AutogestionController extends Controller
         ]);
     }
 
-    // --- GESTIÓN DE AFILIACIONES PROPIAS ---
-    // Obtiene los datos de afiliación del usuario autenticado, incluyendo la ARL y
-    // Caja de Compensación configuradas por la empresa o en formalización.
+    // Bloque para consultar los datos de afiliación y seguridad social del usuario autenticado
+    
     public function misAfiliaciones(Request $request)
     {
         $user = $request->user();
         $empleado = \App\Models\Empleado::where('usuario_id', $user->id)->first();
         $afiliacion = DB::table('afiliaciones')->where('user_id', $user->id)->first();
 
-        // Leer la configuración global de Seguridad Social de la empresa
+        // Bloque para leer la configuración de seguridad social de la empresa
         $empresa = DB::table('empresa')->where('id', $user->empresa_id)->first();
 
-        // Priorizar datos actualizados de Formalización/Empleado si existen
+        // Bloque para priorizar datos de formalización del empleado
         $eps = $empleado?->eps ?: ($afiliacion?->eps ?? null);
         $afondo_pension = $empleado?->fondo_pension ?: ($afiliacion?->afondo_pension ?? null);
         $fondo_cesantias = $empleado?->fondo_cesantias ?: ($afiliacion?->fondo_cesantias ?? null);
@@ -64,7 +63,7 @@ class AutogestionController extends Controller
         ]);
     }
 
-    // ¿La empresa del usuario tiene activo el módulo Gestión Humana?
+    // Bloque para verificar si la empresa tiene activo el módulo de Gestión Humana
     private function empresaTieneRRHH($user)
     {
         if (!$user || !$user->empresa_id) {
@@ -78,7 +77,7 @@ class AutogestionController extends Controller
             ->exists();
     }
 
-    // Guarda o actualiza las afiliaciones del empleado. El documento es obligatorio para el cambio.
+    // Bloque para guardar o actualizar las afiliaciones del empleado con documento de soporte
     public function guardarAfiliaciones(Request $request)
     {
         $request->validate([
@@ -91,8 +90,7 @@ class AutogestionController extends Controller
         $user = $request->user();
         $existe = DB::table('afiliaciones')->where('user_id', $user->id)->first();
 
-        // Con Gestión Humana activa, RRHH aprueba el cambio (estado pendiente).
-        // Sin Gestión Humana, el empleado solo puede modificarlas hasta 2 veces en total.
+        // Bloque de validación de límite de modificaciones según módulo de Gestión Humana
         if (!$this->empresaTieneRRHH($user)) {
             $veces = $existe ? (int) $existe->veces_modificada : 0;
             if ($veces >= 2) {
@@ -102,7 +100,7 @@ class AutogestionController extends Controller
             }
         }
 
-        // Subir el documento de soporte si se adjuntó
+        // Bloque para subir el documento de soporte a Cloudinary
         $documentoUrl = $existe?->documento_soporte_url ?? null;
         if ($request->hasFile('documento_soporte')) {
             try {
@@ -148,8 +146,7 @@ class AutogestionController extends Controller
         ]);
     }
 
-    // --- GESTIÓN DE AFILIACIONES POR RRHH ---
-    // Obtiene la información de afiliación de un empleado específico
+    // Bloque para obtener la información de afiliación de un empleado específico
     public function obtenerAfiliacionEmpleado(Request $request, $id)
     {
 
@@ -157,7 +154,7 @@ class AutogestionController extends Controller
         return response()->json(['afiliacion' => $afiliacion]);
     }
 
-    // Aprueba, rechaza y asigna fechas contractuales a las afiliaciones de un empleado
+    // Bloque para aprobar, rechazar o actualizar fechas contractuales de afiliación de un empleado
     public function gestionarAfiliacionEmpleado(Request $request, $id)
     {
         $request->validate([

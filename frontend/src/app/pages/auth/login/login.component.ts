@@ -32,39 +32,44 @@ export class LoginComponent implements OnInit {
     newPassword: ''
   };
 
-  // Control de Sesiones Simultáneas
+  // --- CONTROL DE SESIONES SIMULTÁNEAS ---
   showSessionConflictModal = false;
   sessionConflictMessage = '';
   remoteLogoutNotice = '';
 
-  // Modal Recuperar Contraseña
+  // --- MODAL RECUPERAR CONTRASEÑA ---
   showRecoveryModal = false;
   recoveryEmail = '';
   isRecovering = false;
   recoveryMessage = '';
   recoveryError = '';
 
+  // --- INYECCIÓN DE DEPENDENCIAS Y SERVICIOS ---
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   public accessibilityService = inject(AccessibilityService);
   private cdr = inject(ChangeDetectorRef);
 
+  // Bloque del ciclo de vida ngOnInit para inicializar el login, verificar sesión previa y capturar motivos de redirección
   ngOnInit(): void {
-    // Si el usuario llega al login (por botón atrás o navegación directa) teniendo sesión abierta, se cierra de inmediato
+    // Bloque de cierre de sesión si el usuario llega al login teniendo un token previo activo
     if (this.authService.getToken()) {
       this.authService.logout(false);
     }
 
-    // Si viene redirigido porque se inició sesión en otro dispositivo
+    // Bloque de detección de parámetros URL por desconexión remota o por inactividad
     this.route.queryParams.subscribe(params => {
       if (params['motivo'] === 'sesion_remota') {
         this.remoteLogoutNotice = 'Tu sesión fue cerrada porque se inició sesión con tu cuenta desde otro dispositivo o navegador.';
+      } else if (params['motivo'] === 'inactividad') {
+        this.remoteLogoutNotice = 'Tu sesión fue cerrada automáticamente tras 1 hora de inactividad.';
         this.cdr.detectChanges();
       }
     });
   }
 
+  // Bloque para abrir el modal de recuperación de contraseña
   abrirModalRecuperar() {
     this.recoveryEmail = this.credentials.email || '';
     this.recoveryMessage = '';
@@ -72,6 +77,7 @@ export class LoginComponent implements OnInit {
     this.showRecoveryModal = true;
   }
 
+  // Bloque para cerrar el modal de recuperación de contraseña y limpiar el formulario
   cerrarModalRecuperar() {
     this.showRecoveryModal = false;
     this.recoveryEmail = '';
@@ -79,6 +85,7 @@ export class LoginComponent implements OnInit {
     this.recoveryError = '';
   }
 
+  // Bloque para solicitar el restablecimiento de contraseña temporal al backend
   solicitarRecuperacion() {
     if (!this.recoveryEmail || !this.recoveryEmail.trim()) {
       this.recoveryError = 'Ingrese su correo electrónico registrado.';
@@ -89,6 +96,7 @@ export class LoginComponent implements OnInit {
     this.recoveryError = '';
     this.recoveryMessage = '';
 
+    // Bloque de petición HTTP para procesar la recuperación de contraseña
     this.authService.recuperarPassword(this.recoveryEmail.trim()).subscribe({
       next: (res) => {
         this.isRecovering = false;
@@ -105,34 +113,34 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  // Alterna la visibilidad de la contraseña en el formulario
+  // Bloque para alternar la visibilidad de la contraseña en el formulario
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
 
-  // Abre o cierra el menú de opciones de accesibilidad
+  // Bloque para alternar la visibilidad del menú de accesibilidad visual
   toggleAccessibilityMenu() {
     this.isAccessibilityMenuOpen = !this.isAccessibilityMenuOpen;
   }
 
-  // Aplica el filtro de daltonismo seleccionado
+  // Bloque para aplicar el filtro de daltonismo seleccionado mediante el servicio de accesibilidad
   setDaltonismMode(mode: DaltonismMode) {
     this.accessibilityService.setMode(mode);
     this.isAccessibilityMenuOpen = false;
   }
 
-  // Cierra el modal de advertencia de sesión simultánea
+  // Bloque para cancelar el modal de conflicto de sesión simultánea
   cancelarConflictoSesion(): void {
     this.showSessionConflictModal = false;
     this.sessionConflictMessage = '';
   }
 
-  // Cierra la sesión activa en el otro dispositivo e ingresa en este
+  // Bloque para forzar el cierre de la sesión remota previa e iniciar sesión en el dispositivo actual
   cerrarOtraSesionEIngresar(): void {
     this.onSubmit(true);
   }
 
-  // Procesa el formulario de login y redirige según el rol
+  // Bloque para procesar el formulario de inicio de sesión y redirigir según el rol y empresa
   onSubmit(forceLogout: boolean = false): void {
     if (this.requiresPasswordChange) {
       this.submitNewPassword();
@@ -146,6 +154,7 @@ export class LoginComponent implements OnInit {
       force_logout: forceLogout
     };
 
+    // Bloque de autenticación contra la API Sanctum
     this.authService.login(payload).subscribe({
       next: (response) => {
         this.isLoading = false;
@@ -153,13 +162,14 @@ export class LoginComponent implements OnInit {
         this.remoteLogoutNotice = '';
         console.log("LOGIN RESPONSE", response);
 
-        // Si el backend exige cambio de clave, mostramos el formulario de cambio
+        // Bloque de verificación si se requiere cambio de clave obligatorio
         if (response.requires_password_change) {
           this.requiresPasswordChange = true;
           this.cdr.detectChanges();
           return;
         }
 
+        // Bloque de enrutamiento según rol de usuario o empresa asignada
         const user = response.user;
         if (user && user.empresa_id === null) {
           console.log("NAVIGATING TO /saas-admin/dashboard");
@@ -170,7 +180,7 @@ export class LoginComponent implements OnInit {
             ruta = '/' + user.empresa.dominio + '/inicio';
           } else if (user.empresa && user.empresa.razon_social) {
             const slug = user.empresa.razon_social.toLowerCase()
-              .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+              .normalize("NFD").replace(/[̀-ͯ]/g, "")
               .replace(/[^a-z0-9]/g, '');
             ruta = '/' + slug + '/inicio';
           }
@@ -187,11 +197,11 @@ export class LoginComponent implements OnInit {
           try {
             errorData = JSON.parse(errorData);
           } catch {
-            // No es un string JSON válido
+            // Bloque de captura en caso de que la respuesta de error no sea JSON válido
           }
         }
 
-        // 1. Conflicto por Sesión Simultánea abierta en otro dispositivo
+        // Bloque de captura de conflicto por sesión simultánea activa (código HTTP 409)
         if (err.status === 409 || errorData?.session_conflict) {
           this.sessionConflictMessage = errorData?.message || 'Has iniciado sesión en otro dispositivo, por favor cierra esa sesión e intenta nuevamente.';
           this.showSessionConflictModal = true;
@@ -227,7 +237,7 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  // Envía la nueva contraseña para forzar el cambio inicial
+  // Bloque para enviar la nueva contraseña en caso de primer ingreso obligatorio
   submitNewPassword(): void {
     this.isLoading = true;
     const payload = {
@@ -236,6 +246,7 @@ export class LoginComponent implements OnInit {
       new_password: this.changePasswordData.newPassword
     };
 
+    // Bloque de petición HTTP para actualizar la contraseña inicial
     this.authService.changeInitialPassword(payload).subscribe({
       next: (response) => {
         this.isLoading = false;

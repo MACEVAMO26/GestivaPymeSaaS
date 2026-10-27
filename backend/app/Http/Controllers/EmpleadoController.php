@@ -12,7 +12,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class EmpleadoController extends Controller
 {
-    // Trae la lista de usuarios "cáscara" pendientes de formalización
+    // Bloque para listar usuarios pendientes de formalización
     public function pendientes()
     {
         $empresaId = auth()->user()->empresa_id;
@@ -23,11 +23,11 @@ class EmpleadoController extends Controller
         return response()->json($pendientes);
     }
 
-    // Trae la lista de empleados ya formalizados
+    // Bloque para listar empleados formalizados en la empresa
     public function index()
     {
         $empresaId = auth()->user()->empresa_id;
-        // Cargamos la relación con usuario para traer nombre, documento, etc.
+        // Bloque de carga de relaciones de usuario, área y cargo
         $empleados = Empleado::with(['usuario', 'area', 'cargo'])
                              ->where('empresa_id', $empresaId)
                              ->get();
@@ -35,7 +35,7 @@ class EmpleadoController extends Controller
         return response()->json($empleados);
     }
 
-    // Formaliza un usuario "cáscara", creando su perfil de empleado y otorgando acceso
+    // Bloque para formalizar un usuario creando su perfil laboral y sincronizando afiliaciones
     public function formalizar(Request $request, $usuarioId)
     {
         $request->validate([
@@ -64,7 +64,7 @@ class EmpleadoController extends Controller
         $arl = $request->arl ?: ($empresa->arl ?? 'SURA');
         $caja = $request->caja_compensacion ?: ($empresa->caja_compensacion ?? 'Compensar');
 
-        // 1. Crear el registro en empleados
+        // Bloque de guardado de registro en empleados
         $empleado = Empleado::create([
             'usuario_id' => $usuario->id,
             'empresa_id' => $empresaId,
@@ -83,7 +83,7 @@ class EmpleadoController extends Controller
             'estado' => 'activo'
         ]);
 
-        // 2. Sincronizar en tabla afiliaciones para autogestión
+        // Bloque de sincronización en tabla de afiliaciones para autogestión
         if ($request->eps || $request->fondo_pension || $arl) {
             DB::table('afiliaciones')->updateOrInsert(
                 ['user_id' => $usuario->id],
@@ -99,10 +99,10 @@ class EmpleadoController extends Controller
             );
         }
 
-        // 3. Obtener el Cargo para heredar sus permisos (rol)
+        // Bloque de obtención del cargo para asignación de rol
         $cargo = \App\Models\Cargo::findOrFail($request->cargo_id);
 
-        // 4. Actualizar el usuario para desbloquearlo y asignarle su nivel de seguridad
+        // Bloque de actualización de usuario para desbloqueo y formalización
         $usuario->perfil_formalizado = true;
         $usuario->rol_id = $cargo->rol_id;
         $usuario->save();
@@ -113,7 +113,7 @@ class EmpleadoController extends Controller
         ]);
     }
 
-    // Actualiza los datos del contrato de un empleado (tipo, fechas, salario)
+    // Bloque para actualizar los datos contractuales del empleado
     public function updateContrato(Request $request, $id)
     {
         $request->validate([
@@ -136,7 +136,7 @@ class EmpleadoController extends Controller
         return response()->json(['message' => 'Contrato actualizado correctamente', 'empleado' => $empleado]);
     }
 
-    // Solicita la baja de un empleado (GH -> Gerente)
+    // Bloque para solicitar la baja laboral de un empleado
     public function solicitarBaja(Request $request, $id)
     {
         $request->validate([
@@ -151,11 +151,11 @@ class EmpleadoController extends Controller
             return response()->json(['error' => 'Ya existe una solicitud de baja para este empleado.'], 400);
         }
 
-        // Marcar como solicitada
+        // Bloque de marcación de solicitud de baja
         $empleado->baja_solicitada = true;
         $empleado->save();
 
-        // Buscar al gerente de la empresa para notificarle
+        // Bloque de búsqueda del gerente para envío de notificación
         $gerenteRole = Role::where('nombre', 'Gerente General')->first();
         if ($gerenteRole) {
             $gerentes = User::where('empresa_id', $empresaId)->where('rol_id', $gerenteRole->id)->get();
@@ -172,6 +172,7 @@ class EmpleadoController extends Controller
         return response()->json(['message' => 'Solicitud de baja enviada al Gerente exitosamente.']);
     }
 
+    // Bloque para generar el certificado laboral en formato PDF descargable
     public function generarCertificado($id)
     {
         $user = auth()->user();
@@ -181,7 +182,7 @@ class EmpleadoController extends Controller
 
         $empresaId = $user->empresa_id;
 
-        // Buscar empleado por ID o por usuario_id
+        // Bloque de búsqueda de empleado por ID o usuario
         $empleado = null;
         if ($id === 'me' || $id == $user->id) {
             $empleado = Empleado::with(['usuario.empresa', 'cargo', 'area'])
@@ -213,7 +214,7 @@ class EmpleadoController extends Controller
         $empresaNombre = $empresa ? ($empresa->nombre_comercial ?? $empresa->razon_social ?? $empresa->nombre) : 'Techventas y Soluciones S.A.S.';
         $empresaNit = $empresa ? ($empresa->nit ?? $empresa->documento ?? '901.834.192-4') : '901.834.192-4';
 
-        // Formato de fechas en español
+        // Bloque de formateo de fechas en español para el documento
         $meses = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
         $fechaIngresoCarbon = $empleado->fecha_contratacion ? \Carbon\Carbon::parse($empleado->fecha_contratacion) : ($empleado->created_at ?? now());
         $fechaIngresoTexto = $fechaIngresoCarbon->day . ' de ' . $meses[$fechaIngresoCarbon->month] . ' de ' . $fechaIngresoCarbon->year;
@@ -241,7 +242,7 @@ class EmpleadoController extends Controller
         return $pdf->download('Certificado_Laboral_' . ($usuario->documento ?? $usuario->id) . '.pdf');
     }
 
-    // Aprueba la baja (Gerente -> Empleado)
+    // Bloque para aprobar la baja definitiva de un empleado e inactivar su cuenta
     public function aprobarBaja(Request $request, $id)
     {
         $empresaId = auth()->user()->empresa_id;
@@ -249,12 +250,12 @@ class EmpleadoController extends Controller
         $empleado = Empleado::where('id', $id)->where('empresa_id', $empresaId)->firstOrFail();
         $usuario = $empleado->usuario;
 
-        // Inactivar empleado
+        // Bloque de inactivación de empleado
         $empleado->estado = 'inactivo';
         $empleado->baja_solicitada = false;
         $empleado->save();
 
-        // Inactivar usuario
+        // Bloque de inactivación de usuario
         if ($usuario) {
             $usuario->activo = false;
             $usuario->save();
@@ -263,7 +264,7 @@ class EmpleadoController extends Controller
         return response()->json(['message' => 'El empleado ha sido inactivado correctamente.']);
     }
 
-    // Actualiza el perfil laboral, seguridad social y los módulos permitidos de un empleado formalizado
+    // Bloque para actualizar el perfil laboral, seguridad social y módulos permitidos del empleado
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -304,7 +305,7 @@ class EmpleadoController extends Controller
 
         $empleado->update($updateData);
 
-        // Sincronizar con tabla afiliaciones para reflejo instantáneo en Autogestión
+        // Bloque de sincronización en afiliaciones para reflejo en autogestión
         if ($empleado->usuario_id) {
             $afilUpdates = ['updated_at' => now()];
             if (array_key_exists('eps', $updateData)) $afilUpdates['eps'] = $updateData['eps'];
@@ -318,7 +319,7 @@ class EmpleadoController extends Controller
             );
         }
 
-        // Sincronizar el rol correspondiente al cargo seleccionado en el usuario
+        // Bloque de sincronización de rol según cargo en el usuario
         $cargo = \App\Models\Cargo::find($request->cargo_id);
         if ($cargo && $empleado->usuario) {
             $empleado->usuario->rol_id = $cargo->rol_id;

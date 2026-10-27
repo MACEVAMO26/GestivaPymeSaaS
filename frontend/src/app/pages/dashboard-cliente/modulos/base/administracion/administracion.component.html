@@ -1,10 +1,11 @@
-  <!-- Botón Volver Inyectado -->
-  <div style="margin-bottom: 1.5rem; display: flex; justify-content: flex-start;">
+  <!-- HTML BOTON VOLVER -->
+  <div class="btn-volver-container">
     <button class="btn-volver btn-pill" appVolver>
       <i class="fas fa-arrow-left"></i> Volver
     </button>
   </div>
 
+<!-- HTML ADMINISTRACION DE CUENTA Y CONTRATO SAAS -->
 <div class="administracion-container">
   <div class="header-section">
     <h1>Administración de Cuenta y Contrato SaaS</h1>
@@ -21,12 +22,12 @@
           <span class="badge badge-info">Versión {{ contratoActivo.version }}</span>
         </div>
 
-        <!-- Contenido del Contrato -->
+        <!-- HTML CONTENIDO DEL CONTRATO -->
         <div class="contract-body" [innerHTML]="contratoActivo.contenido">
         </div>
 
         @if (userEmpresa?.contrato_id === contratoActivo.id) {
-          <!-- Contrato ya firmado -->
+          <!-- HTML CONTRATO FIRMADO -->
           <div class="contract-footer signed-state bg-emerald-50 border border-emerald-200 p-6 rounded-xl mt-6">
             <div class="flex items-center gap-4 mb-4">
               <div class="icon-circle bg-emerald-100 text-emerald-600 w-12 h-12 rounded-full flex items-center justify-center text-2xl">
@@ -48,7 +49,7 @@
             </button>
           </div>
         } @else {
-          <!-- Contrato pendiente de firma -->
+          <!-- HTML CONTRATO PENDIENTE DE FIRMA -->
           <div class="contract-footer pending-state bg-amber-50 border border-amber-200 p-6 rounded-xl mt-6">
             <h3 class="text-amber-800 font-bold text-lg mb-2">
               <i class="fas fa-exclamation-triangle"></i> Acción Requerida: Firma del Contrato
@@ -90,7 +91,7 @@
       </div>
     }
 
-    <!-- Migración de Datos (Onboarding SaaS) -->
+    <!-- HTML MIGRACION DE DATOS -->
     <div class="migracion-wrapper card-neumorphic mt-6">
       <div class="migracion-header">
         <h2><i class="fas fa-truck-loading"></i> Migración de Datos</h2>

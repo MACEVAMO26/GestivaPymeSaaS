@@ -27,11 +27,12 @@ export class GestivaIaTutorialComponent implements OnInit, OnDestroy, OnChanges 
   user: any;
   private sub?: Subscription;
 
+  // Bloque de inicialización para escuchar activación de tutorial
   ngOnInit() {
     this.user = this.authService.getUser();
     this.generarPasos();
     
-    // La guía se muestra de forma controlada cuando el usuario la solicita voluntariamente
+    
     this.mostrar = false;
 
     this.sub = this.iaStateService.showTutorial$.subscribe(() => {
@@ -47,6 +48,7 @@ export class GestivaIaTutorialComponent implements OnInit, OnDestroy, OnChanges 
     }
   }
 
+  // Bloque de destrucción para cancelar suscripciones activas
   ngOnDestroy() {
     if (this.sub) {
       this.sub.unsubscribe();
@@ -91,7 +93,7 @@ export class GestivaIaTutorialComponent implements OnInit, OnDestroy, OnChanges 
         }
       });
     } else {
-      // Pasos base garantizados si la lista de módulos aún está cargando
+      
       this.pasos.push({
         title: 'Menú Lateral Adaptativo',
         description: 'En el panel izquierdo encontrarás todos los módulos contratados por tu empresa, desde ventas y facturación hasta inventario y recursos humanos.'
@@ -108,12 +110,14 @@ export class GestivaIaTutorialComponent implements OnInit, OnDestroy, OnChanges 
     });
   }
 
+  // Bloque para retroceder al paso anterior del tutorial
   anterior() {
     if (this.pasoActual > 0) {
       this.pasoActual--;
     }
   }
 
+  // Bloque para avanzar al siguiente paso del tutorial
   siguiente() {
     if (this.pasoActual < this.pasos.length - 1) {
       this.pasoActual++;
@@ -122,12 +126,14 @@ export class GestivaIaTutorialComponent implements OnInit, OnDestroy, OnChanges 
     }
   }
 
+  // Bloque para navegar a un paso específico del tutorial
   irAPaso(index: number) {
     if (index >= 0 && index < this.pasos.length) {
       this.pasoActual = index;
     }
   }
 
+  // Bloque para cerrar temporalmente la guía interactiva
   cerrarTutorial() {
     this.mostrar = false;
     if (typeof sessionStorage !== 'undefined') {
@@ -135,6 +141,7 @@ export class GestivaIaTutorialComponent implements OnInit, OnDestroy, OnChanges 
     }
   }
 
+  // Bloque para registrar la finalización exitosa del tutorial
   finalizarTutorial() {
     this.mostrar = false;
     if (typeof sessionStorage !== 'undefined') {

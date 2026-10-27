@@ -21,7 +21,7 @@
         <strong>Registro:</strong> {{ nombreEntidad }}
       </div>
 
-      <!-- CREAR SOLICITUD (Operativo) -->
+      <!-- HTML CREAR SOLICITUD OPERATIVO -->
       @if (esOperativo) {
         <div class="sol-nueva">
           <textarea class="sol-textarea" [(ngModel)]="motivo" rows="3" placeholder="Motivo de la solicitud (obligatorio)..."></textarea>
@@ -31,7 +31,7 @@
         </div>
       }
 
-      <!-- LISTA DE SOLICITUDES -->
+      <!-- HTML LISTA DE SOLICITUDES -->
       <div class="sol-lista">
         @if (cargando) {
           <p class="sol-vacio">Cargando solicitudes...</p>
@@ -59,7 +59,7 @@
             }
 
             @if (solicitudAbierta?.id === s.id) {
-              <!-- HILO DE RÉPLICAS -->
+              <!-- HTML HILO DE REPLICAS -->
               <div class="sol-hilo">
                 @for (r of (s.respuestas || []); track r.id) {
                   <div class="sol-msg">
@@ -78,7 +78,7 @@
                   </div>
                 }
 
-                <!-- DECISIÓN DEL JEFE DE ÁREA / GERENTE -->
+                <!-- HTML DECISION DEL JEFE DE AREA O GERENTE -->
                 @if (esDecisorDe(s) && (s.estado === 'pendiente' || s.estado === 'en_replica')) {
                   <div class="sol-decision">
                     @if (!accionDecidir) {

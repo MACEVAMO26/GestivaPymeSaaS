@@ -1,4 +1,4 @@
-import { Component, OnInit, inject , ChangeDetectorRef} from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AgendaService, EventoCalendario } from '../../../../../../services/agenda.service';
@@ -13,24 +13,27 @@ import { timeout } from 'rxjs';
   styleUrl: './inicio-calendario.component.scss'
 })
 export class InicioCalendarioComponent implements OnInit {
+  // --- INYECCIÓN DE DEPENDENCIAS Y SERVICIOS ---
   private cdr = inject(ChangeDetectorRef);
   private agendaService = inject(AgendaService);
   private toast = inject(ToastService);
 
+  // --- VARIABLES DE ESTADO Y CALENDARIO ---
   mesActual = new Date();
   diasDelMes: {dia: number, hoy: boolean, evento: boolean, eventos: EventoCalendario[], fechaISO: string}[] = [];
   diasVacios: number[] = [];
   nombreMes = '';
-  
   diasSemana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
   diaSeleccionado: {dia: number, hoy: boolean, evento: boolean, eventos: EventoCalendario[], fechaISO: string} | null = null;
   eventosDelDia: EventoCalendario[] = [];
 
+  // Bloque del ciclo de vida ngOnInit para inicializar y cargar los eventos de la agenda
   ngOnInit() {
     this.cargarEventos();
   }
 
+  // Bloque para consultar los eventos de calendario del usuario desde el servicio de agenda
   cargarEventos() {
     this.agendaService.getEventos().pipe(timeout(15000)).subscribe({
       next: (eventos) => {
@@ -47,7 +50,7 @@ export class InicioCalendarioComponent implements OnInit {
     });
   }
 
-  // Genera la grilla de días del mes actual
+  // Bloque para generar la grilla interactiva de días del mes actual con sus respectivos eventos
   generarCalendario(eventos: EventoCalendario[] = []) {
     const anio = this.mesActual.getFullYear();
     const mes = this.mesActual.getMonth();
@@ -58,60 +61,54 @@ export class InicioCalendarioComponent implements OnInit {
 
     const primerDia = new Date(anio, mes, 1);
     const ultimoDia = new Date(anio, mes + 1, 0);
-    const totalDias = ultimoDia.getDate();
 
-    let diaInicio = primerDia.getDay() - 1;
-    if (diaInicio < 0) diaInicio = 6;
+    let diaSemanaInicio = primerDia.getDay() - 1;
+    if (diaSemanaInicio === -1) diaSemanaInicio = 6;
 
-    this.diasVacios = Array(diaInicio).fill(0);
+    this.diasVacios = Array(diaSemanaInicio).fill(0);
 
     const hoy = new Date();
     this.diasDelMes = [];
-    for (let d = 1; d <= totalDias; d++) {
-      const fechaISO = `${anio}-${String(mes + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      const delDia = eventos.filter(ev => {
-        const inicio = (ev.fecha_inicio || '').substring(0, 10);
-        return inicio === fechaISO;
-      });
-      
-      const diaObj = {
-        dia: d,
-        hoy: (d === hoy.getDate() && mes === hoy.getMonth() && anio === hoy.getFullYear()),
-        evento: delDia.length > 0,
-        eventos: delDia,
-        fechaISO: fechaISO
-      };
-      
-      this.diasDelMes.push(diaObj);
 
-      // Si es hoy, lo seleccionamos por defecto
-      if (diaObj.hoy && !this.diaSeleccionado) {
-        this.seleccionarDia(diaObj);
-      }
+    for (let i = 1; i <= ultimoDia.getDate(); i++) {
+      const fechaActualDia = new Date(anio, mes, i);
+      const fechaISO = fechaActualDia.toISOString().substring(0, 10);
+      
+      const esHoy = hoy.getFullYear() === anio && hoy.getMonth() === mes && hoy.getDate() === i;
+      const eventosDia = eventos.filter(e => (e.fecha_inicio || '').substring(0, 10) === fechaISO);
+
+      this.diasDelMes.push({
+        dia: i,
+        hoy: esHoy,
+        evento: eventosDia.length > 0,
+        eventos: eventosDia,
+        fechaISO
+      });
     }
-    
-    // Si no se seleccionó el día actual (por estar en otro mes), seleccionar el día 1
-    if (!this.diaSeleccionado && this.diasDelMes.length > 0) {
+
+    const diaHoyObj = this.diasDelMes.find(d => d.hoy);
+    if (diaHoyObj) {
+      this.seleccionarDia(diaHoyObj);
+    } else if (this.diasDelMes.length > 0) {
       this.seleccionarDia(this.diasDelMes[0]);
     }
   }
 
-  seleccionarDia(dia: any) {
-    this.diaSeleccionado = dia;
-    this.eventosDelDia = dia.eventos;
-  }
-
-  // Navegar al mes anterior
+  // Bloque para retroceder un mes en la visualización del calendario
   mesAnterior() {
     this.mesActual = new Date(this.mesActual.getFullYear(), this.mesActual.getMonth() - 1, 1);
-    this.diaSeleccionado = null;
     this.cargarEventos();
   }
 
-  // Navegar al mes siguiente
+  // Bloque para avanzar un mes en la visualización del calendario
   mesSiguiente() {
     this.mesActual = new Date(this.mesActual.getFullYear(), this.mesActual.getMonth() + 1, 1);
-    this.diaSeleccionado = null;
     this.cargarEventos();
+  }
+
+  // Bloque para seleccionar un día de la cuadrícula y desplegar sus eventos programados
+  seleccionarDia(dia: {dia: number, hoy: boolean, evento: boolean, eventos: EventoCalendario[], fechaISO: string}) {
+    this.diaSeleccionado = dia;
+    this.eventosDelDia = dia.eventos;
   }
 }

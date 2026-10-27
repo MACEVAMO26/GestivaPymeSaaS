@@ -1,12 +1,12 @@
 <div class="dashboard-container" [attr.data-daltonism]="accessibilityService.currentMode()">
   
-  <!-- HTML HEADER -->
+  <!-- HTML ENCABEZADO GLOBAL -->
   <header class="global-header">
     <div class="header-left">
       <div class="logo-container">
-        <a [routerLink]="getInicioRoute()" style="display: flex; align-items: center; text-decoration: none;">
+        <a [routerLink]="getInicioRoute()" class="logo-link">
           @if (user?.empresa?.logo_url) {
-            <img [src]="user.empresa.logo_url" alt="{{ user?.empresa?.razon_social || 'Empresa' }}" class="main-logo-img" style="max-height: 40px; object-fit: contain;">
+            <img [src]="user.empresa.logo_url" alt="{{ user?.empresa?.razon_social || 'Empresa' }}" class="main-logo-img">
           } @else {
             <img src="assets/images/Logos/GESTIVAPYME(7).png" alt="GestivaPyme" class="main-logo-img">
           }
@@ -16,14 +16,14 @@
     </div>
     
     <div class="header-right">
-      <!-- Módulo de Notificaciones -->
+      <!-- HTML MODULO DE NOTIFICACIONES -->
       <button class="notification-btn" [class.has-notification]="hasNotification" (click)="toggleNotification()" title="Notificaciones">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
         </svg>
       </button>
 
-      <!-- Módulo de Accesibilidad -->
+      <!-- HTML MODULO DE ACCESIBILIDAD -->
       <button class="accessibility-btn" (click)="toggleDaltonism()" title="Modo Accesibilidad (Daltonismo)">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
@@ -31,22 +31,22 @@
         </svg>
       </button>
 
-      <!-- Botón Guía / Tutorial de la Plataforma -->
+      <!-- HTML BOTON GUIA TUTORIAL -->
       <button class="tutorial-btn" (click)="abrirTutorial()" title="Guía y Tutorial de la Plataforma" aria-label="Abrir Guía y Tutorial">
         <i class="fas fa-question-circle"></i>
         <span>Guía</span>
       </button>
 
-      <!-- Perfil y Logout -->
+      <!-- HTML PERFIL Y LOGOUT -->
       <div class="user-profile">
         @if (user?.avatar_url) {
           <img [src]="user.avatar_url" alt="Avatar" class="avatar-img">
         } @else {
           <div class="avatar">{{ nombreUsuario.charAt(0).toUpperCase() }}</div>
         }
-          <div class="user-info" style="display: flex; flex-direction: column; line-height: 1.2;">
-            <span class="user-name" style="font-weight: bold; font-size: 14px;">{{ nombreUsuario }}</span>
-            <span class="user-role" style="font-size: 14px; color: #2d3748; margin-top: 2px;">{{ cargoUsuario }}</span>
+          <div class="user-info">
+            <span class="user-name">{{ nombreUsuario }}</span>
+            <span class="user-role">{{ cargoUsuario }}</span>
           </div>
         <button class="btn-logout" (click)="logout()" title="Cerrar Sesión">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -60,7 +60,7 @@
   <!-- HTML CUERPO PRINCIPAL -->
   <div class="main-body">
     
-    <!-- HTML SIDEBAR -->
+    <!-- HTML BARRA LATERAL NAVEGACION -->
     <aside class="sidebar" [class.collapsed]="isSidebarCollapsed">
       <button class="toggle-btn" (click)="toggleSidebar()" title="Colapsar menú">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -69,7 +69,7 @@
       </button>
   
       <nav class="nav-menu">
-        <!-- Ítems dinámicos según módulos contratados -->
+        <!-- HTML ITEMS DINAMICOS SEGUN MODULOS CONTRATADOS -->
         @for (modulo of modulosSidebar; track modulo.id) {
           <a class="nav-item" [routerLink]="modulo.ruta" [relativeTo]="route" routerLinkActive="active">
             <span class="nav-icon"><i [class]="modulo.icono"></i></span>
@@ -79,13 +79,13 @@
       </nav>
     </aside>
 
-    <!-- HTML CONTENIDO CENTRAL -->
+    <!-- HTML AREA DE CONTENIDO CENTRAL -->
     <main class="content-area">
-      <div style="flex: 1;">
+      <div class="content-outlet-wrapper">
         <router-outlet></router-outlet>
       </div>
       
-      <!-- FOOTER DISCRETO -->
+      <!-- HTML PIE DE PAGINA DISCRETO -->
       <footer class="app-footer">
         <img src="assets/images/Logos/GESTIVAPYME(6).png" alt="GestivaPyme Logo" class="footer-logo" loading="lazy">
         <p class="footer-text">
@@ -97,8 +97,8 @@
   </div>
 </div>
 
-<!-- GESTIVA IA TUTORIAL -->
+<!-- HTML COMPONENTE GESTIVA IA TUTORIAL -->
 <app-gestiva-ia-tutorial [modulos]="modulosSidebar"></app-gestiva-ia-tutorial>
 
-<!-- GESTIVA IA ASSISTANT (Flotante) -->
+<!-- HTML COMPONENTE GESTIVA IA BOT FLOTANTE -->
 <app-gestiva-bot></app-gestiva-bot>

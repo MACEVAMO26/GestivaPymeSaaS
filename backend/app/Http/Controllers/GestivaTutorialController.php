@@ -11,25 +11,24 @@ use App\Models\Venta;
 
 class GestivaTutorialController extends Controller
 {
+    // Bloque para consultar el estado y conteos globales para el tutorial interactivo
     public function getStatus(Request $request)
     {
-        // El usuario logueado
+        
         $user = $request->user();
 
-        // Para simplificar, contamos los registros globales si son módulos simples
-        // Si tienes multi-tenant con empresa_id, idealmente filtras por la empresa del usuario.
-        // Pero asumiendo que el User tiene acceso a ciertos datos o es el admin:
         
-        // Empleados (excluyendo bajas si se desea, o todos)
+        
+        // Bloque para contar empleados registrados
         $empleadosCount = Empleado::count();
         
-        // Productos
+        // Bloque para contar catálogo de productos
         $productosCount = Producto::count();
 
-        // Clientes
+        // Bloque para contar clientes registrados
         $clientesCount = Cliente::count();
 
-        // Ventas
+        // Bloque para contar histórico de ventas
         $ventasCount = Venta::count();
 
         return response()->json([
