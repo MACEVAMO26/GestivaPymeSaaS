@@ -34,12 +34,17 @@
                 <div class="search-group">
                     <i class="fas fa-search search-icon"></i>
                     <input type="text" class="input-neumorphic" placeholder="Buscar cliente por nombre, email o documento..." [(ngModel)]="searchTerm" (ngModelChange)="filtrarClientes()">
+                    @if (searchTerm) {
+                        <button type="button" class="search-clear-btn" (click)="searchTerm = ''; filtrarClientes()" title="Limpiar búsqueda">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    }
                 </div>
                 <div class="filter-group">
                     <select class="input-neumorphic" [(ngModel)]="tipoFiltro" (ngModelChange)="filtrarClientes()">
                         <option value="">Todos los tipos</option>
-                        <option value="Particular">Particular</option>
-                        <option value="Empresa">Empresa</option>
+                        <option value="Natural">Persona Natural / Particular</option>
+                        <option value="Juridico">Persona Jurídica / Empresa</option>
                     </select>
                 </div>
             </div>

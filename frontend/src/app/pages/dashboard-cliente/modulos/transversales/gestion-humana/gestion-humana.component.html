@@ -1,4 +1,4 @@
-<div class="gestion-humana-container fade-in">
+<div class="module-container fade-in">
   <div [hidden]="(isContratoModalOpen && empleadoContrato) || isNovedadModalOpen" class="main-view-wrapper">
 
   <!-- HTML ENCABEZADO -->
@@ -7,29 +7,38 @@
     <p class="descripcion-general">Administra contratos, perfiles laborales y novedades del personal.</p>
     
     <div class="acciones-centro mt-3">
-      <button class="btn-general-1 btn-pill" (click)="exportarExcel()">
+      <button class="btn-save btn-pill" (click)="exportarExcel()">
         <i class="fas fa-file-excel icon-mr-5"></i> Exportar a Excel
-      </button>
-      <button class="btn-general-2 btn-pill" (click)="abrirModuloTiempo()">
-        <svg class="icon icon-svg-16" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-        </svg>
-        Módulo de Gestión de Tiempos
       </button>
     </div>
   </div>
 
-  <!-- HTML NAVEGACION DE PESTAÑAS -->
+  <!-- HTML NAVEGACION DE PESTAÑAS (TABS) CENTRADAS TIPO PÍLDORA NEUMÓRFICA -->
   <div class="tabs-nav-wrapper">
-    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'pendientes'" (click)="setTab('pendientes')"> <span class="icon">⏳</span> Solicitudes <span class="badge badge-pendiente ml-1" *ngIf="vacacionesPendientes.length > 0">{{vacacionesPendientes.length}}</span> </button>
-    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'activos'" (click)="setTab('activos')"> <span class="icon">✅</span> Personal Activo </button>
-    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'inactivos'" (click)="setTab('inactivos')"> <span class="icon">✅</span> Inactivos </button>
-    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'ausentes'" (click)="setTab('ausentes')"> <span class="icon">🏖️</span> Ausentes / Vacaciones </button>
-    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'contratos'" (click)="setTab('contratos')"> <span class="icon">📑</span> Contratos <span class="badge badge-pendiente ml-1" *ngIf="alertasContratos > 0">{{alertasContratos}}</span> </button>
-    
-    
-    
-    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'configuracion'" (click)="setTab('configuracion')"> <span class="icon">📌</span> Configuración </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'pendientes'" (click)="setTab('pendientes')">
+      <span class="icon">⏳</span> Solicitudes
+      @if (vacacionesPendientes.length > 0) {
+        <span class="badge-tab">{{vacacionesPendientes.length}}</span>
+      }
+    </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'activos'" (click)="setTab('activos')">
+      <span class="icon">👥</span> Personal Activo
+    </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'inactivos'" (click)="setTab('inactivos')">
+      <span class="icon">👤</span> Inactivos
+    </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'ausentes'" (click)="setTab('ausentes')">
+      <span class="icon">🏖️</span> Ausentes / Vacaciones
+    </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'contratos'" (click)="setTab('contratos')">
+      <span class="icon">📑</span> Contratos
+      @if (alertasContratos > 0) {
+        <span class="badge-tab">{{alertasContratos}}</span>
+      }
+    </button>
+    <button class="tab-neu-inactive" [class.tab-neu-active]="currentTab === 'configuracion'" (click)="setTab('configuracion')">
+      <span class="icon">⚙️</span> Configuración
+    </button>
   </div>
 
   <!-- HTML CONTENIDO DE PESTAÑAS -->

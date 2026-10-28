@@ -1,157 +1,243 @@
 <div class="module-container fade-in">
-  <div [hidden]="(showModalApertura) || (showModalCierre)" class="main-view-wrapper">
+  <div [hidden]="(showModalApertura) || (showModalCierre) || (showModalDetalleCaja)" class="main-view-wrapper">
 
+  <!-- ENCABEZADO DEL MÓDULO -->
   <div class="module-header text-center mb-4 relative">
     <h1 class="titulo-principal">Prefacturación y Caja</h1>
-    <p class="descripcion-general">Control de cuadre diario de caja, ingresos, egresos y documentos pendientes de pago.</p>
+    <p class="descripcion-general">Control de cuadre diario de caja, ingresos, egresos, prefacturas y flujo histórico.</p>
   </div>
 
-  <!-- HTML PESTAÑAS -->
+  <!-- NAVEGACION DE 3 PESTAÑAS CENTRADAS -->
   <div class="tabs-nav-wrapper">
-    <button class="tab-neu-inactive" 
+    <button type="button"
+            class="tab-neu-inactive" 
             [class.tab-neu-active]="activeTab === 'caja'" 
-            (click)="switchTab('caja')"> <span class="icon">💵</span> GESTIÓN DE CAJA </button>
-    <button class="tab-neu-inactive" 
+            (click)="switchTab('caja')">
+      <span class="icon">💵</span> GESTIÓN DE CAJA
+    </button>
+    <button type="button"
+            class="tab-neu-inactive" 
             [class.tab-neu-active]="activeTab === 'prefacturas'" 
-            (click)="switchTab('prefacturas')"> <span class="icon">🧾</span> PREFACTURAS PENDIENTES </button>
+            (click)="switchTab('prefacturas')">
+      <span class="icon">🧾</span> PREFACTURAS PENDIENTES
+    </button>
+    <button type="button"
+            class="tab-neu-inactive" 
+            [class.tab-neu-active]="activeTab === 'historial'" 
+            (click)="switchTab('historial')">
+      <span class="icon">📊</span> HISTORIAL Y FLUJO DE CAJA
+    </button>
   </div>
 
-  <!-- HTML CONTENIDO DE TABS -->
+  <!-- CONTENIDO DE PESTAÑAS -->
   <div class="tab-content neumorphic-panel-inner p-4">
-    <!-- HTML BOTON VOLVER -->
-    <div class="volver-wrapper">
-      <button class="btn-volver btn-pill" appVolver>
-        <i class="fas fa-arrow-left"></i> VOLVER
-      </button>
-    </div>
     
-    <!-- HTML GESTIÓN DE CAJA -->
+    <!-- PESTAÑA 1: GESTIÓN DE CAJA ACTIVA -->
     @if(activeTab === 'caja') {
       <div class="fade-in">
 
         @if(!cajaAbierta) {
-          <!-- HTML CAJA CERRADA -->
+          <!-- HTML BOTON VOLVER -->
+          <div class="volver-wrapper mb-4">
+            <button type="button" class="btn-volver btn-pill" appVolver>
+              <i class="fas fa-arrow-left"></i> VOLVER
+            </button>
+          </div>
+
+          <!-- ESTADO CAJA CERRADA -->
           <div class="estado-caja">
-            <i class="fas fa-cash-register icon-cerrada"></i>
-            <h1 class="estado-title">LA CAJA ESTÁ CERRADA</h1>
-            <p class="text-muted mb-2rem">Debes realizar la apertura de caja para empezar a registrar movimientos en efectivo.</p>
-            <button class="btn-save btn-pill btn-caja-lg" (click)="abrirCajaModal()">
-              <i class="fas fa-lock-open"></i> Abrir Caja
+            <div class="icon-circle-closed mb-3">
+              <i class="fas fa-cash-register icon-cerrada"></i>
+            </div>
+            <h2 class="estado-title">LA CAJA ESTÁ CERRADA</h2>
+            <p class="text-muted mb-4">Debes realizar la apertura de caja para registrar ingresos, egresos y ventas en efectivo del turno actual.</p>
+            <button type="button" class="btn-save btn-pill btn-caja-lg" (click)="abrirCajaModal()">
+              <i class="fas fa-lock-open"></i> Abrir Caja Registradora
             </button>
           </div>
         } @else {
-          <!-- HTML CAJA ABIERTA -->
-          <div class="caja-abierta">
+          <!-- CAJA ABIERTA: DISEÑO ESPACIOSO Y DESAPIÑUSCADO -->
+          <div class="caja-abierta fade-in">
             
-            <!-- HTML TARJETAS DE RESUMEN -->
-            <div class="tarjetas-resumen">
-              <div class="neumorphic-panel card-resumen card-ingreso">
-                <h3 class="card-label">Total Ingresos</h3>
-                <span class="card-monto monto-ingreso">{{totalIngresos | currency:'COP':'symbol':'1.0-0'}}</span>
+            <!-- BARRA SUPERIOR DE ACCIONES Y ESTADO -->
+            <div class="caja-top-bar mb-4">
+              <div class="top-bar-left">
+                <button type="button" class="btn-volver btn-pill" appVolver>
+                  <i class="fas fa-arrow-left"></i> VOLVER
+                </button>
+                <div class="status-indicator-chip">
+                  <span class="pulse-dot"></span>
+                  <span class="chip-text">TURNO ACTIVO · EN OPERACIÓN</span>
+                </div>
               </div>
-              <div class="neumorphic-panel card-resumen card-egreso">
-                <h3 class="card-label">Total Egresos</h3>
-                <span class="card-monto monto-egreso">{{totalEgresos | currency:'COP':'symbol':'1.0-0'}}</span>
+              <div class="top-bar-right">
+                <button type="button" class="btn-volver btn-pill btn-cierre-caja" (click)="abrirCierreModal()">
+                  <i class="fas fa-lock"></i> Realizar Cierre de Caja
+                </button>
               </div>
-              <div class="neumorphic-panel-inner card-resumen card-saldo">
-                <h3 class="card-label">Saldo Actual en Caja</h3>
-                <span class="card-monto monto-saldo">{{saldoActual | currency:'COP':'symbol':'1.0-0'}}</span>
-              </div>
-              
-              <button class="btn-volver btn-pill btn-cierre" (click)="abrirCierreModal()">
-                <i class="fas fa-lock"></i> Realizar Cierre de Caja
-              </button>
             </div>
 
-            <!-- HTML REGISTRO DE MOVIMIENTOS Y TABLA -->
-            <div class="movimientos-columna">
-              
-              <div class="neu-card neu-card-center-pad">
-                <h3 class="panel-titulo mb-1rem">Registrar Movimiento Manual</h3>
-                <div class="form-fila">
-                  <div class="form-group flex-1">
-                    <label class="form-label">Tipo</label>
-                    <select class="input-neumorphic" [(ngModel)]="tipoMovimiento">
-                      <option value="ingreso">Ingreso (+)</option>
-                      <option value="egreso">Egreso (-)</option>
-                    </select>
+            <!-- FILA DE 3 TARJETAS KPIS HORIZONTALES BIEN ESPACIADAS -->
+            <div class="grid-kpis-caja mb-4">
+              <!-- KPI 1: INGRESOS -->
+              <div class="kpi-card-caja kpi-card-ingreso">
+                <div class="kpi-icon-container icon-ingreso">
+                  <i class="fas fa-arrow-trend-up"></i>
+                </div>
+                <div class="kpi-details">
+                  <span class="kpi-tag">TOTAL INGRESOS HOY</span>
+                  <span class="kpi-number valor-ingreso">{{totalIngresos | currency:'COP':'symbol':'1.0-0'}}</span>
+                  <span class="kpi-footnote">Recaudos y ventas en efectivo</span>
+                </div>
+              </div>
+
+              <!-- KPI 2: EGRESOS -->
+              <div class="kpi-card-caja kpi-card-egreso">
+                <div class="kpi-icon-container icon-egreso">
+                  <i class="fas fa-arrow-trend-down"></i>
+                </div>
+                <div class="kpi-details">
+                  <span class="kpi-tag">TOTAL EGRESOS HOY</span>
+                  <span class="kpi-number valor-egreso">{{totalEgresos | currency:'COP':'symbol':'1.0-0'}}</span>
+                  <span class="kpi-footnote">Salidas operativas y pagos menores</span>
+                </div>
+              </div>
+
+              <!-- KPI 3: SALDO ACTUAL -->
+              <div class="kpi-card-caja kpi-card-saldo">
+                <div class="kpi-icon-container icon-saldo">
+                  <i class="fas fa-vault"></i>
+                </div>
+                <div class="kpi-details">
+                  <span class="kpi-tag">SALDO ACTUAL EN CAJA</span>
+                  <span class="kpi-number valor-saldo">{{saldoActual | currency:'COP':'symbol':'1.0-0'}}</span>
+                  <span class="kpi-footnote">Base inicial + balance neto disponible</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECCIÓN 1: FORMULARIO DE REGISTRO MANUAL -->
+            <div class="neu-card panel-formulario mb-4">
+              <div class="panel-header-row mb-3">
+                <div class="header-with-icon">
+                  <div class="header-icon-circle"><i class="fas fa-hand-holding-dollar"></i></div>
+                  <div>
+                    <h2 class="subtitulo m-0">Registrar Movimiento Manual</h2>
+                    <p class="panel-sub-text">Ingresa transacciones manuales de entrada o salida de efectivo en caja.</p>
                   </div>
-                  <div class="form-group flex-1">
-                    <label class="form-label">Monto</label>
-                    <input type="number" class="input-neumorphic" [(ngModel)]="montoMovimiento" placeholder="0">
+                </div>
+              </div>
+
+              <div class="form-fila">
+                <div class="form-group flex-1">
+                  <label class="form-label">Tipo de Movimiento</label>
+                  <select class="input-neumorphic" [(ngModel)]="tipoMovimiento">
+                    <option value="ingreso">Ingreso (+ Entrada)</option>
+                    <option value="egreso">Egreso (- Salida)</option>
+                  </select>
+                </div>
+                <div class="form-group flex-1">
+                  <label class="form-label">Monto ($)</label>
+                  <input type="number" class="input-neumorphic" [(ngModel)]="montoMovimiento" placeholder="0" min="0">
+                </div>
+                <div class="form-group flex-2">
+                  <label class="form-label">Concepto / Razón</label>
+                  <input type="text" class="input-neumorphic" [(ngModel)]="conceptoMovimiento" placeholder="Ej. Pago servicios, compra insumos, sencillo...">
+                </div>
+                <div class="btn-submit-wrapper">
+                  <button type="button" class="btn-add btn-pill btn-guardar-mov" (click)="registrarMovimiento()">
+                    <i class="fas fa-plus-circle"></i> Guardar Movimiento
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECCIÓN 2: TABLA DE ÚLTIMOS MOVIMIENTOS DEL DÍA -->
+            <div class="neu-card panel-tabla">
+              <div class="panel-header-row mb-3 flex-between">
+                <div class="header-with-icon">
+                  <div class="header-icon-circle"><i class="fas fa-clock-rotate-left"></i></div>
+                  <div>
+                    <h2 class="subtitulo m-0">Últimos Movimientos del Día</h2>
+                    <p class="panel-sub-text">Transacciones registradas durante la jornada actual de caja.</p>
                   </div>
-                  <div class="form-group flex-2">
-                    <label class="form-label">Concepto / Razón</label>
-                    <input type="text" class="input-neumorphic" [(ngModel)]="conceptoMovimiento" placeholder="Ej. Pago servicio internet">
-                  </div>
-                  <div class="btn-submit-wrapper">
-                    <button class="btn-add btn-pill" (click)="registrarMovimiento()">
-                      Guardar
+                </div>
+                <span class="badge-contador">{{movimientos.length}} Registros</span>
+              </div>
+
+              <div class="table-responsive">
+                <table class="data-table neumorphic-table">
+                  <thead>
+                    <tr>
+                      <th>FECHA / HORA</th>
+                      <th>TIPO</th>
+                      <th>CONCEPTO</th>
+                      <th>MONTO</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for(mov of paginatedMovimientos; track $index) {
+                      <tr>
+                        <td>{{fechaMovimiento(mov) | date:'short'}}</td>
+                        <td>
+                          @if(mov.tipo === 'ingreso' || mov.tipo === 'apertura') {
+                            <span class="badge badge-success"><i class="fas fa-arrow-up"></i> {{mov.tipo | uppercase}}</span>
+                          } @else {
+                            <span class="badge badge-danger"><i class="fas fa-arrow-down"></i> {{mov.tipo | uppercase}}</span>
+                          }
+                        </td>
+                        <td><strong>{{mov.concepto}}</strong></td>
+                        <td [ngClass]="mov.tipo === 'egreso' ? 'text-negativo' : 'text-positivo'">
+                          <strong>{{mov.tipo === 'egreso' ? '-' : '+'}}{{mov.monto | currency:'COP':'symbol':'1.0-0'}}</strong>
+                        </td>
+                      </tr>
+                    }
+                    @if(movimientos.length === 0) {
+                      <tr>
+                        <td colspan="4" class="tabla-vacia">
+                          <i class="fas fa-inbox fa-2x mb-2 text-muted"></i>
+                          <div>No se han registrado movimientos en caja el día de hoy.</div>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              @if (movimientos.length > pageSize) {
+                <div class="neu-pagination-bar mt-3">
+                  <span class="pagination-info">Página {{ pageMovimientos }} de {{ totalPagesMovimientos }} ({{ movimientos.length }} movimientos)</span>
+                  <div class="pagination-controls">
+                    <button type="button" class="pagination-btn" [disabled]="pageMovimientos === 1" (click)="pageMovimientos = pageMovimientos - 1">
+                      <i class="fas fa-chevron-left"></i> Anterior
+                    </button>
+                    <span class="pagination-badge">{{ pageMovimientos }}</span>
+                    <button type="button" class="pagination-btn" [disabled]="pageMovimientos >= totalPagesMovimientos" (click)="pageMovimientos = pageMovimientos + 1">
+                      Siguiente <i class="fas fa-chevron-right"></i>
                     </button>
                   </div>
                 </div>
-              </div>
-
-              <div class="neu-card neu-card-center-pad flex-1">
-                <h3 class="panel-titulo mb-1rem">Últimos Movimientos del Día</h3>
-                <div class="table-responsive mt-1rem">
-                  <table class="data-table neumorphic-table">
-                    <thead>
-                      <tr>
-                        <th>FECHA/HORA</th>
-                        <th>TIPO</th>
-                        <th>CONCEPTO</th>
-                        <th>MONTO</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @for(mov of paginatedMovimientos; track $index) {
-                        <tr>
-                          <td>{{fechaMovimiento(mov) | date:'short'}}</td>
-                          <td>
-                            @if(mov.tipo === 'ingreso' || mov.tipo === 'apertura') {
-                              <span class="badge badge-success">{{mov.tipo}}</span>
-                            } @else {
-                              <span class="badge badge-danger">{{mov.tipo}}</span>
-                            }
-                          </td>
-                          <td>{{mov.concepto}}</td>
-                          <td [ngClass]="mov.tipo === 'egreso' ? 'text-negativo' : 'text-positivo'">
-                            {{mov.tipo === 'egreso' ? '-' : '+'}}{{mov.monto | currency:'COP':'symbol':'1.0-0'}}
-                          </td>
-                        </tr>
-                      }
-                    </tbody>
-                  </table>
-                </div>
-
-                @if (movimientos.length > pageSize) {
-                  <div class="neu-pagination-bar">
-                    <span class="pagination-info">Página {{ pageMovimientos }} de {{ totalPagesMovimientos }} ({{ movimientos.length }} movimientos)</span>
-                    <div class="pagination-controls">
-                      <button class="pagination-btn" [disabled]="pageMovimientos === 1" (click)="pageMovimientos = pageMovimientos - 1">
-                        <i class="fas fa-chevron-left"></i> Anterior
-                      </button>
-                      <span class="pagination-badge">{{ pageMovimientos }}</span>
-                      <button class="pagination-btn" [disabled]="pageMovimientos >= totalPagesMovimientos" (click)="pageMovimientos = pageMovimientos + 1">
-                        Siguiente <i class="fas fa-chevron-right"></i>
-                      </button>
-                    </div>
-                  </div>
-                }
-              </div>
-
+              }
             </div>
+
           </div>
         }
       </div>
     }
 
-<!-- HTML PREFACTURAS PENDIENTES -->
+    <!-- PESTAÑA 2: PREFACTURAS PENDIENTES -->
     @if(activeTab === 'prefacturas') {
       <div class="fade-in">
+        
+        <!-- BOTON VOLVER Y ENCABEZADO -->
+        <div class="volver-wrapper mb-3 flex-between">
+          <button type="button" class="btn-volver btn-pill" appVolver>
+            <i class="fas fa-arrow-left"></i> VOLVER
+          </button>
+          <span class="badge-contador">{{prefacturas.length}} Prefacturas</span>
+        </div>
 
-        <p class="text-muted mb-1-5rem">Documentos pendientes de confirmación de pago o emisión de factura final.</p>
+        <p class="text-muted mb-4">Documentos y cotizaciones pendientes de confirmación de pago o emisión de factura de venta definitiva.</p>
         
         <div class="table-responsive">
           <table class="data-table neumorphic-table">
@@ -171,26 +257,29 @@
                   <td><strong>{{consecutivoPref(pref)}}</strong></td>
                   <td>{{nombreClientePref(pref)}}</td>
                   <td>{{fechaPref(pref)}}</td>
-                  <td>{{pref.total | currency:'COP':'symbol':'1.0-0'}}</td>
+                  <td><strong>{{pref.total | currency:'COP':'symbol':'1.0-0'}}</strong></td>
                   <td>
                     <span class="badge" [ngClass]="getBadgeClass(estadoPref(pref))">
-                      {{estadoPref(pref)}}
+                      {{estadoPref(pref) | uppercase}}
                     </span>
                   </td>
                   <td class="text-center">
                     @if(estadoPref(pref) === 'borrador' || estadoPref(pref) === 'enviado' || estadoPref(pref) === 'Pendiente') {
-                      <button class="btn-save btn-pill btn-xs" (click)="generarDocumento(pref.id!)">
+                      <button type="button" class="btn-save btn-pill btn-xs" (click)="generarDocumento(pref.id!)">
                         <i class="fas fa-file-invoice"></i> Generar Factura
                       </button>
                     } @else {
-                      <span class="text-muted text-sm"><i class="fas fa-check"></i> Procesada</span>
+                      <span class="text-muted text-sm"><i class="fas fa-check-circle text-success"></i> Procesada</span>
                     }
                   </td>
                 </tr>
               }
               @if(prefacturas.length === 0 && !cargando) {
                 <tr>
-                  <td colspan="6" class="tabla-vacia">No hay prefacturas registradas.</td>
+                  <td colspan="6" class="tabla-vacia">
+                    <i class="fas fa-file-invoice fa-2x mb-2 text-muted"></i>
+                    <div>No hay prefacturas registradas actualmente.</div>
+                  </td>
                 </tr>
               }
             </tbody>
@@ -198,14 +287,14 @@
         </div>
 
         @if (prefacturas.length > pageSize) {
-          <div class="neu-pagination-bar">
+          <div class="neu-pagination-bar mt-3">
             <span class="pagination-info">Página {{ pagePrefacturas }} de {{ totalPagesPrefacturas }} ({{ prefacturas.length }} registros)</span>
             <div class="pagination-controls">
-              <button class="pagination-btn" [disabled]="pagePrefacturas === 1" (click)="pagePrefacturas = pagePrefacturas - 1">
+              <button type="button" class="pagination-btn" [disabled]="pagePrefacturas === 1" (click)="pagePrefacturas = pagePrefacturas - 1">
                 <i class="fas fa-chevron-left"></i> Anterior
               </button>
               <span class="pagination-badge">{{ pagePrefacturas }}</span>
-              <button class="pagination-btn" [disabled]="pagePrefacturas >= totalPagesPrefacturas" (click)="pagePrefacturas = pagePrefacturas + 1">
+              <button type="button" class="pagination-btn" [disabled]="pagePrefacturas >= totalPagesPrefacturas" (click)="pagePrefacturas = pagePrefacturas + 1">
                 Siguiente <i class="fas fa-chevron-right"></i>
               </button>
             </div>
@@ -213,10 +302,254 @@
         }
       </div>
     }
+
+    <!-- PESTAÑA 3: HISTORIAL Y FLUJO DE CAJA (DÍAS ANTERIORES) -->
+    @if(activeTab === 'historial') {
+      <div class="fade-in">
+        
+        <!-- BOTON VOLVER Y ENCABEZADO DE HISTORIAL -->
+        <div class="volver-wrapper mb-3 flex-between">
+          <button type="button" class="btn-volver btn-pill" appVolver>
+            <i class="fas fa-arrow-left"></i> VOLVER
+          </button>
+          <div class="status-indicator-chip">
+            <i class="fas fa-calendar-check text-azul"></i>
+            <span class="chip-text">AUDITORÍA HISTÓRICA CONSOLIDADA</span>
+          </div>
+        </div>
+
+        <p class="text-muted mb-4">Registro y auditoría diaria de cajas cerradas en jornadas anteriores, cuadre de caja a $0 y balance de flujo de efectivo.</p>
+
+        <!-- KPIS CONSOLIDADOS DE FLUJO HISTÓRICO -->
+        <div class="grid-kpis-historial mb-4">
+          <div class="kpi-card-caja kpi-card-ingreso">
+            <div class="kpi-icon-container icon-ingreso">
+              <i class="fas fa-sack-dollar"></i>
+            </div>
+            <div class="kpi-details">
+              <span class="kpi-tag">TOTAL FLUJO RECAUDADO</span>
+              <span class="kpi-number valor-ingreso">{{totalFlujoHistorico | currency:'COP':'symbol':'1.0-0'}}</span>
+              <span class="kpi-footnote">Ingresos en jornadas anteriores</span>
+            </div>
+          </div>
+
+          <div class="kpi-card-caja kpi-card-egreso">
+            <div class="kpi-icon-container icon-egreso">
+              <i class="fas fa-receipt"></i>
+            </div>
+            <div class="kpi-details">
+              <span class="kpi-tag">TOTAL EGRESOS OPERATIVOS</span>
+              <span class="kpi-number valor-egreso">{{totalEgresosHistorico | currency:'COP':'symbol':'1.0-0'}}</span>
+              <span class="kpi-footnote">Salidas y gastos autorizados</span>
+            </div>
+          </div>
+
+          <div class="kpi-card-caja kpi-card-saldo">
+            <div class="kpi-icon-container icon-saldo">
+              <i class="fas fa-building-columns"></i>
+            </div>
+            <div class="kpi-details">
+              <span class="kpi-tag">SALDO NETO ENTREGADO</span>
+              <span class="kpi-number valor-saldo">{{saldoNetoHistorico | currency:'COP':'symbol':'1.0-0'}}</span>
+              <span class="kpi-footnote">Entregado a tesorería / bancos</span>
+            </div>
+          </div>
+
+          <div class="kpi-card-caja kpi-card-audit">
+            <div class="kpi-icon-container icon-audit">
+              <i class="fas fa-clipboard-check"></i>
+            </div>
+            <div class="kpi-details">
+              <span class="kpi-tag">JORNADAS AUDITADAS</span>
+              <span class="kpi-number text-azul">{{totalCajasCerradas}} Cajas</span>
+              <span class="kpi-footnote">100% Cierres verificados</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- BARRA DESGLOSE CANALES DE PAGO -->
+        <div class="neu-card panel-canales mb-4">
+          <div class="flex-between mb-2">
+            <h3 class="canales-title m-0"><i class="fas fa-chart-pie mr-2"></i> Distribución de Flujo por Canal de Cobro</h3>
+            <span class="text-muted text-xs">Jornadas Históricas</span>
+          </div>
+          <div class="flujo-bar-wrapper">
+            <div class="flujo-segment segment-efectivo" [style.width.%]="porcentajeEfectivo" [title]="'Efectivo: ' + porcentajeEfectivo + '%'"></div>
+            <div class="flujo-segment segment-bancos" [style.width.%]="porcentajeTransferencias" [title]="'Transferencias: ' + porcentajeTransferencias + '%'"></div>
+            <div class="flujo-segment segment-tarjetas" [style.width.%]="porcentajeTarjetas" [title]="'Tarjetas: ' + porcentajeTarjetas + '%'"></div>
+          </div>
+          <div class="flujo-legend mt-2">
+            <span class="legend-item"><span class="dot dot-efectivo"></span> 💵 Efectivo ({{porcentajeEfectivo}}%)</span>
+            <span class="legend-item"><span class="dot dot-bancos"></span> 🏦 Transferencias / QR ({{porcentajeTransferencias}}%)</span>
+            <span class="legend-item"><span class="dot dot-tarjetas"></span> 💳 Tarjetas ({{porcentajeTarjetas}}%)</span>
+          </div>
+        </div>
+
+        <!-- FILTROS Y TABLA HISTÓRICA -->
+        <div class="neu-card panel-tabla">
+          <div class="filtros-historial-bar mb-3">
+            <div class="search-wrap flex-1">
+              <i class="fas fa-search search-icon"></i>
+              <input type="text" class="input-neumorphic" placeholder="Buscar por fecha, día o cajero..." [(ngModel)]="filtroHistorialTerm">
+            </div>
+            <div class="filter-select-wrap">
+              <select class="input-neumorphic" [(ngModel)]="filtroHistorialEstado">
+                <option value="todos">Todas las jornadas</option>
+                <option value="exacto">Cuadre Exacto ($0)</option>
+                <option value="cerrada">Solo Cajas Cerradas</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table neumorphic-table">
+              <thead>
+                <tr>
+                  <th>FECHA / DÍA</th>
+                  <th>HORARIO</th>
+                  <th>CAJERO</th>
+                  <th>BASE INICIAL</th>
+                  <th>INGRESOS</th>
+                  <th>EGRESOS</th>
+                  <th>SALDO FINAL</th>
+                  <th>CUADRE</th>
+                  <th class="text-center">DETALLE</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for(caja of paginatedHistorial; track caja.id) {
+                  <tr>
+                    <td>
+                      <strong>{{caja.fecha}}</strong>
+                      <div class="dia-tag">{{caja.diaSemana}}</div>
+                    </td>
+                    <td>{{caja.horaApertura}} - {{caja.horaCierre}}</td>
+                    <td>{{caja.cajero}}</td>
+                    <td>{{caja.baseInicial | currency:'COP':'symbol':'1.0-0'}}</td>
+                    <td class="text-positivo"><strong>+{{caja.totalIngresos | currency:'COP':'symbol':'1.0-0'}}</strong></td>
+                    <td class="text-negativo"><strong>-{{caja.totalEgresos | currency:'COP':'symbol':'1.0-0'}}</strong></td>
+                    <td><strong class="text-dark">{{caja.saldoFinal | currency:'COP':'symbol':'1.0-0'}}</strong></td>
+                    <td>
+                      <span class="badge badge-success">
+                        <i class="fas fa-check-circle"></i> Exacto ($0)
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <button type="button" class="btn-action-circle" (click)="verDetalleCaja(caja)" title="Ver detalle de movimientos">
+                        <i class="fas fa-eye text-azul"></i>
+                      </button>
+                    </td>
+                  </tr>
+                }
+                @if(paginatedHistorial.length === 0) {
+                  <tr>
+                    <td colspan="9" class="tabla-vacia">
+                      <i class="fas fa-calendar-xmark fa-2x mb-2 text-muted"></i>
+                      <div>No se encontraron registros de jornadas para los filtros aplicados.</div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          @if (historialFiltrado.length > pageSizeHistorial) {
+            <div class="neu-pagination-bar mt-3">
+              <span class="pagination-info">Página {{ pageHistorial }} de {{ totalPagesHistorial }} ({{ historialFiltrado.length }} jornadas)</span>
+              <div class="pagination-controls">
+                <button type="button" class="pagination-btn" [disabled]="pageHistorial === 1" (click)="pageHistorial = pageHistorial - 1">
+                  <i class="fas fa-chevron-left"></i> Anterior
+                </button>
+                <span class="pagination-badge">{{ pageHistorial }}</span>
+                <button type="button" class="pagination-btn" [disabled]="pageHistorial >= totalPagesHistorial" (click)="pageHistorial = pageHistorial + 1">
+                  Siguiente <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+
+      </div>
+    }
+
   </div>
 </div>
 
+</div>
+
+<!-- MODAL VISOR DETALLE DE JORNADA HISTÓRICA -->
+@if(showModalDetalleCaja && cajaDetalleSeleccionada) {
+<div class="view-switch-panel fade-in">
+  <div class="neu-card neu-card-modal-large">
+    <div class="modal-top-header mb-3 flex-between">
+      <div class="header-with-icon">
+        <div class="header-icon-circle icon-saldo"><i class="fas fa-receipt"></i></div>
+        <div>
+          <h2 class="subtitulo m-0">Detalle de Flujo de Caja · {{cajaDetalleSeleccionada.fecha}} ({{cajaDetalleSeleccionada.diaSemana}})</h2>
+          <p class="panel-sub-text">Cajero: {{cajaDetalleSeleccionada.cajero}} | Horario: {{cajaDetalleSeleccionada.horaApertura}} a {{cajaDetalleSeleccionada.horaCierre}}</p>
+        </div>
+      </div>
+      <span class="badge badge-success"><i class="fas fa-check-double"></i> Cuadre Verificado</span>
+    </div>
+
+    <!-- MINI RESUMEN DEL DÍA -->
+    <div class="grid-kpis-caja mb-4">
+      <div class="kpi-mini-pill">
+        <span class="mini-tag">TOTAL INGRESOS</span>
+        <span class="mini-val text-positivo">+{{cajaDetalleSeleccionada.totalIngresos | currency:'COP':'symbol':'1.0-0'}}</span>
+      </div>
+      <div class="kpi-mini-pill">
+        <span class="mini-tag">TOTAL EGRESOS</span>
+        <span class="mini-val text-negativo">-{{cajaDetalleSeleccionada.totalEgresos | currency:'COP':'symbol':'1.0-0'}}</span>
+      </div>
+      <div class="kpi-mini-pill">
+        <span class="mini-tag">SALDO FINAL ARQUEO</span>
+        <span class="mini-val text-dark">{{cajaDetalleSeleccionada.saldoFinal | currency:'COP':'symbol':'1.0-0'}}</span>
+      </div>
+    </div>
+
+    <!-- TABLA DE MOVIMIENTOS DEL DÍA -->
+    <div class="table-responsive mb-4">
+      <table class="data-table neumorphic-table">
+        <thead>
+          <tr>
+            <th>HORA</th>
+            <th>TIPO</th>
+            <th>CONCEPTO</th>
+            <th>MEDIO DE PAGO</th>
+            <th>MONTO</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(m of cajaDetalleSeleccionada.movimientos; track $index) {
+            <tr>
+              <td>{{m.hora}}</td>
+              <td>
+                @if(m.tipo === 'ingreso') {
+                  <span class="badge badge-success"><i class="fas fa-arrow-up"></i> INGRESO</span>
+                } @else {
+                  <span class="badge badge-danger"><i class="fas fa-arrow-down"></i> EGRESO</span>
+                }
+              </td>
+              <td>{{m.concepto}}</td>
+              <td><span class="badge-medio-pago">{{m.medioPago}}</span></td>
+              <td [ngClass]="m.tipo === 'egreso' ? 'text-negativo' : 'text-positivo'">
+                <strong>{{m.tipo === 'egreso' ? '-' : '+'}}{{m.monto | currency:'COP':'symbol':'1.0-0'}}</strong>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="modal-footer justify-center">
+      <button type="button" class="btn-volver btn-pill" (click)="cerrarDetalleCaja()">
+        <i class="fas fa-xmark"></i> Cerrar Detalle
+      </button>
+    </div>
   </div>
+</div>
+}
 
 <!-- HTML MODAL APERTURA CAJA -->
 @if(showModalApertura) {
@@ -230,17 +563,17 @@
       <p class="text-muted mb-1-5rem">Indica el monto base (sencillo) con el que inicia la caja hoy.</p>
       
       <div class="form-group text-left">
-        <label>Base Inicial ($)</label>
+        <label class="form-label">Base Inicial ($)</label>
         <input type="number" class="input-neumorphic monto-input" [(ngModel)]="montoApertura" placeholder="0">
       </div>
       
       <div class="modal-footer">
-        <button class="btn-volver btn-pill" (click)="cerrarCajaModal()">Cancelar</button>
-        <button class="btn-save btn-pill" (click)="confirmarApertura()" [disabled]="guardando">
+        <button type="button" class="btn-volver btn-pill" (click)="cerrarCajaModal()">Cancelar</button>
+        <button type="button" class="btn-save btn-pill" (click)="confirmarApertura()" [disabled]="guardando">
           @if(guardando) {
             <i class="fas fa-spinner fa-spin"></i> Abriendo...
           } @else {
-            Confirmar Apertura
+            <i class="fas fa-check"></i> Confirmar Apertura
           }
         </button>
       </div>
@@ -261,12 +594,12 @@
       <p class="text-muted mb-1-5rem">El sistema registrará un saldo esperado de <strong>{{saldoActual | currency:'COP':'symbol':'1.0-0'}}</strong>. ¿Estás seguro de realizar el cuadre y cerrar la caja?</p>
       
       <div class="modal-footer">
-        <button class="btn-volver btn-pill" (click)="cerrarCierreModal()">Cancelar</button>
-        <button class="btn-volver btn-pill" (click)="confirmarCierre()" [disabled]="guardando">
+        <button type="button" class="btn-volver btn-pill" (click)="cerrarCierreModal()">Cancelar</button>
+        <button type="button" class="btn-volver btn-pill" (click)="confirmarCierre()" [disabled]="guardando">
           @if(guardando) {
             <i class="fas fa-spinner fa-spin"></i> Cerrando...
           } @else {
-            Sí, Cerrar Caja
+            <i class="fas fa-lock"></i> Sí, Cerrar Caja
           }
         </button>
       </div>
@@ -274,9 +607,3 @@
   </div>
 </div>
 }
-
-
-
-
-
-

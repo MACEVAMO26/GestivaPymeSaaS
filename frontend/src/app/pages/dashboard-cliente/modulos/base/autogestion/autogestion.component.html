@@ -102,11 +102,11 @@
       <!-- HTML AFILIACIONES (SEGURIDAD SOCIAL GESTIONADA POR EMPRESA) -->
       <div class="neu-dark-panel form-card">
         <div class="card-header flex-between mb-3">
-          <h3 class="subtitulo" class="m-0">Seguridad Social y Afiliaciones</h3>
+          <h3 class="subtitulo m-0">Seguridad Social y Afiliaciones</h3>
           <span class="status-badge approved">Cobertura Activa</span>
         </div>
 
-        <p class="descripcion-general mb-4" class="text-left">
+        <p class="descripcion-general mb-4 text-left">
           Tu seguridad social es gestionada y pagada por la empresa conforme a tu contratación laboral. Si requieres actualizar alguna entidad, solicita el cambio con Gestión Humana o en tu formalización.
         </p>
 
@@ -155,15 +155,15 @@
           <!-- HTML ESTADO DE COBERTURA -->
           <div class="form-group">
             <label>Estado de Afiliación</label>
-            <div class="input-readonly-pill estado-aprobado" class="font-weight-500">
+            <div class="input-readonly-pill estado-aprobado font-weight-500">
               <i class="fas fa-check-circle"></i> Activa / Al día
             </div>
           </div>
         </div>
 
         @if (formAfiliacion.fecha_contratacion) {
-          <div class="mt-3 p-3 neumorphic-panel-inner" class="bg-translucent-card">
-            <span class="descripcion-general" class="d-block font-size-14">
+          <div class="mt-3 p-3 neumorphic-panel-inner bg-translucent-card">
+            <span class="descripcion-general d-block font-size-14">
               <i class="fas fa-calendar-check"></i> Vinculado formalmente desde: <strong>{{ formAfiliacion.fecha_contratacion | date:'longDate' }}</strong>
             </span>
           </div>
@@ -197,18 +197,16 @@
         
         <h4 class="section-title mb-4">Nueva Solicitud de Vacaciones</h4>
         <form (ngSubmit)="solicitarVacaciones()" class="grid-form mb-8">
-          <div class="date-grid">
-            <div class="form-group">
-              <label>Fecha Inicio</label>
-              <input type="date" [(ngModel)]="nuevaVacacion.fecha_inicio" (change)="onFechaInicioChange()" name="vac_inicio" [min]="fechaMinimaHoy" required>
-            </div>
-            <div class="form-group">
-              <label>Fecha Fin</label>
-              <input type="date" [(ngModel)]="nuevaVacacion.fecha_fin" name="vac_fin" [min]="fechaMinimaFin" required>
-            </div>
+          <div class="form-group">
+            <label>Fecha Inicio</label>
+            <input type="date" [(ngModel)]="nuevaVacacion.fecha_inicio" (change)="onFechaInicioChange()" name="vac_inicio" [min]="fechaMinimaHoy" required>
+          </div>
+          <div class="form-group">
+            <label>Fecha Fin</label>
+            <input type="date" [(ngModel)]="nuevaVacacion.fecha_fin" name="vac_fin" [min]="fechaMinimaFin" required>
           </div>
           
-          <div class="form-group">
+          <div class="form-group full-width">
             <label>Tipo de Vacaciones</label>
             <select [(ngModel)]="nuevaVacacion.tipo" name="vac_tipo" required>
               <option value="Disfrute Legal">Disfrute Legal (Remuneradas)</option>
@@ -217,14 +215,20 @@
             </select>
           </div>
           
-          <div class="form-group">
+          <div class="form-group full-width">
             <label>Observaciones (Opcional)</label>
-            <textarea [(ngModel)]="nuevaVacacion.observaciones" name="vac_obs" rows="2"></textarea>
+            <textarea [(ngModel)]="nuevaVacacion.observaciones" name="vac_obs" rows="2" placeholder="Detalles o aclaraciones sobre su período solicitado..."></textarea>
           </div>
           
-          <button type="submit" class="btn-save btn-pill w-full mt-2" [disabled]="isSubmittingVacacion">
-            {{ isSubmittingVacacion ? 'Enviando...' : 'Enviar Solicitud a RRHH' }}
-          </button>
+          <div class="form-actions-vacaciones">
+            <button type="submit" class="btn-submit-vacaciones btn-pill" [disabled]="isSubmittingVacacion">
+              @if (isSubmittingVacacion) {
+                <i class="fas fa-spinner fa-spin"></i> Enviando...
+              } @else {
+                <i class="fas fa-paper-plane"></i> Enviar Solicitud a RRHH
+              }
+            </button>
+          </div>
         </form>
 
         @if (misVacaciones && misVacaciones.length > 0) {

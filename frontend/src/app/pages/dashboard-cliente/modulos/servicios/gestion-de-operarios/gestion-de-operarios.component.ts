@@ -1,11 +1,13 @@
 import { VolverDirective } from '../../../../../shared/directives/volver.directive';
 import { SolicitudInactivacionComponent } from '../../../../../shared/components/solicitud-inactivacion/solicitud-inactivacion.component';
-import { Component, OnInit, inject, ChangeDetectorRef, Input } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, DestroyRef, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OperariosTicketsService, ServicioTicket } from '../../../../../services/operarios-tickets.service';
+import { EmpleadoService } from '../../../../../services/empleado.service';
 import { ToastService } from '../../../../../services/toast.service';
 import { timeout } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-gestion-de-operarios',
@@ -20,11 +22,15 @@ export class GestionDeOperariosComponent implements OnInit {
 
   // --- SERVICIOS INYECTADOS ---
   private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
   private ticketsService = inject(OperariosTicketsService);
+  private empleadoService = inject(EmpleadoService);
   private toast = inject(ToastService);
 
   // --- VARIABLES DE ESTADO ---
   tickets: ServicioTicket[] = [];
+  tecnicos: any[] = [];
+  searchTermOperarios: string = '';
   cargando = false;
   guardando = false;
   pageSize = 8;
@@ -33,39 +39,118 @@ export class GestionDeOperariosComponent implements OnInit {
   nuevoTicket: ServicioTicket = {
     cliente_nombre: '',
     servicio_requerido: '',
-    estado: 'Pendiente'
+    estado: 'Pendiente',
+    tecnico_id: undefined
   };
 
-  // --- GETTERS Y PAGINACION ---
+  // --- GETTERS Y FILTRADO ---
+  get ticketsFiltrados(): ServicioTicket[] {
+    if (!this.searchTermOperarios.trim()) return this.tickets;
+    const term = this.searchTermOperarios.trim().toLowerCase();
+    return this.tickets.filter(t => {
+      const c = (t.consecutivo || '').toLowerCase();
+      const cli = (t.cliente_nombre || '').toLowerCase();
+      const s = (t.servicio_requerido || '').toLowerCase();
+      const tec = this.nombreTecnico(t.tecnico_id).toLowerCase();
+      const est = (t.estado || '').toLowerCase();
+      const dir = (t.direccion || '').toLowerCase();
+      return c.includes(term) || cli.includes(term) || s.includes(term) || tec.includes(term) || est.includes(term) || dir.includes(term);
+    });
+  }
+
   get paginatedTickets(): ServicioTicket[] {
     const start = (this.pageTickets - 1) * this.pageSize;
-    return this.tickets.slice(start, start + this.pageSize);
+    return this.ticketsFiltrados.slice(start, start + this.pageSize);
   }
 
   get totalPagesTickets(): number {
-    return Math.ceil(this.tickets.length / this.pageSize) || 1;
+    return Math.ceil(this.ticketsFiltrados.length / this.pageSize) || 1;
   }
 
-  // Bloque de ciclo de vida OnInit para cargar tickets
+  // Bloque de ciclo de vida OnInit para cargar tickets y técnicos
   ngOnInit() {
     this.cargarTickets();
+    this.cargarTecnicos();
+  }
+
+  // Bloque para consultar técnicos disponibles desde EmpleadoService
+  cargarTecnicos() {
+    if (this.tecnicos.length > 0) return;
+    this.empleadoService.getEmpleados().pipe(
+      takeUntilDestroyed(this.destroyRef),
+      timeout(35000)
+    ).subscribe({
+      next: (res) => {
+        let filtered = res.filter((e: any) => {
+          const rol = (e.usuario?.rol?.nombre || '').toLowerCase();
+          const cargo = (e.cargo?.nombre || e.puesto || '').toLowerCase();
+          const area = (e.area?.nombre || e.cargo?.area?.nombre || e.usuario?.area?.nombre || '').toLowerCase();
+
+          if (
+            rol.includes('gerente') ||
+            rol.includes('jefe') ||
+            rol.includes('recursos humanos') ||
+            rol.includes('rrhh') ||
+            cargo.includes('gerente') ||
+            cargo.includes('jefe') ||
+            cargo.includes('recursos humanos') ||
+            cargo.includes('rrhh') ||
+            cargo.includes('director') ||
+            cargo.includes('coordinador')
+          ) {
+            return false;
+          }
+
+          const esAreaServicios = area === '' || area.includes('servicio') || area.includes('técnic') || area.includes('tecnic') || area.includes('campo');
+          const esCargoOperativoTecnico = cargo.includes('tecnic') || cargo.includes('operar') || cargo.includes('operativ') || cargo.includes('campo') || cargo.includes('manten') || cargo.includes('servicio');
+          const esRolOperativo = rol === 'operativo' || rol.includes('operativo');
+
+          return (esRolOperativo || esCargoOperativoTecnico) && esAreaServicios;
+        });
+
+        if (filtered.length === 0 && res.length > 0) {
+          filtered = res;
+        }
+
+        this.tecnicos = filtered.map((e: any) => ({
+          id: e.id,
+          nombre: `${e.usuario?.primer_nombre || e.usuario?.nombres || ''} ${e.usuario?.primer_apellido || e.usuario?.apellidos || ''}`.trim() || e.nombre || `Empleado #${e.id}`,
+          cargo: e.cargo?.nombre || e.puesto || 'Técnico Operativo',
+          estado: e.estado
+        })).filter((t: any) => t.nombre);
+
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.tecnicos = [];
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  // Bloque para obtener el nombre legible del técnico
+  nombreTecnico(id?: number): string {
+    if (!id) return 'Sin Asignar';
+    const tec = this.tecnicos.find(t => t.id === Number(id));
+    return tec?.nombre || `Técnico #${id}`;
   }
 
   // Bloque para consultar tickets de operarios desde el backend
-  cargarTickets() {
+  cargarTickets(forzar = false) {
+    if (this.cargando) return;
+    if (!forzar && this.tickets.length > 0) return;
     this.cargando = true;
-    this.ticketsService.getTickets().pipe(timeout(15000)).subscribe({
+    this.ticketsService.getTickets().pipe(
+      takeUntilDestroyed(this.destroyRef),
+      timeout(35000)
+    ).subscribe({
       next: (res) => {
-        this.tickets = res;
+        this.tickets = Array.isArray(res) ? res : ((res as any)?.data || []);
         this.cargando = false;
         this.cdr.detectChanges();
       },
-      error: (err: any) => {
-        if (err?.name === 'TimeoutError') {
-          this.toast.error('Tiempo de espera agotado');
-        }
+      error: () => {
         this.tickets = [];
-        this.toast.error('Error al cargar tickets');
         this.cargando = false;
         this.cdr.detectChanges();
       }
@@ -79,19 +164,27 @@ export class GestionDeOperariosComponent implements OnInit {
     }
 
     this.guardando = true;
-    this.ticketsService.crearTicket(this.nuevoTicket).pipe(timeout(10000)).subscribe({
+    if (this.nuevoTicket.tecnico_id) {
+      this.nuevoTicket.estado = 'Asignado';
+    }
+
+    this.ticketsService.crearTicket(this.nuevoTicket).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      timeout(35000)
+    ).subscribe({
       next: () => {
         this.toast.success('Ticket creado con éxito');
-        this.nuevoTicket = { cliente_nombre: '', servicio_requerido: '', estado: 'Pendiente' };
-        this.cargarTickets();
+        this.nuevoTicket = { cliente_nombre: '', servicio_requerido: '', estado: 'Pendiente', tecnico_id: undefined };
+        this.cargarTickets(true);
         this.guardando = false;
         this.cdr.detectChanges();
       },
       error: (err: any) => {
         if (err?.name === 'TimeoutError') {
-          this.toast.error('Tiempo de espera agotado');
+          this.toast.error('Tiempo de espera agotado al crear ticket');
+        } else {
+          this.toast.error('Error al crear ticket');
         }
-        this.toast.error('Error al crear ticket');
         this.guardando = false;
         this.cdr.detectChanges();
       }
@@ -101,9 +194,12 @@ export class GestionDeOperariosComponent implements OnInit {
   // Bloque para mapear el estado del ticket a una clase visual de badge
   getBadgeEstado(estado: string): string {
     switch (estado) {
-      case 'Completado': return 'badge-success';
+      case 'Completado':
+      case 'Finalizado': return 'badge-success';
       case 'Pendiente': return 'badge-warning';
+      case 'Recibido': return 'badge-info';
       case 'Asignado': return 'badge-primary';
+      case 'En Camino': return 'badge-warning';
       case 'En Sitio': return 'badge-info';
       default: return 'badge-secondary';
     }

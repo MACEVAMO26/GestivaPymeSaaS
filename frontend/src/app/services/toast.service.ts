@@ -14,10 +14,17 @@ export class ToastService {
   private idCounter = 0;
 
   show(message: string, type: 'success' | 'error' | 'warning' | 'info' = 'success', durationMs: number = 4000) {
-    const id = this.idCounter++;
-    this.toasts.update(t => [...t, { id, message, type }]);
+    // Evitar toasts duplicados idénticos visibles simultáneamente
+    if (this.toasts().some(t => t.message === message && t.type === type)) {
+      return;
+    }
 
-    
+    const id = this.idCounter++;
+    this.toasts.update(t => {
+      const updated = [...t, { id, message, type }];
+      return updated.length > 3 ? updated.slice(updated.length - 3) : updated;
+    });
+
     setTimeout(() => {
       this.remove(id);
     }, durationMs);

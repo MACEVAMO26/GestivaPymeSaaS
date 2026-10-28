@@ -11,7 +11,7 @@ $text-dark: #1a1a1a;
 $text-muted: #2d3748;
 $btn-add: #45a1ae;
 $btn-volver: #de3737;
-$btn-save: #066810;
+$btn-save: #6B8F71;
 $btn-gen-1: #6B8F71;
 $btn-gen-2: #7C6FA6;
 $btn-gen-3: #C9A227;
@@ -215,8 +215,13 @@ $btn-contract: #7C6FA6;
     }
   }
 
-  .estado-aprobado { color: #066810; font-weight: bold; }
+  .estado-aprobado { color: #6B8F71; font-weight: bold; }
   .estado-pendiente { color: #b5654a; }
+}
+
+.form-group.full-width,
+.full-width {
+  grid-column: 1 / -1;
 }
 
 .form-actions {
@@ -226,6 +231,18 @@ $btn-contract: #7C6FA6;
   margin-top: 1.5rem;
   justify-content: center;
   flex-wrap: wrap;
+}
+
+.form-actions-vacaciones {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 0.75rem;
+
+  @media (max-width: 600px) {
+    justify-content: center;
+  }
 }
 
 /* --- 6. BOTONES TIPO PÍLDORA NEUMÓRFICA --- */
@@ -250,8 +267,42 @@ $btn-contract: #7C6FA6;
 
 .btn-add { @extend .btn-neumorphic; background-color: $btn-add; border: 2px solid color.adjust($btn-add, $lightness: -10%); color: #000000; }
 .btn-volver { @extend .btn-neumorphic; background-color: $btn-volver; border: 2px solid color.adjust($btn-volver, $lightness: -10%); color: #ffffff; }
-.btn-save { @extend .btn-neumorphic; background-color: $btn-save; border: 2px solid color.adjust($btn-save, $lightness: -10%); color: #ffffff; box-shadow: none; }
+.btn-save { @extend .btn-neumorphic; background-color: $btn-cert; border: 2px solid color.adjust($btn-cert, $lightness: 12%); color: #ffffff; box-shadow: 4px 4px 8px $shadow-dark, -4px -4px 8px $shadow-light; }
 .btn-pill { border-radius: 9999px; }
+
+.btn-submit-vacaciones {
+  @extend .btn-neumorphic;
+  background-color: $btn-cert;
+  border: 2px solid color.adjust($btn-cert, $lightness: 12%);
+  color: #ffffff;
+  box-shadow: 4px 4px 8px $shadow-dark, -4px -4px 8px $shadow-light;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 0.7rem 1.6rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  i {
+    font-size: 14px;
+    margin-right: 0.35rem;
+  }
+
+  &:hover:not(:disabled) {
+    background-color: color.adjust($btn-cert, $lightness: -4%);
+    box-shadow: 6px 6px 12px $shadow-dark, -6px -6px 12px $shadow-light;
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    box-shadow: inset 3px 3px 6px $shadow-dark, inset -3px -3px 6px $shadow-light;
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+}
 
 .btn-general-1 { @extend .btn-neumorphic; background-color: $btn-gen-1; border: 2px solid color.adjust($btn-gen-1, $lightness: -10%); color: #ffffff; }
 .btn-general-2 { @extend .btn-neumorphic; background-color: $btn-gen-2; border: 2px solid color.adjust($btn-gen-2, $lightness: -10%); color: #ffffff; }

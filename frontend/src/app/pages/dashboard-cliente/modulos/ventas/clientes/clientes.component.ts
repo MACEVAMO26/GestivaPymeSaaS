@@ -59,8 +59,9 @@ export class ClientesComponent implements OnInit {
 
   // Bloque utilitario para formatear el tipo y número de documento
   getDocumentoFormateado(c: any): string {
-    if (!c || !c.documento) return '--';
-    const doc = c.documento.trim();
+    const docVal = c?.documento || c?.numero_documento || '';
+    if (!docVal) return '--';
+    const doc = String(docVal).trim();
     const docLower = doc.toLowerCase();
     if (docLower.startsWith('nit') || docLower.startsWith('cc') || docLower.startsWith('ce') || docLower.startsWith('pas')) {
       return doc;
@@ -86,22 +87,24 @@ export class ClientesComponent implements OnInit {
 
   // Bloque de ciclo de vida OnInit para cargar el directorio de clientes
   ngOnInit() {
-    this.// Bloque para consultar el catálogo de clientes desde la API
-  cargarClientes();
+    this.cargarClientes();
   }
 
   cargarClientes() {
     this.cargando = true;
     this.clienteService.getClientes().pipe(timeout(15000)).subscribe({
       next: (res) => {
-        this.clientesOriginales = res;
-        this.clientes = [...this.clientesOriginales];
+        this.clientesOriginales = Array.isArray(res) ? res : [];
+        this.filtrarClientes();
         this.cargando = false;
         this.cdr.detectChanges();
       },
       error: (err: any) => {
+        console.error('Error cargando clientes:', err);
         if (err?.name === 'TimeoutError') {
           this.toast.error('Tiempo de espera agotado al cargar clientes.');
+        } else {
+          this.toast.error('No se pudo cargar la lista de clientes desde el servidor.');
         }
         this.clientesOriginales = [];
         this.clientes = [];
@@ -114,20 +117,33 @@ export class ClientesComponent implements OnInit {
   // Bloque para filtrar clientes por término de búsqueda y tipo
   filtrarClientes() {
     this.pageClientes = 1;
-    let result = this.clientesOriginales;
-    if (this.searchTerm) {
-      const term = this.searchTerm.toLowerCase();
-      result = result.filter(c => 
-        (c.nombre && c.nombre.toLowerCase().includes(term)) ||
-        (c.documento && c.documento.includes(term)) ||
-        (c.email && c.email.toLowerCase().includes(term)) ||
-        (c.empresa && c.empresa.toLowerCase().includes(term))
-      );
+    let result = [...this.clientesOriginales];
+    if (this.searchTerm && this.searchTerm.trim()) {
+      const term = this.searchTerm.trim().toLowerCase();
+      result = result.filter(c => {
+        const nombre = this.getNombreCliente(c).toLowerCase();
+        const doc = ((c.documento || c.numero_documento) || '').toLowerCase();
+        const email = (c.email || '').toLowerCase();
+        const tel = (c.telefono || '').toLowerCase();
+        const ciudad = (c.ciudad || '').toLowerCase();
+        return nombre.includes(term) || doc.includes(term) || email.includes(term) || tel.includes(term) || ciudad.includes(term);
+      });
     }
     if (this.tipoFiltro) {
-      result = result.filter(c => c.tipo_cliente === this.tipoFiltro);
+      const filtro = this.tipoFiltro.toLowerCase();
+      result = result.filter(c => {
+        const tipo = (c.tipo_cliente || 'Natural').toLowerCase();
+        if (filtro === 'natural' || filtro === 'particular') {
+          return tipo === 'natural' || tipo === 'particular';
+        }
+        if (filtro === 'juridico' || filtro === 'empresa') {
+          return tipo === 'juridico' || tipo === 'empresa';
+        }
+        return tipo === filtro;
+      });
     }
     this.clientes = result;
+    this.cdr.detectChanges();
   }
 
   // --- SECCION LOGICA DIRECTORIO ---
@@ -154,6 +170,9 @@ export class ClientesComponent implements OnInit {
   abrirModalEditar(c: any) {
     this.isEditMode = true;
     this.clienteActual = { ...c };
+    if (!this.clienteActual.documento && this.clienteActual.numero_documento) {
+      this.clienteActual.documento = this.clienteActual.numero_documento;
+    }
     if (!this.clienteActual.tipo_cliente) {
       this.clienteActual.tipo_cliente = this.clienteActual.nombre_razon_social ? 'Juridico' : 'Natural';
     }
@@ -181,7 +200,7 @@ export class ClientesComponent implements OnInit {
     }
 
     this.isSaving = true;
-    const payload: any = { ...this.clienteActual };
+    const payload: any = { ...this.clienteActual, numero_documento: this.clienteActual.documento };
 
     if (this.isEditMode && this.clienteActual.id) {
       this.clienteService.actualizarCliente(this.clienteActual.id, payload).pipe(timeout(10000)).subscribe({

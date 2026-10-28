@@ -47,6 +47,14 @@
             <label class="form-label">Dirección del Servicio:</label>
             <input type="text" class="input-neumorphic" name="direccion" [(ngModel)]="nuevoTicket.direccion">
           </div>
+
+          <div class="form-group full-width">
+            <label class="form-label">Técnico Operario Asignado:</label>
+            <select class="input-neumorphic" name="tecnico_id" [(ngModel)]="nuevoTicket.tecnico_id">
+              <option [ngValue]="undefined">-- Sin Asignar (Pendiente de Despacho) --</option>
+              <option *ngFor="let tec of tecnicos" [ngValue]="tec.id">👷 {{ tec.nombre }} ({{ tec.cargo }})</option>
+            </select>
+          </div>
         </div>
 
         <div class="form-actions">
@@ -70,6 +78,29 @@
             <p>Cargando tickets...</p>
           </div>
         }
+
+        <!-- HTML BARRA DE BUSQUEDA TICKETS OPERARIOS -->
+        <div class="search-filter-bar search-bar-centered mb-4">
+          <div class="search-rel-box">
+            <i class="fas fa-search search-icon-input"></i>
+            <input
+              type="text"
+              class="input-neumorphic search-input-padded"
+              placeholder="Buscar por consecutivo, cliente, servicio, técnico, estado o lugar..."
+              [(ngModel)]="searchTermOperarios"
+              (ngModelChange)="pageTickets = 1"
+            />
+            <button
+              *ngIf="searchTermOperarios"
+              type="button"
+              (click)="searchTermOperarios = ''; pageTickets = 1"
+              class="search-clear-input-btn"
+              title="Limpiar búsqueda"
+            >
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
 
         <!-- HTML TABLA TICKETS -->
         @if (!cargando) {
@@ -95,22 +126,29 @@
                   <td>
                     <span class="badge" [ngClass]="getBadgeEstado(t.estado)">{{ t.estado }}</span>
                   </td>
-                  <td>{{ t.tecnico_id || 'Sin Asignar' }}</td>
+                  <td>
+                    <span class="font-semibold" [class.text-muted]="!t.tecnico_id" [class.text-azul]="t.tecnico_id">
+                      {{ nombreTecnico(t.tecnico_id) }}
+                    </span>
+                  </td>
                   <td class="text-center">
                     <app-solicitud-inactivacion [area]="'s_ope'" [entidad]="'tickets'" [entidadId]="t.id"
                       [nombreEntidad]="'Ticket ' + (t.consecutivo || t.id)" label="Solicitar cancelación"></app-solicitud-inactivacion>
                   </td>
                 </tr>
-                <tr *ngIf="tickets.length === 0">
-                  <td colspan="7" class="text-center">No hay tickets activos en este momento.</td>
+                <tr *ngIf="ticketsFiltrados.length === 0">
+                  <td colspan="7" class="text-center py-4">
+                    <span *ngIf="searchTermOperarios">No se encontraron tickets con "{{ searchTermOperarios }}".</span>
+                    <span *ngIf="!searchTermOperarios">No hay tickets activos en este momento.</span>
+                  </td>
                 </tr>
               </tbody>
             </table>
 
             <!-- HTML CONTROLES PAGINACION -->
-            @if (tickets.length > pageSize) {
+            @if (ticketsFiltrados.length > pageSize) {
               <div class="neu-pagination-bar">
-                <span class="pagination-info">Página {{ pageTickets }} de {{ totalPagesTickets }} ({{ tickets.length }} tickets)</span>
+                <span class="pagination-info">Página {{ pageTickets }} de {{ totalPagesTickets }} ({{ ticketsFiltrados.length }} tickets)</span>
                 <div class="pagination-controls">
                   <button class="pagination-btn" [disabled]="pageTickets === 1" (click)="pageTickets = pageTickets - 1">
                     <i class="fas fa-chevron-left"></i> Anterior

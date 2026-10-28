@@ -21,7 +21,10 @@ class ProductoController extends Controller
 
         $productos = Producto::with('categoria')
             ->where('empresa_id', $empresaId)
-            ->where('activo', true)
+            ->where(function ($q) {
+                $q->whereNull('activo')
+                  ->orWhereIn('activo', ['1', 'true', 'activo', 'Si', 'si', 'ACTIVO']);
+            })
             ->get();
 
         return response()->json($productos);
@@ -46,7 +49,7 @@ class ProductoController extends Controller
         $empresaId = request()->header('X-Empresa-Id') ?? ($user?->empresa_id ?? null);
         $data = $request->except('imagen');
         $data['empresa_id'] = $empresaId;
-        $data['activo'] = true;
+        $data['activo'] = '1';
 
         if ($request->hasFile('imagen')) {
             $uploadedFileUrl = Cloudinary::upload($request->file('imagen')->getRealPath())->getSecurePath();
@@ -112,7 +115,7 @@ class ProductoController extends Controller
     public function destroy($id)
     {
         $producto = Producto::findOrFail($id);
-        $producto->activo = false;
+        $producto->activo = '0';
         $producto->inactive_at = now();
         // Bloque de guardado en BD
         $producto->save();

@@ -19,7 +19,7 @@ class ServicioController extends Controller
 
         $servicios = Servicio::with('categoria')
             ->where('empresa_id', $empresaId)
-            ->where('activo', 1)
+            ->whereIn('activo', ['1', 'true'])
             ->orderBy('id', 'desc')
             ->get();
 

@@ -1,22 +1,22 @@
-import { VolverDirective } from '../../../../../shared/directives/volver.directive';
+import { VolverDirective } from '../../../../../../shared/directives/volver.directive';
 import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../../../services/auth.service';
-import { ToastService } from '../../../../../services/toast.service';
-import { LoadingSpinnerComponent } from '../../../../../shared/components/loading-spinner/loading-spinner';
+import { AuthService } from '../../../../../../services/auth.service';
+import { ToastService } from '../../../../../../services/toast.service';
+import { LoadingSpinnerComponent } from '../../../../../../shared/components/loading-spinner/loading-spinner';
 import { timeout } from 'rxjs';
 
 @Component({
-  selector: 'app-administracion',
+  selector: 'app-admin-contrato',
   standalone: true,
   imports: [CommonModule, FormsModule, LoadingSpinnerComponent, VolverDirective],
-  templateUrl: './administracion.component.html',
-  styleUrl: './administracion.component.scss'
+  templateUrl: './admin-contrato.html',
+  styleUrl: './admin-contrato.scss'
 })
-export class AdministracionComponent implements OnInit, AfterViewInit {
+export class AdminContratoComponent implements OnInit, AfterViewInit {
   // --- INYECCION DE DEPENDENCIAS Y SERVICIOS ---
   private cdr = inject(ChangeDetectorRef);
 

@@ -1,4 +1,5 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AgendaService, EventoCalendario } from '../../../../../../services/agenda.service';
@@ -15,6 +16,7 @@ import { timeout } from 'rxjs';
 export class InicioCalendarioComponent implements OnInit {
   // --- INYECCIÓN DE DEPENDENCIAS Y SERVICIOS ---
   private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
   private agendaService = inject(AgendaService);
   private toast = inject(ToastService);
 
@@ -35,15 +37,15 @@ export class InicioCalendarioComponent implements OnInit {
 
   // Bloque para consultar los eventos de calendario del usuario desde el servicio de agenda
   cargarEventos() {
-    this.agendaService.getEventos().pipe(timeout(15000)).subscribe({
+    this.agendaService.getEventos().pipe(
+      timeout(35000),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: (eventos) => {
-        this.generarCalendario(eventos);
+        this.generarCalendario(eventos || []);
         this.cdr.detectChanges();
       },
-      error: (err: any) => {
-        if (err?.name === 'TimeoutError') {
-          this.toast.error('Tiempo de espera agotado');
-        }
+      error: () => {
         this.generarCalendario([]);
         this.cdr.detectChanges();
       }

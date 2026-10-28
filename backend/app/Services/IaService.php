@@ -68,7 +68,7 @@ class IaService
         $directricesTexto = "";
         if ($empresaId) {
             $directricesActivas = \App\Models\IaSugerenciaPersonalizada::where('empresa_id', $empresaId)
-                ->where('activo', true)
+                ->whereIn('activo', ['1', 'true'])
                 ->get();
             if ($directricesActivas->count() > 0) {
                 $directricesTexto = "DIRECTRICES CORPORATIVAS VIGENTES ESTABLECIDAS POR LA GERENCIA:\n";

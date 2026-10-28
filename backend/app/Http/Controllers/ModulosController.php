@@ -53,15 +53,21 @@ class ModulosController extends Controller
 
         $resultado = [];
 
-        $tipo = $empresa->tipo_empresa;
+        $tipo = $empresa->tipo_empresa ?? '';
         $tarifas = $empresa->tarifasCatalogo()->pluck('tarifas_catalogo.id')->toArray();
 
+        $tipoLower = strtolower($tipo);
+        $isMixto = $tipo === 'Mixto' || $tipo === 'Ventas y Servicios' || str_contains($tipoLower, 'mixto') || str_contains($tipoLower, 'ventas y servicios');
+        $isVentas = $tipo === 'Ventas' || $isMixto || str_contains($tipoLower, 'venta');
+        $isServicios = $tipo === 'Servicios' || $isMixto || str_contains($tipoLower, 'servicio');
+
         $paquetesPermitidos = ['base'];
-        if ($tipo === 'Ventas' || $tipo === 'Ventas y Servicios') $paquetesPermitidos[] = 'ventas';
-        if ($tipo === 'Servicios' || $tipo === 'Ventas y Servicios') $paquetesPermitidos[] = 'servicios';
+        if ($isVentas) $paquetesPermitidos[] = 'ventas';
+        if ($isServicios) $paquetesPermitidos[] = 'servicios';
+        $paquetesPermitidos[] = 'finanzas'; // Prefacturación y Gestión de Caja siempre disponible
         
         if (in_array('modulo_rrhh', $tarifas)) $paquetesPermitidos[] = 'rrhh';
-        if (in_array('modulo_finanzas', $tarifas)) $paquetesPermitidos[] = 'finanzas';
+        if (in_array('modulo_finanzas', $tarifas) && !in_array('finanzas', $paquetesPermitidos)) $paquetesPermitidos[] = 'finanzas';
         
         if (in_array('addon_factura', $tarifas) || in_array('addon_contable', $tarifas)) {
             $paquetesPermitidos[] = 'addons';

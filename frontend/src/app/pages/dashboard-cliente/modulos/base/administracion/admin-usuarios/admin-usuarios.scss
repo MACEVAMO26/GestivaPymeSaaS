@@ -16,7 +16,7 @@ $text-dark: #1a1a1a;
 $text-muted: #2d3748;
 $btn-add: #45a1ae;
 $btn-volver: #de3737;
-$btn-save: #066810;
+$btn-save: #6B8F71;
 $btn-gen-1: #6B8F71;
 $btn-gen-2: #7C6FA6;
 $btn-gen-3: #C9A227;
@@ -458,7 +458,7 @@ $btn-gen-6: #A38B6D;
   box-shadow: inset 2px 2px 4px $shadow-dark, inset -2px -2px 4px $shadow-light;
 }
 
-.badge-activo { color: #066810; border: 1px solid rgba(6, 104, 16, 0.2); }
+.badge-activo { color: #6B8F71; border: 1px solid rgba(107, 143, 113, 0.2); }
 .badge-baja { color: #de3737; border: 1px solid rgba(222, 55, 55, 0.2); }
 .badge-pendiente { color: #C9A227; border: 1px solid rgba(201, 162, 39, 0.2); }
 
@@ -474,25 +474,25 @@ $btn-gen-6: #A38B6D;
 }
 
 .btn-icon-action {
-  background: $bg-color;
-  border: none;
+  background: #edf2f7;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  min-height: 36px;
-  max-width: 36px;
-  max-height: 36px;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  max-width: 28px;
+  max-height: 28px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   cursor: pointer;
-  box-shadow: 2px 2px 5px $shadow-dark, -2px -2px 5px $shadow-light;
+  box-shadow: 2px 2px 4px $shadow-dark, -2px -2px 4px $shadow-light;
   transition: all 0.2s ease;
 
   i {
-    font-size: 18px;
+    font-size: 12px;
     line-height: 1;
     display: inline-flex;
     align-items: center;
@@ -500,34 +500,40 @@ $btn-gen-6: #A38B6D;
   }
 
   &:hover {
-    box-shadow: inset 2px 2px 4px $shadow-dark, inset -2px -2px 4px $shadow-light;
-    transform: translateY(-1px);
+    transform: scale(1.08);
+    box-shadow: 2px 2px 5px $shadow-dark, -2px -2px 5px $shadow-light;
   }
 
   &:active {
-    box-shadow: inset 3px 3px 6px $shadow-dark, inset -3px -3px 6px $shadow-light;
-    transform: translateY(1px);
+    transform: scale(0.95);
+    box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.15);
   }
 }
 
 .btn-icon-edit {
-  color: #7C6FA6;
-  &:hover { color: #5a4e84; }
+  background: #fef3e7 !important;
+  color: #c05621 !important;
+  border-color: rgba(192, 86, 33, 0.2) !important;
+  &:hover { background: #fde8cf !important; color: #9c4215 !important; }
 }
 
 .btn-icon-warning {
-  color: #C9A227;
-  &:hover { color: #9e7e1b; }
+  background: #fef9c3 !important;
+  color: #b7791f !important;
+  border-color: rgba(183, 121, 31, 0.2) !important;
+  &:hover { background: #fef08a !important; color: #92400e !important; }
 }
 
 .btn-icon-success {
-  color: #6B8F71;
-  &:hover { color: #4b664f; }
+  background: rgba(107, 143, 113, 0.15) !important; color: #6B8F71 !important; border-color: rgba(107, 143, 113, 0.3) !important;
+  &:hover { background: #c8e6c9 !important; color: #1b5e20 !important; }
 }
 
 .btn-icon-delete {
-  color: #de3737;
-  &:hover { color: #b02323; }
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+  border-color: rgba(220, 38, 38, 0.2) !important;
+  &:hover { background: #fecaca !important; color: #991b1b !important; }
 }
 
 .inline-form-container { width: 100%; display: block; }
@@ -577,7 +583,7 @@ $btn-gen-6: #A38B6D;
   width: 40px;
   height: 40px;
   border: 4px solid #e0e0c8;
-  border-top: 4px solid #066810;
+  border-top: 4px solid #6B8F71;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -628,7 +634,7 @@ $btn-gen-6: #A38B6D;
 }
 
 .text-green {
-  color: #066810;
+  color: #6B8F71;
 }
 
 .text-blue {

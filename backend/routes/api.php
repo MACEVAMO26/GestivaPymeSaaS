@@ -304,9 +304,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/ventas/{id}/estado-paquete', [\App\Http\Controllers\VentaController::class, 'updateEstadoPaquete']);
     Route::post('/ventas/{id}/anular', [\App\Http\Controllers\VentaController::class, 'anularVenta']);
 
-    // Soporte Tickets
+    // Soporte Tickets (Empresa)
     Route::get('/soporte', [\App\Http\Controllers\SoporteTicketController::class, 'index']);
     Route::post('/soporte', [\App\Http\Controllers\SoporteTicketController::class, 'store']);
+
+    }); // Fin del middleware 'formalizado'
+
+    // ==========================================
+    // RUTAS ADMINISTRATIVAS SAAS (Super Admin)
+    // ==========================================
+    // Soporte Tickets SaaS Admin
     Route::get('/saas/soporte', [\App\Http\Controllers\SoporteTicketController::class, 'saasIndex']);
     Route::put('/saas/soporte/{id}', [\App\Http\Controllers\SoporteTicketController::class, 'update']);
 
@@ -322,7 +329,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/saas/contratos/firmar', [\App\Http\Controllers\SaasContratoController::class, 'firmar']);
     Route::get('/saas/tarifas/catalogo', [\App\Http\Controllers\TarifaController::class, 'catalogo']);
     Route::put('/saas/tarifas/catalogo', [\App\Http\Controllers\TarifaController::class, 'catalogoUpdate']);
-
-    }); // Fin del middleware 'formalizado'
 
 });Route::middleware("auth:sanctum")->post("/empresas/{id}/impersonate-auditor", [\App\Http\Controllers\ImpersonateController::class, "impersonateAuditor"]);

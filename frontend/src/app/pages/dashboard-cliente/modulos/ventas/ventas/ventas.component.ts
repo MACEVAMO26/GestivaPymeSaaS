@@ -119,10 +119,26 @@ export class VentasComponent implements OnInit {
     const term = this.searchTerm.toLowerCase();
     this.ventasFiltradas = this.ventas.filter(v =>
       (v.factura_consecutivo?.toString() || '').includes(term) ||
+      (v.cliente?.nombre_razon_social || '').toLowerCase().includes(term) ||
       v.cliente?.nombres?.toLowerCase().includes(term) ||
       v.cliente?.apellidos?.toLowerCase().includes(term)
     );
     this.pageVentas = 1;
+  }
+
+  // Bloque utilitario para obtener el nombre legible del cliente
+  getNombreCliente(c: any): string {
+    if (!c) return 'Consumidor Final';
+    if (c.nombre_razon_social && c.nombre_razon_social.trim()) return c.nombre_razon_social.trim();
+    const nom = `${c.nombres || ''} ${c.apellidos || ''}`.trim();
+    return nom || c.email || 'Cliente';
+  }
+
+  // Bloque utilitario para obtener el documento del cliente
+  getDocumentoCliente(c: any): string {
+    if (!c) return '';
+    const doc = c.documento || c.numero_documento || '';
+    return doc ? String(doc) : '';
   }
 
   // Bloque utilitario para formatear el consecutivo de la factura de venta

@@ -71,13 +71,13 @@ export class SolicitudInactivacionComponent implements OnInit {
   cargar() {
     this.cargando = true;
     this.solicitudes = [];
-    this.solicitudService.getMisSolicitudes().pipe(timeout(8000)).subscribe({
+    this.solicitudService.getMisSolicitudes().pipe(timeout(25000)).subscribe({
       next: (res) => {
         this.solicitudes = (res || []).filter((s) =>
           s.area === this.area && s.entidad === this.entidad && s.entidad_id === this.entidadId
         );
         if (this.esDecisor) {
-          this.solicitudService.getBandeja().pipe(timeout(8000)).subscribe({
+          this.solicitudService.getBandeja().pipe(timeout(25000)).subscribe({
             next: (bandeja) => {
               const pendientes = (bandeja || []).filter((s) =>
                 s.area === this.area && s.entidad === this.entidad && s.entidad_id === this.entidadId &&
@@ -113,7 +113,7 @@ export class SolicitudInactivacionComponent implements OnInit {
       entidad_id: this.entidadId,
       accion: 'Inactivar registro',
       motivo: this.motivo
-    }).pipe(timeout(8000)).subscribe({
+    }).pipe(timeout(25000)).subscribe({
       next: (res) => {
         this.isSubmitting = false;
         this.toast.success(res.message || 'Solicitud enviada');
@@ -145,7 +145,7 @@ export class SolicitudInactivacionComponent implements OnInit {
   responder(s: Solicitud) {
     if (!this.mensajeReplica.trim()) return;
     this.isSubmitting = true;
-    this.solicitudService.responder(s.id, this.mensajeReplica).pipe(timeout(8000)).subscribe({
+    this.solicitudService.responder(s.id, this.mensajeReplica).pipe(timeout(25000)).subscribe({
       next: (res) => {
         this.isSubmitting = false;
         this.toast.success(res.message || 'Respuesta enviada');

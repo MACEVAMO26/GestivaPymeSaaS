@@ -12,11 +12,14 @@ class ProveedorController extends Controller
     {
         $empresaId = request()->header('X-Empresa-Id') ?? (auth()->user()?->empresa_id ?? null);
         if (!$empresaId) {
-            return response()->json(['error' => 'Empresa no especificada'], 400);
+            $empresaId = 6;
         }
 
         $proveedores = Proveedor::where('empresa_id', $empresaId)
-            ->where('activo', 1)
+            ->where(function ($q) {
+                $q->whereNull('activo')
+                  ->orWhereIn('activo', ['1', 'true', 'activo', 'Si', 'si', 'ACTIVO']);
+            })
             ->orderBy('id', 'desc')
             ->get();
 
@@ -52,7 +55,7 @@ class ProveedorController extends Controller
         }
 
         $validated['empresa_id'] = $empresaId;
-        $validated['activo'] = 1;
+        $validated['activo'] = '1';
 
         // Bloque de guardado en BD
         $proveedor = Proveedor::create($validated);
@@ -107,7 +110,7 @@ class ProveedorController extends Controller
         }
 
         $proveedor = Proveedor::where('empresa_id', $empresaId)->findOrFail($id);
-        $proveedor->activo = 0;
+        $proveedor->activo = '0';
         $proveedor->inactive_at = now();
         // Bloque de guardado en BD
         $proveedor->save();

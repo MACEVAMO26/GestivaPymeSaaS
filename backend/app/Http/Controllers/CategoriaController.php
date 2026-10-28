@@ -17,7 +17,7 @@ class CategoriaController extends Controller
         }
 
         $categorias = Categoria::where('empresa_id', $user->empresa_id)
-            ->where('activo', 1)
+            ->whereIn('activo', ['1', 'true'])
             ->orderBy('id', 'desc')
             ->get();
 

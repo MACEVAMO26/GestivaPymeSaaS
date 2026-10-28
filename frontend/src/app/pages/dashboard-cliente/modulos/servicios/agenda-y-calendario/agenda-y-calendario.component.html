@@ -41,9 +41,28 @@
               <input type="datetime-local" class="input-neumorphic" name="fecha_fin" [(ngModel)]="nuevoEvento.fecha_fin" [min]="nuevoEvento.fecha_inicio || fechaMinimaActual" required>
             </div>
 
-            <div class="form-group">
-              <label class="form-label">Color de Etiqueta:</label>
-              <input type="color" class="input-neumorphic color-input" name="color_etiqueta" [(ngModel)]="nuevoEvento.color_etiqueta">
+            <div class="form-group full-width">
+              <label class="form-label">Prioridad del Evento (Color de Etiqueta):</label>
+              <div class="prioridades-grid">
+                @for(p of prioridades; track p.id) {
+                  <button
+                    type="button"
+                    class="prioridad-card"
+                    [class.selected]="nuevoEvento.color_etiqueta === p.color"
+                    (click)="seleccionarColor(p.color)"
+                  >
+                    <span class="p-dot" [style.backgroundColor]="p.color"></span>
+                    <div class="p-info">
+                      <strong class="p-title" [style.color]="p.textPastel">
+                        <i [class]="p.icono"></i> {{ p.nombre }}
+                      </strong>
+                    </div>
+                    @if(nuevoEvento.color_etiqueta === p.color) {
+                      <i class="fas fa-check-circle check-active" [style.color]="p.color"></i>
+                    }
+                  </button>
+                }
+              </div>
             </div>
           </div>
 
@@ -103,7 +122,7 @@
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Color</th>
+                  <th>Prioridad</th>
                   <th>Título</th>
                   <th>Descripción</th>
                   <th>Inicio</th>
@@ -114,7 +133,15 @@
                 <tr *ngFor="let e of paginatedEventos">
                   <td>{{ e.id }}</td>
                   <td>
-                    <div class="color-swatch" [style.backgroundColor]="e.color_etiqueta"></div>
+                    <span
+                      class="badge-prioridad-tag"
+                      [style.backgroundColor]="getPrioridad(e.color_etiqueta).bgPastel"
+                      [style.color]="getPrioridad(e.color_etiqueta).textPastel"
+                      [style.borderColor]="getPrioridad(e.color_etiqueta).color"
+                    >
+                      <span class="color-dot-mini" [style.backgroundColor]="getPrioridad(e.color_etiqueta).color"></span>
+                      {{ getPrioridad(e.color_etiqueta).nombre }}
+                    </span>
                   </td>
                   <td><strong>{{ e.titulo }}</strong></td>
                   <td>{{ e.descripcion }}</td>

@@ -30,13 +30,39 @@ export class AgendaYCalendarioComponent implements OnInit {
   pageSize = 8;
   pageEventos = 1;
 
+  // --- PRIORIDADES UNIFICADAS EN 5 COLORES ---
+  prioridades = [
+    { id: 'urgente', nombre: '1. Urgente', color: '#dc2626', bgPastel: '#fee2e2', textPastel: '#991b1b', icono: 'fas fa-exclamation-circle' },
+    { id: 'alta', nombre: '2. Alta', color: '#ea580c', bgPastel: '#ffedd5', textPastel: '#9a3412', icono: 'fas fa-arrow-up' },
+    { id: 'media', nombre: '3. Media', color: '#d97706', bgPastel: '#fef3c7', textPastel: '#92400e', icono: 'fas fa-minus' },
+    { id: 'baja', nombre: '4. Baja', color: '#2563eb', bgPastel: '#dbeafe', textPastel: '#1e40af', icono: 'fas fa-arrow-down' },
+    { id: 'rutinaria', nombre: '5. Rutinaria', color: '#16a34a', bgPastel: '#dcfce7', textPastel: '#166534', icono: 'fas fa-calendar-check' }
+  ];
+
   nuevoEvento: EventoCalendario = {
     titulo: '',
     descripcion: '',
     fecha_inicio: '',
     fecha_fin: '',
-    color_etiqueta: '#45a1ae'
+    color_etiqueta: '#d97706'
   };
+
+  seleccionarColor(color: string) {
+    this.nuevoEvento.color_etiqueta = color;
+  }
+
+  getPrioridad(color?: string) {
+    if (!color) return this.prioridades[2];
+    const match = this.prioridades.find(p => p.color.toLowerCase() === color.toLowerCase());
+    return match || {
+      id: 'personalizado',
+      nombre: 'Media',
+      color: color,
+      bgPastel: '#fef3c7',
+      textPastel: '#92400e',
+      icono: 'fas fa-tag'
+    };
+  }
 
   // --- GETTERS Y PROPIEDADES CALCULADAS ---
   get fechaMinimaActual(): string {
@@ -117,7 +143,7 @@ export class AgendaYCalendarioComponent implements OnInit {
     this.agendaService.crearEvento(this.nuevoEvento).pipe(timeout(10000)).subscribe({
       next: () => {
         this.toast.success('Evento agendado con éxito');
-        this.nuevoEvento = { titulo: '', descripcion: '', fecha_inicio: '', fecha_fin: '', color_etiqueta: '#45a1ae' };
+        this.nuevoEvento = { titulo: '', descripcion: '', fecha_inicio: '', fecha_fin: '', color_etiqueta: '#d97706' };
         this.cargarEventos();
         this.guardando = false;
         this.cdr.detectChanges();

@@ -26,7 +26,11 @@ class ClienteController extends Controller
         }
 
         $clientes = Cliente::where('empresa_id', $empresaId)
-            ->where('activo', 1)
+            ->whereNull('inactive_at')
+            ->where(function ($q) {
+                $q->whereNull('activo')
+                  ->orWhereIn('activo', ['1', 'true', 'activo', 'Si', 'si', 'ACTIVO']);
+            })
             ->orderBy('id', 'desc')
             ->get();
 

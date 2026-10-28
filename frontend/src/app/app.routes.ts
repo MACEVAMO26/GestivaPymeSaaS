@@ -21,7 +21,7 @@ export const routes: Routes = [
             { path: 'inicio', loadComponent: () => import('./pages/dashboard-cliente/modulos/base/inicio/inicio.component').then(m => m.InicioComponent) },
             { 
                 path: 'administracion', 
-                loadComponent: () => import('./pages/dashboard-cliente/modulos/base/administracion/administracion/administracion').then(m => m.AdministracionComponent),
+                loadComponent: () => import('./pages/dashboard-cliente/modulos/base/administracion/administracion-layout.component').then(m => m.AdministracionLayoutComponent),
                 children: [
                     { path: '', redirectTo: 'empresa', pathMatch: 'full' },
                     { path: 'empresa', loadComponent: () => import('./pages/dashboard-cliente/modulos/base/administracion/admin-empresa/admin-empresa').then(m => m.AdminEmpresa) },
@@ -30,7 +30,7 @@ export const routes: Routes = [
                     { path: 'estructura', loadComponent: () => import('./pages/dashboard-cliente/modulos/base/administracion/admin-estructura/admin-estructura').then(m => m.AdminEstructura) },
                     { path: 'soporte', loadComponent: () => import('./pages/dashboard-cliente/modulos/base/administracion/admin-soporte/admin-soporte').then(m => m.AdminSoporteComponent) },
                     { path: 'auditoria', loadComponent: () => import('./pages/dashboard-cliente/modulos/base/administracion/admin-auditoria/admin-auditoria').then(m => m.AdminAuditoria) },
-                    { path: 'contrato', loadComponent: () => import('./pages/dashboard-cliente/modulos/base/administracion/administracion.component').then(m => m.AdministracionComponent) }
+                    { path: 'contrato', loadComponent: () => import('./pages/dashboard-cliente/modulos/base/administracion/admin-contrato/admin-contrato').then(m => m.AdminContratoComponent) }
                 ]
             },
             { path: 'gestion-de-tareas', loadComponent: () => import('./pages/dashboard-cliente/modulos/base/gestion-de-tareas/gestion-de-tareas.component').then(m => m.GestionDeTareasComponent) },

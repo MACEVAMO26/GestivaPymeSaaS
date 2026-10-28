@@ -45,7 +45,7 @@
                 <select class="input-neumorphic" [(ngModel)]="clienteSeleccionado">
                   <option value="" disabled selected>Seleccione cliente...</option>
                   @for(cliente of clientesDisponibles; track cliente.id) {
-                    <option [value]="cliente.id">{{cliente.nombres}} {{cliente.apellidos}} ({{cliente.documento}})</option>
+                    <option [value]="cliente.id">{{ getNombreCliente(cliente) }} {{ getDocumentoCliente(cliente) ? '(' + getDocumentoCliente(cliente) + ')' : '' }}</option>
                   }
                 </select>
               </div>
@@ -120,16 +120,16 @@
             
             <div class="subtotal-fila">
               <span>Subtotal:</span>
-              <span>{{totalCarrito | currency:'COP':'symbol':'1.0-0'}}</span>
+              <span class="monto-destacado">$ {{ (totalCarrito || 0) | number:'1.0-0' }} COP</span>
             </div>
             <div class="subtotal-fila">
               <span>Impuestos (0%):</span>
-              <span>$0</span>
+              <span class="monto-destacado">$ 0 COP</span>
             </div>
             <hr class="divider">
             <div class="total-fila">
               <span class="total-label">TOTAL:</span>
-              <span class="total-monto">{{totalCarrito | currency:'COP':'symbol':'1.0-0'}}</span>
+              <span class="total-monto">$ {{ (totalCarrito || 0) | number:'1.0-0' }} COP</span>
             </div>
 
             <div class="form-group mb-2rem">
@@ -158,10 +158,18 @@
     @if(activeTab === 'historial') {
       <div class="neumorphic-panel fade-in">
         <div class="action-bar">
-          <input type="text" 
-                 class="search-input input-neumorphic" 
-                 placeholder="Buscar por factura, cliente..."
-                 [(ngModel)]="searchTerm">
+          <div class="search-group">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" 
+                   class="search-input input-neumorphic" 
+                   placeholder="Buscar por factura, cliente..."
+                   [(ngModel)]="searchTerm">
+            @if (searchTerm) {
+              <button type="button" class="search-clear-btn" (click)="searchTerm = ''" title="Limpiar búsqueda">
+                <i class="fas fa-times"></i>
+              </button>
+            }
+          </div>
         </div>
 
         <div class="table-responsive">
@@ -181,7 +189,7 @@
               @for(venta of paginatedVentas; track venta.id) {
                 <tr>
                   <td><strong>{{numeroFactura(venta)}}</strong></td>
-                  <td>{{venta.cliente?.nombres}} {{venta.cliente?.apellidos}}</td>
+                  <td>{{ getNombreCliente(venta.cliente) }}</td>
                   <td>{{venta.created_at | date:'shortDate'}}</td>
                   <td>{{venta.total | currency:'COP':'symbol':'1.0-0'}}</td>
                   <td>

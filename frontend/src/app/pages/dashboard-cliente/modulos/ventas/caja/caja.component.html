@@ -163,14 +163,7 @@
             <div class="search-filter-bar mb-4 search-caja-bar" *ngIf="movimientos.length > 0">
               <div class="search-input-wrapper">
                 <i class="fas fa-search search-icon-left"></i>
-                <input
-                  type="text"
-                  class="input-neumorphic"
-                  class="input-search-padded input-neumorphic"
-                  placeholder="Buscar movimiento por concepto, tipo, monto o medio..."
-                  [(ngModel)]="searchTermMovimientos"
-                  (ngModelChange)="onSearchTermMovimientosChange()"
-                />
+                <input class="input-neumorphic input-search-padded" type="text" placeholder="Buscar movimiento por concepto, tipo, monto o medio..." [(ngModel)]="searchTermMovimientos" (ngModelChange)="onSearchTermMovimientosChange()" />
                 <button
                   *ngIf="searchTermMovimientos"
                   type="button"

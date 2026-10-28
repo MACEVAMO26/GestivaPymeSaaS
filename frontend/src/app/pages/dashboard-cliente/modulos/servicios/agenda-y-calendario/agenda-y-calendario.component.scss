@@ -16,7 +16,7 @@ $text-dark: #1a1a1a;
 $text-muted: #2d3748;
 $btn-add: #45a1ae;
 $btn-volver: #de3737;
-$btn-save: #066810;
+$btn-save: #6B8F71;
 
 /* --- 2. TIPOGRAFIA Y JERARQUIA --- */
 .module-header h1, h1.titulo-principal {
@@ -114,10 +114,85 @@ $btn-save: #066810;
   color: $text-dark;
 }
 
-.color-input {
-  height: 48px;
-  padding: 0.25rem 0.5rem;
+/* --- SELECTOR DE 5 PRIORIDADES POR COLOR --- */
+.prioridades-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.65rem;
+  width: 100%;
+}
+
+.prioridad-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 12px;
+  border: 1.5px solid transparent;
+  background: $bg-color;
+  box-shadow: 3px 3px 6px $shadow-dark, -3px -3px 6px $shadow-light;
   cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Montserrat', sans-serif;
+  outline: none;
+
+  .p-dot {
+    width: 12px;
+    height: 12px;
+    min-width: 12px;
+    min-height: 12px;
+    border-radius: 50%;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.25);
+  }
+
+  .p-info {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    text-align: left;
+  }
+
+  .p-title {
+    font-size: 12.5px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .check-active {
+    font-size: 13px;
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 4px 4px 8px $shadow-dark, -4px -4px 8px $shadow-light;
+  }
+
+  &.selected {
+    box-shadow: inset 2px 2px 5px $shadow-dark, inset -2px -2px 5px $shadow-light;
+    border-color: currentColor;
+    background: $bg-color;
+  }
+}
+
+.badge-prioridad-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  border: 1px solid;
+  white-space: nowrap;
+
+  .color-dot-mini {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
 }
 
 .form-actions {

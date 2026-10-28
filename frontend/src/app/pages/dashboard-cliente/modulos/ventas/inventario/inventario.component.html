@@ -43,10 +43,18 @@
     @if(activeTab === 'catalogo') {
       <div class="neumorphic-panel fade-in">
         <div class="action-bar">
-          <input type="text" 
-                 class="search-input input-neumorphic" 
-                 placeholder="Buscar por código, nombre..."
-                 [(ngModel)]="searchTerm">
+          <div class="search-group">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" 
+                   class="search-input input-neumorphic" 
+                   placeholder="Buscar por código, nombre..."
+                   [(ngModel)]="searchTerm">
+            @if (searchTerm) {
+              <button type="button" class="search-clear-btn" (click)="searchTerm = ''" title="Limpiar búsqueda">
+                <i class="fas fa-times"></i>
+              </button>
+            }
+          </div>
                  
           <button class="btn-add btn-pill" (click)="abrirModal()">
             <i class="fas fa-plus"></i> Nuevo Producto

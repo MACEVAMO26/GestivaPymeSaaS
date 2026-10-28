@@ -45,9 +45,10 @@ class EmpresaController extends Controller
     {
         $empresas = Empresa::with('tarifasCatalogo')->orderBy('created_at', 'asc')->get();
         
-        $mrr = $empresas->where('activo', 1)->sum('monto_mensual');
-        $clientesActivos = $empresas->where('activo', 1)->count();
-        $clientesMora = $empresas->where('activo', 1)->where('estado_pago', 'mora')->count();
+        $activosCollection = $empresas->filter(fn($e) => $e->activo == '1' || $e->activo === true || $e->activo === null);
+        $mrr = $activosCollection->sum('monto_mensual');
+        $clientesActivos = $activosCollection->count();
+        $clientesMora = $activosCollection->where('estado_pago', 'mora')->count();
         
         $crecimientoMensual = 12.5;
 

@@ -708,6 +708,8 @@ export class SaasAdminComponent implements OnInit {
       this.cargarConfiguracionIA();
     } else if (vista === 'contratos') {
       this.cargarContratos();
+    } else if (vista === 'soporte') {
+      this.cargarTicketsSoporte();
     }
   }
 
@@ -1175,12 +1177,10 @@ export class SaasAdminComponent implements OnInit {
 
 
   cargarTicketsSoporte() {
-    const token = sessionStorage.getItem('auth_token');
-    const headers = { Authorization: `Bearer ${token}` };
-    this.http.get<any[]>('/api/saas/soporte', { headers }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.http.get<any[]>('/api/saas/soporte', { headers: this.getHeaders() }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
-        this.ticketsSoporte = data;
-        this.ticketsSoportePendientes = data.filter((t: any) => t.estado === 'Abierto' || t.estado === 'En progreso').length;
+        this.ticketsSoporte = Array.isArray(data) ? data : [];
+        this.ticketsSoportePendientes = this.ticketsSoporte.filter((t: any) => t.estado === 'Abierto' || t.estado === 'En progreso').length;
         this.cdr.detectChanges();
       },
       error: (err) => console.error('Error al cargar tickets de soporte', err)
@@ -1223,8 +1223,6 @@ export class SaasAdminComponent implements OnInit {
     }
     
     this.isRespondiendoTicket = true;
-    const token = sessionStorage.getItem('auth_token');
-    const headers = { Authorization: `Bearer ${token}` };
     
     this.http.put(`/api/saas/soporte/${this.ticketSeleccionado.id}`, 
       { 
@@ -1232,7 +1230,7 @@ export class SaasAdminComponent implements OnInit {
         estado: this.estadoNuevoTicket || 'Resuelto',
         tecnico_id: this.user?.id || 1
       }, 
-      { headers }
+      { headers: this.getHeaders() }
     ).subscribe({
       next: () => {
         this.toastService.success('Ticket actualizado y guardado correctamente.');

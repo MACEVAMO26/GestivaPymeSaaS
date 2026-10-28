@@ -92,7 +92,7 @@ class IaController extends Controller
         }
 
         $directrices = \App\Models\IaSugerenciaPersonalizada::where('empresa_id', $user->empresa_id)
-            ->where('activo', true)
+            ->whereIn('activo', ['1', 'true'])
             ->whereIn('audiencia', array_unique($audiencias))
             ->pluck('mensaje')
             ->toArray();
@@ -216,7 +216,7 @@ class IaController extends Controller
         if ($modulo === 'empleados' || $modulo === 'gestion-humana') {
             $empleados = \App\Models\Empleado::where('empresa_id', $empresaId)->with(['cargo', 'area'])->get();
             $totalEmpleados = $empleados->count();
-            $activos = $empleados->where('activo', true)->count();
+            $activos = $empleados->filter(fn($e) => ($e->estado ?? '') === 'activo' || ($e->activo ?? '') == '1')->count();
             $formalizados = $empleados->where('formalizado', true)->count();
             $totalNomina = $empleados->sum('salario') ?: 0;
 

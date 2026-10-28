@@ -116,7 +116,7 @@ export class ComprasComponent implements OnInit {
 
   // Bloque utilitario para resolver el nombre del proveedor asociado
   nombreProveedor(orden: any): string {
-    return orden.proveedor?.razon_social || orden.proveedor?.nombre || '-';
+    return orden.proveedor?.razon_social || orden.proveedor?.nombre_comercial || orden.proveedor?.nombre || '-';
   }
 
   // Bloque utilitario para determinar el estado de la orden

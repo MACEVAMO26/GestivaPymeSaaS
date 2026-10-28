@@ -15,9 +15,12 @@ class EmpleadoController extends Controller
     // Bloque para listar usuarios pendientes de formalización
     public function pendientes()
     {
-        $empresaId = auth()->user()->empresa_id;
+        $empresaId = request()->header('X-Empresa-Id') ?? (auth()->user()?->empresa_id ?? null);
         $pendientes = User::where('empresa_id', $empresaId)
-                          ->where('perfil_formalizado', false)
+                          ->where(function ($q) {
+                              $q->whereNull('perfil_formalizado')
+                                ->orWhereIn('perfil_formalizado', ['0', 'false', '']);
+                          })
                           ->get();
                           
         return response()->json($pendientes);
@@ -26,10 +29,12 @@ class EmpleadoController extends Controller
     // Bloque para listar empleados formalizados en la empresa
     public function index()
     {
-        $empresaId = auth()->user()->empresa_id;
+        $empresaId = request()->header('X-Empresa-Id') ?? (auth()->user()?->empresa_id ?? null);
         // Bloque de carga de relaciones de usuario, área y cargo
         $empleados = Empleado::with(['usuario', 'area', 'cargo'])
-                             ->where('empresa_id', $empresaId)
+                             ->when($empresaId, function ($q) use ($empresaId) {
+                                 $q->where('empresa_id', $empresaId);
+                             })
                              ->get();
                              
         return response()->json($empleados);
@@ -103,7 +108,7 @@ class EmpleadoController extends Controller
         $cargo = \App\Models\Cargo::findOrFail($request->cargo_id);
 
         // Bloque de actualización de usuario para desbloqueo y formalización
-        $usuario->perfil_formalizado = true;
+        $usuario->perfil_formalizado = '1';
         $usuario->rol_id = $cargo->rol_id;
         $usuario->save();
 

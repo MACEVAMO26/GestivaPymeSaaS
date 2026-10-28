@@ -16,7 +16,7 @@ $text-dark: #1a1a1a;
 $text-muted: #2d3748;
 $btn-add: #45a1ae;
 $btn-volver: #de3737;
-$btn-save: #066810;
+$btn-save: #6B8F71;
 $btn-gen-1: #6B8F71;
 $btn-gen-2: #7C6FA6;
 $btn-gen-3: #C9A227;
@@ -154,10 +154,11 @@ $btn-gen-3: #C9A227;
   }
 }
 
-.btn-volver { background: $btn-volver; }
-.btn-add { background: $btn-add; }
-.btn-save { background: $btn-save; }
-.btn-gen-2 { background: $btn-gen-2; }
+.btn-volver { background: $btn-volver; color: #ffffff; }
+.btn-add { background: $btn-add; color: #ffffff; }
+.btn-save { background: $btn-save; color: #ffffff; }
+.btn-gen-1, .btn-general-1 { background: $btn-save; color: #ffffff; }
+.btn-gen-2, .btn-general-2 { background: $btn-gen-2; color: #ffffff; }
 
 .volver-wrapper {
   margin-bottom: 1.5rem;
@@ -176,62 +177,124 @@ $btn-gen-3: #C9A227;
 }
 
 .btn-circle {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  max-width: 28px;
+  max-height: 28px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: none;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   cursor: pointer;
-  box-shadow: 3px 3px 6px $shadow-dark, -3px -3px 6px $shadow-light;
+  box-shadow: 2px 2px 4px $shadow-dark, -2px -2px 4px $shadow-light;
   transition: all 0.2s ease;
-  color: #ffffff;
+
+  i {
+    font-size: 12px;
+  }
 
   &:hover {
     transform: scale(1.08);
   }
 
-  &.btn-sm-primary { background: $btn-add; }
-  &.btn-sm-success { background: $btn-save; }
-  &.btn-sm-danger { background: $btn-volver; }
+  &.btn-sm-primary { background: #e8f1fc; color: #2b6cb0; border-color: rgba(43, 108, 176, 0.2); }
+  &.btn-sm-success { background: rgba(107, 143, 113, 0.15) ; color: #6B8F71 ; border-color: rgba(107, 143, 113, 0.3) ; }
+  &.btn-sm-danger { background: #fee2e2; color: #dc2626; border-color: rgba(220, 38, 38, 0.2); }
 }
 
-/* --- 6. NAVEGACION DE PESTAÑAS (TABS) --- */
+/* --- 6. NAVEGACION DE PESTAÑAS (TABS) CENTRADAS TIPO PÍLDORA NEUMÓRFICA --- */
 .tabs-nav-wrapper {
   background: $bg-color;
-  border-radius: 12px;
-  padding: 0.35rem;
-  margin-bottom: 1.5rem;
+  border-radius: 9999px;
   box-shadow: inset 4px 4px 8px $shadow-dark, inset -4px -4px 8px $shadow-light;
+  padding: 0.5rem;
+  margin: 0 auto 1.5rem auto;
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
   gap: 0.5rem;
+  width: fit-content;
+  max-width: 100%;
 }
 
-.tab-neu-inactive, .tab-btn {
-  flex: 1;
-  min-width: 140px;
-  padding: 0.65rem 1rem;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
+.tab-neu-inactive {
+  padding: 0.6rem 1.35rem;
+  border-radius: 9999px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 13px;
-  font-weight: bold;
-  color: $text-muted;
+  font-size: 14px;
+  font-weight: 700 !important;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
+  transition: all 0.25s ease;
+  border: none;
+  background-color: $bg-color;
+  color: $text-muted;
+  box-shadow: 4px 4px 8px $shadow-dark, -4px -4px 8px $shadow-light;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  text-decoration: none;
+  white-space: nowrap;
 
-  &.tab-neu-active, &.active {
-    background: $bg-color;
-    color: $btn-add;
-    box-shadow: 4px 4px 8px $shadow-dark, -4px -4px 8px $shadow-light;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 6px 6px 12px $shadow-dark, -6px -6px 12px $shadow-light;
+    color: $text-dark;
   }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: inset 2px 2px 4px $shadow-dark, inset -2px -2px 4px $shadow-light;
+  }
+
+  .icon {
+    font-size: 15px;
+  }
+}
+
+.tab-neu-active {
+  padding: 0.6rem 1.35rem;
+  border-radius: 9999px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border: none;
+  background-color: $bg-color;
+  color: $btn-add !important;
+  box-shadow: inset 4px 4px 8px $shadow-dark, inset -4px -4px 8px $shadow-light !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  white-space: nowrap;
+
+  .icon {
+    font-size: 15px;
+  }
+}
+
+.badge-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(201, 162, 39, 0.2);
+  color: #8f6e06;
+  margin-left: 0.35rem;
 }
 
 /* --- 7. TABLAS Y COMPONENTES DE DATOS --- */
@@ -278,7 +341,7 @@ $btn-gen-3: #C9A227;
   font-weight: bold;
 }
 
-.badge-activo { background: rgba(6, 104, 16, 0.12); color: #066810; }
+.badge-activo { background: rgba(107, 143, 113, 0.15); color: #6B8F71; font-weight: 600; }
 .badge-inactivo { background: rgba(222, 55, 55, 0.12); color: #de3737; }
 .badge-pendiente { background: rgba(201, 162, 39, 0.15); color: #8f6e06; }
 .badge-ausente { background: rgba(124, 111, 166, 0.15); color: #524479; }

@@ -17,7 +17,7 @@ $text-dark: #1a1a1a;
 $text-muted: #2d3748;
 $btn-add: #45a1ae;
 $btn-volver: #de3737;
-$btn-save: #066810;
+$btn-save: #6B8F71;
 $btn-gen-1: #6B8F71;
 $btn-gen-2: #7C6FA6;
 $btn-gen-3: #C9A227;
@@ -104,6 +104,74 @@ $btn-gen-3: #C9A227;
   }
 }
 
+.search-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.search-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 320px;
+  min-width: 240px;
+
+  .search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-size: 14px;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .input-neumorphic {
+    padding-left: 2.75rem !important;
+    padding-right: 2.5rem !important;
+    height: 44px;
+    width: 100%;
+  }
+}
+
+.filter-group-btn {
+  display: inline-flex;
+  align-items: center;
+
+  button {
+    height: 44px;
+    padding: 0 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .search-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.85rem;
+  }
+
+  .search-group,
+  .filter-group-btn {
+    width: 100%;
+    min-width: 100%;
+    flex: none;
+
+    button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
 .search-input-wrapper {
   position: relative;
   width: 100%;
@@ -181,26 +249,55 @@ $btn-gen-3: #C9A227;
   background: $btn-save;
 }
 
+.actions-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+td.col-accion {
+  white-space: nowrap;
+  width: 1%;
+  min-width: 105px;
+  text-align: center;
+}
+
 .btn-circle {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  max-width: 28px;
+  max-height: 28px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: none;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   cursor: pointer;
-  box-shadow: 3px 3px 6px $shadow-dark, -3px -3px 6px $shadow-light;
+  box-shadow: 2px 2px 4px $shadow-dark, -2px -2px 4px $shadow-light;
   transition: all 0.2s ease;
-  color: #ffffff;
+
+  i {
+    font-size: 12px;
+  }
 
   &:hover {
     transform: scale(1.08);
   }
 
-  &.btn-sm-primary { background: $btn-add; }
-  &.btn-sm-success { background: $btn-save; }
-  &.btn-sm-danger { background: $btn-volver; }
+  &.btn-circle-360 {
+    background: #e8f1fc;
+    color: #2b6cb0;
+  }
+
+  &.btn-circle-edit {
+    background: #fef3e7;
+    color: #c05621;
+  }
 }
 
 /* --- 6. TABLAS Y COMPONENTES DE DATOS --- */
@@ -247,7 +344,7 @@ $btn-gen-3: #C9A227;
   font-weight: bold;
 }
 
-.badge-success { background: rgba(6, 104, 16, 0.12); color: #066810; }
+.badge-success { background: rgba(107, 143, 113, 0.12); color: #6B8F71; }
 .badge-warning { background: rgba(201, 162, 39, 0.15); color: #8f6e06; }
 .badge-info { background: rgba(69, 161, 174, 0.15); color: #226b77; }
 .badge-primary { background: rgba(124, 111, 166, 0.15); color: #524479; }

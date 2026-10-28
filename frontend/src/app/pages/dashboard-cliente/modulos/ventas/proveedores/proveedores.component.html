@@ -37,11 +37,19 @@
       @if(activeTab === 'directorio') {
         <div class="neumorphic-panel fade-in">
           <div class="action-bar">
-            <input type="text" 
-                   class="search-input input-neumorphic" 
-                   placeholder="Buscar por Razón Social, NIT, Contacto..."
-                   [(ngModel)]="searchTerm"
-                   (input)="filtrarProveedores()">
+            <div class="search-group">
+              <i class="fas fa-search search-icon"></i>
+              <input type="text" 
+                     class="search-input input-neumorphic" 
+                     placeholder="Buscar por Razón Social, NIT, Contacto..."
+                     [(ngModel)]="searchTerm"
+                     (input)="filtrarProveedores()">
+              @if (searchTerm) {
+                <button type="button" class="search-clear-btn" (click)="searchTerm = ''; filtrarProveedores()" title="Limpiar búsqueda">
+                  <i class="fas fa-times"></i>
+                </button>
+              }
+            </div>
                    
             <button class="btn-add btn-pill" (click)="abrirModal()">
               <i class="fas fa-plus"></i> Nuevo Proveedor
@@ -137,7 +145,7 @@
               <span class="monto-deuda">{{totalDeuda | currency:'COP':'symbol':'1.0-0'}}</span>
             </div>
             <div class="info-deuda">
-              <p class="descripcion-general">Aquí puedes visualizar las facturas pendientes de pago a tus proveedores. Recuerda registrar los pagos a tiempo para mantener un buen historial crediticio y una evaluación excelente.</p>
+              <p class="text-muted mb-1-5rem">Aquí puedes visualizar las facturas pendientes de pago a tus proveedores. Recuerda registrar los pagos a tiempo para mantener un buen historial crediticio y una evaluación excelente.</p>
             </div>
           </div>
 
@@ -223,7 +231,7 @@
                   <th>CALIFICACIÓN</th>
                   <th>DESEMPEÑO</th>
                   <th>OBSERVACIONES / SLAs</th>
-                  <th class="text-center">EVALUAR</th>
+                  <th class="text-center">ACCIÓN</th>
                 </tr>
               </thead>
               <tbody>
@@ -249,9 +257,11 @@
                       </td>
                       <td class="cell-truncate">{{eval.comentarios}}</td>
                       <td class="text-center">
-                        <button class="btn-general-2 btn-pill btn-evaluar" (click)="abrirEvaluar(eval)">
-                          <i class="fas fa-star-half-alt"></i> Calificar
-                        </button>
+                        <div class="acciones-fila acciones-fila-center">
+                          <button class="btn-action-circle btn-circle-eval" (click)="abrirEvaluar(eval)" title="Calificar Proveedor">
+                            <i class="fas fa-star"></i>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   }
@@ -373,7 +383,7 @@
         <div class="panel-body">
           <p class="text-muted text-center mb-1-5rem">Evaluación para: <strong>{{evaluacionSeleccionada.proveedor}}</strong></p>
           
-          <div class="form-group" class="text-center">
+          <div class="form-group text-center">
             <label>Calificación (1 a 5 Estrellas)</label>
             <input type="number" class="input-neumorphic monto-input" [(ngModel)]="nuevaCalificacion" min="1" max="5">
           </div>

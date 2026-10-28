@@ -16,7 +16,7 @@ $text-dark: #1a1a1a;
 $text-muted: #2d3748;
 $btn-add: #45a1ae;
 $btn-volver: #de3737;
-$btn-save: #066810;
+$btn-save: #6B8F71;
 
 /* --- 2. TIPOGRAFIA Y JERARQUIA --- */
 .module-header h1, h1.titulo-principal {
@@ -212,7 +212,7 @@ $btn-save: #066810;
   font-weight: bold;
 }
 
-.badge-success { background: rgba(6, 104, 16, 0.12); color: #066810; }
+.badge-success { background: rgba(107, 143, 113, 0.12); color: #6B8F71; }
 .badge-warning { background: rgba(201, 162, 39, 0.15); color: #8f6e06; }
 .badge-info { background: rgba(69, 161, 174, 0.15); color: #226b77; }
 .badge-primary { background: rgba(124, 111, 166, 0.15); color: #524479; }
@@ -291,4 +291,57 @@ $btn-save: #066810;
 @keyframes spin {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
+}
+
+/* --- 8. BUSCADOR Y FILTROS --- */
+.search-bar-centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 550px;
+  margin: 0 auto 1.5rem auto;
+}
+
+.search-rel-box {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon-input {
+  position: absolute;
+  left: 1.1rem;
+  color: $text-muted;
+  pointer-events: none;
+  font-size: 14px;
+}
+
+.search-input-padded {
+  padding-left: 2.75rem !important;
+  padding-right: 2.5rem !important;
+  width: 100%;
+}
+
+.search-clear-input-btn {
+  position: absolute;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  font-size: 14px;
+
+  &:hover {
+    color: $btn-volver;
+  }
+}
+
+.text-azul {
+  color: $btn-add !important;
+}
+
+.font-semibold {
+  font-weight: 600;
 }

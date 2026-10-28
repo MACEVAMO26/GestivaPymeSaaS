@@ -13,7 +13,7 @@ $text-dark: #1a1a1a;
 $text-muted: #2d3748;
 $btn-add: #45a1ae;
 $btn-volver: #de3737;
-$btn-save: #066810;
+$btn-save: #6B8F71;
 $btn-gen-1: #6B8F71;
 $btn-gen-2: #7C6FA6;
 $btn-gen-3: #C9A227;
@@ -379,7 +379,7 @@ $btn-gen-6: #A38B6D;
   width: 40px;
   height: 40px;
   border: 4px solid #e0e0c8;
-  border-top: 4px solid #066810;
+  border-top: 4px solid #6B8F71;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -464,9 +464,9 @@ $btn-gen-6: #A38B6D;
   }
   
   &.toast-success {
-    .toast-icon { background: rgba(6, 104, 16, 0.1); color: #066810; }
-    h4 { color: #066810; }
-    border-left: 3px solid #066810;
+    .toast-icon { background: rgba(107, 143, 113, 0.1); color: #6B8F71; }
+    h4 { color: #6B8F71; }
+    border-left: 3px solid #6B8F71;
   }
   
   &.toast-error {

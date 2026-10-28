@@ -14,15 +14,16 @@ use App\Models\Producto;
 class TicketServicioController extends Controller
 {
     // Bloque para listar los tickets de servicio con sus materiales y técnicos asignados
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
-        if (!$user) {
+        $empresaId = $request->header('X-Empresa-Id') ?? ($user?->empresa_id ?? null);
+        if (!$empresaId) {
             return response()->json(['error' => 'No autorizado'], 401);
         }
 
         $tickets = TicketServicio::with(['materiales.producto', 'tecnico.usuario', 'tecnico.cargo'])
-            ->where('empresa_id', $user->empresa_id)
+            ->where('empresa_id', $empresaId)
             ->orderBy('id', 'desc')
             ->get();
 
@@ -33,7 +34,8 @@ class TicketServicioController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        if (!$user) {
+        $empresaId = $request->header('X-Empresa-Id') ?? ($user?->empresa_id ?? null);
+        if (!$empresaId) {
             return response()->json(['error' => 'No autorizado'], 401);
         }
 
@@ -54,7 +56,7 @@ class TicketServicioController extends Controller
             'costo_total' => 'nullable|numeric|min:0'
         ]);
 
-        $countToday = TicketServicio::where('empresa_id', $user->empresa_id)
+        $countToday = TicketServicio::where('empresa_id', $empresaId)
             ->whereDate('created_at', now()->toDateString())
             ->count() + 1;
 
@@ -62,7 +64,7 @@ class TicketServicioController extends Controller
 
         // Bloque de guardado en BD
         $ticket = TicketServicio::create([
-            'empresa_id' => $user->empresa_id,
+            'empresa_id' => $empresaId,
             'consecutivo' => $consecutivo,
             'cliente_nombre' => $validated['cliente_nombre'],
             'servicio_requerido' => $validated['servicio_requerido'],

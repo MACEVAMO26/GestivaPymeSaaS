@@ -11,6 +11,8 @@ export interface Caja {
   total_ingresos?: number;
   total_egresos?: number;
   saldo_final?: number;
+  diferencia?: number;
+  movimientos_count?: number;
   estado: 'abierta' | 'cerrada';
   observaciones?: string;
 }

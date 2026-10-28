@@ -45,7 +45,10 @@ class SaasContratoController extends Controller
         ]);
 
         // Bloque para notificar a los gerentes de empresas activas sobre la nueva versión
-        $empresas = Empresa::where('activo', 1)->get();
+        $empresas = Empresa::where(function ($q) {
+            $q->whereNull('activo')
+              ->orWhereIn('activo', ['1', 'true', 'activo']);
+        })->get();
         $notificacionesCreadas = 0;
 
         foreach ($empresas as $empresa) {

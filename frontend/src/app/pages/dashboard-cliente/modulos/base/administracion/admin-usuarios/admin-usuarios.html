@@ -21,14 +21,8 @@
   <!-- HTML BARRA DE BUSQUEDA EN TIEMPO REAL -->
   <div class="search-filter-bar mb-4" *ngIf="!isLoading && usuarios.length > 0" class="search-bar-usuarios">
     <div class="search-input-wrapper">
-      <i class="fas fa-search" class="search-icon"></i>
-      <input
-        type="text"
-        class="input-neumorphic"
-        class="input-neumorphic search-input-pad"
-        placeholder="Buscar usuario por nombre, documento, email o rol..."
-        [(ngModel)]="searchTerm"
-      />
+      <i class="fas fa-search search-icon"></i>
+      <input class="input-neumorphic search-input-pad" type="text" placeholder="Buscar usuario por nombre, documento, email o rol..." [(ngModel)]="searchTerm" />
       <button
         *ngIf="searchTerm"
         type="button"
@@ -62,20 +56,18 @@
     <!-- HTML BUSQUEDA SIN RESULTADOS -->
     <div *ngIf="!isLoading && !errorMessage && usuarios.length > 0 && usuariosFiltrados.length === 0" class="empty-state text-center py-6">
       <p class="search-no-results-text">No se encontraron usuarios con "{{ searchTerm }}"</p>
-      <button class="btn-pill" (click)="limpiarBusqueda()" class="btn-pill btn-clear-search">
+      <button class="btn-pill btn-clear-search" (click)="limpiarBusqueda()">
         Limpiar búsqueda
       </button>
     </div>
 
     <!-- HTML BLOQUES POR ROL -->
     @for (rol of rolesPresentes; track rol) {
-      <h3 class="panel-title text-left mt-4 mb-2"
-          class="panel-title text-left mt-4 mb-2 rol-heading">
+      <h3 class="panel-title text-left mt-4 mb-2 rol-heading">
         {{ rol }}
       </h3>
 
-      <div class="table-container mb-4"
-           class="table-container mb-4 table-transparent-wrap">
+      <div class="table-container mb-4 table-transparent-wrap">
         <table class="data-table">
           <thead>
             <tr>

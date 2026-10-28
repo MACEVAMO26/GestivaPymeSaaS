@@ -75,6 +75,12 @@ export class DashboardClienteComponent implements OnInit {
   // Bloque del ciclo de vida ngOnInit para inicializar usuario, sidebar y validación de sesión
   ngOnInit(): void {
     this.user = this.authService.getUser();
+    try {
+      const storedCollapsed = localStorage.getItem('gestiva_sidebar_collapsed');
+      if (storedCollapsed !== null) {
+        this.isSidebarCollapsed = storedCollapsed === 'true';
+      }
+    } catch (e) {}
     this.construirSidebar();
 
     // Bloque de verificación periódica para validar la vigencia de la sesión remota
@@ -106,6 +112,39 @@ export class DashboardClienteComponent implements OnInit {
       };
     });
 
+    // Cargar módulos activos en caché de sesión (authService) de manera síncrona inmediata
+    const modulosActivosCache = this.authService.getModulosActivos();
+    if (modulosActivosCache && typeof modulosActivosCache === 'object') {
+      Object.keys(modulosActivosCache).forEach((modId) => {
+        if (modulosActivosCache[modId]) {
+          if (RUTA_MODULO[modId]) {
+            const nombre = modId === 'v_pos' ? 'Ventas' :
+                           modId === 'v_inv' ? 'Inventario' :
+                           modId === 'v_cxc' ? 'Clientes' :
+                           modId === 'v_rep' ? 'Compras' :
+                           modId === 'v_prov' ? 'Proveedores' :
+                           modId === 's_age' ? 'Agenda' :
+                           modId === 's_cat' ? 'Servicios' :
+                           modId === 's_crm' ? 'Clientes' : modId;
+            botones[modId] = {
+              id: modId,
+              nombre,
+              icono: ICONO_MODULO[modId] || 'fas fa-circle',
+              ruta: RUTA_MODULO[modId]
+            };
+          } else if (['rrhh', 'finanzas', 'addons'].includes(modId)) {
+            const nombre = modId === 'rrhh' ? 'Gestión Humana' : (modId === 'finanzas' ? 'Finanzas' : 'Addons+');
+            botones[modId] = {
+              id: modId,
+              nombre,
+              icono: ICONO_MODULO[modId] || 'fas fa-circle',
+              ruta: this.slugify(nombre)
+            };
+          }
+        }
+      });
+    }
+
     // Bloque de cálculo de plan según tipo de empresa del usuario
     if (this.user?.rol?.nombre === 'Auditor') {
       this.planActual = 'AUDITORIA';
@@ -114,11 +153,37 @@ export class DashboardClienteComponent implements OnInit {
       this.planActual = this.calcularPlan(tipoEmpresaUsuario);
     }
 
+    // Si el plan es Mixto, asegurar que finanzas y módulos comerciales estén disponibles por defecto
+    if (this.planActual === 'Mixto' || this.planActual === 'Ventas') {
+      if (!botones['finanzas']) {
+        botones['finanzas'] = { id: 'finanzas', nombre: 'Finanzas', icono: ICONO_MODULO['finanzas'] || 'fas fa-wallet', ruta: 'finanzas' };
+      }
+      if (!botones['v_pos']) {
+        botones['v_pos'] = { id: 'v_pos', nombre: 'Ventas', icono: ICONO_MODULO['v_pos'] || 'fas fa-store', ruta: 'ventas' };
+      }
+      if (!botones['v_inv']) {
+        botones['v_inv'] = { id: 'v_inv', nombre: 'Inventario', icono: ICONO_MODULO['v_inv'] || 'fas fa-boxes', ruta: 'inventario' };
+      }
+      if (!botones['v_cxc']) {
+        botones['v_cxc'] = { id: 'v_cxc', nombre: 'Clientes', icono: ICONO_MODULO['v_cxc'] || 'fas fa-address-book', ruta: 'clientes' };
+      }
+      if (!botones['v_rep']) {
+        botones['v_rep'] = { id: 'v_rep', nombre: 'Compras', icono: ICONO_MODULO['v_rep'] || 'fas fa-shopping-basket', ruta: 'compras' };
+      }
+      if (!botones['v_prov']) {
+        botones['v_prov'] = { id: 'v_prov', nombre: 'Proveedores', icono: ICONO_MODULO['v_prov'] || 'fas fa-truck', ruta: 'proveedores' };
+      }
+    }
+
+    // APLICAR ORDENAMIENTO INMEDIATO SÍNCRONO: Garantiza que la barra lateral NUNCA esté vacía
+    this.aplicarOrdenamiento(botones);
+
     // Bloque de consulta de módulos contratados por la empresa autenticada
-    if (this.user?.empresa_id) {
+    const empresaId = this.user?.empresa_id || this.user?.empresa?.id;
+    if (empresaId) {
       this.modulosService.getMisModulos().subscribe({
         next: (resp) => {
-          const modulosEmpresa = resp.modulos || {};
+          const modulosEmpresa = resp?.modulos || {};
 
           // Bloque de reconstrucción de ítems de navegación según respuesta de la base de datos
           const botonesReales: { [key: string]: ModuloSidebar } = {};
@@ -131,49 +196,55 @@ export class DashboardClienteComponent implements OnInit {
             };
           });
 
-          Object.keys(modulosEmpresa).forEach((paqueteId) => {
-            const subs = modulosEmpresa[paqueteId] || [];
+          // Asegurar módulo de finanzas siempre presente en empresas activas
+          botonesReales['finanzas'] = {
+            id: 'finanzas',
+            nombre: 'Finanzas',
+            icono: ICONO_MODULO['finanzas'] || 'fas fa-wallet',
+            ruta: 'finanzas'
+          };
 
-            if (paqueteId === 'ventas' || paqueteId === 'servicios') {
-              // Bloque de procesamiento de submódulos comerciales activos
-              subs.forEach((sub: any) => {
-                if (sub.activo) {
-                  botonesReales[sub.id] = {
-                    id: sub.id,
-                    nombre: sub.nombre,
-                    icono: ICONO_MODULO[sub.id] || 'fas fa-circle',
-                    ruta: RUTA_MODULO[sub.id] || this.slugify(sub.nombre)
+          if (typeof modulosEmpresa === 'object') {
+            Object.keys(modulosEmpresa).forEach((paqueteId) => {
+              const subs = modulosEmpresa[paqueteId] || [];
+
+              if (paqueteId === 'ventas' || paqueteId === 'servicios') {
+                // Bloque de procesamiento de submódulos comerciales activos
+                subs.forEach((sub: any) => {
+                  if (sub.activo) {
+                    botonesReales[sub.id] = {
+                      id: sub.id,
+                      nombre: sub.nombre,
+                      icono: ICONO_MODULO[sub.id] || 'fas fa-circle',
+                      ruta: RUTA_MODULO[sub.id] || this.slugify(sub.nombre)
+                    };
+                  }
+                });
+              } else if (['rrhh', 'finanzas', 'addons', 'base'].includes(paqueteId)) {
+                // Bloque de verificación de módulos con submódulos activos
+                const isActivo = subs.some((s: any) => s.activo);
+                if (isActivo || paqueteId === 'finanzas') {
+                  let id = paqueteId;
+                  let nombre = paqueteId === 'rrhh' ? 'Gestión Humana' : (paqueteId === 'finanzas' ? 'Finanzas' : (paqueteId === 'addons' ? 'Addons+' : ''));
+                  let ruta = this.slugify(nombre);
+                  if (paqueteId === 'base') {
+                    return;
+                  }
+                  botonesReales[id] = {
+                    id,
+                    nombre,
+                    icono: ICONO_MODULO[id] || 'fas fa-circle',
+                    ruta
                   };
                 }
-              });
-            } else if (['rrhh', 'finanzas', 'addons', 'base'].includes(paqueteId)) {
-              // Bloque de verificación de módulos con submódulos activos
-              const isActivo = subs.some((s: any) => s.activo);
-              if (isActivo) {
-                let id = paqueteId;
-                let nombre = paqueteId === 'rrhh' ? 'Gestión Humana' : (paqueteId === 'finanzas' ? 'Finanzas' : (paqueteId === 'addons' ? 'Addons+' : ''));
-                let ruta = this.slugify(nombre);
-                if (paqueteId === 'base') {
-                  // Bloque para omitir generación de botón para el paquete base genérico
-                  return;
-                }
-                botonesReales[id] = {
-                  id,
-                  nombre,
-                  icono: ICONO_MODULO[id] || 'fas fa-circle',
-                  ruta
-                };
               }
-            }
-          });
+            });
+          }
 
           this.aplicarOrdenamiento(botonesReales);
         },
         error: () => this.aplicarOrdenamiento(botones) // Si falla, mantener los módulos base
       });
-    } else {
-      // Bloque de contingencia para mantener módulos base si no hay empresa asignada
-      this.aplicarOrdenamiento(botones);
     }
   }
 
@@ -245,14 +316,20 @@ export class DashboardClienteComponent implements OnInit {
     ];
 
     let itemsOrdenados: ModuloSidebar[] = [];
-    const rolNombre = (this.user?.rol?.nombre || '').toLowerCase();
-    const cargoNombre = (this.user?.cargo?.nombre || this.user?.puesto || '').toLowerCase();
-    const areaNombre = (this.user?.empleado?.area?.nombre || '').toLowerCase();
+    const cargoEmpresa = (this.user?.empleado?.cargo?.nombre || this.user?.cargo?.nombre || this.user?.puesto || '').toLowerCase();
+    const rolUser = (this.user?.rol?.nombre || '').toLowerCase();
+    const areaUser = (this.user?.empleado?.area?.nombre || '').toLowerCase();
+    const areaNombre = areaUser;
     const parsedMods = this.getParsedModsPermitidos();
 
-    const esGerente = rolNombre.includes('gerente') || rolNombre.includes('auditor');
-    const esJefeRRHH = rolNombre === 'jefe de área' || rolNombre.includes('jefe') || cargoNombre.includes('recursos humanos') || cargoNombre.includes('gestión humana') || cargoNombre.includes('rrhh');
-    const esFormalizado = esGerente || esJefeRRHH || this.user?.estado_formalizacion === 'Formalizado' || !!this.user?.empleado || (this.user?.cargo_id && this.user?.cargo_id > 0);
+    // Detección completa de perfil Gerencial / Directivo / Auditor / Admin
+    const esGerente = rolUser.includes('gerente') || rolUser.includes('auditor') || rolUser.includes('admin') ||
+                      cargoEmpresa.includes('gerente') || cargoEmpresa.includes('administrador') || cargoEmpresa.includes('director') ||
+                      areaUser.includes('gerencia') || areaUser.includes('dirección') || areaUser.includes('direccion');
+
+    const esJefeRRHH = rolUser === 'jefe de área' || rolUser.includes('jefe') || cargoEmpresa.includes('recursos humanos') || cargoEmpresa.includes('gestión humana') || cargoEmpresa.includes('rrhh') || areaUser.includes('humana') || areaUser.includes('rrhh');
+
+    const esFormalizado = esGerente || esJefeRRHH || this.user?.estado_formalizacion === 'Formalizado' || !!this.user?.empleado || (this.user?.cargo_id && this.user?.cargo_id > 0) || !!this.user?.empresa_id;
 
     ordenDeseado.forEach(id => {
       // Bloque de validación de acceso público a inicio y autogestión
@@ -330,6 +407,15 @@ export class DashboardClienteComponent implements OnInit {
       }
     });
 
+    // Red de seguridad: si tras el filtrado quedan menos de 3 módulos y no hay restricciones explícitas, mostrar módulos base autorizados
+    if (itemsOrdenados.length <= 2 && (!parsedMods || Object.keys(parsedMods).length === 0)) {
+      ordenDeseado.forEach(id => {
+        if (botones[id] && !itemsOrdenados.some(it => it.id === id)) {
+          itemsOrdenados.push(botones[id]);
+        }
+      });
+    }
+
     this.modulosSidebar = itemsOrdenados;
     this.cdr.detectChanges();
   }
@@ -359,6 +445,9 @@ export class DashboardClienteComponent implements OnInit {
   // Bloque para alternar el estado colapsado o expandido de la barra lateral
   toggleSidebar() {
     this.isSidebarCollapsed = !this.isSidebarCollapsed;
+    try {
+      localStorage.setItem('gestiva_sidebar_collapsed', String(this.isSidebarCollapsed));
+    } catch (e) {}
   }
 
   // Bloque para alternar el indicador de notificaciones del sistema

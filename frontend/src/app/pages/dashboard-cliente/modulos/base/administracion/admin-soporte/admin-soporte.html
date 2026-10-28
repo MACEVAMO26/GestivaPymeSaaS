@@ -35,8 +35,8 @@
         @if (requireFile) {
           <div class="form-group full-width fade-in mt-3">
             <label class="form-label">Adjuntar Archivo Requerido <span class="text-danger">*</span></label>
-            <input type="file" id="archivoRequerido" class="input-neumorphic" (change)="onFileSelected($event)" [accept]="fileAcceptType" class="input-file-pad">
-            <small class="text-muted" class="file-hint">Por favor adjunta el archivo correspondiente para esta solicitud.</small>
+            <input class="input-neumorphic input-file-pad" type="file" id="archivoRequerido" (change)="onFileSelected($event)" [accept]="fileAcceptType">
+            <small class="text-muted file-hint">Por favor adjunta el archivo correspondiente para esta solicitud.</small>
           </div>
         }
       </div>

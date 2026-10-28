@@ -32,7 +32,9 @@
         
         <!-- HTML FORMULARIO CREACION -->
         <div class="fsm-form-col">
-          <h3 class="panel-titulo">Nuevo Ticket de Servicio</h3>
+          <h3 class="panel-titulo">
+            <i class="fas fa-file-signature text-azul"></i> Nuevo Ticket de Servicio
+          </h3>
           
           <div class="form-modalidad-selector mb-3">
             <label class="label-xs mb-1 d-block">Modalidad del Servicio:</label>
@@ -48,7 +50,12 @@
 
           <div class="form-group">
             <label>Cliente (Razón Social o Nombre)</label>
-            <input type="text" class="input-neumorphic" [(ngModel)]="formTicket.cliente" placeholder="Ej: Clínica San José o Juan Pérez">
+            <input type="text" list="lista-clientes-servicios" class="input-neumorphic" [(ngModel)]="formTicket.cliente" (change)="onClienteSeleccionado()" placeholder="Ej: Clínica San José o Juan Pérez">
+            <datalist id="lista-clientes-servicios">
+              @for(cli of clientes; track cli.id) {
+                <option [value]="cli.nombre_razon_social || ((cli.nombres || '') + ' ' + (cli.apellidos || '')).trim()"></option>
+              }
+            </datalist>
           </div>
 
           <div class="form-group">
@@ -57,6 +64,16 @@
               <option value="">Seleccione un servicio del catálogo...</option>
               @for(cat of catalogo; track cat.id) {
                 <option [value]="cat.nombre">{{cat.nombre}} - {{cat.tarifa | currency:'COP':'symbol':'1.0-0'}}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Técnico Responsable Asignado</label>
+            <select class="input-neumorphic" [(ngModel)]="formTicket.tecnico_id">
+              <option [ngValue]="null">-- Sin asignar (Despachar posteriormente) --</option>
+              @for(tec of tecnicos; track tec.id) {
+                <option [ngValue]="tec.id">👷 {{tec.nombre}} ({{tec.cargo}})</option>
               }
             </select>
           </div>
@@ -119,11 +136,34 @@
             
             <!-- HTML FILTROS DE ESTADO -->
             <div class="filtros-estado-pills">
-              <button class="btn-filtro" [class.btn-filtro-active]="filtroEstado === 'TODOS'" (click)="filtroEstado = 'TODOS'">Todos</button>
-              <button class="btn-filtro" [class.btn-filtro-active]="filtroEstado === 'Pendiente'" (click)="filtroEstado = 'Pendiente'">Pendiente</button>
-              <button class="btn-filtro" [class.btn-filtro-active]="filtroEstado === 'Recibido'" (click)="filtroEstado = 'Recibido'">Recibido</button>
-              <button class="btn-filtro" [class.btn-filtro-active]="filtroEstado === 'En Camino'" (click)="filtroEstado = 'En Camino'">En Camino</button>
-              <button class="btn-filtro" [class.btn-filtro-active]="filtroEstado === 'Finalizado'" (click)="filtroEstado = 'Finalizado'">Finalizado</button>
+              <button class="btn-filtro" [class.btn-filtro-active]="filtroEstado === 'TODOS'" (click)="setFiltroEstado('TODOS')">Todos</button>
+              <button class="btn-filtro" [class.btn-filtro-active]="filtroEstado === 'Pendiente'" (click)="setFiltroEstado('Pendiente')">Pendiente</button>
+              <button class="btn-filtro" [class.btn-filtro-active]="filtroEstado === 'Recibido'" (click)="setFiltroEstado('Recibido')">Recibido</button>
+              <button class="btn-filtro" [class.btn-filtro-active]="filtroEstado === 'En Camino'" (click)="setFiltroEstado('En Camino')">En Camino</button>
+              <button class="btn-filtro" [class.btn-filtro-active]="filtroEstado === 'Finalizado'" (click)="setFiltroEstado('Finalizado')">Finalizado</button>
+            </div>
+          </div>
+
+          <!-- HTML BARRA DE BUSQUEDA TICKETS HISTORIAL -->
+          <div class="search-filter-bar mb-3">
+            <div class="search-rel-box">
+              <i class="fas fa-search search-icon-input"></i>
+              <input
+                type="text"
+                class="input-neumorphic search-input-padded"
+                placeholder="Buscar por ticket, cliente, servicio, técnico, serial o falla..."
+                [(ngModel)]="searchTermTickets"
+                (ngModelChange)="onSearchTermTicketsChange()"
+              />
+              <button
+                *ngIf="searchTermTickets"
+                type="button"
+                (click)="limpiarBusquedaTickets()"
+                class="search-clear-input-btn"
+                title="Limpiar búsqueda"
+              >
+                <i class="fas fa-times"></i>
+              </button>
             </div>
           </div>
 
@@ -201,7 +241,19 @@
                   </tr>
                 }
                 @if(getTicketsFiltrados().length === 0) {
-                  <tr><td colspan="7" class="tabla-vacia">No hay tickets registrados en este filtro.</td></tr>
+                  <tr>
+                    <td colspan="7" class="tabla-vacia">
+                      @if(searchTermTickets) {
+                        No se encontraron tickets con "{{ searchTermTickets }}".
+                        <br>
+                        <button class="btn-pill mt-2 btn-reset-search" (click)="limpiarBusquedaTickets()">
+                          Limpiar búsqueda
+                        </button>
+                      } @else {
+                        No hay tickets registrados en este filtro.
+                      }
+                    </td>
+                  </tr>
                 }
               </tbody>
             </table>
@@ -228,9 +280,32 @@
     <!-- HTML AGENDA DESPACHO -->
     @if(activeTab === 'agenda') {
       <div class="neumorphic-panel fade-in">
-        <p class="descripcion-general mb-6">
+        <p class="descripcion-general mb-4">
           Despacha a tus técnicos en campo o asigna servicios de taller. Monitorea su estado operativo en tiempo real.
         </p>
+
+        <!-- HTML BARRA DE BUSQUEDA AGENDA -->
+        <div class="search-filter-bar search-bar-centered mb-4">
+          <div class="search-rel-box">
+            <i class="fas fa-search search-icon-input"></i>
+            <input
+              type="text"
+              class="input-neumorphic search-input-padded"
+              placeholder="Buscar en agenda por ticket, cliente, técnico o dirección..."
+              [(ngModel)]="searchTermAgenda"
+              (ngModelChange)="onSearchTermAgendaChange()"
+            />
+            <button
+              *ngIf="searchTermAgenda"
+              type="button"
+              (click)="limpiarBusquedaAgenda()"
+              class="search-clear-input-btn"
+              title="Limpiar búsqueda"
+            >
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
         
         <div class="table-responsive">
           <table class="premium-table data-table">
@@ -288,7 +363,17 @@
               }
               @if(agendaTickets.length === 0) {
                 <tr>
-                  <td colspan="6" class="tabla-vacia">No hay tickets activos para despacho en este momento.</td>
+                  <td colspan="6" class="tabla-vacia">
+                    @if(searchTermAgenda) {
+                      No se encontraron servicios en agenda con "{{ searchTermAgenda }}".
+                      <br>
+                      <button class="btn-pill mt-2 btn-reset-search" (click)="limpiarBusquedaAgenda()">
+                        Limpiar búsqueda
+                      </button>
+                    } @else {
+                      No hay tickets activos para despacho en este momento.
+                    }
+                  </td>
                 </tr>
               }
             </tbody>
@@ -321,57 +406,94 @@
             Gestiona los repuestos, herramientas y materiales que el técnico lleva al servicio. Al finalizar, el sistema descuenta automáticamente el stock de la empresa y registra el movimiento de inventario.
           </p>
         </div>
+
+        <!-- HTML BARRA DE BUSQUEDA EJECUCION -->
+        <div class="search-filter-bar search-bar-centered mb-4">
+          <div class="search-rel-box">
+            <i class="fas fa-search search-icon-input"></i>
+            <input
+              type="text"
+              class="input-neumorphic search-input-padded"
+              placeholder="Buscar por ticket, cliente, técnico, falla o equipo..."
+              [(ngModel)]="searchTermEjecucion"
+            />
+            <button
+              *ngIf="searchTermEjecucion"
+              type="button"
+              (click)="limpiarBusquedaEjecucion()"
+              class="search-clear-input-btn"
+              title="Limpiar búsqueda"
+            >
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
         
-        <div class="ejecucion-grid">
-          @for(tk of tickets; track tk.id) {
-            @if(tk.estado === 'Asignado' || tk.estado === 'En Camino' || tk.estado === 'En Sitio' || tk.estado === 'Recibido') {
-              <div class="neumorphic-panel ticket-card">
-                <div class="ticket-head-row">
-                  <h3 class="ticket-consecutivo-title">{{tk.consecutivo}}</h3>
-                  <span class="badge" [ngClass]="getBadgeEstado(tk.estado)">
-                    <i [class]="getIconoEstado(tk.estado)"></i> {{tk.estado}}
-                  </span>
-                </div>
-                
-                <p class="ticket-dato"><strong>Cliente:</strong> {{tk.cliente_nombre}}</p>
-                <p class="ticket-dato"><strong>Servicio:</strong> {{tk.servicio_requerido}}</p>
-                <p class="ticket-dato"><strong>Técnico:</strong> {{nombreTecnico(tk.tecnico_id)}}</p>
-                <p class="ticket-dato"><strong>Lugar:</strong> {{tk.direccion}}</p>
-
-                @if(tk.equipo_recibido) {
-                  <div class="card-equipo-mini p-2 mt-2 mb-2 bg-gray-50 border-rounded text-xs">
-                    <div><strong>Equipo:</strong> {{tk.equipo_recibido}}</div>
-                    <div><strong>S/N:</strong> {{tk.serie_equipo || 'N/A'}}</div>
-                    <div><strong>Falla:</strong> {{tk.falla_reportada || 'N/A'}}</div>
-                  </div>
-                }
-
-                <!-- HTML MINI INVENTARIO ASIGNADO -->
-                <div class="mini-inventario-preview p-2 mt-2 mb-3 border-rounded bg-white">
-                  <span class="label-xs text-azul font-bold d-block mb-1">
-                    <i class="fas fa-toolbox"></i> Repuestos / Materiales Asignados ({{tk.materiales?.length || 0}}):
-                  </span>
-                  @if(tk.materiales && tk.materiales.length > 0) {
-                    <ul class="lista-materiales-xs">
-                      @for(mat of tk.materiales; track mat.id) {
-                        <li>
-                          <strong>{{mat.cantidad}}x</strong> {{mat.producto?.nombre || nombreProducto(mat.producto_id)}}
-                          <span class="text-muted">({{mat.estado_material || 'Llevado'}})</span>
-                        </li>
-                      }
-                    </ul>
-                  } @else {
-                    <span class="text-muted text-xs">Sin materiales cargados aún</span>
-                  }
-                </div>
-                
-                <button class="btn-general-5 btn-pill btn-block" (click)="abrirEjecucion(tk)">
-                  <i class="fas fa-tools"></i> Gestionar Materiales y Cerrar
-                </button>
+        <div class="ejecucion-grid" *ngIf="ticketsEjecucion.length > 0">
+          @for(tk of ticketsEjecucion; track tk.id) {
+            <div class="neumorphic-panel ticket-card">
+              <div class="ticket-head-row">
+                <h3 class="ticket-consecutivo-title">{{tk.consecutivo}}</h3>
+                <span class="badge" [ngClass]="getBadgeEstado(tk.estado)">
+                  <i [class]="getIconoEstado(tk.estado)"></i> {{tk.estado}}
+                </span>
               </div>
-            }
+              
+              <p class="ticket-dato"><strong>Cliente:</strong> {{tk.cliente_nombre}}</p>
+              <p class="ticket-dato"><strong>Servicio:</strong> {{tk.servicio_requerido}}</p>
+              <p class="ticket-dato"><strong>Técnico:</strong> {{nombreTecnico(tk.tecnico_id)}}</p>
+              <p class="ticket-dato"><strong>Lugar:</strong> {{tk.direccion}}</p>
+
+              @if(tk.equipo_recibido) {
+                <div class="card-equipo-mini p-2 mt-2 mb-2 bg-gray-50 border-rounded text-xs">
+                  <div><strong>Equipo:</strong> {{tk.equipo_recibido}}</div>
+                  <div><strong>S/N:</strong> {{tk.serie_equipo || 'N/A'}}</div>
+                  <div><strong>Falla:</strong> {{tk.falla_reportada || 'N/A'}}</div>
+                </div>
+              }
+
+              <!-- HTML MINI INVENTARIO ASIGNADO -->
+              <div class="mini-inventario-preview p-2 mt-2 mb-3 border-rounded bg-white">
+                <span class="label-xs text-azul font-bold d-block mb-1">
+                  <i class="fas fa-toolbox"></i> Repuestos / Materiales Asignados ({{tk.materiales?.length || 0}}):
+                </span>
+                @if(tk.materiales && tk.materiales.length > 0) {
+                  <ul class="lista-materiales-xs">
+                    @for(mat of tk.materiales; track mat.id) {
+                      <li>
+                        <strong>{{mat.cantidad}}x</strong> {{mat.producto?.nombre || nombreProducto(mat.producto_id)}}
+                        <span class="text-muted">({{mat.estado_material || 'Llevado'}})</span>
+                      </li>
+                    }
+                  </ul>
+                } @else {
+                  <span class="text-muted text-xs">Sin materiales cargados aún</span>
+                }
+              </div>
+              
+              <button class="btn-general-5 btn-pill btn-block" (click)="abrirEjecucion(tk)">
+                <i class="fas fa-tools"></i> Gestionar Materiales y Cerrar
+              </button>
+            </div>
           }
         </div>
+
+        @if(ticketsEjecucion.length === 0) {
+          <div class="empty-state p-4 text-center">
+            <i class="fas fa-tools fa-2x text-muted mb-2"></i>
+            <p class="text-muted">
+              @if(searchTermEjecucion) {
+                No hay servicios en ejecución que coincidan con "{{ searchTermEjecucion }}".
+                <br>
+                <button class="btn-pill mt-2 btn-reset-search" (click)="limpiarBusquedaEjecucion()">
+                  Limpiar búsqueda
+                </button>
+              } @else {
+                No hay servicios en ejecución actualmente.
+              }
+            </p>
+          </div>
+        }
       </div>
     }
 
@@ -382,8 +504,29 @@
         <!-- HTML LISTA TECNICOS -->
         <div class="rendimiento-tecnicos neumorphic-panel-inner">
           <h3 class="panel-titulo">Plantilla Técnica</h3>
+
+          <!-- HTML BUSCADOR TECNICOS -->
+          <div class="search-rel-box mb-3">
+            <i class="fas fa-search search-icon-input"></i>
+            <input
+              type="text"
+              class="input-neumorphic search-input-padded"
+              placeholder="Buscar técnico..."
+              [(ngModel)]="searchTermTecnicos"
+            />
+            <button
+              *ngIf="searchTermTecnicos"
+              type="button"
+              (click)="limpiarBusquedaTecnicos()"
+              class="search-clear-input-btn"
+              title="Limpiar búsqueda"
+            >
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+
           <div class="tecnicos-list-col">
-            @for(tec of tecnicos; track tec.id) {
+            @for(tec of tecnicosFiltrados; track tec.id) {
               <div class="tech-card" [class.tech-card-active]="tecnicoDashboard?.id === tec.id" (click)="seleccionarTecnicoRender(tec)">
                 <div class="card-tecnico-header">
                   <strong>{{tec.nombre}}</strong>
@@ -394,7 +537,13 @@
             } @empty {
               <div class="empty-state">
                 <i class="fas fa-users-slash mb-2 icon-dim-16"></i>
-                <p class="descripcion-general m-0">No hay personal técnico registrado aún. Agregue operarios/técnicos en Gestión Humana.</p>
+                <p class="descripcion-general m-0">
+                  @if(searchTermTecnicos) {
+                    No hay técnicos que coincidan con "{{ searchTermTecnicos }}".
+                  } @else {
+                    No hay personal técnico registrado aún. Agregue operarios/técnicos en Gestión Humana.
+                  }
+                </p>
               </div>
             }
           </div>
@@ -492,7 +641,7 @@
         <p class="text-muted mb-6">Definición de servicios base para la empresa. Estos alimentan las cotizaciones y facturas.</p>
         
         <!-- HTML BARRA DE BUSQUEDA DE SERVICIOS -->
-        <div class="search-filter-bar search-bar-centered mb-4" *ngIf="catalogo.length > 0">
+        <div class="search-filter-bar search-bar-centered mb-4">
           <div class="search-rel-box">
             <i class="fas fa-search search-icon-input"></i>
             <input

@@ -23,6 +23,11 @@
         <div class="search-group">
           <i class="fas fa-search search-icon"></i>
           <input type="text" class="input-neumorphic" [(ngModel)]="busqueda" (keyup.enter)="buscar()" (ngModelChange)="buscar()" placeholder="Buscar cliente por nombre, NIT, cédula, ciudad o email...">
+          @if (busqueda) {
+            <button type="button" class="search-clear-btn" (click)="busqueda = ''; buscar()" title="Limpiar búsqueda">
+              <i class="fas fa-times"></i>
+            </button>
+          }
         </div>
         <div class="filter-group-btn">
           <button type="button" class="btn-general-1 btn-pill" (click)="buscar()">

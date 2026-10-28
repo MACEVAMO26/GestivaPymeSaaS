@@ -181,7 +181,7 @@ export class InventarioComponent implements OnInit {
     this.productoService.crearProducto(payload).pipe(timeout(10000)).subscribe({
       next: (prod) => {
         if (prod.id) {
-          this.inventarioService.getInventario().pipe(timeout(5000)).subscribe(() => {});
+          this.inventarioService.getInventario().pipe(timeout(25000)).subscribe(() => {});
         }
         this.toast.success('Producto guardado exitosamente');
         this.cerrarModal();

@@ -1,8 +1,8 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReunionService, Reunion } from '../../../../../../services/reunion.service';
-import { ToastService } from '../../../../../../services/toast.service';
 import { timeout } from 'rxjs';
 
 @Component({
@@ -15,8 +15,8 @@ import { timeout } from 'rxjs';
 export class InicioReunionesComponent implements OnInit {
   // --- INYECCIÓN DE DEPENDENCIAS Y SERVICIOS ---
   private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
   private reunionService = inject(ReunionService);
-  private toast = inject(ToastService);
 
   // --- VARIABLES DE ESTADO ---
   reuniones: Reunion[] = [];
@@ -30,16 +30,16 @@ export class InicioReunionesComponent implements OnInit {
   // Bloque para consultar el listado de reuniones programadas del usuario
   cargarReuniones() {
     this.cargando = true;
-    this.reunionService.getReuniones().pipe(timeout(15000)).subscribe({
+    this.reunionService.getReuniones().pipe(
+      timeout(35000),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: (data) => {
-        this.reuniones = data.slice(0, 5);
+        this.reuniones = (data || []).slice(0, 5);
         this.cargando = false;
         this.cdr.detectChanges();
       },
-      error: (err: any) => {
-        if (err?.name === 'TimeoutError') {
-          this.toast.error('Tiempo de espera agotado cargando reuniones');
-        }
+      error: () => {
         this.reuniones = [];
         this.cargando = false;
         this.cdr.detectChanges();

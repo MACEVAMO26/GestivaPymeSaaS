@@ -119,7 +119,7 @@ export class AdminSoporteComponent implements OnInit {
   // Bloque para cargar el historial de tickets de soporte
   cargarTickets() {
     this.isLoading = true;
-    this.soporteService.getTickets().pipe(timeout(5000)).subscribe({
+    this.soporteService.getTickets().pipe(timeout(30000)).subscribe({
       next: (data) => {
         const misTickets = (data || []).map((t: any) => ({
           ...t,

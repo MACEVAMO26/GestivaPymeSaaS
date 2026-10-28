@@ -16,7 +16,7 @@ $text-dark: #1a1a1a;
 $text-muted: #2d3748;
 $btn-add: #45a1ae;
 $btn-volver: #de3737;
-$btn-save: #066810;
+$btn-save: #6B8F71;
 $btn-gen-1: #6B8F71;
 $btn-gen-2: #7C6FA6;
 $btn-gen-3: #C9A227;
@@ -25,7 +25,7 @@ $btn-gen-5: #B5654A;
 $btn-gen-6: #A38B6D;
 
 $color-add: #45a1ae;
-$color-save: #066810;
+$color-save: #6B8F71;
 $color-danger: #de3737;
 
 /* --- 2. FONDOS Y LAYOUT PRINCIPAL --- */
@@ -275,15 +275,15 @@ $color-danger: #de3737;
 }
 
 .btn-icon {
-  background: #f5f5dc;
-  border: none;
+  background: #edf2f7;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  min-height: 36px;
-  max-width: 36px;
-  max-height: 36px;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  max-width: 28px;
+  max-height: 28px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -292,12 +292,13 @@ $color-danger: #de3737;
   transition: all 0.2s ease;
 
   i {
-    font-size: 18px;
+    font-size: 12px;
     line-height: 1;
   }
 
   &:hover {
-    box-shadow: inset 2px 2px 4px #d0d0bb, inset -2px -2px 4px #ffffff;
+    transform: scale(1.08);
+    box-shadow: 2px 2px 5px #d0d0bb, -2px -2px 5px #ffffff;
   }
 }
 

@@ -21,7 +21,10 @@ class SoporteTicketController extends Controller
 
         $tickets = SoporteTicket::with(['usuario', 'tecnico'])
             ->where('empresa_id', $user->empresa_id)
-            ->where('activo', true)
+            ->where(function ($q) {
+                $q->whereNull('activo')
+                  ->orWhereIn('activo', ['1', 'true', 'activo']);
+            })
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -48,7 +51,7 @@ class SoporteTicketController extends Controller
             'prioridad' => $request->prioridad ?? 'Media',
             'mensaje' => $request->mensaje,
             'estado' => 'Abierto',
-            'activo' => true
+            'activo' => '1'
         ]);
 
         // Bloque para notificar al administrador de soporte por correo
@@ -70,7 +73,10 @@ class SoporteTicketController extends Controller
     public function saasIndex()
     {
         $tickets = SoporteTicket::with(['empresa', 'usuario', 'tecnico'])
-            ->where('activo', true)
+            ->where(function ($q) {
+                $q->whereNull('activo')
+                  ->orWhereIn('activo', ['1', 'true', 'activo']);
+            })
             ->orderBy('estado', 'asc')
             ->orderBy('created_at', 'desc')
             ->get();

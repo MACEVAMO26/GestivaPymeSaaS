@@ -128,7 +128,7 @@ export class AutogestionComponent implements OnInit {
   // Bloque para cargar la información de afiliaciones del usuario autenticado
   cargarAfiliacion() {
     if (!this.usuarioActual) return;
-    this.empleadoService.getMisAfiliaciones().pipe(timeout(15000)).subscribe({
+    this.empleadoService.getMisAfiliaciones().pipe(timeout(30000)).subscribe({
       next: (res) => {
         this.afiliacion = res.afiliacion || {};
         this.moduloRRHH = !!res.modulo_rrhh_activo;
@@ -305,7 +305,7 @@ export class AutogestionComponent implements OnInit {
   cargarVacaciones() {
     if (!this.usuarioActual) return;
     this.cargando = true;
-    this.tiempoService.getMisVacaciones(this.usuarioActual.id).pipe(timeout(15000)).subscribe({
+    this.tiempoService.getMisVacaciones(this.usuarioActual.id).pipe(timeout(30000)).subscribe({
       next: (res) => {
         this.misVacaciones = res;
         this.cargando = false;
@@ -364,7 +364,7 @@ export class AutogestionComponent implements OnInit {
   // Bloque para cargar los documentos laborales del empleado
   cargarDocumentos() {
     this.cargando = true;
-    this.empleadoService.getMisDocumentos().pipe(timeout(15000)).subscribe({
+    this.empleadoService.getMisDocumentos().pipe(timeout(30000)).subscribe({
       next: (res) => {
         this.misDocumentos = res;
         this.cargando = false;

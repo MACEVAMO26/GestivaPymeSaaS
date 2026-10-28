@@ -18,6 +18,7 @@ class CajaController extends Controller
         }
 
         $cajas = Caja::where('empresa_id', $user->empresa_id)
+            ->with('movimientos')
             ->orderBy('id', 'desc')
             ->get()
             ->map(function ($caja) {
@@ -125,14 +126,25 @@ class CajaController extends Controller
     // Bloque utilitario para transformar la entidad de caja a formato compatible con el frontend
     private function mapCaja($caja)
     {
+        $movs = $caja->relationLoaded('movimientos') ? $caja->movimientos : $caja->movimientos()->get();
+        $ingresos = (float) $movs->where('tipo', 'ingreso')->sum('monto');
+        $egresos = (float) $movs->where('tipo', 'egreso')->sum('monto');
+        $base = (float) ($caja->saldo_inicial ?? 0);
+        $final = $caja->saldo_final !== null ? (float) $caja->saldo_final : ($base + $ingresos - $egresos);
+        $diferencia = $final - ($base + $ingresos - $egresos);
+
         return [
             'id' => $caja->id,
             'usuario_id' => $caja->usuario_apertura ?? $caja->usuario_cierre,
             'fecha_apertura' => $caja->abierta_en,
             'fecha_cierre' => $caja->cerrada_en,
-            'base_inicial' => $caja->saldo_inicial,
-            'saldo_final' => $caja->saldo_final,
+            'base_inicial' => $base,
+            'total_ingresos' => $ingresos,
+            'total_egresos' => $egresos,
+            'saldo_final' => $final,
+            'diferencia' => (float) $diferencia,
             'estado' => $caja->estado,
+            'movimientos_count' => $movs->count(),
         ];
     }
 }

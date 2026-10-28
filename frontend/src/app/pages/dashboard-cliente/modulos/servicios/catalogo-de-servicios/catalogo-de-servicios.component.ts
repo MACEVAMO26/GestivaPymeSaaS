@@ -1,17 +1,19 @@
 import { VolverDirective } from '../../../../../shared/directives/volver.directive';
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CatalogoServiciosService, Servicio } from '../../../../../services/catalogo-servicios.service';
 import { OperariosTicketsService, ServicioTicket, ServicioMaterial } from '../../../../../services/operarios-tickets.service';
 import { InventarioService, Inventario } from '../../../../../services/inventario.service';
 import { EmpleadoService } from '../../../../../services/empleado.service';
+import { ClienteService } from '../../../../../services/cliente.service';
 import { ToastService } from '../../../../../services/toast.service';
 import { AuthService } from '../../../../../services/auth.service';
 import { GestionDeOperariosComponent } from '../gestion-de-operarios/gestion-de-operarios.component';
 import { ReportesDeServiciosComponent } from '../reportes-de-servicios/reportes-de-servicios.component';
 import { SolicitudInactivacionComponent } from '../../../../../shared/components/solicitud-inactivacion/solicitud-inactivacion.component';
 import { timeout } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-catalogo-de-servicios',
@@ -22,10 +24,12 @@ import { timeout } from 'rxjs';
 })
 export class CatalogoDeServiciosComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
   private catalogoService = inject(CatalogoServiciosService);
   private ticketsService = inject(OperariosTicketsService);
   private inventarioService = inject(InventarioService);
   private empleadoService = inject(EmpleadoService);
+  private clienteService = inject(ClienteService);
   private toast = inject(ToastService);
   private authService = inject(AuthService);
 
@@ -38,6 +42,7 @@ export class CatalogoDeServiciosComponent implements OnInit {
   formTicket: any = { 
     cliente: '', 
     servicio: '', 
+    tecnico_id: null,
     fecha: '', 
     hora: '', 
     direccion: '',
@@ -49,6 +54,7 @@ export class CatalogoDeServiciosComponent implements OnInit {
   };
 
   catalogo: Servicio[] = [];
+  clientes: any[] = [];
   tickets: ServicioTicket[] = [];
   ticketsPendientes: ServicioTicket[] = [];
   tecnicos: any[] = [];
@@ -73,39 +79,73 @@ export class CatalogoDeServiciosComponent implements OnInit {
 
   // Bloque de inicialización del componente y carga de datos iniciales
   ngOnInit() {
-    this.// Bloque para consultar el catálogo de servicios desde el backend
-  cargarCatalogo();
-    this.// Bloque para consultar la lista de tickets de servicio
-  cargarTickets();
-    this.// Bloque para cargar el inventario de materiales y repuestos disponibles
-  cargarInventario();
-    this.// Bloque para cargar el listado de técnicos operativos de la empresa
-  cargarTecnicos();
+    this.cargarCatalogo();
+    this.cargarTickets(true);
+    this.cargarTecnicos();
+    this.cargarClientes();
+  }
+
+  cargarClientes() {
+    if (this.clientes.length > 0) return;
+    this.clienteService.getClientes().pipe(
+      takeUntilDestroyed(this.destroyRef),
+      timeout(35000)
+    ).subscribe({
+      next: (res) => {
+        this.clientes = Array.isArray(res) ? res : ((res as any)?.data || []);
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.clientes = [];
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  onClienteSeleccionado() {
+    if (!this.formTicket.cliente) return;
+    const match = this.clientes.find((c: any) => {
+      const nombre = (c.nombre_razon_social || `${c.nombres || ''} ${c.apellidos || ''}`).trim().toLowerCase();
+      return nombre === this.formTicket.cliente.trim().toLowerCase();
+    });
+    if (match && match.direccion && !this.formTicket.direccion) {
+      this.formTicket.direccion = match.direccion;
+    }
+  }
+
+  setFiltroEstado(estado: string) {
+    this.filtroEstado = estado;
+    this.pageTickets = 1;
   }
 
   cargarCatalogo() {
-    this.catalogoService.getServicios().pipe(timeout(15000)).subscribe({
+    if (this.catalogo.length > 0) return;
+    this.catalogoService.getServicios().pipe(
+      takeUntilDestroyed(this.destroyRef),
+      timeout(35000)
+    ).subscribe({
       next: (res) => {
-        this.catalogo = res;
+        this.catalogo = Array.isArray(res) ? res : ((res as any)?.data || []);
         this.cdr.detectChanges();
       },
-      error: (err: any) => {
-        if (err?.name === 'TimeoutError') {
-          this.toast.error('Tiempo de espera agotado');
-        }
+      error: () => {
         this.catalogo = [];
         this.cdr.detectChanges();
       }
     });
   }
 
-  cargarTickets() {
+  cargarTickets(forzar = false) {
+    if (this.cargando && !forzar) return;
+    if (!forzar && this.tickets.length > 0) return;
     this.cargando = true;
-    this.ticketsService.getTickets().pipe(timeout(15000)).subscribe({
+    this.ticketsService.getTickets().pipe(
+      takeUntilDestroyed(this.destroyRef),
+      timeout(35000)
+    ).subscribe({
       next: (res) => {
-        this.tickets = res;
-        this.// Bloque para filtrar tickets en estado pendiente o recibido
-  filtrarTicketsPendientes();
+        this.tickets = Array.isArray(res) ? res : ((res as any)?.data || []);
+        this.filtrarTicketsPendientes();
         if (this.tecnicos.length > 0 && this.tecnicoDashboard) {
           const tec = this.tecnicos.find(t => t.id === this.tecnicoDashboard.id);
           if (tec) this.seleccionarTecnicoRender(tec);
@@ -113,10 +153,8 @@ export class CatalogoDeServiciosComponent implements OnInit {
         this.cargando = false;
         this.cdr.detectChanges();
       },
-      error: (err: any) => {
-        if (err?.name === 'TimeoutError') {
-          this.toast.error('Tiempo de espera agotado');
-        }
+      error: (err) => {
+        console.error('Error cargando tickets de servicios:', err);
         this.tickets = [];
         this.ticketsPendientes = [];
         this.cargando = false;
@@ -126,15 +164,16 @@ export class CatalogoDeServiciosComponent implements OnInit {
   }
 
   cargarInventario() {
-    this.inventarioService.getInventario().pipe(timeout(15000)).subscribe({
+    if (this.inventario.length > 0) return;
+    this.inventarioService.getInventario().pipe(
+      takeUntilDestroyed(this.destroyRef),
+      timeout(35000)
+    ).subscribe({
       next: (res) => {
         this.inventario = res;
         this.cdr.detectChanges();
       },
-      error: (err: any) => {
-        if (err?.name === 'TimeoutError') {
-          this.toast.error('Tiempo de espera agotado');
-        }
+      error: () => {
         this.inventario = [];
         this.cdr.detectChanges();
       }
@@ -142,9 +181,13 @@ export class CatalogoDeServiciosComponent implements OnInit {
   }
 
   cargarTecnicos() {
-    this.empleadoService.getEmpleados().pipe(timeout(15000)).subscribe({
+    if (this.tecnicos.length > 0) return;
+    this.empleadoService.getEmpleados().pipe(
+      takeUntilDestroyed(this.destroyRef),
+      timeout(35000)
+    ).subscribe({
       next: (res) => {
-        this.tecnicos = res.filter((e: any) => {
+        let filtered = res.filter((e: any) => {
           const rol = (e.usuario?.rol?.nombre || '').toLowerCase();
           const cargo = (e.cargo?.nombre || e.puesto || '').toLowerCase();
           const area = (e.area?.nombre || e.cargo?.area?.nombre || e.usuario?.area?.nombre || '').toLowerCase();
@@ -169,10 +212,17 @@ export class CatalogoDeServiciosComponent implements OnInit {
           const esRolOperativo = rol === 'operativo' || rol.includes('operativo');
 
           return (esRolOperativo || esCargoOperativoTecnico) && esAreaServicios;
-        }).map((e: any) => ({
+        });
+
+        // Fallback: si no hay ninguno con filtro estricto pero hay empleados registrados, incluir empleados activos
+        if (filtered.length === 0 && res.length > 0) {
+          filtered = res;
+        }
+
+        this.tecnicos = filtered.map((e: any) => ({
           id: e.id,
-          nombre: `${e.usuario?.primer_nombre || e.usuario?.nombres || ''} ${e.usuario?.primer_apellido || e.usuario?.apellidos || ''}`.trim(),
-          cargo: e.cargo?.nombre || 'Técnico Operativo',
+          nombre: `${e.usuario?.primer_nombre || e.usuario?.nombres || ''} ${e.usuario?.primer_apellido || e.usuario?.apellidos || ''}`.trim() || e.nombre || `Empleado #${e.id}`,
+          cargo: e.cargo?.nombre || e.puesto || 'Técnico Operativo',
           estado: e.estado
         })).filter((t: any) => t.nombre);
 
@@ -183,10 +233,7 @@ export class CatalogoDeServiciosComponent implements OnInit {
         }
         this.cdr.detectChanges();
       },
-      error: (err: any) => {
-        if (err?.name === 'TimeoutError') {
-          this.toast.error('Tiempo de espera agotado');
-        }
+      error: () => {
         this.tecnicos = [];
         this.tecnicoDashboard = null;
         this.cdr.detectChanges();
@@ -198,15 +245,27 @@ export class CatalogoDeServiciosComponent implements OnInit {
   switchTab(tab: string) {
     this.activeTab = tab;
     if (tab === 'recepcion' || tab === 'agenda' || tab === 'ejecucion' || tab === 'rendimiento') {
-      this.cargarTickets();
+      if (this.tickets.length === 0) {
+        this.cargarTickets();
+      }
     }
-    if (tab === 'catalogo') this.cargarCatalogo();
+    if (tab === 'ejecucion') {
+      if (this.inventario.length === 0) {
+        this.cargarInventario();
+      }
+    }
+    if (tab === 'catalogo') {
+      if (this.catalogo.length === 0) {
+        this.cargarCatalogo();
+      }
+    }
   }
 
   // Bloque para obtener el nombre legible de un técnico por su ID
   nombreTecnico(id?: number): string {
-    const tec = this.tecnicos.find(t => t.id === id);
-    return tec?.nombre || 'Sin Asignar';
+    if (!id) return 'Sin Asignar';
+    const tec = this.tecnicos.find(t => t.id === Number(id));
+    return tec?.nombre || `Técnico #${id}`;
   }
 
   // Bloque para formatear el código visual de un servicio
@@ -230,7 +289,9 @@ export class CatalogoDeServiciosComponent implements OnInit {
     }
     this.guardando = true;
 
-    const estadoInicial = this.tipoServicio === 'TALLER' ? 'Recibido' : 'Pendiente';
+    const estadoInicial = this.formTicket.tecnico_id 
+      ? 'Asignado' 
+      : (this.tipoServicio === 'TALLER' ? 'Recibido' : 'Pendiente');
 
     const ticket: ServicioTicket = {
       cliente_nombre: this.formTicket.cliente,
@@ -239,6 +300,7 @@ export class CatalogoDeServiciosComponent implements OnInit {
       hora_sugerida: this.formTicket.hora || '09:00',
       direccion: this.tipoServicio === 'TALLER' ? 'Sede Central - Taller / Laboratorio' : (this.formTicket.direccion || 'A convenir con cliente'),
       estado: estadoInicial,
+      tecnico_id: this.formTicket.tecnico_id ? Number(this.formTicket.tecnico_id) : undefined,
       equipo_recibido: this.tipoServicio === 'TALLER' ? this.formTicket.equipo : undefined,
       serie_equipo: this.tipoServicio === 'TALLER' ? this.formTicket.serie : undefined,
       accesorios_recibidos: this.tipoServicio === 'TALLER' ? this.formTicket.accesorios : undefined,
@@ -246,17 +308,20 @@ export class CatalogoDeServiciosComponent implements OnInit {
       costo_total: this.formTicket.costo || 0
     };
 
-    this.ticketsService.crearTicket(ticket).pipe(timeout(10000)).subscribe({
+    this.ticketsService.crearTicket(ticket).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      timeout(35000)
+    ).subscribe({
       next: () => {
         this.toast.success(`Ticket registrado exitosamente en estado "${estadoInicial}"`);
-        this.formTicket = { cliente: '', servicio: '', fecha: '', hora: '', direccion: '', equipo: '', serie: '', accesorios: '', falla: '', costo: 0 };
+        this.formTicket = { cliente: '', servicio: '', tecnico_id: null, fecha: '', hora: '', direccion: '', equipo: '', serie: '', accesorios: '', falla: '', costo: 0 };
         this.guardando = false;
-        this.cargarTickets();
+        this.cargarTickets(true);
         this.cdr.detectChanges();
       },
       error: (err: any) => {
         if (err?.name === 'TimeoutError') {
-          this.toast.error('Tiempo de espera agotado');
+          this.toast.error('Tiempo de espera agotado al registrar ticket');
         } else {
           this.toast.error('Error al crear el ticket');
         }
@@ -275,10 +340,48 @@ export class CatalogoDeServiciosComponent implements OnInit {
   pageAgenda = 1;
   pageCatalogo = 1;
 
+  // --- VARIABLES DE BÚSQUEDA ---
+  searchTermTickets: string = '';
+  searchTermAgenda: string = '';
+  searchTermEjecucion: string = '';
+  searchTermTecnicos: string = '';
+  searchTermCatalogo: string = '';
+
+  // Bloque para evento al cambiar término de búsqueda de tickets
+  onSearchTermTicketsChange() {
+    this.pageTickets = 1;
+  }
+
+  // Bloque para limpiar búsqueda en tickets
+  limpiarBusquedaTickets() {
+    this.searchTermTickets = '';
+    this.pageTickets = 1;
+  }
+
+  // Bloque para evento al cambiar término de búsqueda de agenda
+  onSearchTermAgendaChange() {
+    this.pageAgenda = 1;
+  }
+
+  // Bloque para limpiar búsqueda en agenda
+  limpiarBusquedaAgenda() {
+    this.searchTermAgenda = '';
+    this.pageAgenda = 1;
+  }
+
+  // Bloque para limpiar búsqueda en ejecución
+  limpiarBusquedaEjecucion() {
+    this.searchTermEjecucion = '';
+  }
+
+  // Bloque para limpiar búsqueda en técnicos
+  limpiarBusquedaTecnicos() {
+    this.searchTermTecnicos = '';
+  }
+
   // --- GETTERS Y PAGINACION ---
   get paginatedTickets(): ServicioTicket[] {
-    const list = this.// Bloque para obtener los tickets filtrados por estado
-  getTicketsFiltrados();
+    const list = this.getTicketsFiltrados();
     const start = (this.pageTickets - 1) * this.pageSize;
     return list.slice(start, start + this.pageSize);
   }
@@ -287,7 +390,27 @@ export class CatalogoDeServiciosComponent implements OnInit {
   }
 
   get agendaTickets(): ServicioTicket[] {
-    return this.tickets.filter(tk => tk.estado !== 'Finalizado' && tk.estado !== 'Cancelado');
+    let list = this.tickets.filter(tk => tk.estado !== 'Finalizado' && tk.estado !== 'Cancelado');
+    if (this.searchTermAgenda.trim()) {
+      const term = this.searchTermAgenda.trim().toLowerCase();
+      list = list.filter(t => {
+        const consecutivo = (t.consecutivo || '').toLowerCase();
+        const cliente = (t.cliente_nombre || '').toLowerCase();
+        const servicio = (t.servicio_requerido || '').toLowerCase();
+        const direccion = (t.direccion || '').toLowerCase();
+        const tecnico = this.nombreTecnico(t.tecnico_id).toLowerCase();
+        const estado = (t.estado || '').toLowerCase();
+        return (
+          consecutivo.includes(term) ||
+          cliente.includes(term) ||
+          servicio.includes(term) ||
+          direccion.includes(term) ||
+          tecnico.includes(term) ||
+          estado.includes(term)
+        );
+      });
+    }
+    return list;
   }
   get paginatedAgendaTickets(): ServicioTicket[] {
     const start = (this.pageAgenda - 1) * this.pageSize;
@@ -296,8 +419,6 @@ export class CatalogoDeServiciosComponent implements OnInit {
   get totalPagesAgenda(): number {
     return Math.ceil(this.agendaTickets.length / this.pageSize) || 1;
   }
-
-  searchTermCatalogo: string = '';
 
   // Bloque de evento al escribir en el buscador de servicios
   onSearchTermCatalogoChange() {
@@ -330,8 +451,74 @@ export class CatalogoDeServiciosComponent implements OnInit {
   }
 
   getTicketsFiltrados(): ServicioTicket[] {
-    if (this.filtroEstado === 'TODOS') return this.tickets;
-    return this.tickets.filter(t => t.estado === this.filtroEstado);
+    let list = this.tickets;
+    if (this.filtroEstado !== 'TODOS') {
+      list = list.filter(t => (t.estado || '').toLowerCase() === this.filtroEstado.toLowerCase());
+    }
+    if (this.searchTermTickets.trim()) {
+      const term = this.searchTermTickets.trim().toLowerCase();
+      list = list.filter(t => {
+        const consecutivo = (t.consecutivo || '').toLowerCase();
+        const cliente = (t.cliente_nombre || '').toLowerCase();
+        const servicio = (t.servicio_requerido || '').toLowerCase();
+        const direccion = (t.direccion || '').toLowerCase();
+        const equipo = (t.equipo_recibido || '').toLowerCase();
+        const serie = (t.serie_equipo || '').toLowerCase();
+        const falla = (t.falla_reportada || '').toLowerCase();
+        const tecnico = this.nombreTecnico(t.tecnico_id).toLowerCase();
+        const estado = (t.estado || '').toLowerCase();
+        return (
+          consecutivo.includes(term) ||
+          cliente.includes(term) ||
+          servicio.includes(term) ||
+          direccion.includes(term) ||
+          equipo.includes(term) ||
+          serie.includes(term) ||
+          falla.includes(term) ||
+          tecnico.includes(term) ||
+          estado.includes(term)
+        );
+      });
+    }
+    return list;
+  }
+
+  get ticketsEjecucion(): ServicioTicket[] {
+    let list = this.tickets.filter(
+      tk => tk.estado === 'Asignado' || tk.estado === 'En Camino' || tk.estado === 'En Sitio' || tk.estado === 'Recibido'
+    );
+    if (this.searchTermEjecucion.trim()) {
+      const term = this.searchTermEjecucion.trim().toLowerCase();
+      list = list.filter(tk => {
+        const c = (tk.consecutivo || '').toLowerCase();
+        const cli = (tk.cliente_nombre || '').toLowerCase();
+        const s = (tk.servicio_requerido || '').toLowerCase();
+        const tec = this.nombreTecnico(tk.tecnico_id).toLowerCase();
+        const eq = (tk.equipo_recibido || '').toLowerCase();
+        const dir = (tk.direccion || '').toLowerCase();
+        const falla = (tk.falla_reportada || '').toLowerCase();
+        return (
+          c.includes(term) ||
+          cli.includes(term) ||
+          s.includes(term) ||
+          tec.includes(term) ||
+          eq.includes(term) ||
+          dir.includes(term) ||
+          falla.includes(term)
+        );
+      });
+    }
+    return list;
+  }
+
+  get tecnicosFiltrados(): any[] {
+    if (!this.searchTermTecnicos.trim()) return this.tecnicos;
+    const term = this.searchTermTecnicos.trim().toLowerCase();
+    return this.tecnicos.filter(tec => {
+      const nom = (tec.nombre || '').toLowerCase();
+      const cargo = (tec.cargo || '').toLowerCase();
+      return nom.includes(term) || cargo.includes(term);
+    });
   }
 
   // Bloque para determinar la clase visual del badge según el estado
@@ -410,17 +597,20 @@ export class CatalogoDeServiciosComponent implements OnInit {
       return;
     }
     this.guardando = true;
-    this.ticketsService.actualizarEstado(this.ticketSeleccionado.id, nuevoEstado, Number(this.tecnicoSeleccionado)).pipe(timeout(15000)).subscribe({
+    this.ticketsService.actualizarEstado(this.ticketSeleccionado.id, nuevoEstado, Number(this.tecnicoSeleccionado)).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      timeout(35000)
+    ).subscribe({
       next: () => {
         this.toast.success(`Servicio actualizado a "${nuevoEstado}" con técnico asignado.`);
         this.cerrarAsignacion();
         this.guardando = false;
-        this.cargarTickets();
+        this.cargarTickets(true);
         this.cdr.detectChanges();
       },
       error: (err: any) => {
         if (err?.name === 'TimeoutError') {
-          this.toast.error('Tiempo de espera agotado');
+          this.toast.error('Tiempo de espera agotado al asignar');
         } else {
           this.toast.error('Error al asignar técnico');
         }
@@ -434,11 +624,14 @@ export class CatalogoDeServiciosComponent implements OnInit {
   cambiarEstadoDirecto(tk: ServicioTicket, nuevoEstado: string) {
     if (!tk.id) return;
     this.guardando = true;
-    this.ticketsService.actualizarEstado(tk.id, nuevoEstado, tk.tecnico_id).pipe(timeout(10000)).subscribe({
+    this.ticketsService.actualizarEstado(tk.id, nuevoEstado, tk.tecnico_id).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      timeout(35000)
+    ).subscribe({
       next: () => {
         this.toast.success(`Servicio actualizado a "${nuevoEstado}".`);
         this.guardando = false;
-        this.cargarTickets();
+        this.cargarTickets(true);
         this.cdr.detectChanges();
       },
       error: () => {
@@ -513,7 +706,10 @@ export class CatalogoDeServiciosComponent implements OnInit {
       estado_material: 'Utilizado'
     };
 
-    this.ticketsService.agregarMaterial(this.ticketSeleccionado.id, nuevoMaterial).pipe(timeout(10000)).subscribe({
+    this.ticketsService.agregarMaterial(this.ticketSeleccionado.id, nuevoMaterial).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      timeout(35000)
+    ).subscribe({
       next: (res) => {
         this.toast.success('Material agregado al servicio.');
         this.materialesUsados.push(res);
@@ -534,7 +730,10 @@ export class CatalogoDeServiciosComponent implements OnInit {
       return;
     }
 
-    this.ticketsService.eliminarMaterial(this.ticketSeleccionado.id, mat.id).pipe(timeout(10000)).subscribe({
+    this.ticketsService.eliminarMaterial(this.ticketSeleccionado.id, mat.id).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      timeout(35000)
+    ).subscribe({
       next: () => {
         this.toast.success('Material removido del servicio.');
         this.materialesUsados.splice(index, 1);
@@ -573,13 +772,16 @@ export class CatalogoDeServiciosComponent implements OnInit {
     const tecnicoId = this.ticketSeleccionado.tecnico_id;
 
     this.ticketsService.actualizarEstado(this.ticketSeleccionado.id, 'Finalizado', tecnicoId, this.notasEjecucion, extraData)
-      .pipe(timeout(15000))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        timeout(35000)
+      )
       .subscribe({
         next: () => {
           this.toast.success('¡Servicio finalizado con éxito! Materiales descontados de inventario y calificaciones registradas.');
           this.cerrarEjecucion();
           this.guardando = false;
-          this.cargarTickets();
+          this.cargarTickets(true);
           this.cargarInventario();
           this.cdr.detectChanges();
         },
@@ -628,7 +830,10 @@ export class CatalogoDeServiciosComponent implements OnInit {
       feedback_tecnico: this.feedbackTecnico,
       calificacion_cliente: this.calificacionCliente,
       feedback_cliente: this.feedbackCliente
-    }).pipe(timeout(10000)).subscribe({
+    }).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      timeout(35000)
+    ).subscribe({
       next: (res) => {
         this.toast.success(res.message || 'Calificación guardada exitosamente.');
         this.cerrarModalCalificacion();

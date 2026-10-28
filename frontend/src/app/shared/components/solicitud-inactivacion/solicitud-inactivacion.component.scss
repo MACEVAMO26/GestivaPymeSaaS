@@ -6,45 +6,51 @@ $shadow-dark: #d1d1bc;
 $text-dark: #1a1a1a;
 $text-muted: #2d3748;
 
+:host {
+  display: inline-flex;
+  vertical-align: middle;
+}
+
 /* --- 2. BOTONES DE ACCIÓN CIRCULARES Y BANDERA --- */
 .btn-action-circle {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  min-height: 36px;
-  max-width: 36px;
-  max-height: 36px;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  max-width: 28px;
+  max-height: 28px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  border: none;
+  border: 1px solid rgba(197, 48, 48, 0.2);
   transition: all 0.2s ease;
-  box-shadow: 2px 2px 5px $shadow-dark, -2px -2px 5px $shadow-light;
+  box-shadow: 2px 2px 4px $shadow-dark, -2px -2px 4px $shadow-light;
 
   i {
-    font-size: 18px;
+    font-size: 12px;
     line-height: 1;
   }
 
   &:hover {
-    transform: translateY(-1px);
-    box-shadow: 3px 3px 6px $shadow-dark, -2px -2px 5px $shadow-light;
+    transform: scale(1.08);
+    box-shadow: 2px 2px 5px $shadow-dark, -2px -2px 5px $shadow-light;
   }
 
   &:active {
-    box-shadow: inset 2px 2px 4px rgba(0,0,0,0.2);
+    transform: scale(0.95);
+    box-shadow: inset 1px 1px 3px rgba(0,0,0,0.15);
   }
 }
 
 .btn-circle-flag {
-  background: #c9a227;
-  color: #ffffff;
-  border: 1px solid #a6841c;
+  background: #fdeeed;
+  color: #c53030;
 
   &:hover {
-    background: #b5901e;
+    background: #fcd5d3;
+    color: #9b2c2c;
   }
 }
 
@@ -180,7 +186,7 @@ $text-muted: #2d3748;
 }
 
 .sol-btn-aprobar {
-  background: #066810;
+  background: #6B8F71;
   border: 2px solid #044b0c;
   color: #fff;
   border-radius: 9999px;
@@ -268,7 +274,7 @@ $text-muted: #2d3748;
 
 .badge-pendiente { color: #C9A227; border: 1px solid rgba(201, 162, 39, 0.35); }
 .badge-replica { color: #45a1ae; border: 1px solid rgba(69, 161, 174, 0.35); }
-.badge-ejecutada { color: #066810; border: 1px solid rgba(6, 104, 16, 0.35); }
+.badge-ejecutada { color: #6B8F71; border: 1px solid rgba(107, 143, 113, 0.35); }
 .badge-rechazada { color: #de3737; border: 1px solid rgba(222, 55, 55, 0.35); }
 
 /* --- 6. HILO DE RÉPLICAS Y MENSAJES --- */

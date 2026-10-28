@@ -1,4 +1,5 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RecordatoriosService, Recordatorio } from '../../../../../../services/recordatorios.service';
@@ -15,6 +16,7 @@ import { timeout } from 'rxjs';
 export class InicioRecordatoriosComponent implements OnInit {
   // --- INYECCIÓN DE DEPENDENCIAS Y SERVICIOS ---
   private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
   private recordatoriosService = inject(RecordatoriosService);
   private toast = inject(ToastService);
 
@@ -33,16 +35,16 @@ export class InicioRecordatoriosComponent implements OnInit {
   // Bloque para consultar la lista de recordatorios activos desde el backend
   cargarRecordatorios() {
     this.cargando = true;
-    this.recordatoriosService.getRecordatorios().pipe(timeout(15000)).subscribe({
+    this.recordatoriosService.getRecordatorios().pipe(
+      timeout(35000),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: (res) => {
-        this.recordatorios = res;
+        this.recordatorios = res || [];
         this.cargando = false;
         this.cdr.detectChanges();
       },
-      error: (err: any) => {
-        if (err?.name === 'TimeoutError') {
-          this.toast.error('Tiempo de espera agotado');
-        }
+      error: () => {
         this.recordatorios = [];
         this.cargando = false;
         this.cdr.detectChanges();

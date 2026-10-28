@@ -1,4 +1,5 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { NotificacionesService, Notificacion } from '../../../../../../services/notificaciones.service';
 import { ToastService } from '../../../../../../services/toast.service';
@@ -14,6 +15,7 @@ import { timeout } from 'rxjs';
 export class InicioNotificacionesComponent implements OnInit {
   // --- INYECCIÓN DE DEPENDENCIAS Y SERVICIOS ---
   private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
   private notifService = inject(NotificacionesService);
   private toast = inject(ToastService);
 
@@ -29,16 +31,16 @@ export class InicioNotificacionesComponent implements OnInit {
   // Bloque para consultar el listado de notificaciones del usuario desde el servicio
   cargarNotificaciones() {
     this.cargando = true;
-    this.notifService.getNotificaciones().pipe(timeout(15000)).subscribe({
+    this.notifService.getNotificaciones().pipe(
+      timeout(35000),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: (res) => {
-        this.notificaciones = res;
+        this.notificaciones = res || [];
         this.cargando = false;
         this.cdr.detectChanges();
       },
-      error: (err: any) => {
-        if (err?.name === 'TimeoutError') {
-          this.toast.error('Tiempo de espera agotado');
-        }
+      error: () => {
         this.notificaciones = [];
         this.cargando = false;
         this.cdr.detectChanges();

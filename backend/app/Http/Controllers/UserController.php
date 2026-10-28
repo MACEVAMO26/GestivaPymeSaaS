@@ -165,7 +165,10 @@ class UserController extends Controller
 
             $jefeRRHHActivo = User::where('empresa_id', auth()->user()->empresa_id)
                 ->where('rol_id', $roleJefe->id)
-                ->where('activo', true)
+                ->where(function ($q) {
+                    $q->whereNull('activo')
+                      ->orWhereIn('activo', ['1', 'true', 'activo']);
+                })
                 ->exists();
 
             if (!$jefeRRHHActivo) {

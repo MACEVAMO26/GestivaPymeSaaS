@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { NavigationStart, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { ToastComponent } from './components/toast/toast.component';
+import { ToastComponent } from './shared/components/toast/toast.component';
 import { SessionWarningModalComponent } from './shared/components/session-warning-modal/session-warning-modal.component';
 import { AuthService } from './services/auth.service';
 import { SessionTimeoutService } from './services/session-timeout.service';

@@ -68,7 +68,7 @@
             }
             @if (pendientes.length === 0) {
               <tr>
-                <td colspan="5" class="text-center" class="table-empty-pad">No hay usuarios pendientes de formalización.</td>
+                <td class="text-center table-empty-pad" colspan="5">No hay usuarios pendientes de formalización.</td>
               </tr>
             }
           </tbody>
@@ -127,7 +127,7 @@
             }
             @if (formalizados.length === 0) {
               <tr>
-                <td colspan="7" class="text-center" class="table-empty-pad">Aún no hay personal formalizado.</td>
+                <td class="text-center table-empty-pad" colspan="7">Aún no hay personal formalizado.</td>
               </tr>
             }
           </tbody>
@@ -161,7 +161,7 @@
   <!-- HTML SUBPAGINA DEDICADA FORMALIZAR -->
   @if (isFormalizarModalOpen) {
   <div class="view-switch-panel fade-in">
-    <div class="neu-card" class="neu-card-centered">
+    <div class="neu-card neu-card-centered">
       <div class="panel-header mb-4">
         <h1>FORMALIZAR: {{ nombreCompleto(usuarioAFormalizar) }}</h1>
         <button class="btn-close" (click)="cerrarModalFormalizar()">&times;</button>
@@ -271,7 +271,7 @@
   <!-- HTML SUBPAGINA DEDICADA EDICION EMPLEADO -->
   @if (isEditarEmpleadoModalOpen) {
   <div class="view-switch-panel fade-in">
-    <div class="neu-card" class="neu-card-centered">
+    <div class="neu-card neu-card-centered">
       <div class="panel-header mb-4">
         <h1>EDITAR PERFIL, SEGURIDAD SOCIAL Y PERMISOS</h1>
         <button class="btn-close" (click)="cerrarModalEditarEmpleado()">&times;</button>
@@ -381,12 +381,12 @@
           <label class="form-label text-azul label-bold-block">
             <i class="fas fa-key"></i> Módulos Habilitados en Menú Lateral para este Empleado:
           </label>
-          <small class="descripcion-general mb-3" class="d-block">
+          <small class="descripcion-general mb-3 d-block">
             * Nota: Inicio y Autogestión son siempre visibles para todos los empleados.
           </small>
 
           <div class="modulos-grid-auto">
-            <label *ngFor="let mod of listaModulosDisponibles" class="checkbox-label cursor-pointer p-2 rounded" class="checkbox-label-flex">
+            <label class="checkbox-label cursor-pointer p-2 rounded checkbox-label-flex" *ngFor="let mod of listaModulosDisponibles">
               <input type="checkbox" [checked]="isModuloPermitido(mod.id)" (change)="toggleModuloPermitido(mod.id)">
               <i [class]="mod.icono"></i> {{ mod.nombre }}
             </label>

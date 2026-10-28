@@ -1,4 +1,5 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { TareaService } from '../../../../../../services/tarea.service';
 import { ReunionService } from '../../../../../../services/reunion.service';
@@ -16,6 +17,7 @@ import { timeout } from 'rxjs';
 export class InicioResumenComponent implements OnInit {
   // --- INYECCIÓN DE DEPENDENCIAS Y SERVICIOS ---
   private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
   private tareaService = inject(TareaService);
   private reunionService = inject(ReunionService);
   private clienteService = inject(ClienteService);
@@ -37,15 +39,15 @@ export class InicioResumenComponent implements OnInit {
 
   // Bloque para consultar y contabilizar el número de tareas pendientes
   cargarTareas() {
-    this.tareaService.getTareas().pipe(timeout(15000)).subscribe({
+    this.tareaService.getTareas().pipe(
+      timeout(35000),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: (tareas) => {
-        this.tareasPendientes = tareas.filter(t => t.estado !== 'terminada').length;
+        this.tareasPendientes = (tareas || []).filter(t => t.estado !== 'terminada').length;
         this.cdr.detectChanges();
       },
-      error: (err: any) => {
-        if (err?.name === 'TimeoutError') {
-          console.error('Tiempo de espera agotado cargando tareas');
-        }
+      error: () => {
         this.cdr.detectChanges();
       }
     });
@@ -53,16 +55,16 @@ export class InicioResumenComponent implements OnInit {
 
   // Bloque para consultar y contabilizar las reuniones programadas para el día de hoy
   cargarReuniones() {
-    this.reunionService.getReuniones().pipe(timeout(15000)).subscribe({
+    this.reunionService.getReuniones().pipe(
+      timeout(35000),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: (reuniones) => {
         const hoy = new Date().toISOString().substring(0, 10);
-        this.reunionesHoy = reuniones.filter(r => (r.fecha_hora || '').substring(0, 10) === hoy).length;
+        this.reunionesHoy = (reuniones || []).filter(r => (r.fecha_hora || '').substring(0, 10) === hoy).length;
         this.cdr.detectChanges();
       },
-      error: (err: any) => {
-        if (err?.name === 'TimeoutError') {
-          console.error('Tiempo de espera agotado cargando reuniones');
-        }
+      error: () => {
         this.cdr.detectChanges();
       }
     });
@@ -70,15 +72,15 @@ export class InicioResumenComponent implements OnInit {
 
   // Bloque para consultar y contabilizar el total de clientes registrados
   cargarClientes() {
-    this.clienteService.getClientes().pipe(timeout(15000)).subscribe({
+    this.clienteService.getClientes().pipe(
+      timeout(35000),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: (clientes) => {
         this.nuevosClientes = (clientes || []).length;
         this.cdr.detectChanges();
       },
-      error: (err: any) => {
-        if (err?.name === 'TimeoutError') {
-          console.error('Tiempo de espera agotado cargando clientes');
-        }
+      error: () => {
         this.cdr.detectChanges();
       }
     });
@@ -86,15 +88,15 @@ export class InicioResumenComponent implements OnInit {
 
   // Bloque para consultar y contabilizar las notificaciones activas no leídas
   cargarNotificaciones() {
-    this.notificacionesService.getNotificaciones().pipe(timeout(15000)).subscribe({
+    this.notificacionesService.getNotificaciones().pipe(
+      timeout(35000),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: (notifs) => {
         this.notificaciones = (notifs || []).filter(n => !n.leida).length;
         this.cdr.detectChanges();
       },
-      error: (err: any) => {
-        if (err?.name === 'TimeoutError') {
-          console.error('Tiempo de espera agotado cargando notificaciones');
-        }
+      error: () => {
         this.cdr.detectChanges();
       }
     });

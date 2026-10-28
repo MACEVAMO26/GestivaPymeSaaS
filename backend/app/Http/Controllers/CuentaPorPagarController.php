@@ -11,7 +11,7 @@ class CuentaPorPagarController extends Controller
     // Bloque para listar las cuentas por pagar de la empresa autenticada
     public function index()
     {
-        $empresaId = request()->header('X-Empresa-Id') ?? (auth()->user()?->empresa_id ?? null);
+        $empresaId = request()->header('X-Empresa-Id') ?? (auth()->user()?->empresa_id ?? 6);
 
         $cuentas = CuentaPorPagar::with('proveedor')
             ->when($empresaId, function ($q) use ($empresaId) {
