@@ -1314,6 +1314,7 @@
                     type="text"
                     [(ngModel)]="nuevaEmpresa.razon_social"
                     name="razon_social"
+                    (blur)="onRazonSocialBlur()"
                     required
                     class="saas-input"
                   />
@@ -1397,7 +1398,7 @@
                 >
                   <option value="Ventas">Ventas</option>
                   <option value="Servicios">Servicios</option>
-                  <option value="Mixto">Mixto (Ventas y Servicios)</option>
+                  <option value="Ventas y Servicios">Mixto (Ventas y Servicios)</option>
                 </select>
               </div>
 
@@ -1436,11 +1437,12 @@
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="saas-form-group">
-                  <label class="saas-label">Primer Nombre</label>
+                  <label class="saas-label">Primer Nombre *</label>
                   <input
                     type="text"
                     [(ngModel)]="nuevaEmpresa.primer_nombre_gerente"
                     name="primer_nombre_gerente"
+                    required
                     class="saas-input"
                     placeholder="Ej: Juan"
                   />
@@ -1456,11 +1458,12 @@
                   />
                 </div>
                 <div class="saas-form-group">
-                  <label class="saas-label">Primer Apellido</label>
+                  <label class="saas-label">Primer Apellido *</label>
                   <input
                     type="text"
                     [(ngModel)]="nuevaEmpresa.primer_apellido_gerente"
                     name="primer_apellido_gerente"
+                    required
                     class="saas-input"
                     placeholder="Ej: Pérez"
                   />

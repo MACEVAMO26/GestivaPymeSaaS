@@ -1617,21 +1617,42 @@ export class SaasAdminComponent implements OnInit {
   // Bloque para inicializar el formulario de creación de una nueva empresa cliente
 
 
+  getInitialNuevaEmpresa(): any {
+    return {
+      razon_social: '',
+      dominio: '',
+      nit: '',
+      email: '',
+      plan_suscripcion: 'Emprendedor',
+      tipo_empresa: 'Ventas',
+      tipo_identificacion: 'NIT',
+      fecha_inscripcion: this.getFechaActualSistema(),
+      periodo: 'Mensual',
+      descuento: 'N/A',
+      color_primario: '#6366f1',
+      color_secundario: '#1e293b',
+      color_fondo: '#4c808a',
+      color_texto: '#f8fafc',
+      primer_nombre_gerente: '',
+      segundo_nombre_gerente: '',
+      primer_apellido_gerente: '',
+      segundo_apellido_gerente: '',
+      tipo_documento_gerente: 'CC',
+      documento_gerente: ''
+    };
+  }
+
+  onRazonSocialBlur() {
+    if (!this.nuevaEmpresa.dominio || !this.nuevaEmpresa.dominio.trim()) {
+      this.generarDominio();
+    }
+  }
+
   abrirModalCrearEmpresa() {
     this.isEditMode = false;
     this.editingId = null;
     this.listaDescuentosEmpresa = [];
-    this.nuevaEmpresa = { 
-      razon_social: '', 
-      dominio: '',
-      nit: '', 
-      plan_suscripcion: 'Emprendedor', 
-      fecha_inscripcion: this.getFechaActualSistema(), 
-      periodo: 'Mensual', 
-      descuento: 'N/A',
-      nombre_gerente: '',
-      apellido_gerente: ''
-    };
+    this.nuevaEmpresa = this.getInitialNuevaEmpresa();
     this.showModal = true;
   }
   // Bloque para generar sugerencias automáticas de subdominio según la razón social
@@ -1686,28 +1707,7 @@ export class SaasAdminComponent implements OnInit {
 
 
   abrirModal() {
-    this.isEditMode = false;
-    this.editingId = null;
-    this.listaDescuentosEmpresa = [];
-    this.nuevaEmpresa = { 
-      razon_social: '', 
-      dominio: '',
-      nit: '', 
-      plan_suscripcion: 'Emprendedor', 
-      tipo_empresa: 'Ventas',
-      tipo_identificacion: 'NIT',
-      fecha_inscripcion: this.getFechaActualSistema(), 
-      periodo: 'Mensual', 
-      descuento: 'N/A',
-      color_primario: '#6366f1',
-      color_secundario: '#1e293b',
-      color_fondo: '#4c808a',
-      color_texto: '#f8fafc',
-      nombre_gerente: '',
-      apellido_gerente: '',
-      documento_gerente: ''
-    };
-    this.showModal = true;
+    this.abrirModalCrearEmpresa();
   }
   // Bloque para precargar los datos de una empresa existente para su edición
 
@@ -1722,7 +1722,7 @@ export class SaasAdminComponent implements OnInit {
       nit: empresa.nit,
       email: empresa.email || '',
       plan_suscripcion: empresa.plan_suscripcion || 'Emprendedor',
-      tipo_empresa: empresa.tipo_empresa === 'Ventas y Servicios' ? 'Mixto' : (empresa.tipo_empresa || 'Ventas'),
+      tipo_empresa: empresa.tipo_empresa || 'Ventas',
       tipo_identificacion: empresa.tipo_identificacion || 'NIT',
       fecha_inscripcion: empresa.fecha_inscripcion ? empresa.fecha_inscripcion.substring(0, 10) : '',
       periodo: empresa.periodo || 'Mensual',
@@ -1994,7 +1994,7 @@ export class SaasAdminComponent implements OnInit {
     this.isEditMode = false;
     this.editingId = null;
     this.listaDescuentosEmpresa = [];
-    this.nuevaEmpresa = { razon_social: '', dominio: '', nit: '', email: '', plan_suscripcion: 'Emprendedor', fecha_inscripcion: this.getFechaActualSistema(), periodo: 'Mensual', descuento: 'N/A', nombre_gerente: '', apellido_gerente: '', documento_gerente: '' };
+    this.nuevaEmpresa = this.getInitialNuevaEmpresa();
   }
   // Bloque para cerrar el modal de éxito con las credenciales generadas
 
@@ -2014,6 +2014,18 @@ export class SaasAdminComponent implements OnInit {
       : 'N/A';
 
     let payload = { ...this.nuevaEmpresa };
+
+    // Si no tiene dominio asignado, autogenerarlo a partir de la razón social
+    if (!payload.dominio || !payload.dominio.trim()) {
+      this.generarDominio();
+      payload.dominio = this.nuevaEmpresa.dominio;
+    }
+
+    // Normalizar Mixto a Ventas y Servicios
+    if (payload.tipo_empresa === 'Mixto') {
+      payload.tipo_empresa = 'Ventas y Servicios';
+    }
+
     if (!this.isEditMode) {
       payload.fecha_inscripcion = this.getFechaActualSistema();
     } else if (payload.fecha_inscripcion === '') {
@@ -2034,9 +2046,11 @@ export class SaasAdminComponent implements OnInit {
           
           if (err.error && err.error.errors) {
             const firstErrorField = Object.keys(err.error.errors)[0];
-            msg += ' ' + err.error.errors[firstErrorField][0];
+            msg = err.error.errors[firstErrorField][0];
           } else if (err.error && err.error.message) {
-            msg += ' ' + err.error.message;
+            msg = err.error.message;
+          } else if (err.error && err.error.error) {
+            msg = err.error.error;
           }
           
           this.toastService.error(msg);
@@ -2060,11 +2074,13 @@ export class SaasAdminComponent implements OnInit {
           
           if (err.error && err.error.errors) {
             const firstErrorField = Object.keys(err.error.errors)[0];
-            msg += ' ' + err.error.errors[firstErrorField][0];
+            msg = err.error.errors[firstErrorField][0];
           } else if (err.error && err.error.message) {
-            msg += ' ' + err.error.message;
+            msg = err.error.message;
+          } else if (err.error && err.error.error) {
+            msg = err.error.error;
           } else {
-            msg += ' Revisa los datos.';
+            msg += ' Revisa los datos ingresados.';
           }
           
           this.toastService.error(msg);

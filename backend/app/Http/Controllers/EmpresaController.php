@@ -244,6 +244,11 @@ class EmpresaController extends Controller
     // Bloque para registrar una nueva empresa y generar automáticamente su usuario gerente administrador
     public function store(Request $request)
     {
+        // Bloque de normalización del tipo de empresa si viene como Mixto
+        if ($request->input('tipo_empresa') === 'Mixto') {
+            $request->merge(['tipo_empresa' => 'Ventas y Servicios']);
+        }
+
         // Bloque de normalización de datos de la empresa y campos del gerente
         if ($request->filled('nombre_gerente') && !$request->filled('primer_nombre_gerente')) {
             $nombres = explode(' ', trim((string)$request->input('nombre_gerente')), 2);
@@ -264,7 +269,7 @@ class EmpresaController extends Controller
             'razon_social' => 'required|string|max:255',
             'dominio' => 'required|string|unique:empresa,dominio|max:255',
             'nit' => 'required|string|max:255|unique:empresa',
-            'tipo_empresa' => 'nullable|in:Servicios,Ventas,Ventas y Servicios',
+            'tipo_empresa' => 'nullable|in:Servicios,Ventas,Ventas y Servicios,Mixto',
             'plan_suscripcion' => 'nullable|in:Emprendedor,Pyme,Empresarial',
             'direccion' => 'nullable|string|max:255',
             'telefono' => 'nullable|string|max:255',
@@ -281,10 +286,29 @@ class EmpresaController extends Controller
             'primer_nombre_gerente' => 'required|string|max:255',
             'segundo_nombre_gerente' => 'nullable|string|max:255',
             'primer_apellido_gerente' => 'required|string|max:255',
-            'segundo_apellido_gerente' => 'required|string|max:255',
+            'segundo_apellido_gerente' => 'nullable|string|max:255',
             'tipo_documento_gerente' => 'nullable|string|max:50',
             'documento_gerente' => 'nullable|string|max:255',
+        ], [
+            'razon_social.required' => 'La razón social es obligatoria.',
+            'dominio.required' => 'El subdominio o ruta de la empresa es obligatorio.',
+            'dominio.unique' => 'Este subdominio ya está registrado. Por favor elija o autogenere otro.',
+            'nit.required' => 'El NIT o número de identificación es obligatorio.',
+            'nit.unique' => 'Ya existe una empresa registrada con este NIT.',
+            'tipo_empresa.in' => 'El tipo de empresa seleccionado no es válido.',
+            'email.email' => 'El correo electrónico no tiene un formato válido.',
+            'primer_nombre_gerente.required' => 'El primer nombre del gerente es obligatorio.',
+            'primer_apellido_gerente.required' => 'El primer apellido del gerente es obligatorio.',
         ]);
+
+        // Verificación preventiva de duplicidad de documento en usuarios
+        $docGerente = $request->input('documento_gerente') ?: $request->input('nit');
+        if ($docGerente && User::where('documento', $docGerente)->exists()) {
+            return response()->json([
+                'message' => 'El documento de identificación (' . $docGerente . ') ya está registrado para otro usuario.',
+                'errors' => ['documento_gerente' => ['El documento de identificación ya se encuentra registrado en el sistema.']]
+            ], 422);
+        }
 
         // Bloque de transacción de base de datos para creación atómica de empresa y gerente
         DB::beginTransaction();
@@ -441,7 +465,13 @@ class EmpresaController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => 'Error al crear la empresa.'], 500);
+            \Illuminate\Support\Facades\Log::error('Error al crear la empresa: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'error' => 'Error al crear la empresa.',
+                'message' => 'Ocurrió un error al guardar la empresa: ' . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -465,7 +495,7 @@ class EmpresaController extends Controller
             'razon_social' => 'required|string|max:255',
             'dominio' => ['required', 'string', 'max:255', Rule::unique('empresa')->ignore($empresa->id)],
             'nit' => ['required', 'string', 'max:255', Rule::unique('empresa')->ignore($empresa->id)],
-            'tipo_empresa' => 'nullable|in:Servicios,Ventas,Ventas y Servicios',
+            'tipo_empresa' => 'nullable|in:Servicios,Ventas,Ventas y Servicios,Mixto',
             'plan_suscripcion' => 'nullable|in:Emprendedor,Pyme,Empresarial',
             'direccion' => 'nullable|string|max:255',
             'telefono' => 'nullable|string|max:255',
